@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database name="default">
+    <table name="system_acl" phpName="Acl" idMethod="native">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+        <column name="object" type="VARCHAR" size="64" required="false"/>
+        <column name="target_type" type="INTEGER" required="false"/>
+        <column name="target_id" type="INTEGER" required="false"/>
+        <column name="sub" type="SMALLINT" required="false"/>
+        <column name="fields" type="LONGVARCHAR" required="false"/>
+        <column name="access" type="SMALLINT" required="false"/>
+        <column name="prio" type="INTEGER" required="false"/>
+        <column name="mode" type="SMALLINT" required="false"/>
+        <column name="constraint_type" type="SMALLINT" required="false"/>
+        <column name="constraint_code" type="LONGVARCHAR" required="false"/>
+        <index>
+            <index-column name="object"/>
+        </index>
+        <index>
+            <index-column name="target_id"/>
+        </index>
+        <index>
+            <index-column name="target_type"/>
+        </index>
+        <vendor type="mysql">
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="system_file" phpName="File">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+        <column name="path" type="VARCHAR" size="255"/>
+        <column name="hash" type="VARCHAR" size="64"/>
+        <column name="type" type="VARCHAR" size="16"/>
+        <column name="size" type="INTEGER"/>
+        <column name="created_time" type="BIGINT"/>
+        <column name="modified_time" type="BIGINT"/>
+        <column name="mount_point" type="VARCHAR" size="128"/>
+        <vendor type="mysql">
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="system_lock" phpName="Lock" idMethod="native">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="type" type="VARCHAR" size="64" required="false"/>
+        <column name="ckey" type="VARCHAR" size="255" required="false"/>
+        <column name="session_id" type="INTEGER" required="false"/>
+        <column name="time" type="INTEGER" required="false"/>
+        <index>
+            <index-column name="ckey"/>
+        </index>
+        <index>
+            <index-column name="session_id"/>
+        </index>
+        <index>
+            <index-column name="type"/>
+        </index>
+        <vendor type="mysql">
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="system_app_lock" phpName="AppLock" idMethod="native">
+        <column name="id" type="VARCHAR" size="255" primaryKey="true" required="true"/>
+        <column name="timeout" type="BIGINT" required="true"/>
+        <vendor type="mysql">
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="system_langs" phpName="Language">
+        <column name="code" type="VARCHAR" primaryKey="true"/>
+        <column name="title" type="VARCHAR"/>
+        <column name="langtitle" type="VARCHAR"/>
+        <column name="userdefined" type="BOOLEAN"/>
+        <column name="visible" type="BOOLEAN"/>
+        <vendor type="mysql">
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="system_session" phpName="Session" idMethod="native">
+        <column name="id" type="VARCHAR" size="255" primaryKey="true" required="true"/>
+        <column name="user_id" type="INTEGER" required="false"/>
+        <column name="time" type="INTEGER" required="true"/>
+        <column name="ip" type="VARCHAR" size="255" required="false"/>
+        <column name="useragent" type="VARCHAR" size="255" required="false"/>
+        <column name="language" type="VARCHAR" size="255" required="false"/>
+        <column name="page" type="VARCHAR" size="255" required="false"/>
+        <column name="refreshed" type="INTEGER" required="false"/>
+        <column name="extra" type="LONGVARCHAR" required="false"/>
+        <column name="created" type="INTEGER" required="false"/>
+        <foreign-key foreignTable="system_user" onDelete="cascade">
+            <reference local="user_id" foreign="id"/>
+        </foreign-key>
+        <vendor type="mysql">
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="system_content" phpName="Content" idMethod="native">
+        <index>
+            <index-column name="box_id"/>
+        </index>
+        <index>
+            <index-column name="hide"/>
+        </index>
+        <index>
+            <index-column name="node_id"/>
+        </index>
+        <behavior name="sortable" custom="true">
+            <parameter name="rank_column" value="sort"/>
+            <parameter name="use_scope" value="true"/>
+            <parameter name="scope_column" value="box_id"/>
+        </behavior>
+    </table>
+    <table name="system_log" phpName="Log" idMethod="native">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="request_id" type="VARCHAR" size="64" required="false"/>
+        <column name="date" type="DOUBLE" required="false"/>
+        <column name="level" type="VARCHAR" required="false"/>
+        <column name="message" type="LONGVARCHAR" required="false"/>
+        <foreign-key foreignTable="system_log_request">
+            <reference foreign="id" local="request_id"/>
+        </foreign-key>
+        <vendor type="mysql">
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="system_log_request" phpName="LogRequest" idMethod="native">
+        <column name="id" type="VARCHAR" size="64" primaryKey="true"/>
+        <column name="date" type="DOUBLE" required="false"/>
+        <column name="username" type="VARCHAR" size="64" required="false"/>
+        <column name="path" type="VARCHAR" size="255" required="false"/>
+        <column name="ip" type="VARCHAR" size="32" required="false"/>
+        <column name="counts" type="LONGVARCHAR" required="false"/>
+        <column name="profile_token" type="VARCHAR" size="32" required="false"/>
+        <vendor type="mysql">
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    
+</database>

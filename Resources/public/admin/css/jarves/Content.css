@@ -1,0 +1,189 @@
+.jarves-content {
+    min-height: 15px;
+    position: relative;
+}
+
+.jarves-editor-dragMode .jarves-content:hover {
+    outline: 0;
+    background-color: transparent;
+}
+
+.jarves-content-onDrag {
+    position: absolute;
+    cursor: move;
+}
+
+.jarves-content-onDrag .jarves-content-inner {
+    cursor: move;
+}
+
+.jarves-content-text.mce-edit-focus {
+    outline: 0;
+}
+
+.jarves-content-actionBar {
+    min-height: 25px;
+    min-width: 50px;
+    background-color: white;
+    border-bottom: 0px;
+    padding: 0 5px;
+    line-height: 25px;
+    position: absolute;
+    left: 3px;
+    top: -27px;
+    display: none;
+}
+
+.jarves-content:hover .jarves-content-actionBar {
+    display: block;
+    border: 1px solid #ababb5;
+    border-bottom: 0px;
+}
+
+.jarves-content-selected .jarves-content-actionBar,
+.jarves-content-selected:hover .jarves-content-actionBar {
+    display: block;
+    border: 1px solid #22638E;
+    border-bottom: 0px;
+}
+
+.jarves-content-actionBar a:link {
+    color: black;
+    font-size: 14px;
+    text-decoration: none;
+    line-height: 25px;
+    padding: 0 5px;
+}
+
+.jarves-content:hover {
+    outline: 1px solid #ababb5;
+}
+
+.jarves-content-selected,
+.jarves-content-selected:hover {
+    outline: 1px solid #22638E;
+    box-shadow: 0 0 1px #fff;
+}
+
+.jarves-content-actionBar a:hover {
+    color: #444;
+}
+
+.jarves-content-plugin {
+    position: relative;
+}
+
+.jarves-content-text:focus {
+    outline: 0;
+}
+
+.jarves-content-inner {
+    background: #22638E;
+    padding: 5px;
+    color: white;
+    padding-right: 40px;
+    text-shadow: 0 1px 0 #333;
+    cursor: pointer;
+    min-height: 25px;
+}
+
+.jarves-content-plugin {
+    border: 1px solid #6C8FA8;
+}
+
+.jarves-content-selected .jarves-content-plugin,
+.jarves-content:hover .jarves-content-plugin {
+    border: 1px solid white;
+}
+
+.jarves-content-selected .jarves-content-inner {
+    background: #25567e;
+}
+
+.jarves-content-inner-icon {
+    position: absolute;
+    right: 6px;
+    top: 4px;
+    font-size: 24px;
+    color: white;
+    text-shadow: 1px 1px 0px #6F6F6F;
+}
+
+.jarves-content-inner-title {
+    font-weight: bold;
+}
+
+.jarves-content-inner-subtitle {
+}
+
+.jarves-content-plugin-options {
+    display: none;
+}
+
+.jarves-content-plugin:hover .jarves-content-plugin-options {
+    display: block;
+}
+
+.jarves-content-actionBar-move {
+    cursor: move;
+}
+
+.jarves-content-html-toolbarContainer {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.jarves-content-markdown textarea {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    font-family: monospace, sans-serif;
+    text-indent: 0;
+}
+
+.jarves-content-markdown textarea:focus {
+    outline: 0;
+    border-color: transparent;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+
+.jarves-content-text-wysiwyg-toolbar {
+    position: relative;
+    height: 30px;
+    overflow: hidden;
+}
+
+.jarves-content-text-wysiwyg-toolbar:hover {
+    overflow: visible;
+    z-index: 10000000;
+}
+
+.mce-tooltip {
+    pointer-events: none;
+}
+
+.jarves-content-text-wysiwyg-toolbar .mce-btn-group .mce-btn {
+    border: 0;
+}
+
+.jarves-content-text-wysiwyg-toolbar .mce-btn-small button {
+    padding: 5px;
+}
+
+.jarves-content-text-wysiwyg-toolbar .mce-flow-layout-item {
+    margin: 0;
+}
+
+.jarves-content-text-wysiwyg-toolbar .mce-menubtn.mce-fixed-width.mce-btn-small span {
+    width: auto;
+    margin-right: 15px;
+}
+
+.jarves-Content-inspector-window {
+    position: absolute;
+    width: 250px;
+    min-height: 50px;
+    border: 5px solid #222;
+}

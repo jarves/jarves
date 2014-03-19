@@ -1,0 +1,25 @@
+.jarves-FileUploader-smallProgressBar {
+    float: right;
+    color: #E2E2E2;
+    position: relative;
+    font-size: 12px;
+    line-height: 23px;
+    top: 29px;
+    padding-right: 15px;
+    cursor: pointer;
+}
+
+.jarves-FileUploader-smallProgressBar:hover {
+    color: white;
+}
+
+.jarves-FilesUpload-topBar {
+    position: relative;
+    text-align: right;
+    border-bottom: 1px dashed #DDD;
+    padding-bottom: 15px;
+}
+
+.jarves-FilesUpload-topBarLeft {
+    float: left;
+}

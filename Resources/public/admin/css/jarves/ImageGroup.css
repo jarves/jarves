@@ -1,0 +1,35 @@
+.kwindow-win-imageTabWrapper {
+    width: 75px;
+    height: 100px;
+}
+
+.jarves-imageGroup .kwindow-win-tabWrapper {
+    background-color: #eaeaea;
+    padding: 18px 7px 2px;
+}
+
+.jarves-imageGroup .kwindow-win-imageTabWrapper:hover {
+    background-color: #ddd;
+}
+
+.jarves-imageGroup .buttonHover {
+    background-color: #d7d7d7;
+}
+
+.jarves-imageGroup .kwindow-win-tabWrapperFirst {
+    -moz-border-radius-bottomleft: 4px;
+}
+
+.jarves-imageGroup .kwindow-win-tabWrapperLast {
+    -moz-border-radius-bottomright: 4px;
+}
+
+.jarves-imageGroup {
+    padding-top: 20px;
+}
+
+.jarves-field-imageGroup a {
+    background-repeat: no-repeat;
+    background-position: center 1px;
+    cursor: pointer;
+}

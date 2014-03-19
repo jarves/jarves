@@ -1,0 +1,14 @@
+a.extensionmanager-category-line,
+a.extensionmanager-category-line:link {
+    font-weight: bold;
+    padding: 4px;
+    display: block;
+    color: #444;
+    text-decoration: none;
+    border-bottom: 1px dotted silver;
+}
+
+a.extensionmanager-category-line:hover {
+    border-bottom: 1px solid gray;
+    color: #222;
+}

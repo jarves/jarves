@@ -1,0 +1,228 @@
+parameters:
+     jarves.core.class: Jarves\Jarves
+     jarves.objects.class: Jarves\Objects
+     jarves.cache.fast.factory.class: Jarves\Cache\Factory
+     jarves.cache.fast.class: Jarves\Cache\AbstractCache
+     jarves.content.render.class: Jarves\ContentRender
+     jarves.routes.loader: Jarves\Router\FrontendLoader
+     jarves.rest.routing_loader.class: Jarves\Router\RestApiLoader
+
+     jarves.acl.class: Jarves\ACL
+
+     jarves.navigation.class: Jarves\Navigation
+     jarves.stopwatch.class: Jarves\StopwatchHelper
+     jarves.translator.class: Jarves\Translation\Translator
+
+     jarves.pluginResponse.listener.class: Jarves\EventListener\PluginResponseListener
+     jarves.paramFetcher.listener.class: Jarves\EventListener\ParamFetcherListener
+     jarves.securityFirewall.listener.class: Jarves\EventListener\SecurityFirewallListener
+     jarves.restException.listener.class: Jarves\EventListener\RestExceptionListener
+     jarves.viewResponse.listener.class: Jarves\EventListener\ViewResponseListener
+     jarves.frontendRoutes.listener.class: Jarves\EventListener\FrontendRouteListener
+     jarves.debugger.subscriber.class: Jarves\EventListener\DebuggerSubscriber
+     jarves.latencyMonitor.subscriber.class: Jarves\EventListener\LatencyMonitorSubscriber
+
+     jarves.page.response.class: Jarves\PageResponse
+     jarves.logger.handler.class: Jarves\Logger\JarvesHandler
+
+     jarves.filesystem.local.class: Jarves\Filesystem\Filesystem
+     jarves.filesystem.cache.class: Jarves\Filesystem\Filesystem
+     jarves.filesystem.web.class: Jarves\Filesystem\WebFilesystem
+     jarves.filesystem.adapter.local.class: Jarves\Filesystem\Adapter\Local
+
+     jarves.model.builder.class: Jarves\ORM\Builder\Builder
+     jarves.model.builder.propel.class: Jarves\ORM\Builder\Propel
+
+#     jarves.configuration.class: Jarves\Configuration\SystemConfig
+     jarves.configuration.database.class: Jarves\Configuration\Database
+
+     jarves.configuration.database.connection.main.class: Jarves\Configuration\Connection
+
+     jarves.asset_handler.scss.class: Jarves\AssetHandler\ScssHandler
+     jarves.asset_handler.css.class: Jarves\AssetHandler\CssHandler
+     jarves.asset_handler.js.class: Jarves\AssetHandler\JsHandler
+     jarves.asset_handler.container.class: Jarves\AssetHandler\Container
+
+     database_table_prefix: jarves_
+     jarves_admin_prefix: /jarves
+
+services:
+     jarves:
+         class: %jarves.core.class%
+         arguments: ["@service_container"]
+
+     jarves.objects:
+         class: %jarves.objects.class%
+         arguments: ["@jarves"]
+
+     jarves.cache.fast:
+         class: %jarves.cache.fast.class%
+         factory_class: %jarves.cache.fast.factory.class%
+         factory_method: createFast
+         arguments: ["@jarves"]
+
+     jarves.page.response:
+         class: %jarves.page.response.class%
+         calls:
+            - [setJarves, ["@jarves"]]
+            - [setStopwatch, ["@jarves.stopwatch"]]
+
+     jarves.content.render:
+         class: %jarves.content.render.class%
+         arguments: ["@jarves", "@jarves.stopwatch"]
+#
+#     jarves.configuration:
+#         class: %jarves.configuration.class%
+#         calls:
+#            - [setDatabase, ["@jarves.configuration.database"]]
+#            - [setJarves, ["@jarves"]]
+
+     jarves.configuration.database:
+         class: %jarves.configuration.database.class%
+         calls:
+            - [addConnection, ["@jarves.configuration.database.connection.main"]]
+            - [setPrefix, ["%database_table_prefix%"]]
+
+     jarves.configuration.database.connection.main:
+         class: %jarves.configuration.database.connection.main.class%
+         calls:
+            - [setType, ["%database_driver%"]]
+            - [setServer, ["%database_host%"]]
+            - [setPort, ["%database_port%"]]
+            - [setName, ["%database_name%"]]
+            - [setUsername, ["%database_user%"]]
+            - [setPassword, ["%database_password%"]]
+
+     jarves.filesystem.adapter.local:
+         class: %jarves.filesystem.adapter.local.class%
+         arguments: ["/"]
+         calls:
+             - [setRoot, ["%kernel.root_dir%/.."]]
+
+     jarves.filesystem.adapter.cache:
+         class: %jarves.filesystem.adapter.local.class%
+         arguments: ["/"]
+         calls:
+             - [setRoot, ["%kernel.cache_dir%"]]
+
+     jarves.filesystem.local:
+         class: %jarves.filesystem.local.class%
+         calls:
+            - [setAdapter, ["@jarves.filesystem.adapter.local"]]
+
+     jarves.filesystem.cache:
+         class: %jarves.filesystem.cache.class%
+         calls:
+            - [setAdapter, ["@jarves.filesystem.adapter.cache"]]
+
+     jarves.filesystem.web:
+         class: %jarves.filesystem.web.class%
+         arguments: ["@jarves"]
+
+     jarves.navigation:
+         class: %jarves.navigation.class%
+         arguments: ["@jarves"]
+
+     jarves.pluginResponse.listener:
+        class: %jarves.pluginResponse.listener.class%
+        arguments: ["@jarves", "@jarves.frontendRoutes.listener"]
+        tags:
+            - { name: kernel.event_listener, event: kernel.response }
+            - { name: kernel.event_listener, event: kernel.view }
+
+     jarves.paramFetcher.listener:
+        class: %jarves.paramFetcher.listener.class%
+        arguments: ["@service_container"]
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, prioarity: 6 }
+
+     jarves.viewResponse.listener:
+        class: %jarves.viewResponse.listener.class%
+        arguments: ["@service_container"]
+        tags:
+            - { name: kernel.event_listener, event: kernel.view, priority: 101 }
+            - { name: kernel.event_listener, event: kernel.controller, priority: -9 }
+
+     jarves.frontendRoutes.listener:
+        class: %jarves.frontendRoutes.listener.class%
+        arguments: ["@jarves"]
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, priority: 33 }
+
+     jarves.securityFirewall.listener:
+        class: %jarves.securityFirewall.listener.class%
+        arguments: ["@service_container"]
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, priority: 21 }
+
+     jarves.restException.listener:
+        class: %jarves.restException.listener.class%
+        arguments: ["@service_container"]
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception}
+
+     jarves.latencyMonitor.subscriber:
+        class: %jarves.latencyMonitor.subscriber.class%
+        arguments: ["@jarves"]
+        tags:
+            - { name: kernel.event_subscriber }
+
+     jarves.debugger.subscriber:
+        class: %jarves.debugger.subscriber.class%
+        arguments: ["@jarves", "@jarves.logger.handler"]
+        tags:
+            - { name: kernel.event_subscriber }
+
+     jarves.translator:
+        class: %jarves.translator.class%
+        arguments: ["@jarves"]
+
+     jarves.stopwatch:
+        class: %jarves.stopwatch.class%
+        arguments: ["@?debug.stopwatch"]
+
+     jarves.acl:
+        class: %jarves.acl.class%
+        arguments: ["@jarves", "@jarves.objects"]
+
+     jarves.logger.handler:
+        class: %jarves.logger.handler.class%
+        arguments: ["@jarves"]
+        
+     jarves.rest.routing_loader:
+        class: %jarves.rest.routing_loader.class%
+        arguments: ["@jarves"]
+        tags:
+            - { name: routing.loader }
+
+     jarves.model.builder:
+        class: %jarves.model.builder.class%
+        arguments: ["@jarves"]
+
+     jarves.model.builder.propel:
+        class: %jarves.model.builder.propel.class%
+        arguments: [@jarves.filesystem.local, @jarves.objects, @kernel]
+        tags:
+            - { name: jarves.model.builder, alias: propel }
+
+     jarves.asset_handler.container:
+        arguments: ["@service_container"]
+        class: %jarves.asset_handler.container.class%
+
+     jarves.asset_handler.scss:
+        class: %jarves.asset_handler.scss.class%
+        arguments: ["@jarves"]
+        tags:
+            - { name: jarves.asset_handler.compiler, extension: scss }
+
+     jarves.asset_handler.css:
+        class: %jarves.asset_handler.css.class%
+        arguments: ["@jarves"]
+        tags:
+            - { name: jarves.asset_handler.loader, contentType: 'text/css', extension: css }
+
+     jarves.asset_handler.js:
+        class: %jarves.asset_handler.js.class%
+        arguments: ["@jarves"]
+        tags:
+            - { name: jarves.asset_handler.loader, contentType: 'text/javascript', extension: js }

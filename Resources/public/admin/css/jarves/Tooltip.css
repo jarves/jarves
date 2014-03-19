@@ -1,0 +1,58 @@
+.jarves-tooltip {
+    position: absolute;
+    /*
+  width: 120px;
+ */
+    height: 25px;
+    z-index: 5000000;
+    white-space: nowrap;
+}
+
+.jarves-tooltip-bg {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 25px;
+    background-color: #444;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.jarves-tooltip-loader {
+    margin-top: 1px;
+    margin-right: 7px;
+}
+
+.jarves-tooltip-corner, .jarves-tooltip-corner-top, .jarves-tooltip-corner-left {
+
+    width: 0px;
+    height: 0px;
+
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 7px solid #444;
+
+    position: absolute;
+    left: 25px;
+    bottom: -6px;
+}
+
+.jarves-tooltip-corner-top {
+    background-image: url(../images/jarves-tooltip-corner-top.png);
+    bottom: 17px;
+}
+
+.jarves-tooltip-corner-left {
+    background-image: url(../images/jarves-tooltip-corner-left.png);
+    bottom: 5px;
+    left: -18px;
+}
+
+.jarves-tooltip-text {
+    padding: 5px 8px;
+    color: #eee;
+    line-height: 15px;
+    position: relative;
+}

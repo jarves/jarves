@@ -1,0 +1,119 @@
+.jarves-ui-ImageCrop {
+}
+
+.jarves-ui-ImageCrop-overlay {
+    position: absolute;
+    background-color: #222;
+}
+
+.jarves-ui-ImageCrop-overlayTop {
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.jarves-ui-ImageCrop-overlayRight {
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.jarves-ui-ImageCrop-overlayBottom {
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+.jarves-ui-ImageCrop-overlayLeft {
+    top: 0;
+    left: 0;
+    bottom: 0;
+}
+
+.jarves-ui-ImageCrop-window {
+    position: absolute;
+    cursor: move;
+    width: 300px;
+    height: 200px;
+    outline: 1px dashed #ddd;
+}
+
+.jarves-ui-ImageCrop-sizer {
+    position: absolute;
+}
+
+.jarves-ui-ImageCrop-sizer-n {
+    top: 0;
+    height: 10px;
+    left: 0;
+    right: 0;
+    cursor: n-resize;
+}
+
+.jarves-ui-ImageCrop-sizer-s {
+    bottom: 0;
+    height: 10px;
+    left: 0;
+    right: 0;
+    cursor: s-resize;
+}
+
+.jarves-ui-ImageCrop-sizer-e {
+    top: 0;
+    width: 10px;
+    bottom: 0;
+    right: 0;
+    cursor: e-resize;
+}
+
+.jarves-ui-ImageCrop-sizer-w {
+    top: 0;
+    width: 10px;
+    bottom: 0;
+    left: 0;
+    cursor: w-resize;
+}
+
+/*
+'n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'
+*/
+.jarves-ui-ImageCrop-sizer-ne,
+.jarves-ui-ImageCrop-sizer-se,
+.jarves-ui-ImageCrop-sizer-sw,
+.jarves-ui-ImageCrop-sizer-nw {
+    background-color: white;
+    width: 10px;
+    height: 10px;
+}
+
+.jarves-ui-ImageCrop-sizer-ne {
+    top: -1px;
+    right: -1px;
+    cursor: ne-resize;
+    border-left: 1px dotted silver;
+    border-bottom: 1px dotted silver;
+}
+
+.jarves-ui-ImageCrop-sizer-se {
+    bottom: -1px;
+    right: -1px;
+    cursor: se-resize;
+    border-left: 1px dotted silver;
+    border-top: 1px dotted silver;
+}
+
+.jarves-ui-ImageCrop-sizer-sw {
+    bottom: -1px;
+    left: -1px;
+    cursor: sw-resize;
+    border-right: 1px dotted silver;
+    border-top: 1px dotted silver;
+}
+
+.jarves-ui-ImageCrop-sizer-nw {
+    top: -1px;
+    left: -1px;
+    cursor: nw-resize;
+    border-right: 1px dotted silver;
+    border-bottom: 1px dotted silver;
+}

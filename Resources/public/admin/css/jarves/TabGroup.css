@@ -1,0 +1,51 @@
+.jarves-tabGroup,
+.jarves-tabGroup-small {
+    position: relative;
+    white-space: nowrap;
+    background-color: #E4E4E4;
+    padding-bottom: 0;
+    overflow: hidden;
+}
+
+.jarves-tabGroup:first-child,
+.jarves-tabGroup-small:first-child {
+    margin-left: 0;
+    border-left: 1px solid #c9c9c9;
+}
+
+a.jarves-tabGroup-item {
+    text-decoration: none;
+    color: #424242;
+    display: inline-block;
+    padding: 0 10px;
+    min-width: 20px;
+    cursor: default;
+    line-height: 42px;
+    height: 42px;
+    font-size: 15px;
+    border-right: 1px solid #c9c9c9;
+    background-color: #E4E4E4;
+}
+
+.jarves-tabGroup-item-with-image:before {
+    margin-right: 5px;
+    text-shadow: 0px 1px 0px white;
+}
+
+.jarves-tabGroup-item img,
+.jarves-tabGroup-item:link img {
+    position: relative;
+    top: 1px;
+    height: 12px;
+}
+
+a.jarves-tabGroup-item:hover {
+    color: #222;
+    background-color: #f1f1f1;
+}
+
+a.jarves-tabGroup-item-active,
+a.jarves-tabGroup-item-active:hover  {
+    position: relative;
+    background-color: #f9f9f9;
+}

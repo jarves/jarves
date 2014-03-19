@@ -1,0 +1,580 @@
+@import "../bourbon/bourbon";
+
+.jarves-Files-wrapper {
+  margin: 5px 15px;
+}
+
+.jarves-Files-wrapper-fixed {
+  margin: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.jarves-Files-wrapper-header {
+
+}
+
+.jarves-Files-body {
+  margin-top: 18px;
+}
+
+.jarves-Files-wrapper-fixed .jarves-Files-body {
+  margin: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.jarves-Files-with-own-header .jarves-Files-body {
+  top: 55px;
+}
+
+.jarves-Files-infos + .jarves-Splitter-main {
+  right: -16px;
+  width: 15px;
+  border: 0;
+}
+
+.jarves-Files-addressFaker-container {
+  margin-right: 30px;
+  display: block;
+}
+
+div.jarves-Files-addressFaker {
+  line-height: 30px;
+  height: 30px;
+  cursor: text;
+  border-right: 1px solid #e9e6e6;
+}
+
+div.jarves-Files-addressFaker + .jarves-buttonGroup-item,
+div.jarves-Files-addressFaker + .jarves-buttonGroup-item + .jarves-buttonGroup-item {
+  border-top: 1px solid #cecece;
+  border-right: 1px solid #cecece;
+  border-left: 1px solid #ececec;
+  box-shadow: none;
+  position: relative;
+  left: -66px;
+  line-height: 29px;
+}
+
+div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
+  left: -65px;
+}
+
+.jarves-Files-addressFaker > a,
+.jarves-Files-addressFaker > a:link {
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.jarves-Files-addressFaker-asFile > a:last-child:after {
+  display: none;
+}
+
+.jarves-Files-addressFaker > a:after {
+  content: '/';
+  padding-left: 3px;
+}
+
+.jarves-Files-addressFaker > a:hover {
+  background-color: silver;
+}
+
+.jarves-Files-actionBar {
+  height: 31px;
+}
+
+.jarves-Files-actionBar-addressPos {
+  position: absolute;
+  left: 396px;
+  top: 0px;
+  right: 144px;
+  height: 16px;
+}
+
+.jarves-Files-fileContainer-bg {
+}
+
+.jarves-Files-fileContainer {
+  position: relative;
+  cursor: default;
+  padding: 2px 15px;
+  border-bottom: 0;
+}
+
+.jarves-Files-fileContainer-fixed {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 31px;
+}
+
+.jarves-Files-fileContainer-iframe,
+.jarves-Files-fileContainer-editor {
+  padding: 0;
+  overflow: hidden;
+}
+
+.jarves-Files-fileContainer-editor .jarves-Field-Codemirror,
+.jarves-Files-fileContainer-editor .CodeMirror,
+.jarves-Files-fileContainer-editor .CodeMirror-gutters {
+  border: 0;
+  background-color: transparent;
+}
+
+.jarves-Files-status-bar {
+  margin-top: 30px;
+  height: 30px;
+  line-height: 30px;
+  color: #636363;
+  text-align: center;
+  font-size: 12px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.jarves-Files-status-bar-fixed {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin-top: 0px;
+}
+
+.jarves-Files-status-bar-loader {
+  position: absolute;
+  right: 5px;
+  top: 6px;
+}
+
+.jarves-Files-fileContainer-selected {
+  border: 2px solid #ff8;
+  padding: 1px 14px;
+}
+
+.jarves-Files-preview {
+  z-index: 120000;
+  position: absolute;
+  width: 600px;
+  text-align: center;
+  background-color: #333;
+  border: 1px solid #111;
+  box-shadow: 0px 0px 5px silver;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+}
+
+.jarves-Files-preview-inner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.jarves-Files-preview img {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.jarves-Files-infos {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+  padding-top: 15px;
+  border-right: 1px solid #e0e0e0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.jarves-Files-infos a {
+  display: block;
+  padding-left: 15px;
+  cursor: default;
+  display: block;
+
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  border-radius: 0px;
+
+  line-height: 27px;
+  color: #eee;
+}
+
+.jarves-Files-infos a:before {
+  padding-right: 9px;
+  color: #eee;
+  text-shadow: 1px 0 0 white;
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+.jarves-Files-infos a:hover {
+  background-color: #F8F8F8;
+}
+
+.jarves-Files-infos a.jarves-Files-item-selected {
+  background-color: #22638E;
+}
+
+.jarves-Files-infos a.jarves-Files-item-selected,
+.jarves-Files-infos a.jarves-Files-item-selected:before {
+  color: white;
+}
+
+.jarves-Files-uploadPane {
+  position: absolute;
+  top: 52px;
+  right: 30px;
+  left: 30px;
+  height: 150px;
+  background-color: white;
+  border: 1px solid silver;
+}
+
+.jarves-Files-seperator {
+  clear: left;
+  border-bottom: 1px solid #eee;
+  margin: 4px 5px 4px 5px;
+  padding-left: 5px;
+  font-weight: bold;
+}
+
+/* context */
+.jarves-Files-context {
+  width: 145px;
+  border: 1px solid #ccc;
+  border-right: 1px solid #aaa;
+  border-bottom: 1px solid #aaa;
+  padding: 1px;
+  position: absolute;
+  z-index: 150000;
+  box-shadow: 0px 0px 1px #ccc;
+  -moz-border-radius: 5px;
+  box-shadow: 1px 1px 2px #CCCCCC;
+  -moz-box-shadow: 1px 1px 2px #CCCCCC;
+  background-color: #f0f0f0;
+}
+
+.jarves-Files-context a,
+.jarves-Files-context a:link {
+  text-decoration: none;
+  display: block;
+  padding: 3px 10px 3px 20px;
+  margin: 1px 0px 1px 0px;
+  cursor: default;
+  color: #333;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.jarves-Files-context a.delimiter {
+  border-top: 1px solid gray;
+}
+
+.jarves-Files-context a:hover {
+  background-color: #656465;
+  color: white;
+}
+
+.jarves-Files-context a.notactive:hover {
+  background-color: transparent;
+  color: silver;
+}
+
+.jarves-Files-context a.notactive {
+  color: silver;
+}
+
+/* files items */
+.jarves-Files-fileContainer .jarves-Files-item {
+  display: inline-block;
+  width: 120px;
+  margin: 10px 5px;
+  position: relative;
+  text-align: center;
+  cursor: default;
+  vertical-align: middle;
+
+  @include animation(kaFilesFadeIn 0.4s);
+}
+
+@include keyframes(kaFilesFadeIn) {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.jarves-Files-item-title-dimensions {
+  color: #5A86B2;
+  color: #999;
+  font-size: 11px;
+}
+
+.jarves-Files-item-selected .jarves-Files-item-title-dimensions,
+.jarves-Files-item-drag-selected .jarves-Files-item-title-dimensions {
+  color: white;
+}
+
+.jarves-Files-item:hover div.jarves-Files-item-title,
+.jarves-Files-item-miniatur:hover .jarves-Files-item-miniatur-name {
+  background-color: #eee;
+  color: #333;
+}
+
+.jarves-Files-item-title {
+  position: relative;
+  color: #444;
+  padding: 0px 4px 1px 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  cursor: default;
+  margin-top: 10px;
+  word-wrap: break-word;
+}
+
+.jarves-Files-selector {
+  background-color: #ccc;
+  border: 1px solid #aaa;
+  position: absolute;
+  z-index: 150000;
+}
+
+.jarves-Files-item-drag-selected div.jarves-Files-item-title,
+.jarves-Files-item-drag-selected:hover div.jarves-Files-item-title,
+.jarves-Files-item-drag-selected:hover .jarves-Files-item-miniatur-name,
+.jarves-Files-item-drag-selected .jarves-Files-item-miniatur-name,
+.jarves-Files-item-selected div.jarves-Files-item-title,
+.jarves-Files-item-selected:hover div.jarves-Files-item-title,
+.jarves-Files-item-selected:hover .jarves-Files-item-miniatur-name,
+.jarves-Files-item-selected .jarves-Files-item-miniatur-name,
+{
+  background-color: #22638E; /* 0%, #22638E*/
+  color: white;
+}
+
+.jarves-Files-item-selected,
+.jarves-Files-item-drag-selected {
+  background-color: #ddd;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+
+/* listType: miniatur */
+.jarves-Files-item-miniatur {
+  width: 120px;
+  border: 1px solid silver;
+  height: 70px;
+  background-color: #eee;
+  display: inline-block;
+  margin: 10px;
+  margin-bottom: 25px;
+  position: relative;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.jarves-Files-fileContainer .jarves-Table-hover > div > .jarves-Table-body > tr.jarves-Files-item-selected:hover > td,
+.jarves-Files-fileContainer .jarves-Table-body > tr.jarves-Files-item-selected > td {
+  background-color: #aaa;
+}
+
+.jarves-Files-fileContainer tr td {
+  cursor: default;
+}
+
+.jarves-Files-item-miniatur.jarves-Files-item-selected {
+  border: 1px solid gray;
+  background-color: #ddd;
+}
+
+.jarves-Files-item-miniatur-name {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  position: absolute;
+  top: 75px;
+  left: 0px;
+  right: 0px;
+  line-height: 15px;
+  font-size: 11px;
+  text-align: center;
+  padding: 0px 2px 0px 2px;
+}
+
+.jarves-file-uploadtable td {
+  border-bottom: 1px dashed silver;
+  padding: 6px;
+}
+
+table.jarves-files-search-table td {
+  border-bottom: 1px solid #d3d3d3;
+  padding: 1px;
+}
+
+table.jarves-files-search-table tr:hover td {
+  background-color: #e5e5e5;
+}
+
+.jarves-Files-fileContainer .jarves-Files-item .jarves-Files-item-icon {
+  font-size: 38px;
+  height: 40px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  color: #22638E;
+  text-shadow: 1px 0 0 white;
+}
+
+.jarves-Files-listtype-miniatur .jarves-Files-item {
+  width: 210px;
+}
+
+.jarves-Files-listtype-miniatur .jarves-Files-item .jarves-Files-item-icon {
+  font-size: 150px;
+  height: 190px;
+  width: 210px;
+  line-height: 160px;
+  vertical-align: middle;
+}
+
+.jarves-Files-item-icon img {
+  box-shadow: 0 0 9px #DDD;
+  vertical-align: middle;
+  padding: 5px;
+  top: -7px;
+  position: relative;
+  border-radius: 2px;
+}
+
+/*
+.jarves-Files-infos .jarves-objectTree-item-hover,
+.jarves-Files-infos .jarves-objectTree-item-hover:link,
+.jarves-Files-infos .jarves-objectTree-item-selectable:hover {
+    color: #eee;
+    background-color: rgba(47, 140, 189, 0.3);
+}
+
+.jarves-Files-infos .jarves-objectTree-item,
+.jarves-Files-infos .jarves-objectTree-drag-box {
+    color: white;
+}*/
+
+.jarves-Files-fileOptionsBar {
+  display: none;
+  border-top: 1px solid #808080;
+}
+
+.jarves-Files-sidebar-more-information {
+  color: white;
+}
+
+.jarves-Files-sidebar-more-information-title {
+  padding: 5px;
+  font-weight: normal;
+  font-family: "Open Sans";
+  margin-top: 5px;
+  word-wrap: break-word;
+}
+
+.jarves-Files-sidebar-more-information-title:before {
+  margin-right: 5px;
+}
+
+.jarves-Files-sidebar-more-information .jarves-Table {
+  border: 0;
+  background-color: transparent;
+  font-size: 11px;
+}
+
+.jarves-Files-sidebar-more-information .jarves-Table > thead {
+  display: none;
+}
+
+.jarves-Files-render-image {
+  margin: auto;
+  position: relative;
+  /*-webkit-transition: all 0.3s ease-out;*/
+  /*-moz-transition: all 0.3s ease-out;*/
+  /*-o-transition: all 0.3s ease-out;*/
+  /*transition: all 0.3s ease-out;*/
+}
+
+.jarves-Files-imageContainer {
+  bottom: 41px;
+}
+
+.jarves-Files-imageContainer > div > table td {
+  vertical-align: middle;
+  text-align: center;
+}
+
+.jarves-Files-imageContainer > div {
+  overflow: auto;
+}
+
+.jarves-Files-render-image > img,
+.jarves-Files-render-image > canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.jarves-Files-render-image .jarves-progress {
+  position: absolute;
+  top: 40%;
+  left: 50px;
+  right: 50px;
+}
+
+.jarves-Files-render-statusBar-right {
+  float: right;
+  margin-right: 30px;
+}
+
+.jarves-Files-render-statusBar-middle {
+  margin: auto;
+  text-align: center;
+}
+
+.jarves-Files-render-statusBar-left {
+  float: left;
+  margin-left: 15px;
+}
+
+.jarves-Files-statusBar-image {
+  -webkit-transition: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  -o-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+
+  height: 40px;
+  line-height: 40px;
+}
+
+.jarves-Files-statusBar-image > div {
+  padding-top: 5px;
+}
+
+.jarves-Files-iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}

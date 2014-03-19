@@ -1,0 +1,36 @@
+@font-face {
+    font-family: 'Open Sans Condensed';
+    src: url('open-sans-condensed/CondensedBold/OpenSans-CondBold-webfont.eot');
+    src: url('open-sans-condensed/CondensedBold/OpenSans-CondBold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('open-sans-condensed/CondensedBold/OpenSans-CondBold-webfont.woff') format('woff'),
+         url('open-sans-condensed/CondensedBold/OpenSans-CondBold-webfont.ttf') format('truetype'),
+         url('open-sans-condensed/CondensedBold/OpenSans-CondBold-webfont.svg#open_sans_condensedbold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: 'Open Sans Condensed';
+    src: url('open-sans-condensed/CondensedLight/OpenSans-CondLight-webfont.eot');
+    src: url('open-sans-condensed/CondensedLight/OpenSans-CondLight-webfont.eot?#iefix') format('embedded-opentype'),
+         url('open-sans-condensed/CondensedLight/OpenSans-CondLight-webfont.woff') format('woff'),
+         url('open-sans-condensed/CondensedLight/OpenSans-CondLight-webfont.ttf') format('truetype'),
+         url('open-sans-condensed/CondensedLight/OpenSans-CondLight-webfont.svg#open_sanscondensed_light') format('svg');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Open Sans Condensed';
+    src: url('open-sans-condensed/CondensedLightItalic/OpenSans-CondLightItalic-webfont.eot');
+    src: url('open-sans-condensed/CondensedLightItalic/OpenSans-CondLightItalic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('open-sans-condensed/CondensedLightItalic/OpenSans-CondLightItalic-webfont.woff') format('woff'),
+         url('open-sans-condensed/CondensedLightItalic/OpenSans-CondLightItalic-webfont.ttf') format('truetype'),
+         url('open-sans-condensed/CondensedLightItalic/OpenSans-CondLightItalic-webfont.svg#open_sansCnLtIt') format('svg');
+    font-weight: 300;
+    font-style: italic;
+}
+
+
+

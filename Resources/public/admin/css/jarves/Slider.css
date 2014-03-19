@@ -1,0 +1,35 @@
+.jarves-Slider {
+    display: inline-block;
+    line-height: 30px;
+
+    cursor: default;
+    position: relative;
+
+    overflow: hidden;
+    display: inline-block;
+
+    min-width: 40px;
+    margin: 0 3px;
+    height: 30px;
+    vertical-align: top;
+}
+
+.jarves-Slider-line {
+    border-top: 1px solid silver;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 15px;
+}
+
+.jarves-Slider-knob {
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    position: absolute;
+    display: block;
+    top: 7px;
+    width: 16px;
+    height:16px;
+    background-color: gray;
+}

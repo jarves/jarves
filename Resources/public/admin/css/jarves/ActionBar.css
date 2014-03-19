@@ -1,0 +1,9 @@
+.jarves-ActionBar {
+    padding: 5px 0;
+    text-align: right;
+    height: 30px;
+}
+
+.jarves-ActionBar-left {
+    text-align: left;
+}

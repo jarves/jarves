@@ -1,0 +1,15 @@
+p {
+    margin: 0 0 1em;
+}
+
+.jarves-contentType-image.align-left {
+    text-align: left;
+}
+
+.jarves-contentType-image.align-center {
+    text-align: center;
+}
+
+.jarves-contentType-image.align-right {
+    text-align: right;
+}

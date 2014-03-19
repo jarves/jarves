@@ -1,0 +1,3 @@
+jarves:
+    resource: "@JarvesBundle/Resources/config/routing.yml"
+

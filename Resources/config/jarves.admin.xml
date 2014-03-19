@@ -1,0 +1,99 @@
+<config>
+    <bundle>
+        <adminAssets>
+            <asset>@JarvesBundle/admin/mootools-core-1.4.5-fixed-memory-leak.js</asset>
+            <asset>@JarvesBundle/admin/mootools-more.js</asset>
+            <assets>@JarvesBundle/admin/js/mootools-extras/*.js</assets>
+            <asset>@JarvesBundle/admin/mowla.min.js</asset>
+
+            <asset>@JarvesBundle/admin/js/jarves.js</asset>
+            <asset>@JarvesBundle/admin/js/jarves/AdminInterface.js</asset>
+            <asset>@JarvesBundle/admin/js/jarves/Button.js</asset>
+            <asset>@JarvesBundle/admin/js/jarves/Select.js</asset>
+            <asset>@JarvesBundle/admin/js/jarves/Checkbox.js</asset>
+            <asset>@JarvesBundle/admin/js/jarves/Base.js</asset>
+
+            <asset>@JarvesBundle/admin/js/jarves/ObjectTree.js</asset>
+            <asset>@JarvesBundle/admin/js/jarves/TabGroup.js</asset>
+            <asset>@JarvesBundle/admin/js/jarves/WindowEdit.js</asset>
+            <asset>@JarvesBundle/admin/js/jarves/WindowList.js</asset>
+            <asset>@JarvesBundle/admin/js/jarves/Select.js</asset>
+            <asset>@JarvesBundle/admin/js/jarves/FieldAbstract.js</asset>
+            <asset>@JarvesBundle/admin/js/jarves/Dialog.js</asset>
+            <assets>@JarvesBundle/admin/js/jarves/*.js</assets>
+            <assets>@JarvesBundle/admin/js/lib/*.js</assets>
+            <assets>@JarvesBundle/admin/js/jarves/DashboardWidgets/Base.js</assets>
+            <assets>@JarvesBundle/admin/js/jarves/DashboardWidgets/*.js</assets>
+
+            <asset>@JarvesBundle/admin/js/jarves/FieldTypes/Text.js</asset>
+            <asset>@JarvesBundle/admin/js/jarves/FieldTypes/Object.js</asset>
+            <asset>@JarvesBundle/admin/js/jarves/FieldTypes/Select.js</asset>
+            <assets>@JarvesBundle/admin/js/jarves/FieldTypes/*.js</assets>
+            <assets>@JarvesBundle/admin/js/jarves/LabelTypes/*.js</assets>
+
+            <assets>@JarvesBundle/admin/js/jarves/ContentTypes/*.js</assets>
+            <assets>@JarvesBundle/admin/js/jarves/ui/*.js</assets>
+
+            <assets>@JarvesBundle/admin/js/extras/*.js</assets>
+            <asset compression="false">@JarvesBundle/tinymce/tinymce.min.js</asset>
+
+            <asset>@JarvesBundle/admin/icons/style.css</asset>
+
+            <asset>@JarvesBundle/codemirror/lib/codemirror.js</asset>
+            <asset>@JarvesBundle/codemirror/addon/mode/loadmode.js</asset>
+            <asset>@JarvesBundle/codemirror/addon/selection/active-line.js</asset>
+            <asset>@JarvesBundle/codemirror/lib/codemirror.css</asset>
+
+            <asset>@JarvesBundle/font/OpenSans/open-sans.css</asset>
+            <asset>@JarvesBundle/font/OpenSans/open-sans-condensed.css</asset>
+            <assets>@JarvesBundle/admin/css/jarves.scss</assets>
+            <asset>@JarvesBundle/admin/css/jarves/Button.css</asset>
+            <asset>@JarvesBundle/admin/css/jarves/ButtonGroup.css</asset>
+            <assets>@JarvesBundle/admin/css/jarves/*.css</assets>
+            <assets>@JarvesBundle/admin/css/jarves/*.scss</assets>
+            <assets>@JarvesBundle/admin/css/jarves/ui/*.css</assets>
+        </adminAssets>
+        <streams>
+            <stream path="load">
+                <class>Jarves\Controller\Admin\DashboardWidgets</class>
+                <method>load</method>
+            </stream>
+
+            <stream path="space">
+                <class>Jarves\Controller\Admin\DashboardWidgets</class>
+                <method>space</method>
+            </stream>
+
+            <stream path="uptime">
+                <class>Jarves\Controller\Admin\DashboardWidgets</class>
+                <method>uptime</method>
+            </stream>
+
+            <stream path="analytics">
+                <class>Jarves\Controller\Admin\DashboardWidgets</class>
+                <method>analytics</method>
+            </stream>
+
+            <stream path="latency">
+                <class>Jarves\Controller\Admin\DashboardWidgets</class>
+                <method>latency</method>
+            </stream>
+
+            <stream path="latencies">
+                <class>Jarves\Controller\Admin\DashboardWidgets</class>
+                <method>latencies</method>
+            </stream>
+
+            <stream path="apc">
+                <class>Jarves\Controller\Admin\DashboardWidgets</class>
+                <method>apc</method>
+            </stream>
+
+            <stream path="newsFeed">
+                <class>Jarves\Controller\Admin\DashboardWidgets</class>
+                <method>newsFeed</method>
+            </stream>
+
+        </streams>
+    </bundle>
+</config>

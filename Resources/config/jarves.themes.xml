@@ -1,0 +1,21 @@
+<config>
+    <bundle>
+        <themes>
+            <theme id="coreLayouts">
+                <label>Core layouts</label>
+                <contents>
+                    <content>
+                        <label>Default</label>
+                        <file>JarvesBundle:Default:content.html.twig</file>
+                    </content>
+                </contents>
+                <navigations>
+                    <navigation>
+                        <label>Default</label>
+                        <file>JarvesBundle:Default:navigation.html.twig</file>
+                    </navigation>
+                </navigations>
+            </theme>
+        </themes>
+    </bundle>
+</config>

@@ -1,0 +1,71 @@
+.jarves-Checkbox:link {
+    height: 30px;
+    width: 60px;
+    -moz-border-radius: 25px;
+    -webkit-border-radius: 25px;
+    border-radius: 25px;
+    position: relative;
+    cursor: default;
+    display: inline-block;
+    line-height: 28px;
+}
+
+.jarves-Checkbox:focus {
+    outline: 0;
+
+    border-color: rgba(47, 140, 189, 0.9);
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+    box-shadow: 0 0 0 3px rgba(47, 140, 189, 0.2);
+
+    -moz-transition-duration: .1s;
+    -webkit-transition-duration: .1s;
+    -o-transition-duration: .1s;
+    -ms-transition-duration: .1s;
+    transition-duration: .1s;
+}
+
+.jarves-Checkbox-text-off {
+    font-weight: bold;
+    color: #fbfbfb;
+    position: absolute;
+    right: 11px;
+    font-size: 15px;
+    top: 0px;
+}
+
+.jarves-Checkbox-text-on {
+    font-weight: bold;
+    color: white;
+    position: absolute;
+    left: 17px;
+    font-size: 15px;
+    top: 0px;
+}
+
+.jarves-Checkbox-off {
+    background-color: #e1e1e1;
+}
+
+.jarves-Checkbox-on {
+    background-color: #22638E;
+}
+
+.jarves-Checkbox-knob {
+    background-color: #FDFDFD;
+
+    -moz-border-radius: 28px;
+    -webkit-border-radius: 28px;
+    border-radius: 24px;
+
+    width: 28px;
+    height: 28px;
+    position: relative;
+    left: 1px;
+    top: 1px;
+}
+
+.jarves-Checkbox-on .jarves-Checkbox-knob {
+    left: 31px;
+}

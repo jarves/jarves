@@ -1,0 +1,42 @@
+.jarves-helpsystem-container {
+    position: absolute;
+    left: 20px;
+    bottom: 25px;
+    overflow: hidden;
+    width: 270px;
+    z-index: 5000000;
+}
+
+a.jarves-helpsystem-bubble-closer {
+    position: absolute;
+    right: 4px;
+    top: 3px;
+    font-weight: bold;
+    font-size: 9px;
+    height: 15px;
+    width: 15px;
+}
+
+a.jarves-helpsystem-bubble-closer:hover {
+    color: black;
+}
+
+.jarves-helpsystem-bubble {
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    background-color: #dadada;
+    padding: 10px 10px;
+    font-size: 11px;
+    margin-top: 5px;
+    line-height: 20px;
+    position: relative;
+    border-left: 5px solid #265F85;
+    color: #444;
+}
+
+.jarves-helpsystem-bubble h3 {
+    margin-top: 0px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #999;
+}

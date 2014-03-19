@@ -1,0 +1,28 @@
+<config>
+  <bundle>
+    <caches>
+      <cache>core/contents</cache>
+      <cache method="test">core/contents2</cache>
+    </caches>
+    <events>
+      <event key="core/object/modify">
+        <desc>Fires on every object modification (add/delete/update). Subject is the normalized object key.</desc>
+      </event>
+      <event key="core/object/update">
+        <desc>Fires on every object update. Subject is the normalized object key.</desc>
+      </event>
+    </events>
+    <listeners>
+      <event key="core/object/modify" subject="core:domain">
+        <clearCache>core/domains.created</clearCache>
+        <clearCache>core/domains</clearCache>
+      </event>
+      <event key="core/object/modify" subject="core:content">
+        <clearCache>core/contents</clearCache>
+      </event>
+      <event key="core/object/modify" subject="core:node">
+        <clearCache>core/contents</clearCache>
+      </event>
+    </listeners>
+  </bundle>
+</config>

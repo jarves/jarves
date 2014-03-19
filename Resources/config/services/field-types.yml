@@ -1,0 +1,145 @@
+parameters:
+     jarves.field.types.class: Jarves\Admin\FieldTypes\FieldTypes
+     jarves.field.types.text.class: Jarves\Admin\FieldTypes\TypeText
+     jarves.field.types.number.class: Jarves\Admin\FieldTypes\TypeNumber
+     jarves.field.types.object.class: Jarves\Admin\FieldTypes\TypeObject
+     jarves.field.types.datetime.class: Jarves\Admin\FieldTypes\TypeDatetime
+     jarves.field.types.select.class: Jarves\Admin\FieldTypes\TypeSelect
+     jarves.field.types.checkbox.class: Jarves\Admin\FieldTypes\TypeCheckbox
+     jarves.field.types.page.class: Jarves\Admin\FieldTypes\TypePage
+     jarves.field.types.layout.class: Jarves\Admin\FieldTypes\TypeLayout
+     jarves.field.types.lang.class: Jarves\Admin\FieldTypes\TypeLang
+     jarves.field.types.textarea.class: Jarves\Admin\FieldTypes\TypeTextarea
+     jarves.field.types.file.class: Jarves\Admin\FieldTypes\TypeFile
+     jarves.field.types.filelist.class: Jarves\Admin\FieldTypes\TypeFilelist
+     jarves.field.types.layoutelement.class: Jarves\Admin\FieldTypes\TypeLayoutElement
+     jarves.field.types.view.class: Jarves\Admin\FieldTypes\TypeView
+     jarves.field.types.tab.class: Jarves\Admin\FieldTypes\TypeTab
+     jarves.field.types.childrenSwitcher.class: Jarves\Admin\FieldTypes\TypeChildrenSwitcher
+     jarves.field.types.array.class: Jarves\Admin\FieldTypes\TypeArray
+     jarves.field.types.content.class: Jarves\Admin\FieldTypes\TypeContent
+     jarves.field.types.wysiwyg.class: Jarves\Admin\FieldTypes\TypeWysiwyg
+     jarves.field.types.password.class: Jarves\Admin\FieldTypes\TypePassword
+     jarves.field.types.contentElements.class: Jarves\Admin\FieldTypes\TypeContentElements
+     jarves.field.types.properties.class: Jarves\Admin\FieldTypes\TypeProperties
+
+services:
+     jarves.field.types:
+         class: %jarves.field.types.class%
+         arguments: ["@service_container"]
+
+     jarves.field.types.text:
+         class: %jarves.field.types.text.class%
+         tags:
+             - { name: jarves.field.type, alias: text }
+
+     jarves.field.types.theme:
+         class: %jarves.field.types.text.class%
+         tags:
+             - { name: jarves.field.type, alias: theme }
+
+     jarves.field.types.number:
+         class: %jarves.field.types.number.class%
+         tags:
+             - { name: jarves.field.type, alias: number }
+
+     jarves.field.types.object:
+         class: %jarves.field.types.object.class%
+         arguments: ["@jarves.objects"]
+         tags:
+             - { name: jarves.field.type, alias: object }
+
+     jarves.field.types.datetime:
+         class: %jarves.field.types.datetime.class%
+         tags:
+             - { name: jarves.field.type, alias: datetime }
+
+     jarves.field.types.select:
+         class: %jarves.field.types.select.class%
+         tags:
+             - { name: jarves.field.type, alias: select }
+
+     jarves.field.types.checkbox:
+         class: %jarves.field.types.checkbox.class%
+         tags:
+             - { name: jarves.field.type, alias: checkbox }
+
+     jarves.field.types.page:
+         class: %jarves.field.types.page.class%
+         tags:
+             - { name: jarves.field.type, alias: page }
+
+     jarves.field.types.layout:
+         class: %jarves.field.types.layout.class%
+         tags:
+             - { name: jarves.field.type, alias: layout }
+
+     jarves.field.types.lang:
+         class: %jarves.field.types.lang.class%
+         tags:
+             - { name: jarves.field.type, alias: lang }
+
+     jarves.field.types.textarea:
+         class: %jarves.field.types.textarea.class%
+         tags:
+             - { name: jarves.field.type, alias: textarea }
+
+     jarves.field.types.wysiwyg:
+         class: %jarves.field.types.wysiwyg.class%
+         tags:
+             - { name: jarves.field.type, alias: wysiwyg }
+
+     jarves.field.types.file:
+         class: %jarves.field.types.file.class%
+         tags:
+             - { name: jarves.field.type, alias: file }
+
+     jarves.field.types.filelist:
+         class: %jarves.field.types.filelist.class%
+         tags:
+             - { name: jarves.field.type, alias: filelist }
+
+     jarves.field.types.layoutelement:
+         class: %jarves.field.types.layoutelement.class%
+         tags:
+             - { name: jarves.field.type, alias: layoutelement }
+
+     jarves.field.types.view:
+         class: %jarves.field.types.view.class%
+         tags:
+             - { name: jarves.field.type, alias: view }
+
+     jarves.field.types.tab:
+         class: %jarves.field.types.tab.class%
+         tags:
+             - { name: jarves.field.type, alias: tab }
+
+     jarves.field.types.childrenSwitcher:
+         class: %jarves.field.types.childrenSwitcher.class%
+         tags:
+             - { name: jarves.field.type, alias: childrenSwitcher }
+
+     jarves.field.types.array:
+         class: %jarves.field.types.array.class%
+         tags:
+             - { name: jarves.field.type, alias: array }
+
+     jarves.field.types.content:
+         class: %jarves.field.types.content.class%
+         tags:
+             - { name: jarves.field.type, alias: content }
+
+     jarves.field.types.password:
+         class: %jarves.field.types.password.class%
+         tags:
+             - { name: jarves.field.type, alias: password }
+
+     jarves.field.types.contentElements:
+         class: %jarves.field.types.contentElements.class%
+         tags:
+             - { name: jarves.field.type, alias: contentElements }
+
+     jarves.field.types.properties:
+         class: %jarves.field.types.properties.class%
+         tags:
+             - { name: jarves.field.type, alias: properties }

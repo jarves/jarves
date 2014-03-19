@@ -1,0 +1,19 @@
+<config>
+  <bundle>
+    <objects>
+      <object id="Test">
+        <label>Test</label>
+        <class>Core\Models\Test</class>
+        <dataModel>custom</dataModel>
+        <fields>
+          <field id="id" type="number" primaryKey="true">
+            <label>ID</label>
+          </field>
+          <field id="name" type="text">
+            <label>Name</label>
+          </field>
+        </fields>
+      </object>
+    </objects>
+  </bundle>
+</config>

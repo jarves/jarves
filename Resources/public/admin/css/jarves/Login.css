@@ -1,0 +1,219 @@
+.jarves-login-middle {
+    margin: auto;
+    width: 325px;
+    margin-top: 200px;
+    text-align: center;
+    position: relative;
+    background-color: #f5f5f5;
+    border: 5px solid white;
+}
+
+.jarves-login-middle .jarves-Select-box,
+.jarves-login-middle .jarves-Select-box:link,
+.jarves-login-middle .jarves-Button,
+.jarves-login-middle .jarves-Button:link,
+.jarves-login-middle .jarves-Input-text {
+    margin: 10px 0;
+    display: block;
+    line-height: 40px;
+    height: 40px;
+}
+
+.jarves-login-middle .jarves-Select-box,
+.jarves-login-middle .jarves-Select-box:link {
+    line-height: 30px;
+    height: 30px;
+}
+
+.jarves-login-barrierTape {
+    background-image: url(../../images/login-barrier-tape.gif);
+    background-repeat: repeat-x;
+    top: 395px;
+    left: -100px;
+    right: -100px;
+    height: 200px;
+    position: absolute;
+    text-align: center;
+}
+
+.jarves-login-barrierTapeFullBlockOverlay {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-color: white;
+}
+
+.jarves-login-barrierTape div {
+    margin: auto;
+    width: 700px;
+    height: 60px;
+    font-size: 14px;
+    margin-top: 52px;
+    border: 2px solid #f8d800;
+    background-color: black;
+    color: #f8d800;
+    font-weight: bold;
+}
+
+.jarves-login-logo {
+    height: 45px;
+}
+
+.jarves-login {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    background-color: #22638E;
+    text-align: center;
+    z-index: 200101;
+    overflow: hidden;
+}
+
+.jarves-login-icon {
+    font-size: 18px;
+    color: #ddd;
+    text-shadow: 0px 1px 1px black;
+}
+
+.jarves-login-middle-top {
+    background-color: #22638E;
+    height: 60px;
+    line-height: 60px;
+    text-align: left;
+}
+
+.jarves-login-middle-top img {
+    position: relative;
+    top: 6px;
+    margin-left: 19px;
+}
+
+.jarves-ai-loader-con {
+    height: 30px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    left: 25px;
+    right: 29px;
+    bottom: 68px;
+    position: absolute;
+    border: 1px solid #c7c7c7;
+    background-color: #f8f8f8;
+}
+
+.jarves-ai-loader-txt {
+    height: 4px;
+    bottom: 88px;
+    right: 0px;
+    width: 100%;
+    text-align: center;
+    position: absolute;
+}
+
+.jarves-login-middle-form {
+    position: relative;
+    margin: 15px;
+}
+
+.jarves-login-desktopMode {
+    position: absolute;
+    left: 0px;
+    top: 145px;
+    width: 294px;
+    height: 28px;
+}
+
+.jarves-login-desktopMode-text {
+    position: absolute;
+    left: 8px;
+    font-size: 11px;
+    top: 7px;
+}
+
+.jarves-login-loader-bottom,
+.jarves-login-loader-top {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 0;
+    overflow: hidden;
+    background-color: #f5f5f5;
+}
+
+.jarves-login-loader-top {
+    top: 0px;
+}
+
+.jarves-login-loader-bottom {
+    bottom: 0px;
+}
+
+.jarves-login-animation-left {
+    position: absolute;
+    left: 0;
+    top: 60px;
+    bottom: 0;
+    background-color: #1D1D22;
+}
+
+.jarves-login-animation-top {
+    background-color: #1D1D22;
+}
+
+.jarves-ai-loginLoadingBarText {
+    margin: 5px 15px;
+}
+
+.jarves-ai-loginLoadingBarInside {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background-color: #22638E;
+}
+
+.jarves-login-input-passwd:focus,
+.jarves-login-input-username:focus {
+}
+
+.jarves-login-middle .loginMessage {
+    line-height: 16px;
+    margin: 5px 15px;
+}
+
+.jarves-login-middle-form .loginLangSelection {
+    position: absolute;
+    right: 12px;
+    top: 115px;
+    width: 120px;
+    padding: 3px 2px 2px 2px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+
+/* load backend */
+.jarves-ai-loader {
+    position: absolute;
+    bottom: 0px;
+    height: 30px;
+    left: 0px;
+    background-color: #888;
+    z-index: 131313124;
+}
+
+.jarves-login-barrierTape-fullblock {
+    top: 225px;
+    -ms-transform: rotate(350deg);
+    -o-transform: rotate(350deg);
+    -webkit-transform: rotate(350deg);
+    -moz-transform: rotate(350deg);
+    transform: rotate(350deg);
+    filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.984807753012208, M12=-0.173648177666931, M21=0.173648177666931, M22=0.984807753012208, sizingMethod='auto expand');
+    -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(SizingMethod='auto expand', M11=0.984807753012208, M12=-0.173648177666931,M21=0.173648177666931, M22=0.984807753012208)";
+
+}

@@ -1,0 +1,388 @@
+<config>
+  <bundle>
+    <objects>
+      <object id="File" crossRef="false">
+        <label>File</label>
+        <table>system_file</table>
+        <class>Jarves\ORM\ObjectFile</class>
+        <labelField>name</labelField>
+        <dataModel>custom</dataModel>
+        <fieldLabel>path</fieldLabel>
+        <nested>true</nested>
+        <treeLabel>name</treeLabel>
+        <treeIcon>type</treeIcon>
+        <treeIconMapping>
+          <icon id="dir">#icon-folder-4</icon>
+        </treeIconMapping>
+        <treeInterfaceClass>jarves.FileTree</treeInterfaceClass>
+        <treeInterface>custom</treeInterface>
+        <treeDefaultIcon>#icon-paper</treeDefaultIcon>
+        <browserInterfaceClass>jarves.Files</browserInterfaceClass>
+        <browserInterface>custom</browserInterface>
+        <browserOptions>
+          <field id="onlyUserDefined" type="checkbox">
+            <label>Only user defined files</label>
+          </field>
+          <field id="search" type="checkbox">
+            <label>Enable search</label>
+          </field>
+          <field id="path" type="file">
+            <label>Start path</label>
+          </field>
+          <field id="selectionOnlyFolders" type="checkbox">
+            <label>Only folders</label>
+          </field>
+          <field id="selectionOnlyFiles" type="checkbox">
+            <label>Only files</label>
+          </field>
+          <field id="onlyLocal" type="checkbox">
+            <label>Only local files</label>
+            <desc>Exclude all external files in magic folders</desc>
+          </field>
+          <field id="returnPath" type="checkbox">
+            <label>Return path</label>
+            <desc>Instead of returning the object id</desc>
+          </field>
+        </browserOptions>
+        <fields>
+          <field id="id" type="number" primaryKey="true" autoIncrement="true">
+            <label>ID</label>
+          </field>
+          <field id="path" type="text">
+            <label>Path</label>
+          </field>
+          <field id="name" type="text">
+            <label>Name</label>
+          </field>
+          <field id="type" type="select">
+            <label>Type</label>
+          </field>
+          <field id="size" type="number">
+            <label>Size</label>
+            <desc>In bytes</desc>
+          </field>
+          <field id="ctime" type="datetime">
+            <label>Created</label>
+          </field>
+          <field id="mtime" type="datetime">
+            <label>Modified</label>
+          </field>
+        </fields>
+      </object>
+      <object id="Node">
+        <label>Node</label>
+        <desc>Pages, Links, Trays and Navigation folder</desc>
+        <table>system_node</table>
+        <labelField>title</labelField>
+        <defaultSelection>type, title, alternativeTitle, urn, layout, visible, target</defaultSelection>
+        <nested>true</nested>
+        <nestedRootAsObject>true</nestedRootAsObject>
+        <nestedRootObject>jarves/domain</nestedRootObject>
+        <nestedRootObjectField>domainId</nestedRootObjectField>
+        <nestedRootObjectLabelField>domain</nestedRootObjectLabelField>
+        <treeFields>type, title, accessDenied, accessFromGroups, visible</treeFields>
+        <treeIcon>type</treeIcon>
+        <treeInterfaceClass>jarves.NodeTree</treeInterfaceClass>
+        <treeInterface>custom</treeInterface>
+        <treeRootObjectIconPath>#world</treeRootObjectIconPath>
+        <treeRootObjectFixedIcon>true</treeRootObjectFixedIcon>
+        <treeRootFieldTemplate>{domain}</treeRootFieldTemplate>
+        <fields>
+          <field id="id" type="number" primaryKey="true" autoIncrement="true">
+            <label>ID</label>
+          </field>
+          <field id="pid" type="number">
+            <label>Parent ID</label>
+          </field>
+          <field id="domain" type="object">
+            <label>Domain ID</label>
+            <object>JarvesBundle/Domain</object>
+            <objectRelation>nTo1</objectRelation>
+          </field>
+          <field id="type" type="number">
+            <label>Type</label>
+          </field>
+          <field id="title" type="text">
+            <label>Title</label>
+          </field>
+          <field id="alternativeTitle" type="text">
+            <label>Page title</label>
+          </field>
+          <field id="urn" type="text">
+            <label>URN</label>
+          </field>
+          <field id="link" type="text">
+            <label>Link</label>
+          </field>
+          <field id="target" type="text">
+            <label>Link target</label>
+          </field>
+          <field id="visible" type="checkbox">
+            <label>Visible in navigation</label>
+          </field>
+          <field id="accessDenied" type="checkbox">
+            <label>Access denied</label>
+            <desc>For everyone. This removes the page from the navigation.</desc>
+          </field>
+          <field id="meta" type="text">
+            <label>Meta tags</label>
+          </field>
+          <field id="forceHttps" type="checkbox">
+            <label>Force HTTPS</label>
+          </field>
+          <field id="accessFrom" type="datetime"/>
+          <field id="accessTo" type="datetime"/>
+          <field id="accessRedirectTo" type="page"/>
+          <field id="accessNohidenavi" type="checkbox"/>
+          <field id="accessNeedVia" type="number"/>
+          <field id="accessFromGroups" type="text"/>
+          <field id="searchWords" type="text"/>
+          <field id="unsearchable" type="checkbox"/>
+          <field id="layout" type="layout"/>
+          <field id="theme" type="text"/>
+        </fields>
+        <publicUrlGenerator>Core\PageController::getPublicUrl</publicUrlGenerator>
+      </object>
+      <object id="Domain">
+        <label>Domain</label>
+        <table>system_domain</table>
+        <labelField>domain</labelField>
+        <labelTemplate>[{lang}] {domain}</labelTemplate>
+        <defaultSelection>domain, lang</defaultSelection>
+        <multiLanguage>true</multiLanguage>
+        <fields>
+          <field id="id" type="number" primaryKey="true" autoIncrement="true">
+            <label>ID</label>
+          </field>
+          <field id="domain" type="text" required="true">
+            <label>Domain name</label>
+          </field>
+          <field id="lang" type="lang">
+            <label>Language</label>
+          </field>
+          <field id="master" type="checkbox">
+            <label>Language master</label>
+          </field>
+          <field id="alias" type="text">
+            <label>Domain Aliases</label>
+            <desc>A comma separated list of domain names.</desc>
+          </field>
+          <field id="redirect" type="text">
+            <label>Domain Redirects</label>
+            <desc>A comma separated list of domain redirections.</desc>
+          </field>
+          <field id="startnode" type="object">
+            <label>Startpage</label>
+            <object>JarvesBundle:Node</object>
+            <objectRelation>nTo1</objectRelation>
+          </field>
+          <field id="resourceCompression" type="checkbox">
+            <label>Resource compression</label>
+            <desc>JS and CSS compression.</desc>
+          </field>
+          <field id="path" type="text" required="true">
+            <label>Path</label>
+            <desc>If your installation does not point to a domain name directly but is in a subfolder, then this is the name of this folder. Default /.</desc>
+            <default>/</default>
+          </field>
+          <field id="email" type="text">
+            <label>Email</label>
+            <desc>If errors/exceptions appear the system prints this email to the user.</desc>
+          </field>
+          <field id="robots" type="textarea">
+            <label>robots.txt</label>
+            <desc>The content of the robots.txt file for this domain.</desc>
+          </field>
+          <field id="favicon" type="file">
+            <label>Favicon path.</label>
+          </field>
+          <field id="searchIndexKey" type="text"/>
+          <field id="themeProperties" type="properties"/>
+          <field id="sessionProperties" type="properties"/>
+          <field id="theme" type="theme">
+            <label>Theme</label>
+          </field>
+          <field id="titleFormat" type="text"/>
+        </fields>
+      </object>
+      <object id="Language">
+        <label>Language</label>
+        <table>system_langs</table>
+        <class>Jarves\ORM\ObjectLanguage</class>
+        <labelField>title</labelField>
+        <labelTemplate>{title} ({langtitle}, {code})</labelTemplate>
+        <defaultSelection>title, langtitle, code</defaultSelection>
+        <dataModel>custom</dataModel>
+        <fields>
+          <field id="code" type="text" primaryKey="true"/>
+          <field id="title" type="text"/>
+          <field id="langtitle" type="text"/>
+          <field id="userdefined" type="checkbox"/>
+          <field id="visible" type="checkbox"/>
+        </fields>
+      </object>
+      <object id="Workspace">
+        <label>Workspace</label>
+        <table>system_workspace</table>
+        <fields>
+          <field id="id" type="number" primaryKey="true" autoIncrement="true"/>
+          <field id="title" type="text">
+            <label>Title</label>
+          </field>
+          <field id="owner" type="object">
+            <object>jarves/user</object>
+            <objectRelation>nTo1</objectRelation>
+            <objectLabel>name</objectLabel>
+          </field>
+          <field id="created" type="datetime"/>
+        </fields>
+      </object>
+      <object id="EntryPoint">
+        <label>EntryPoint</label>
+        <class>Jarves\ORM\ObjectEntryPoint</class>
+        <labelField>title</labelField>
+        <dataModel>custom</dataModel>
+        <nested>true</nested>
+        <fields>
+          <field id="path" type="text" primaryKey="true"/>
+          <field id="title" type="text"/>
+          <field id="type" type="text"/>
+        </fields>
+      </object>
+      <object id="Content">
+        <label>Contents</label>
+        <table>system_content</table>
+        <labelField>id</labelField>
+        <defaultSelection>node,boxId,template,type,content</defaultSelection>
+        <fields>
+          <field id="id" type="number" primaryKey="true" autoIncrement="true">
+            <label>ID</label>
+          </field>
+          <field id="node" type="object">
+            <label>Node</label>
+            <object>jarves/node</object>
+            <objectRelation>nTo1</objectRelation>
+            <objectLabel>title</objectLabel>
+            <objectRefRelationName>Content</objectRefRelationName>
+          </field>
+          <field id="boxId" type="number"/>
+          <field id="sort" type="number"/>
+          <field id="title" type="text"/>
+          <field id="content" type="textarea"/>
+          <field id="template" type="text"/>
+          <field id="type" type="text"/>
+          <field id="hide" type="checkbox"/>
+          <field id="unsearchable" type="text"/>
+          <field id="accessFrom" type="number"/>
+          <field id="accessTo" type="number"/>
+          <field id="accessFromGroups" type="text"/>
+        </fields>
+      </object>
+      <object id="View">
+        <label>Template View</label>
+        <desc>Template views</desc>
+        <class>Jarves\ORM\ObjectView</class>
+        <labelField>name</labelField>
+        <dataModel>custom</dataModel>
+        <nested>true</nested>
+        <fields>
+          <field id="path" type="text" primaryKey="true">
+            <label>Path</label>
+          </field>
+          <field id="name" type="text">
+            <label>File name</label>
+          </field>
+        </fields>
+      </object>
+      <object id="User">
+        <label>Users</label>
+        <table>system_user</table>
+        <labelField>username</labelField>
+        <blacklistSelection>passwd, passwdSalt</blacklistSelection>
+        <fields>
+          <field id="id" type="number" primaryKey="true" autoIncrement="true">
+            <label>ID</label>
+          </field>
+          <field id="username" type="text">
+            <label>Username</label>
+          </field>
+          <field id="authClass" type="text">
+            <label>Auth class</label>
+          </field>
+          <field id="passwd" type="textarea">
+            <label>Password</label>
+          </field>
+          <field id="passwdSalt" type="text"/>
+          <field id="activationKey" type="text"/>
+          <field id="email" type="text">
+            <label>Email</label>
+          </field>
+          <field id="settings" type="properties"/>
+          <field id="widgets" type="properties"/>
+          <field id="activate" type="checkbox">
+            <label>Active account</label>
+          </field>
+          <field id="logins" type="number"/>
+          <field id="lastLogin" type="number"/>
+          <field id="created" type="datetime"/>
+          <field id="modified" type="datetime"/>
+          <field id="groupMembership" type="object">
+            <label>Group membership</label>
+            <object>jarves/group</object>
+            <objectRelation>nToM</objectRelation>
+            <objectLabel>name</objectLabel>
+            <objectRelationTable>system_user_group</objectRelationTable>
+          </field>
+          <field id="firstName" type="text">
+            <label>First name</label>
+          </field>
+          <field id="lastName" type="text">
+            <label>Last name</label>
+          </field>
+          <field id="imagePath" type="file"/>
+        </fields>
+      </object>
+      <object id="Group">
+        <label>Groups</label>
+        <table>system_group</table>
+        <labelField>name</labelField>
+        <defaultSelection>name, description</defaultSelection>
+        <fields>
+          <field id="id" type="number" primaryKey="true" autoIncrement="true">
+            <label>ID</label>
+          </field>
+          <field id="name" type="text">
+            <label>Name</label>
+          </field>
+          <field id="description" type="text">
+            <label>Description</label>
+          </field>
+        </fields>
+        <browserColumns>
+          <field id="name" type="text">
+            <width>30%</width>
+          </field>
+          <field id="description" type="text"/>
+        </browserColumns>
+      </object>
+      <object id="NewsFeed" crossRef="false">
+        <label>News Feed</label>
+        <table>system_news_feed</table>
+        <labelField>title</labelField>
+        <fields>
+          <field id="id" type="number" primaryKey="true" autoIncrement="true">
+            <label>id</label>
+          </field>
+          <field id="username" type="text"/>
+          <field id="verb" type="text"/>
+          <field id="targetObject" type="text"/>
+          <field id="targetPk" type="text"/>
+          <field id="targetLabel" type="text"/>
+          <field id="link" type="text"/>
+          <field id="message" type="textarea"/>
+          <field id="created" type="datetime"/>
+        </fields>
+      </object>
+    </objects>
+  </bundle>
+</config>

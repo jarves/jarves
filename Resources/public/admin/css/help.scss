@@ -1,0 +1,26 @@
+.jarves-help-left {
+    font-size: $base-font-size;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+    width: 189px;
+    border-right: 1px solid silver;
+    overflow: auto;
+    padding: 5px;
+}
+
+.jarves-help-main {
+    position: absolute;
+    left: 200px;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    overflow: auto;
+}
+
+.jarves-help-main-content {
+    padding: 5px;
+    font-size: 12px;
+}
+

@@ -1,0 +1,39 @@
+<config>
+  <bundle>
+    <label>Jarves cms</label>
+    <caches>
+      <cache>core/contents</cache>
+      <cache>core/domains</cache>
+      <cache>core/domains.created</cache>
+      <cache>core/acl</cache>
+      <cache>core/acl-rules</cache>
+    </caches>
+    <events>
+      <event key="core/object/modify">
+        <desc>Fires on every object modification (add/delete/update). Subject is the normalized object key.</desc>
+      </event>
+      <event key="core/object/update">
+        <desc>Fires on every object update. Subject is the normalized object key.</desc>
+      </event>
+    </events>
+    <listeners>
+      <event key="core/object/modify" subject="jarves/domain">
+        <clearCache>core/domains.created</clearCache>
+        <clearCache>core/domains</clearCache>
+      </event>
+      <event key="core/object/modify" subject="jarves/content">
+        <clearCache>core/contents</clearCache>
+      </event>
+      <event key="core/object/modify" subject="jarves/node">
+        <clearCache>core/contents</clearCache>
+        <clearCache>core/navigation</clearCache>
+      </event>
+      <event key="core/object/modify" subject="jarves/user">
+        <clearCache>core/object-caching</clearCache>
+      </event>
+      <event key="core/bundle/schema-update">
+        <serviceCall>jarves.propelHelper::updateSchema</serviceCall>
+      </event>
+    </listeners>
+  </bundle>
+</config>

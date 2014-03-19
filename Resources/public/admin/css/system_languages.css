@@ -1,0 +1,16 @@
+.jarves-system-languages-main {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 33px;
+    bottom: 0px;
+    overflow: auto;
+}
+
+tr.system-language-mod-item td {
+    padding: 2px;
+}
+
+tr.system-language-mod-item:hover td {
+    background-color: #ddd;
+}

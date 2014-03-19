@@ -1,0 +1,310 @@
+.jarves-user-acl-left {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+    width: 215px;
+    border-right: 1px solid silver;
+    background-color: white;
+    overflow: auto;
+}
+
+.jarves-user-acl-right {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    left: 216px;
+}
+
+.jarves-user-acl-tree-childcontainer {
+    position: relative;
+}
+
+input.jarves-user-acl-query {
+    margin-left: 5px;
+    box-shadow: 0px 1px 0px #aaa;
+    padding-left: 18px;
+    text-indent: 0px;
+    border: 1px solid #999;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 184px;
+}
+
+.jarves-user-acl-entrypoint-list {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 400px;
+    bottom: 0px;
+    border-right: 1px solid #bbb;
+    overflow: auto;
+}
+
+.jarves-user-acl-entrypoint-rule-container {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    left: 401px;
+}
+
+.jarves-user-acl-entrypoint-list a img {
+    position: relative;
+    top: 3px;
+    margin-right: 3px;
+}
+
+.jarves-user-acl-entrypoint-list a,
+.jarves-user-acl-entrypoint-list a:link {
+    text-decoration: none;
+    padding: 2px;
+    position: relative;
+    margin-left: 5px;
+    outline: 0;
+    color: #222;
+    line-height: 14px;
+}
+
+.jarves-user-acl-entrypoint-list a.selected,
+.jarves-user-acl-entrypoint-list a.selected:link,
+.jarves-user-acl-entrypoint-list a.selected:hover {
+    font-weight: bold;
+    color: #434343;
+    background-color: silver;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.jarves-user-acl-entrypoint-rule {
+    margin: 10px;
+    border: 1px solid silver;
+    padding: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background-color: #f3f3f3;
+}
+
+.jarves-user-acl-entrypoint-list .jarves-user-acl-entrypoint-rule-active {
+    background-color: #999;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.jarves-user-acl-object-list {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 200px;
+    bottom: 0px;
+    border-right: 1px solid #bbb;
+    background-color: white;
+    overflow: auto;
+}
+
+.jarves-user-acl-object-constraints {
+    position: absolute;
+    left: 201px;
+    top: 0px;
+    width: 250px;
+    bottom: 0px;
+    border-right: 1px solid #bbb;
+    background-color: white;
+}
+
+.jarves-user-acl-object-constraints-title {
+
+}
+
+.jarves-user-acl-object-constraints-title {
+    height: 65px;
+    background-color: #ddd;
+    position: relative;
+}
+
+.jarves-with-desktop .jarves-user-acl-object-constraints-title {
+    -moz-border-radius-topleft: 0;
+    -webkit-border-top-left-radius: 0;
+    border-top-left-radius: 0;
+    -moz-border-radius-topright: 0;
+    -webkit-border-top-right-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.jarves-user-acl-object-constraints-title > .jarves-tabGroup {
+    position: absolute;
+    bottom: -1px;
+    left: -4px;
+}
+
+.jarves-user-acl-object-constraints-container {
+    position: absolute;
+    left: 0px;
+    top: 65px;
+    right: 0px;
+    bottom: 0px;
+    overflow: auto;
+}
+
+.jarves-user-acl-object-rules {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    left: 452px;
+    bottom: 0px;
+    background-color: #FAFAFA;
+}
+
+.jarves-user-acl-object-rules-container {
+    position: absolute;
+    top: 65px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    overflow: auto;
+    background-color: white;
+    overflow-x: hidden;
+}
+
+.jarves-user-acl-object-rules-info {
+    padding: 2px;
+    font-weight: normal;
+    color: gray;
+}
+
+.jarves-user-acl-object-rules-filter {
+    height: 65px;
+    background-color: #ddd;
+    position: relative;
+}
+
+.jarves-user-acl-object-list,
+.jarves-user-acl-object-constraints,
+.jarves-user-acl-object-rules {
+    border-top: 1px solid #E0E0E0;
+}
+
+.jarves-with-desktop .jarves-user-acl-object-rules-filter {
+    -moz-border-radius-topleft: 0;
+    -webkit-border-top-left-radius: 0;
+    border-top-left-radius: 0;
+    -moz-border-radius-topright: 0;
+    -webkit-border-top-right-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.jarves-user-acl-object-rules-filter > .jarves-tabGroup > .jarves-tabGroup-item,
+.jarves-user-acl-object-rules-filter > .jarves-tabGroup > .jarves-tabGroup-item:link {
+    padding: 0px 5px;
+}
+
+.jarves-user-acl-object-rules-filter > .jarves-tabGroup {
+    position: absolute;
+    bottom: -1px;
+    left: -4px;
+    font-weight: normal;
+}
+
+.jarves-user-acl-object-rule {
+    position: relative;
+    padding-left: 65px;
+    color: #333;
+    overflow: hidden;
+    cursor: default;
+}
+
+.jarves-user-acl-object-rule-subline {
+    color: #888;
+}
+
+.jarves-user-acl-object-rule-subline img {
+    position: relative;
+    top: 1px;
+    margin-left: 1px;
+    width: 10px;
+    height: 10px;
+}
+
+.jarves-user-acl-object-rule-mover {
+    position: absolute;
+    left: 4px;
+    top: 7px;
+    cursor: move;
+}
+
+.jarves-user-acl-object-rule-status {
+    position: absolute;
+    left: 24px;
+    top: 7px;
+}
+
+.jarves-user-acl-object-rule-mode {
+    position: absolute;
+    left: 44px;
+    top: 7px;
+}
+
+.jarves-user-acl-object-rule-actions {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+.jarves-user-acl-object-rule-title {
+    padding: 5px;
+    padding-left: 7px;
+}
+
+.jarves-user-acl-object-rule-actions img {
+    cursor: pointer;
+    margin-left: 2px;
+}
+
+.jarves-user-acl-object-rule-titlespan {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    padding: 3px;
+    position: relative;
+    left: -2px;
+}
+
+.jarves-user-acl-object-rule-titlespan img {
+    position: relative;
+    top: 2px;
+    left: 1px;
+    cursor: pointer;
+}
+
+.jarves-user-acl-object-rule-titlespan:hover {
+    border: 1px dotted silver;
+    padding: 2px;
+}
+
+.jarves-user-acl-object-list .jarves-list-combine-item h2 {
+    font-size: 12px;
+}
+
+.jarves-user-acl-rule-fields-item {
+    border: 1px solid silver;
+    position: relative;
+    margin: 23px 0px;
+    background-color: #eee;
+
+}
+
+.jarves-user-acl-rule-fields-item-conditionfield {
+    position: relative;
+    top: 13px;
+}
+
+.jarves-user-acl-rule-fields-item-conditionfield .jarves-field-condition-container + .jarves-Button,
+.jarves-user-acl-rule-fields-item-conditionfield .jarves-field-condition-container + .jarves-Button + .jarves-Button {
+    position: relative;
+    left: 11px;
+}

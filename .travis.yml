@@ -1,0 +1,24 @@
+language: php
+
+php:
+  - 5.4
+  - 5.5
+
+env:
+  - DB_TYPE=mysql DB_USER=root DB_NAME=test
+  - DB_TYPE=pgsql DB_USER=postgres DB_NAME=test
+  - DB_TYPE=sqlite DB_NAME=test DB_SERVER=test.sq3
+
+before_script:
+  - composer install --prefer-dist
+
+  # DB
+  - sh -c "if [ '$DB_TYPE' = 'mysql' ]; then mysql -e 'DROP DATABASE IF EXISTS test; CREATE DATABASE test;'; fi"
+  - sh -c "if [ '$DB_TYPE' = 'pgsql' ]; then psql -c 'CREATE DATABASE test;' -U postgres; fi"
+  - sh -c "if [ '$DB_TYPE' = 'sqlite' ]; then touch test.sq3; chmod 777 test.sq3; fi"
+
+  - sudo chown -R www-data .
+
+  - Tests/Integration/skeletion/app/console jarves:configuration:database $DB_TYPE $DB_NAME $DB_USER --server=$DB_SERVER
+  - rm -rf Tests/Integration/skeletion/app/cache/*
+  - Tests/Integration/skeletion/app/console jarves:install:demo localhost /

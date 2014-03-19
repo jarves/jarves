@@ -1,0 +1,26 @@
+.jarves-system-module-pane {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    display: none;
+    background-color: #f9f9f9;
+}
+
+a.extensionmanager-category-line,
+a.extensionmanager-category-line:link {
+    font-weight: bold;
+    padding: 4px;
+    display: block;
+    color: #444;
+    text-decoration: none;
+    border-bottom: 1px dotted silver;
+}
+
+a.extensionmanager-category-line:hover {
+    border-bottom: 1px solid gray;
+    color: #222;
+}

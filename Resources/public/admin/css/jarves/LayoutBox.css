@@ -1,0 +1,54 @@
+.jarves-layoutBox-main {
+    padding: 0px;
+}
+
+.jarves-layoutBox-container {
+    min-height: 30px;
+}
+
+.jarves-layoutBox-title {
+    position: relative;
+    padding: 2px;
+    color: #666;
+    font-size: 11px;
+    line-height: 15px;
+    border: 1px solid #ddd;
+    border-bottom: 0px;
+    margin-bottom: 3px;
+    padding-left: 25px;
+
+    -webkit-border-top-left-radius: 4px;
+    -webkit-border-top-right-radius: 4px;
+
+    background-color: white;
+    background-image: -webkit-gradient(linear, left top, left bottom, #eeeeee, to(#ffffff));
+    background-image: -webkit-linear-gradient(top, #eeeeee, #ffffff);
+    background-image: -moz-linear-gradient(top, #eeeeee, #ffffff);
+    background-image: -ms-linear-gradient(top, #eeeeee, #ffffff);
+    background-image: -o-linear-gradient(top, #eeeeee, #ffffff);
+    background-image: linear-gradient(top, #eeeeee, #ffffff);
+
+}
+
+body .jarves-layoutBox-main img.jarves-layoutBox-add {
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    cursor: pointer;
+    border: 0px;
+    margin: 0px;
+    padding: 0px;
+}
+
+body .jarves-layoutBox-main .jarves-layoutBox-iconBar-icon {
+    position: relative;
+    border: 0px;
+    margin: 0px;
+    margin-left: 1px;
+    margin-right: 1px;
+    padding: 0px;
+    float: right;
+    left: -17px;
+    top: 0px;
+    cursor: pointer;
+}

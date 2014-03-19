@@ -1,0 +1,87 @@
+.jarves-datePicker-chooser {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    border: 1px solid #bbb;
+    padding: 2px;
+    padding-bottom: 4px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    background-color: #eee;
+    z-index: 1500000;
+}
+
+.jarves-datePicker-chooser table th,
+.jarves-datePicker-chooser table td {
+    width: 27px;
+    line-height: 20px;
+    font-size: 11px;
+    text-align: center;
+}
+
+.jarves-datePicker-chooser table {
+    table-layout: fixed;
+    border: 1px solid #ddd;
+    margin: 2px;
+}
+
+.jarves-datePicker-month {
+    float: left;
+    height: 32px;
+    line-height: 32px;
+    width: 110px;
+}
+
+.jarves-datePicker-month span,
+.jarves-datePicker-year span {
+    padding: 0px 2px;
+}
+
+.jarves-datePicker-month a,
+.jarves-datePicker-year a {
+    position: relative;
+    top: -1px;
+}
+
+.jarves-datePicker-year {
+    float: right;
+    height: 32px;
+    line-height: 32px;
+    padding-right: 5px;
+    width: 80px;
+    text-align: right;
+}
+
+td.jarves-datePicker-item-selected {
+    background-color: #ddd;
+}
+
+a.jarves-datePicker-item {
+    cursor: pointer;
+}
+
+td.jarves-datePicker-item:hover {
+    background-color: #d6d6d6;
+}
+
+a.jarves-datePicker-item-selected {
+    color: black;
+}
+
+a.jarves-datePicker-item-gray {
+    color: #bbb;
+}
+
+.jarves-datePicker-time {
+    text-align: center;
+}
+
+.jarves-datePicker-time span {
+    padding: 0px 4px 0px 4px;
+}
+
+input.jarves-datePicker-timeMinutes,
+input.jarves-datePicker-timeHours {
+    width: 30px;
+}

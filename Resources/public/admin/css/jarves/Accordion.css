@@ -1,0 +1,32 @@
+.jarves-Accordion {
+    position: relative;
+}
+
+a.jarves-Accordion-toggler,
+a.jarves-Accordion-toggler:link {
+    display: block;
+    text-decoration: none;
+    background-color: #ccc;
+    border-bottom: 1px solid #aaa;
+    border-top: 1px solid #eee;
+    clear: both;
+    color: #666666;
+    cursor: pointer;
+    font-weight: bold;
+    outline: 0;
+    padding: 2px 3px;
+}
+
+a.jarves-Accordion-toggler:hover {
+    background-color: #c6c6c6;
+}
+
+.jarves-Accordion-pane-pane {
+    margin: 5px;
+}
+
+.jarves-Accordion-toggler-img {
+    margin-right: 4px;
+    position: relative;
+    top: 1px;
+}

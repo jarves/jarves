@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<database namespace="Test">
+  <table name="test_test" phpName="Test">
+    <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="description" type="VARCHAR"/>
+    <column name="lang" type="VARCHAR" size="3"/>
+    <vendor type="mysql">
+      <parameter name="Charset" value="utf8"/>
+    </vendor>
+  </table>
+  <table name="test_item2" phpName="Item2">
+    <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+    <column name="id2" type="INTEGER" primaryKey="true"/>
+    <column name="title" type="VARCHAR"/>
+    <vendor type="mysql">
+      <parameter name="Charset" value="utf8"/>
+    </vendor>
+  </table>
+  <table name="test_item" phpName="Item">
+    <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+    <column name="title" type="VARCHAR"/>
+    <behavior name="Jarves\Propel\Behavior\WorkspaceBehavior"/>
+
+    <column name="category_id" type="INTEGER"/>
+
+    <foreign-key foreignTable="test_item_category" phpName="OneCategory" onDelete="cascade">
+      <reference local="category_id" foreign="id"/>
+      <reference local="workspace_id" foreign="workspace_id"/>
+    </foreign-key>
+
+    <vendor type="mysql">
+      <parameter name="Charset" value="utf8"/>
+    </vendor>
+  </table>
+  <table name="test_item_category_relation" isCrossRef="true" phpName="Category">
+    <column name="item_id" type="INTEGER" primaryKey="true" required="true"/>
+    <column name="item_category_id" type="INTEGER" primaryKey="true" required="true"/>
+    <foreign-key foreignTable="test_item" phpName="CategoryItem" onDelete="CASCADE">
+      <reference local="item_id" foreign="id"/>
+      <reference local="workspace_id" foreign="workspace_id"/>
+    </foreign-key>
+    <foreign-key foreignTable="test_item_category" onDelete="CASCADE">
+      <reference local="item_category_id" foreign="id"/>
+      <reference local="workspace_id" foreign="workspace_id"/>
+    </foreign-key>
+    <behavior name="Jarves\Propel\Behavior\WorkspaceBehavior"/>
+    <vendor type="mysql">
+      <parameter name="Charset" value="utf8"/>
+    </vendor>
+  </table>
+  <table name="test_item_category" phpName="ItemCategory">
+    <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+    <column name="name" type="VARCHAR"/>
+    <behavior name="Jarves\Propel\Behavior\WorkspaceBehavior"/>
+    <vendor type="mysql">
+      <parameter name="Charset" value="utf8"/>
+    </vendor>
+  </table>
+</database>

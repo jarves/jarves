@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap="./Tests/bootstrap.php" colors="true">
+
+    <testsuites>
+        <testsuite name="JarvesBundle test suite">
+            <directory suffix="Test.php">./Tests</directory>
+            <exclude>./Tests/Integration</exclude>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <server name="KERNEL_DIR" value="Tests/Integration/skeletion/app/" />
+    </php>
+
+    <filter>
+        <blacklist>
+            <directory>../Tests/Integration/skeletion</directory>
+        </blacklist>
+    </filter>
+</phpunit>

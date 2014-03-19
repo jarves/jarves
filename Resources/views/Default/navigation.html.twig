@@ -1,0 +1,5 @@
+{% if navigation %}
+    {% for children in navigation.getLinks() %}
+        <a class="{% if children|isActive %}active{% endif %}" href="{{ children|url }}">{{  children.getTitle() }}</a>
+    {% endfor %}
+{% endif %}

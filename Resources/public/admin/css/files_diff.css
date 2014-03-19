@@ -1,0 +1,15 @@
+.filesDiff {
+}
+
+.filesDiff del {
+    background: none repeat scroll 0 0 #FFDDDD;
+    color: red;
+    text-decoration: none;
+}
+
+.filesDiff ins {
+    background: none repeat scroll 0 0 #CCFFCC;
+    color: green;
+    text-decoration: none;
+    font-weight: bold;
+}

@@ -1,0 +1,202 @@
+a.jarves-Button,
+a.jarves-Button:link {
+    white-space: nowrap;
+    padding: 0px 10px;
+
+    position: relative;
+
+    cursor: default;
+    color: #444;
+    line-height: 28px;
+    height: 30px;
+    font-weight: normal;
+    text-align: center;
+
+    margin: 0 4px;
+    background-color: #fefefe;
+
+    text-decoration: none;
+    outline: 0;
+    position: relative;
+    vertical-align: top;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    display: inline-block;
+    border: 1px solid #ddd;
+
+    -webkit-transition: all 0.3s ease-out;
+    -moz-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
+}
+
+
+a.jarves-button-icon,
+a.jarves-button-icon:link {
+    display: inline-block;
+    cursor: pointer;
+    line-height: 28px;
+    height: 30px;
+    margin: 0 4px;
+    text-decoration: none;
+    outline: 0;
+}
+
+a.jarves-button-icon:hover {
+    color: #47799B;
+}
+
+a.jarves-Button > span {
+    position: relative;
+}
+
+.jarves-ActionBar a.jarves-Button,
+.jarves-ActionBar a.jarves-Button:link,
+.jarves-windowEdit-action-bar a.jarves-Button,
+.jarves-windowEdit-action-bar a.jarves-Button:link,
+.kwindow-win-titleGroups a.jarves-Button,
+.kwindow-win-titleGroups a.jarves-Button:link {
+    line-height: 28px;
+    height: 30px;
+}
+
+a.jarves-Button:last-child {
+    margin-right: 0;
+}
+
+a.jarves-Button:first-child {
+    margin-left: 0;
+}
+
+a.jarves-Button:before {
+    padding-left: 0px;
+    position: relative;
+    top: 1px;
+}
+
+a.jarves-Button-textAndIcon:before {
+    padding-right: 5px;
+}
+
+a.jarves-Button:hover {
+    background-color: #fafafa;
+    color: #111;
+}
+
+a.jarves-Button:focus {
+    border: 1px solid #3E9BCB;
+
+    outline: 0;
+    border-color: rgba(47, 140, 189, 0.9);
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+    box-shadow: 0 0 0 3px rgba(47, 140, 189, 0.2);
+
+    -moz-transition-duration: .1s;
+    -webkit-transition-duration: .1s;
+    -o-transition-duration: .1s;
+    -ms-transition-duration: .1s;
+    transition-duration: .1s;
+
+    color: black;
+}
+
+a.jarves-Button:active,
+a.jarves-Button-pressed,
+a.jarves-Button-pressed:link,
+a.jarves-Button-pressed:hover,
+a.jarves-Button-pressed:active {
+    background-color: #dfdfdf;
+    border: 1px solid #d6d6d6;
+}
+
+div.button-list {
+    text-align: right;
+    padding-right: 5px;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    height: 30px;
+    bottom: -1px;
+    border-top: 1px solid gray;
+    line-height: 28px;
+    background-color: #aaa;
+}
+
+a.jarves-Button img {
+    position: relative;
+    top: 3px;
+    left: -3px;
+}
+
+a.jarves-Button-red, a.jarves-Button-red:link {
+    color: white;
+    background-color: #b23935;
+}
+
+a.jarves-Button-red:hover {
+    color: #eee;
+}
+
+a.jarves-Button-red:active {
+    background-color: #af1715;
+}
+
+a.jarves-Button-blue,
+a.jarves-Button-blue:link {
+    color: white;
+    background-color: #22638E;
+    border: 1px solid #265F85;
+}
+
+a.jarves-Button-blue:hover {
+    color: #eee;
+    background-color: #205A81;
+}
+
+a.jarves-Button-blue:active {
+    background-color: #154A66;
+}
+
+a.jarves-Button-deactivate,
+a.jarves-Button-deactivate:link,
+a.jarves-Button-deactivate:active,
+a.jarves-Button-deactivate:hover {
+    cursor: default;
+    color: gray;
+    background-color: transparent;
+}
+
+a.jarves-Button-loading:before {
+    content: url(../../images/loading.gif?v1);
+}
+
+.jarves-Button-progress {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background-color: gray;
+}
+
+a.jarves-Button-stopLoading-done,
+a.jarves-Button-stopLoading-failed {
+}
+
+body .jarves-Window-sidebar a.jarves-Button-stopLoading-done,
+body .jarves-Window-sidebar a.jarves-Button-stopLoading-done:hover,
+a.jarves-Button-stopLoading-done:hover,
+a.jarves-Button-stopLoading-done {
+    background-color: #487E48;
+}
+
+body .jarves-Window-sidebar a.jarves-Button-stopLoading-failed,
+body .jarves-Window-sidebar a.jarves-Button-stopLoading-failed:hover,
+a.jarves-Button-stopLoading-failed:hover,
+a.jarves-Button-stopLoading-failed {
+    background-color: #7E4848;
+}

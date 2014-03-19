@@ -1,0 +1,84 @@
+.jarves-dialog-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    overflow: hidden;
+    background-color: rgba(236, 236, 236, 0.7);
+}
+
+.jarves-dialog {
+    background-color: #f5f5f5;
+    box-shadow: 0px 0px 30px #444;
+    position: absolute;
+
+    min-height: 50px;
+    min-width: 150px;
+
+    max-height: 99%;
+    max-width: 99%;
+
+    overflow: auto;
+    padding: 5px 10px;
+}
+
+.jarves-SystemDialog-closer {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    font-weight: bold;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.jarves-SystemDialog-closer:hover {
+    color: gray;
+}
+
+.jarves-dialog-fixed .jarves-dialog,
+.jarves-dialog-fixed {
+    position: fixed;
+}
+
+.jarves-dialog-bottom {
+    position: relative;
+    text-align: right;
+    padding-right: 5px;
+}
+
+.jarves-dialog-content {
+    padding: 10px 5px;
+}
+
+.jarves-dialog-content-absolute {
+    position: absolute;
+    overflow: auto;
+    left: 0;
+    right: 0;
+    bottom: 40px;
+    top: 0;
+}
+
+.jarves-dialog-content-no-bottom {
+    bottom: 0;
+}
+
+.jarves-dialog-bottom-absolute {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.jarves-dialog-plain-content {
+    white-space: pre-wrap;
+}
+
+.jarves-dialog-system {
+    -webkit-transition: all 0.2s ease-out;
+    -moz-transition: all 0.2s ease-out;
+    -o-transition: all 0.2s ease-out;
+    transition: all 0.2s ease-out;
+    opacity: 0;
+}

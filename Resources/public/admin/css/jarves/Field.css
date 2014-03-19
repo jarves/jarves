@@ -1,0 +1,396 @@
+.jarves-field,
+.jarves-field-inputTd {
+    position: relative;
+}
+
+.jarves-field.jarves-field-type-wysiwyg {
+    max-width: 100%;
+}
+
+.jarves-field-main {
+    padding: 5px;
+    width: 400px;
+}
+
+td.jarves-field {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.jarves-fields-sub {
+    margin-left: 28px;
+    border-left: 1px solid #ebebeb;
+}
+
+td > .jarves-fields-sub {
+    padding-left: 15px;
+    margin-left: 8px;
+}
+
+.jarves-field-tdtitle,
+.jarves-field-inputTd {
+    border-bottom: 1px solid #f0f0f0;
+    border-top: 1px solid white;
+    vertical-align: top;
+    padding: 10px;
+}
+
+table tr:first-child > .jarves-field-tdtitle,
+table tr:first-child > .jarves-field-inputTd {
+    border-top: 0;
+}
+
+.jarves-field-tdtitle {
+    padding-top: 4px;
+    padding-left: 5px;
+    padding-right: 5px;
+    color: #333;
+    line-height: 28px;
+}
+.jarves-field-main-small {
+    width: 210px;
+    float: left;
+    padding: 5px;
+}
+
+h2.jarves-field-headline {
+    font-size: 12px;
+    margin: 2px;
+}
+
+.jarves-field-main-small .jarves-field-title div.desc {
+    width: 200px;
+}
+
+.jarves-field-tdtitle div.desc {
+    color: #999;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.jarves-field-main-small .jarves-field-title div.title {
+    max-width: 187px;
+}
+
+.jarves-field-title {
+    position: relative;
+}
+
+div.desc {
+    padding: 3px 0px 0px 20px;
+    color: #999;
+    line-height: 14px;
+    font-size: 13px;
+}
+
+div.desc a {
+    color: #666;
+}
+
+tr.jarves-field-main > td div.desc {
+    padding-left: 0;
+    line-height: 14px;
+}
+
+.jarves-field-title div.title {
+    padding: 1px 1px 1px 10px;
+}
+
+.jarves-field-main > .jarves-field-field {
+    position: relative;
+    margin: 5px 20px 2px 20px;
+}
+
+.jarves-field-main > .jarves-field-field-without-margin {
+    margin: 5px 0px 2px 0px;
+}
+
+.jarves-field-main-small input.text.multiUpload-firstInput {
+    width: 120px;
+}
+
+.kwindow-win-buttonWrapper.multiUpload-uploadBtnDiv {
+    height: 14px;
+    margin-top: 5px;
+    margin-left: 3px;
+}
+
+.multiUpload-fileName {
+    border-bottom: 1px solid #DDDDDD;
+    font-weight: bold;
+    padding: 15px 0px 8px 16px;
+}
+
+.multiUpload-fileContainer {
+    margin-bottom: 15px;
+}
+
+.multiUpload-delBtn {
+    padding-left: 5px;
+}
+
+.jarves-field-layoutelement-tinytoolbar {
+    position: absolute;
+    top: 0px;
+    height: 60px;
+    left: 260px;
+}
+
+.jarves-field-textlist {
+    border: 1px solid silver;
+    background-color: white;
+    padding: 1px;
+    min-height: 8px;
+    overflow: hidden;
+    padding-right: 15px;
+    -moz-border-radius: 2px;
+    position: relative;
+}
+
+.jarves-field-textlist-item {
+    position: relative;
+    -moz-border-radius: 2px;
+    padding: 2px 3px;
+    padding-right: 16px;
+    float: left;
+    cursor: pointer;
+    margin: 3px 2px;
+    color: white;
+    background-color: #399bc7;
+}
+
+.jarves-field-textlist-item a {
+    background-color: #444;
+    color: white;
+    position: absolute;
+    right: 2px;
+    font-size: 10px;
+    padding: 0px 3px;
+    height: 12px;
+    top: 2px;
+    -moz-border-radius: 12px;
+}
+
+.jarves-field-textlist-item a:hover {
+    background-color: gray;
+}
+
+.jarves-field-textlist-item-active {
+    background-color: #4bbdda;
+}
+
+.jarves-field-textlist input {
+    padding: 1px;
+    border: 0px;
+    height: 19px;
+    float: left;
+    background-color: transparent;
+}
+
+.jarves-field-textlist-clear {
+    clear: left;
+    position: absolute;
+    right: -1px;
+    top: -1px;
+    bottom: -1px;
+    border: 1px solid silver;
+    width: 15px;
+    padding-left: 1px;
+    padding-top: 6px;
+    cursor: pointer;
+    -moz-border-radius-topright: 2px;
+    -moz-border-radius-bottomright: 2px;
+    text-align: center;
+}
+
+.jarves-field-textlist-clear:hover {
+    background-color: #eee;
+}
+
+.jarves-field-textlist-searchbox {
+    height: 140px;
+    position: absolute;
+    min-width: 150px;
+    border: 4px solid #555;
+    box-shadow: 0px 0px 3px #777;
+    background-color: #eee;
+    -moz-border-radius: 2px;
+}
+
+.jarves-field-textlist-searchbox-head {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    height: 25px;
+    border-bottom: 1px solid silver;
+    background-color: #eee;
+}
+
+.jarves-field-textlist-searchbox-head-c {
+    position: absolute;
+    left: 3px;
+    top: 5px;
+    right: 5px;
+    height: 22px;
+}
+
+.jarves-field-textlist-searchbox-head input {
+    padding: 0px;
+    border: 0px;
+    background-color: #eee;
+    height: 19px;
+}
+
+.jarves-field-textlist-searchbox-body {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    overflow: auto;
+}
+
+.jarves-field-textlist-searchbox-body a,
+.jarves-field-textlist-searchbox-body a:link {
+    display: block;
+    padding: 5px 15px;
+    cursor: default;
+}
+
+.jarves-field-textlist-searchbox-body a.active,
+.jarves-field-textlist-searchbox-body a.active:link {
+    background-color: #399bc7;
+    color: white;
+}
+
+.jarves-field-textlist-searchbox-body a.active:hover {
+    background-color: #4bbdda;
+}
+
+.jarves-field-textlist-searchbox-body a:hover {
+    background-color: #ddd;
+}
+
+.jarves-field-array-column-desc {
+    color: #a2a2a2;
+    font-weight: normal;
+    font-size: 12px;
+}
+
+.jarves-field-condition-leftBracket,
+.jarves-field-condition-reftBracket {
+    display: none;
+    font-size: 24px;
+}
+
+.jarves-field-condition-withLeftBracket .jarves-field-condition-leftBracket,
+.jarves-field-condition-withRightBracket .jarves-field-condition-rightBracket {
+    display: table-cell;
+}
+
+.jarves-field-condition-group {
+    margin: 1px 0px;
+    margin-left: 54px;
+    position: relative;
+}
+
+.jarves-field-condition-group {
+    border-top: 1px solid silver;
+    border-bottom: 1px solid silver;
+    border-left: 1px solid silver;
+}
+
+.jarves-field-condition-withoutRel .jarves-field-condition-relContainer .jarves-Select-box {
+    display: none;
+}
+
+.jarves-field-invalid-icon {
+    position: absolute;
+    top: 9px;
+    left: -22px;
+    margin-left: 2px;
+    font-size: 14px;
+    text-decoration: blink;
+}
+
+.jarves-field-invalid-text {
+    color: red;
+    font-size: 10px;
+    padding-top: 3px;
+}
+
+.jarves-field-designMode-actions {
+    position: absolute;
+    right: 2px;
+    top: 2px;
+}
+
+.jarves-field-wysiwyg {
+    border: 1px solid silver;
+    background-color: white;
+    padding: 5px;
+    min-height: 50px;
+}
+
+.jarves-field-plugin-options {
+    border-top: 2px solid silver;
+    padding-top: 5px;
+    margin-top: 10px;
+}
+
+.jarves-Field-content-actionBar {
+    padding: 0 10px;
+    border-bottom: 1px solid #bababa;
+    padding-top: 6px;
+}
+
+.jarves-Field-Codemirror {
+    border: 1px solid #cecece;
+    min-height: 20px;
+    background-color: white;
+}
+
+.jarves-field-condition-container {
+    padding-top: 25px;
+    padding-bottom: 10px;
+}
+
+.jarves-field-type-condition {
+    padding-bottom: 5px;
+}
+
+.jarves-field-condition-container-field-rule-actionBar {
+    display: inline-block;
+    background-color: #FEFEFE;
+    border: 1px solid #DDD;
+    line-height: 28px;
+    width: 64px;
+    height: 28px;
+}
+
+.jarves-field-condition-container-field-rule-actionBar img {
+    margin: 0 2px;
+    cursor: pointer;
+}
+
+.jarves-Field-group {
+    border: 1px solid #e4e4e4;
+}
+
+.jarves-Field-group-title > div.title {
+    padding-left: 0;
+    color: gray;
+}
+
+.jarves-Field-info {
+    color: gray;
+}
+
+iframe.jarves-Field-info {
+    border: 0;
+    width: 100%;
+    height: 99%;
+    margin: 0;
+    padding: 0;
+}

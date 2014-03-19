@@ -1,0 +1,36 @@
+.jarves-Splitter-main {
+    position: absolute;
+}
+
+.jarves-Splitter-main-top,
+.jarves-Splitter-main-bottom {
+    left: 0;
+    right: 0;
+    height: 5px;
+}
+
+.jarves-Splitter-main-top {
+    top: 0;
+}
+
+.jarves-Splitter-main-bottom {
+    top: 0;
+}
+
+.jarves-Splitter-main-left,
+.jarves-Splitter-main-right {
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    cursor: ew-resize;
+}
+
+.jarves-Splitter-main-left {
+    left: 0;
+    border-left: 1px solid silver;
+}
+
+.jarves-Splitter-main-right {
+    right: 0;
+    border-right: 1px solid silver;
+}

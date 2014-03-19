@@ -1,0 +1,239 @@
+.jarves-Select-wrapper {
+    display: inline-block;
+    position: relative;
+    height: 30px;
+    line-height: 28px;
+}
+
+.jarves-Select-wrapper > .jarves-Select-box {
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+a.jarves-Select-box,
+a.jarves-Select-box:link {
+    cursor: default;
+    position: relative;
+
+    overflow: hidden;
+    display: inline-block;
+    line-height: 28px;
+
+    color: #333;
+
+    vertical-align: top;
+    min-width: 40px;
+    margin: 0 4px;
+
+    background-color: #fefefe;
+    border: 1px solid #ddd;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    text-align: left;
+
+    max-width: 100%;
+}
+
+.jarves-Select-box:first-child {
+    margin-left: 0;
+}
+
+.jarves-Select-box:last-child {
+    margin-right: 0;
+}
+
+
+.jarves-ActionBar .jarves-Select-box,
+.jarves-ActionBar .jarves-Select-box:link,
+.jarves-windowEdit-action-bar .jarves-Select-box,
+.jarves-windowEdit-action-bar .jarves-Select-box:link,
+.kwindow-win-titleGroups .jarves-Select-box,
+.kwindow-win-titleGroups .jarves-Select-box:link {
+    line-height: 30px;
+    height: 30px;
+}
+
+
+.jarves-ButtonGroup > .jarves-Select-box,
+.jarves-ButtonGroup > .jarves-Select-box:link {
+    margin: 0;
+    border-left: 0;
+}
+
+.jarves-ButtonGroup > .jarves-Select-box:first-child {
+    border-left: 1px solid #ececec;
+}
+
+.jarves-Select-arrow {
+    background-color: #fefefe;
+}
+
+a.jarves-Select-box:focus {
+    outline: 0;
+    border-color: rgba(47, 140, 189, 0.9);
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+    box-shadow: 0 0 0 3px rgba(47, 140, 189, 0.2);
+
+    -moz-transition-duration: .1s;
+    -webkit-transition-duration: .1s;
+    -o-transition-duration: .1s;
+    -ms-transition-duration: .1s;
+    transition-duration: .1s;
+}
+
+.jarves-Select-box-open,
+.jarves-Select-box-open:link,
+.jarves-Select-box:active  {
+
+}
+
+a.jarves-Select-box:hover,
+a.jarves-Select-box-open,
+a.jarves-Select-box-open:link,
+a.jarves-Select-box-open:hover {
+    background-color: #f4f4f4;
+}
+
+a.jarves-Select-transparent,
+a.jarves-Select-transparent .jarves-Select-arrow,
+a.jarves-Select-transparent:link,
+a.jarves-Select-transparent:active,
+a.jarves-Select-transparent .jarves-Select-box:active > .jarves-Select-arrow,
+a.jarves-Select-transparent .jarves-Select-box-focus > .jarves-Select-arrow {
+    background-color: transparent;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+a.jarves-Select-box-focus {
+    border: 1px solid #3E9BCB;
+}
+
+.jarves-Select-box-title {
+    padding-left: 5px;
+    padding-right: 25px;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.jarves-select-chooser-item span:before,
+.jarves-Select-box-title span:before {
+    padding-right: 5px;
+    font-size: 16px;
+    position: relative;
+    top: 2px;
+}
+
+.jarves-Select-arrow {
+    position: absolute;
+    padding-top: 1px;
+    padding-right: 5px;
+    top: 0;
+    right: 0;
+    bottom: 0px;
+    border-left: 1px solid #DDD;
+    width: 14px;
+}
+
+.jarves-Select-arrow:before {
+    color: #666;
+    padding-left: 3px;
+    font-size: 12px;
+}
+
+.jarves-Select-box-title > span:before {
+    padding-right: 3px;
+}
+
+.jarves-Select-chooser {
+    margin: 0px auto;
+    border: 1px solid #e6e6e6;
+
+    border-top: 0px;
+
+    position: absolute;
+    min-width: 50px;
+    min-height: 15px;
+    max-height: 200px;
+    max-width: 100%;
+    overflow: auto;
+    background-color: #fefefe;
+}
+
+.jarves-Select-borderline {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 1px;
+    border-top: 1px solid #e6e6e6;
+}
+
+.jarves-Select-chooser div.group {
+    color: #999;
+    text-align: left;
+    padding: 5px 10px;
+    font-weight: bold;
+}
+
+a.jarves-select-chooser-item {
+    display: block;
+    padding: 3px 23px;
+    color: #222;
+    text-decoration: none;
+    line-height: 18px;
+    cursor: default;
+
+    position: relative;
+    white-space: nowrap;
+}
+
+.jarves-Select-box-title img, .jarves-select-chooser-item img {
+    margin-right: 2px;
+    position: relative;
+    top: 3px;
+    left: -2px;
+}
+
+.jarves-select-chooser-item-active {
+    background-color: #e4e4e4;
+}
+
+.jarves-select-chooser-item:hover {
+    background-color: #eee;
+}
+
+a.jarves-Select-separator,
+a.jarves-Select-separator:link {
+    padding: 2px 5px;
+    font-weight: bold;
+    cursor: default;
+}
+
+a.jarves-select-chooser-item-selected {
+    padding-left: 6px;
+}
+
+a.jarves-select-chooser-item-selected:before {
+    padding-right: 4px;
+}
+
+.jarves-Select-chooser a.jarves-Select-separator:hover {
+    background-color: transparent;
+}
+
+.jarves-Select-disabled,
+.jarves-Select-disabled:link,
+.jarves-Select-disabled:hover,
+.jarves-Select-disabled:active {
+    color: #808080;
+    border: 1px solid #E7E7E7;
+    opacity: 0.8;
+    background-color: #FEFEFE;
+}

@@ -1,0 +1,57 @@
+.jarves-layout-pane {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    overflow: auto;
+}
+
+.jarves-layout-left {
+    position: absolute;
+    left: 3px;
+    width: 242px;
+    top: 3px;
+    bottom: 3px;
+    border: 1px solid silver;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    background-color: white;
+    padding: 0px 0px;
+    overflow-y: scroll;
+}
+
+.jarves-layout-left a,
+.jarves-layout-left a:link {
+    display: block;
+    cursor: default;
+    padding: 2px 5px;
+}
+
+.jarves-layout-theme-items a.active,
+.jarves-layout-theme-items a.active:link {
+    background-color: #ddd;
+}
+
+.jarves-layout-theme-items a:hover {
+    background-color: #f6f6f6;
+}
+
+.jarves-layout-theme-items a,
+.jarves-layout-theme-items a:link {
+    padding: 2px 5px 2px 15px;
+}
+
+.jarves-system-layout-codemirror {
+    background-color: white;
+    border: 1px solid #bbb;
+}
+
+.jarves-system-layout-codemirror .CodeMirror-scroll {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    height: 100%;
+}

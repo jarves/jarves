@@ -1,0 +1,61 @@
+.jarves-slot {
+    min-height: 20px;
+}
+
+.jarves-slot-highlight {
+    outline: 1px solid #003366;
+    background-color: rgba(34, 124, 160, 0.1);
+}
+
+.jarves-slot-header {
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+    border: 1px solid #4E4E4E;
+    border-bottom: 0px;
+    min-height: 22px;
+}
+
+.jarves-slot-header-inner {
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+    border-top: 1px solid #66CEFF;
+    background-color: #227CA0;
+    position: relative;
+    min-height: 22px;
+}
+
+.jarves-slot-header-title {
+    margin: 1px 5px;
+    line-height: 20px;
+    float: left;
+    color: white;
+    font-size: 12px;
+    text-shadow: 0 1px 0 #333;
+}
+
+.jarves-slot-header-actions {
+    margin: 1px 5px;
+    float: right;
+    line-height: 20px;
+    color: white;
+}
+
+.jarves-slot-header-actions a,
+.jarves-slot-header-actions a:link {
+    font-family: 'icomoon';
+    font-style: normal;
+    speak: none;
+    line-height: 20px;
+    color: white;
+    font-size: 12px;
+    text-decoration: none;
+    text-shadow: 0 1px 0 #333;
+}
+
+.jarves-slot-header-actions a:hover {
+    color: #ddd;
+}
+
+.jarves-slot-header-actions a:active {
+    color: #aaa;
+}

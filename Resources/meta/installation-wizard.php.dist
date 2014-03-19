@@ -1,0 +1,1225 @@
+<?php
+/*
+* This file is part of Jarves cms.
+*
+ * (c) Marc J. Schmidt <marc@jarves.org>
+*
+* To get the full copyright and license information, please view the
+* LICENSE file, that was distributed with this source code.
+*/
+
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Debug\Debug;
+
+// If you don't want to setup permissions the proper way, just uncomment the following PHP line
+// read http://symfony.com/doc/current/book/installation.html#configuration-and-setup for more information
+umask(0006);
+
+$loader = require_once __DIR__.'/../app/bootstrap.php.cache';
+Debug::enable();
+
+require_once __DIR__.'/../app/AppKernel.php';
+
+$kernel = new AppKernel('prod', true);
+$kernel->loadClassCache();
+$kernel->boot();
+
+try {
+    $bundle = $kernel->getBundle('JarvesBundle');
+} catch (\Exception $e) {
+    throw new \Exception('To use this installation script you have to activate the JarvesBundle first in your AppKernel.', 0, $e);
+}
+
+
+/** @var $jarves \Jarves\Jarves */
+$jarves = $kernel->getContainer()->get('jarves');
+$jarves->prepareWebSymlinks();
+
+
+if (@$_REQUEST['step'] == 'checkConfig') {
+    checkConfig();
+}
+
+if (@$_REQUEST['step'] == '5') {
+    step5Init();
+}
+
+header("Content-Type: text/html; charset=utf-8");
+
+?><!DOCTYPE html>
+<html>
+<head>
+    <title>Jarves cms installation</title>
+    <link rel="stylesheet" type="text/css" href="bundles/jarves/css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="bundles/jarves/font/SourceSansPro/Regular/fonts.css">
+    <link rel="stylesheet" type="text/css" href="bundles/jarves/font/SourceSansPro/Semibold/fonts.css">
+    <link rel="stylesheet" type="text/css" href="bundles/jarves/admin/css/jarves/Button.css">
+    <link rel="stylesheet" type="text/css" href="bundles/jarves/admin/css/jarves/Input.css">
+
+    <style type="text/css">
+        body {
+            font-size: 14px;
+            line-height: 18px;
+            margin: 0px;
+            font-family: "SourceSansPro-Regular", Sans;
+            background-color: #22628d;
+            padding: 0px;
+            text-align: center;
+        }
+
+        .logo {
+            position: relative;
+            left: -240px;
+            margin-bottom: 25px;
+            margin-top: 10px;
+        }
+
+        h1 {
+            margin: 0px 0px 10px 0px;
+            border-bottom: 1px solid #00273c;
+            font-size: 12px;
+            font-weight: bold;
+            color: #145E84;
+        }
+
+        h2 {
+            color: #145E84;
+        }
+
+        h1, h2, h3 {
+            font-family: "SourceSansPro-Semibold";
+        }
+
+        td {
+            vertical-align: top;
+        }
+
+        .step a, .step a:link {
+            text-decoration: none;
+            color: gray;
+        }
+
+        a, a:link {
+            color: gray;
+        }
+
+        table {
+            font-size: 14px;
+            margin: 5px;
+            margin-left: 10px;
+            width: 400px;
+            color: #555;
+        }
+
+        table td {
+            padding: 5px 5px;
+        }
+
+        table th {
+            color: #444;
+            border-bottom: 1px solid silver;
+            font-weight: normal;
+            text-align: left;
+        }
+
+        table.modulelist td {
+            border-bottom: 1px solid #eee;
+        }
+
+        select {
+            width: 152px;
+        }
+
+        .wrapper {
+            text-align: left;
+            margin: auto;
+            width: 700px;
+            left: 60px;
+            border-radius: 2px;
+            border-radius: 2px;
+            -moz-border-radius: 2px;
+            -webkit-border-radius: 2px;
+            padding: 45px 35px;
+            background-color: #f1f1f1;
+            position: relative;
+            color: #333;
+            min-height: 200px
+        }
+
+        .step a, .step a:link {
+            display: block;
+            text-align: left;
+            padding: 12px 5px 12px 15px;
+        }
+
+        .step a.active {
+            color: black;
+            font-weight: bold;
+        }
+
+        .step {
+            border-right: 0px;
+            -moz-border-radius-topleft: 2px;
+            -moz-border-radius-bottomleft: 2px;
+            -webkit-border-top-left-radius: 2px;
+            -webkit-border-bottom-left-radius: 2px;
+            border-top-left-radius: 2px;
+            border-bottom-left-radius: 2px;
+            position: absolute;
+            top: 27px;
+            left: -150px;
+            width: 150px;
+            background-color: #f1f1f1;
+            margin-bottom: 15px;
+        }
+
+        h2.main {
+            position: absolute;
+            top: 0px;
+            left: 35px;
+            right: 35px;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 5px;
+            color: #666;
+        }
+
+        #progressBar {
+            -moz-border-radius: 2px;
+            -webkit-border-radius: 2px;
+            border-radius: 2px;
+            background-color: #22628d;
+            height: 25px;
+            text-align: center;
+            color: white;
+            line-height: 25px;
+            font-weight: bold;
+            position: relative;
+        }
+
+        #progressError {
+            white-space: pre;
+            background-color: white;
+            padding: 15px;
+            border: 1px solid red;
+        }
+
+        #progressBarText {
+            position: relative;
+        }
+
+        #progressBarIn {
+            -moz-border-radius: 2px;
+            -webkit-border-radius: 2px;
+            border-radius: 2px;
+            background-color: #22518e;
+            height: 25px;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+
+        select {
+            width: 141px;
+        }
+
+        .breaker {
+            clear: both
+        }
+
+    </style>
+    <script type="text/javascript" src="bundles/jarves/admin/mootools-core-1.4.5-fixed-memory-leak.js"></script>
+    <script type="text/javascript" src="bundles/jarves/admin/mootools-more.js"></script>
+    <link rel="SHORTCUT ICON" href="bundles/jarves/images/favicon.ico">
+</head>
+<body>
+<img class="logo" src="bundles/jarves/images/logo_white.png"/>
+
+<div class="wrapper">
+<h2 class="main">Installation</h2>
+<?php
+
+$step = 1;
+if (!empty($_REQUEST['step'])) {
+    $step = $_REQUEST['step'];
+}
+?>
+
+<div class="step">
+    <a href="javascript:;" <?php if ($step == 1) {
+        echo 'class="active"';
+    } ?>>1. Start</a>
+    <a href="javascript:;" <?php if ($step == 2) {
+        echo 'class="active"';
+    } ?>>2. Requirements</a>
+    <a href="javascript:;" <?php if ($step == 3) {
+        echo 'class="active"';
+    } ?>>3. Configuration</a>
+    <a href="javascript:;" <?php if ($step == 4) {
+        echo 'class="active"';
+    } ?>>4. Bundles</a>
+    <a href="javascript:;" <?php if ($step == 5) {
+        echo 'class="active"';
+    } ?>>5. Installation</a>
+
+    <div class="breaker"></div>
+</div>
+
+<?php
+
+switch ($step) {
+    case '5':
+        step5();
+        break;
+    case '4':
+        step4();
+        break;
+    case '3':
+        step3();
+        break;
+    case '2':
+        step2();
+        break;
+    case '1':
+        welcome();
+}
+
+function checkConfig()
+{
+    global $kernel, $jarves;
+
+    $configFile = realpath($kernel->getRootDir().'/..') .'/app/config/config.jarves.xml';
+    if ((file_exists($configFile) && !is_writable($configFile))
+        || !file_exists($configFile) && !is_writable(dirname($configFile))
+    ) {
+        $res['res'] = false;
+        $res['error'] = $configFile. ' is not writable.';
+        die(json_encode($res));
+    }
+
+    $cfg = array(
+        "db_server" => $_REQUEST['server'],
+        "db_user" => $_REQUEST['username'],
+        "db_password" => $_REQUEST['password'],
+        "db_name" => $_REQUEST['db'],
+        "db_prefix" => $_REQUEST['prefix'],
+        "db_type" => $_REQUEST['type']
+    );
+
+    $res = array('res' => true);
+
+    $dsn = $cfg['db_type'] . ':dbname=' . $cfg['db_name'] . ';host=' . $cfg['db_server'];
+
+    try {
+        $connection = new \PDO($dsn, $cfg['db_user'], $cfg['db_password']);
+    } catch (PDOException $e) {
+        $res['res'] = false;
+        $res['error'] = "`$dsn` [" . $e->getMessage() . ']';
+    }
+
+    if ($res['res'] == true) {
+        $database = $jarves->getSystemConfig()->getDatabase(true);
+
+        $connection = $database->getMainConnection();
+        $connection->setServer(@$_REQUEST['server']);
+        $connection->setUsername(@$_REQUEST['username']);
+        $connection->setPassword(@$_REQUEST['password']);
+        $connection->setName(@$_REQUEST['db']);
+        $connection->setType(@$_REQUEST['type']);
+        $connection->setPersistent(@$_REQUEST['persistent'] == 1);
+
+        $database->setPrefix(@$_REQUEST['prefix']);
+
+        $timezone = @$_REQUEST['timezone'];
+        if (!$timezone) {
+            $timezone = 'Europe/Berlin';
+        }
+
+        $jarves->getSystemConfig()->setTimezone($timezone);
+
+        $systemTitle = @$_REQUEST['systemTitle'];
+        if (!$systemTitle) {
+            $systemTitle = "Fresh Installation";
+        }
+
+        $jarves->getSystemConfig()->setSystemTitle($systemTitle);
+
+        if (@$_REQUEST['id']) {
+            $jarves->getSystemConfig()->setId($_REQUEST['id']);
+        }
+
+        $filePermission = $jarves->getSystemConfig()->getFile(true);
+        $filePermission->setDisableModeChange(@$_REQUEST['fileNoChangeMode'] == 1);
+        $filePermission->setGroupPermission(@$_REQUEST['fileGroupPermission']);
+        $filePermission->setEveryonePermission(@$_REQUEST['fileEveryonePermission']);
+        $filePermission->setGroupOwner(@$_REQUEST['fileGroupName']);
+
+        if (@$_REQUEST['removeScript']) {
+            file_put_contents($kernel->getCacheDir().'/jarves_installer_remove', '1');
+        }
+        $root = realpath($kernel->getRootDir().'/..');
+        if (!$jarves->getSystemConfig()->save($root . '/app/config/config.jarves.xml', true)) {
+            $res['error'] = 'Can not open file app/config/config.xml - please change the permissions.';
+            $res['res'] = false;
+        }
+    }
+
+    die(json_encode($res));
+}
+
+function welcome()
+{
+    global $kernel;
+    ?>
+
+    <h2>Thanks for choosing Jarves cms!</h2>
+    <br/>
+    Your installation folder is <strong style="color: gray;"><?php echo realpath($kernel->getRootDir().'/..'); ?></strong>
+    <br/>
+    <br/>
+    <b>Jarves cms license</b><br/>
+    <br/>
+    <div style="height: 350px; background-color: white; padding: 5px; overflow: auto; white-space: pre;"><?php
+
+        $license = $kernel->locateResource('@JarvesBundle/Resources/meta/LICENSE');
+
+        if (file_exists($license)) {
+            $f = fopen($license, "r");
+            if ($f) {
+                while (!feof($f)) print fgets($f, 4096);
+            }
+        }
+
+        ?>
+    </div>
+    <br/><br/>
+    <b style="color: gray">Jarves cms comes with amazing additional third party software.</b><br/>
+    Please respect all of their licenses too:<br/>
+    <br/>
+    <table style="width: 100%" cellpadding="3">
+        <tr>
+            <th width="160">Name</th>
+            <th width="250">Author/Link</th>
+            <th>License</th>
+        </tr>
+        <tr>
+            <td width="160">Propel</td>
+            <td width="250"><a href="http://propelorm.org//">propelorm.org/</a></td>
+            <td>&raquo; <a href="http://www.propelorm.org/download#license">MIT license</a></td>
+        </tr>
+        <tr>
+            <td width="160">Mootools</td>
+            <td width="250"><a href="http://mootools.net/">mootools.net</a></td>
+            <td>&raquo; <a href="http://www.opensource.org/licenses/mit-license.php">MIT license</a></td>
+        </tr>
+        <tr>
+            <td>Codemirror</td>
+            <td><a href="http://codemirror.net/">codemirror.net</a></td>
+            <td>&raquo; <a href="../lib/codemirror/LICENSE">MIT-style license</a></td>
+        </tr>
+        <tr>
+            <td>normalize.css</td>
+            <td><a href="http://necolas.github.com/normalize.css/">necolas.github.com/normalize.css</a></td>
+            <td>&raquo; <a href="../lib/codemirror/LICENSE">MIT License</a></td>
+        </tr>
+        <tr>
+            <td>Silk icon set 1.3</td>
+            <td><a href="http://www.famfamfam.com/lab/icons/silk/">www.famfamfam.com/lab/icons/silk/</a></td>
+            <td>&raquo; <a href="http://creativecommons.org/licenses/by/2.5/">Creative Commons Attribution 2.5
+                    License.</a></td>
+        </tr>
+        <tr>
+            <td width="160">[Mootools plugin] Stylesheet</td>
+            <td width="250"><a href="http://mifjs.net">Anton Samoylov</a></td>
+            <td>&raquo; <a href="http://mifjs.net/license.txt">MIT-Style License</a></td>
+        </tr>
+        <tr>
+            <td colspan="3">IconSet:
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" style="white-space: pre; background-color: white;"><?php print file_get_contents(
+                    $kernel->locateResource('@JarvesBundle/Resources/public/admin/icons/license.txt')
+                ); ?>
+            </td>
+        </tr>
+
+    </table>
+    <a href="?step=2" class="jarves-Button">Accept</a>
+
+<?php
+}
+
+function step5Failed($pError)
+{
+    $msg = array('error' => $pError->getMessage(), 'exception' => (string)$pError);
+
+    if ($pError instanceof \PDOException) {
+        //$msg['sql'] = ;
+    }
+    print json_encode($msg);
+    exit;
+}
+
+function step5Done($pMsg)
+{
+    $msg = array('data' => $pMsg);
+    print json_encode($msg);
+    exit;
+}
+
+//Installing jarves bundles
+function step5_1()
+{
+    global $jarves, $kernel;
+
+    $bundleManager = new \Jarves\Controller\Admin\BundleManager\ManagerController();
+    $bundleManager->setContainer($kernel->getContainer());
+    try {
+
+        foreach ($jarves->getBundles() as $bundleName => $bundle) {
+            if ($jarves->isJarvesBundle($bundleName)) {
+                $bundleManager->installAction($bundleName);
+            }
+        }
+
+    } catch (Exception $e) {
+        step5Failed($e);
+    }
+
+    step5Done(true);
+}
+
+//Build models
+function step5_2()
+{
+    global $jarves;
+
+    $propelHelper = new \Jarves\Propel\PropelHelper($jarves);
+
+    try {
+        $propelHelper->generateClasses();
+    } catch (Exception $e) {
+        step5Failed($e);
+    }
+    step5Done(true);
+}
+
+//Update database
+function step5_3()
+{
+    global $jarves;
+
+    $propelHelper = new \Jarves\Propel\PropelHelper($jarves);
+
+    try {
+        $propelHelper->updateSchema();
+    } catch (Exception $e) {
+        step5Failed($e);
+    }
+    step5Done(true);
+}
+
+//Install demo data
+function step5_4()
+{
+    global $kernel;
+
+    $demoDataCommand = new \Jarves\Command\DemoDataCommand();
+    $demoDataCommand->setContainer($kernel->getContainer());
+
+    $input = new \Symfony\Component\Console\Input\ArrayInput(array(
+    ));
+    $output = new \Symfony\Component\Console\Output\StreamOutput(fopen('php://memory', 'rw'));
+
+    try {
+        $demoDataCommand->run($input, $output);
+    } catch (Exception $e) {
+        step5Failed($e);
+    }
+    step5Done(true);
+}
+
+//Cleanup
+function step5_5()
+{
+    global $jarves, $kernel;
+
+    $propelHelper = new \Jarves\Propel\PropelHelper($jarves);
+
+    try {
+        $propelHelper->cleanup();
+
+        if (file_exists($file = $kernel->getCacheDir().'/jarves_installer_remove')) {
+            @unlink($file);
+            @unlink($kernel->getRootDir().'/../web/install.php');
+        }
+    } catch (Exception $e) {
+        step5Failed($e);
+    }
+    step5Done(true);
+}
+
+function step5Init()
+{
+    global $jarves;
+
+    $subStep = @$_GET['substep'] + 0;
+
+    if ($subStep == 0 && @$_REQUEST['modules']) {
+        $appModifier = new \Jarves\Admin\AppKernelModifier();
+
+        foreach ($_REQUEST['modules'] as $bundleClass => $dummy) {
+            $appModifier->addBundle($bundleClass);
+        }
+        $appModifier->save();
+    }
+
+    if ($subStep == 0) {
+        $fs = $jarves->getCacheFileSystem();
+        if ($fs->has('propel-classes')) {
+            $fs->delete('propel-classes');
+        }
+        if ($fs->has('propel')) {
+            $fs->delete('propel');
+        }
+    }
+
+    if ($subStep > 0) {
+        $fn = 'step5_' . $subStep;
+        $fn();
+        exit;
+    }
+}
+
+function step5()
+{
+    global $kernel;
+    ?>
+
+    <br/>
+    <h2>Installing ....</h2>
+<?php
+
+?>
+    <div id="progress">
+        <div id="progressMessage">Pending ...</div>
+        <div id="progressBar">
+            <div id="progressBarIn" style="width: 0px"></div>
+            <div id="progressBarText">0%</div>
+        </div>
+        <div id="progressError" style="display: none; overflow-x: auto;"></div>
+    </div>
+    <div id="installDone" style="display: none;">
+        <br/>
+
+        <h3 style="color: green;">Installation successful!</h3>
+        <br/>
+        <b>Administration login</b><br/>
+        <table width="50%">
+            <tr>
+                <td>Login:</td>
+                <td>admin</td>
+            </tr>
+            <tr>
+                <td>Password:</td>
+                <td>admin</td>
+            </tr>
+
+        </table>
+        !Please change your password as fast as possible!<br/>
+        <br/>
+        <br/>
+        &raquo; Go to:
+        <a target="_blank" href="./">Frontend</a> or <a target="_blank" href="./jarves">Administration</a>
+        <br/>
+        <br/>
+
+        <div
+            style="color: gray;  border: 1px solid silver; border-top: 1px dashed #888; padding: 15px; margin: 15px 0; border-radius: 5px;">
+            Developer information:<br/><br/>
+            If you have chosen a temp directory outside of your project dir, you should include the following folder to your project to get the
+            correct auto-completion in your IDE, since there are all propel model classes.<br/>
+            <pre><?php echo $kernel->getCacheDir().'/propel-classes/' ?></pre>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        window.addEvent('domready', function () {
+
+            var steps = [
+                'Installing jarves bundles ....',
+                'Build models ...',
+                'Update database ...',
+                'Install demo data ...',
+                'Cleanup ...'
+            ];
+
+            var currentStep = 0;
+            var handleNextStep;
+
+            document.id('progressBarIn').set('tween', {duration: 250});
+
+            handleNextStep = function () {
+                currentStep++;
+
+                document.id('progressMessage').set('text', steps[currentStep - 1]);
+
+                new Request.JSON({
+                    url: 'install.php?step=5&substep=' + currentStep,
+                    noCache: 1,
+                    onComplete: function (pResult) {
+
+                        if (pResult.error) {
+                            document.id('progressError').setStyle('display', 'block');
+                            document.id('progressError').set('html', pResult.error);
+                            if (pResult.sql) {
+                                new Element('div', {
+                                    text: pResult.sql
+                                }).inject(document.id('progressError'));
+                            }
+                            if (pResult.exception) {
+                                new Element('div', {
+                                    text: pResult.exception
+                                }).inject(document.id('progressError'));
+                            }
+                            new Element('h2', {
+                                style: 'color: red',
+                                text: 'Error'
+                            }).inject(document.id('progressError'), 'top');
+                        } else {
+
+                            width = (currentStep / (steps.length / 700));
+                            percent = (currentStep / (steps.length / 100));
+                            document.id('progressBarText').set('text', percent.toFixed(0) + '%');
+                            document.id('progressBarIn').tween('width', width);
+
+                            if (steps.length == currentStep) {
+                                document.id('progress').setStyle('display', 'none');
+                                document.id('installDone').setStyle('display', 'block');
+                            } else {
+                                handleNextStep.delay(250);
+                            }
+                        }
+                    },
+                    onError: function (pResult) {
+
+                        document.id('progressError').setStyle('display', 'block');
+                        document.id('progressError').set('html', pResult);
+                        new Element('h2', {
+                            style: 'color: red',
+                            text: 'Error'
+                        }).inject(document.id('progressError'), 'top');
+                    }
+                }).get();
+
+            }
+
+            handleNextStep();
+
+        });
+    </script>
+
+<?php
+}
+
+function step4()
+{
+    global $jarves;
+    ?>
+
+    <br/>
+    Your package contains following bundles:<br/>
+    <br/>
+    <br/>
+    <form action="?step=5" method="post" id="form.modules">
+        <table style="width: 98%; table-layout: fixed;" class="modulelist" cellpadding="4">
+            <?php
+            buildModInfo();
+            ?>
+        </table>
+    </form>
+    <div style="padding: 10px; font-weight: bold; color: red;">All database shown tables and all tables where their name starts with
+        `<?php echo $jarves->getSystemConfig()->getDatabase(true)->getPrefix(); ?>` will be dropped in the next step!</div>
+    <br/>
+    <a href="?step=3" class="jarves-Button">Back</a>
+    <a href="javascript: document.id('form.modules').submit();" class="jarves-Button">Install!</a>
+<?php
+}
+
+function buildModInfo()
+{
+    global $kernel, $jarves;
+
+    $bundleManager = new \Jarves\Controller\Admin\BundleManager\ManagerController();
+    $bundleManager->setContainer($kernel->getContainer());
+
+    $bundles = $bundleManager->getLocalAction();
+
+    $required = [
+        'Jarves\JarvesBundle',
+        'Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle',
+        'Symfony\Bundle\MonologBundle\MonologBundle',
+        'Symfony\Bundle\FrameworkBundle\FrameworkBundle',
+        'Symfony\Bundle\TwigBundle\TwigBundle',
+        'Jarves\DemoTheme\JarvesDemoThemeBundle',
+        'Jarves\Publication\JarvesPublicationBundle',
+        'Symfony\Bundle\WebProfilerBundle\WebProfilerBundle'
+    ];
+
+    $dev = [
+        'Symfony\Bundle\WebProfilerBundle\WebProfilerBundle',
+        'Sensio\Bundle\DistributionBundle\SensioDistributionBundle',
+        'Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle'
+    ];
+
+    $jarvesBundles = [];
+    $otherBundles = [];
+    foreach ($bundles as $bundleClass => $bundle) {
+        if (@$bundle['jarvesBundle']) {
+            $jarvesBundles[$bundleClass] = $bundle;
+        } else {
+            $otherBundles[$bundleClass] = $bundle;
+        }
+    }
+
+    $bundles = array_merge($jarvesBundles, $otherBundles);
+
+    foreach ($bundles as $bundleClass => $bundle) {
+        $disabled = '';
+        if (in_array($bundleClass, $required)) {
+            $bundle['activated'] = true;
+            $disabled = ' disabled';
+        }
+
+        if (in_array($bundleClass, $dev)) {
+            continue;
+        }
+
+        $checked = $bundle['activated'] ? 'checked="checked"' : '';
+
+        $tables = '';
+
+        if (@$bundle['jarvesBundle']) {
+            $tables = [];
+            $prefix = $jarves->getSystemConfig()->getDatabase(true)->getPrefix();
+            if ($config = $jarves->getConfig($bundleClass)) {
+                if ($objects = $config->getObjects()) {
+                    foreach ($objects as $object) {
+                        if ($object->getTable()) {
+                            $tables[] = $prefix . $object->getTable();
+                        }
+                    }
+                }
+            }
+            $tables = implode(", ", $tables);
+        }
+
+        ?>
+
+        <tr>
+            <td valign="top" width="30">
+                <div style="padding-top: 5px;">
+                    <input name="modules[<?php echo $bundleClass; ?>]" <?php echo $checked.$disabled; ?> type="checkbox" value="1" />
+                </div>
+            </td>
+            <td valign="top"><strong><?php echo $bundleClass ?></strong>
+                <div style="color: silver;"><?php echo @$bundle['name'] ?></div>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" colspan="2" style="border-bottom: 1px solid silver;">
+                <div style="padding-left: 40px; color: gray;">
+                    <?php echo @$bundle['description'] ?>
+                </div>
+                <div style="padding-left: 40px; padding-top: 5px; color: #ad0000;">
+                    <?php echo $tables ? 'Tables: ' . $tables : '' ?>
+                </div>
+            </td>
+        </tr>
+
+    <?php
+    }
+
+}
+
+function step2()
+{
+    $anyThingOk = true;
+    ?>
+
+    <h2>Checking requirements</h2>
+    <br/>
+    <ol>
+
+        <li><b>PHP Version</b>
+            <?php
+
+            $t = explode("-", PHP_VERSION);
+            $v = ($t[0]) ? $t[0] : PHP_VERSION;
+            //5.3.2 because flock()
+            if (!version_compare($v, "5.4.0") < 0) {
+                print '<div style="color: red">PHP version too old.<br />';
+                print "You need PHP version 5.4.0 or greater.<br />";
+                print "Installed version: $v (" . PHP_VERSION . ")<br/></div>";
+                $anyThingOk = false;
+            } else {
+                print '<div style="color: green">OK</div>';
+            }
+            ?>
+        </li>
+
+        <li><b>PHP Extensions</b>
+            <?php
+
+            if (!extension_loaded('mbstring')) {
+                $anyThingOk = false;
+                print '<div style="color: red">mbstring required.</div>';
+            } else {
+                print '<div style="color: green">mbstring OK</div>';
+            }
+
+            if (!extension_loaded('gd')) {
+                $anyThingOk = false;
+                print '<div style="color: red">libgd required.</div>';
+            } else {
+                print '<div style="color: green">libgd OK</div>';
+            }
+
+            if (!extension_loaded('zip')) {
+                $anyThingOk = false;
+                print '<div style="color: red">zip required.</div>';
+            } else {
+                print '<div style="color: green">zip OK</div>';
+            }
+
+            ?>
+        </li>
+
+        <li><b>Database PDO driver</b>
+            <?php
+
+            $drivers = array('mysql' => 'MySQL', 'pgsql' => 'PostgreSQL', 'sqlite' => 'SQLite', 'sqlsrv' => 'MSSQL');
+
+            $oneFound = false;
+            foreach ($drivers as $driver => $label) {
+                $color = extension_loaded('pdo_' . $driver) ? 'green' : 'red';
+                if ($color == 'green') {
+                    $oneFound = true;
+                }
+                print '<div style="color: ' . $color . '">' . $label . '</div>';
+            }
+            if (!$oneFound) {
+                print '<br /><div>There is no available pdo driver.</div>';
+                $anyThingOk = false;
+            }
+
+            ?>
+        </li>
+
+    </ol>
+    <br/>
+    <a href="?step=1" class="jarves-Button">Back</a>
+    <?php
+
+    if ($anyThingOk) {
+        print '<a href="?step=3" class="jarves-Button" >Next</a>';
+    } else {
+        print '<a href="?step=2" class="jarves-Button" >Re-Check</a>';
+    }
+
+}
+
+function step3()
+{
+    global $jarves;
+    ?>
+
+    <script type="text/javascript">
+
+        window.addEvent('domready', function () {
+            var driver = document.id('db_type');
+            var server = document.id('db_server');
+            var info = document.id('db_name_sqlite_info');
+            var user = document.id('db_username');
+            var passwd = document.id('db_password');
+            //            var port = document.id('db_port');
+            var persis = document.id('db_persistent');
+
+            driver.addEvent('change', function () {
+                if (driver.value == 'sqlite') {
+                    server.required = false;
+                    user.required = false;
+                    [server, passwd, user, persis].each(function (item) {
+                        item.getParent('tr').setStyle('display', 'none');
+                    });
+                    info.setStyle('display', 'block');
+                } else {
+                    server.required = true;
+                    user.required = true;
+                    [server, passwd, user, persis].each(function (item) {
+                        item.getParent('tr').setStyle('display', 'table-row');
+                    });
+                    info.setStyle('display', 'none');
+                }
+            });
+
+            driver.fireEvent('change');
+
+        });
+
+        window.checkConfigEntries = function () {
+            var ok = true;
+            var driver = document.id('db_type');
+
+            if (driver.value != 'sqlite') {
+                if (document.id('db_server').value == '') {
+                    document.id('db_server').highlight();
+                    ok = false;
+                }
+                if (document.id('db_username').value == '') {
+                    document.id('db_username').highlight();
+                    ok = false;
+                }
+                if (document.id('db_name').value == '') {
+                    document.id('db_name').highlight();
+                    ok = false;
+                }
+            }
+
+            if (ok) {
+                document.id('status').set('html', '<span style="color:green;">Check data ...</span>');
+                var req = document.id('form').toQueryString().parseQueryString();
+
+                if (window.lcer) {
+                    window.lcer.cancel();
+                }
+
+                window.lcer = new Request.JSON({url: 'install.php?step=checkConfig', onComplete: function (stat) {
+                    if (stat != null && stat.res == true) {
+                        document.id('status').set('html', '<span style="color:green;">Success. Redirecting ...</span>');
+                        location = '?step=4';
+                    }
+                    else if (stat != null) {
+                        document.id('status').set('html',
+                            '<span style="color:red;">Failed:<br />' + stat.error + '</span>');
+                    }
+                    else {
+                        document.id('status').set('html',
+                            '<span style="color:red;">Fatal Error. Please take a look in server logs.</span>');
+                    }
+                },
+                    onError: function (res) {
+                        document.id('status').set('html',
+                            '<span style="color:red;">Fatal Error. Please take a look in server logs.</span> Maybe this helps: <br />' +
+                                res);
+                    }}).get(req);
+            }
+        };
+
+        window.addSlave = function () {
+
+            var tr = new Element('tr');
+
+            var names = ['host', 'username', 'password', 'database', 'prefix'];
+            for (var i = 0; i < 6; i++) {
+                new Element('input', {name: 'slaves[' + names[i] + '][]', required: i == 1 ? null :
+                    true, 'class': 'jarves-Input', style: 'width: 100%'}).inject(new Element('td').inject(tr));
+            }
+
+            var remove = new Element('a', {text: 'X', href: 'javascript:;'}).inject(new Element('td').inject(tr));
+
+            remove.addEvent('click', function () {
+                tr.destroy();
+            })
+
+            tr.inject($('slaves'));
+
+        }
+    </script>
+
+    <form id="form" autocomplete="off" onsubmit="checkConfigEntries(); return false;">
+
+        <div style="padding: 15px 0">
+            These settings are only the minimum settings to run Jarves cms.<br/>
+            To set more detailed settings, just login to the administration and open the settings window after the installation.
+        </div>
+
+        <h3>System</h3>
+
+        <table style="width: 100%" cellpadding="3">
+            <tr>
+                <td width="450">Title*</td>
+                <td>
+                    <input type="text" class="jarves-Input-text" required name="systemTitle" value="<?php echo $jarves->getSystemConfig()->getSystemTitle() ?: 'Fresh installation'; ?>">
+                </td>
+            </tr>
+            <tr>
+                <td>Installation id*
+                    <div style="color: #aaa">No special characters.</div>
+                </td>
+                <td>
+                    <input type="text" class="jarves-Input-text" required name="id"
+                           value="<?php echo $jarves->getSystemConfig()->getId() ?: dechex((time() / 1000) / mt_rand(10, 100)); ?>">
+                </td>
+            </tr>
+            <tr>
+                <td>Timezone</td>
+                <td>
+                    <select name="timezone">
+                        <?php
+                        $value = $jarves->getSystemConfig()->getTimezone() ?: 'Europe/Berlin';
+                        $zones = timezone_identifiers_list();
+                        foreach ($zones as $zone) {
+                            echo "<option " . ($zone == $value ? 'selected="selected"' : '') . ">$zone</option>";
+                        }
+                        ?>
+                    </select>
+                </td>
+            </tr>
+        </table>
+
+        <h3>Local Filesystem</h3>
+
+        <table style="width: 100%" cellpadding="3">
+            <tr>
+                <td colspan="2">
+                    <div style="color: #aaa;">Following settings are used only for modified files and new files created by
+                        Jarves cms.
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td width="450">Default group owner
+                </td>
+                <td>
+                    <input type="text" class="jarves-Input-text" name="fileGroupName" value="<?php echo $jarves->getSystemConfig()->getFile(true)->getGroupOwner(); ?>">
+                </td>
+            </tr>
+            <tr>
+                <td>Default group permission</td>
+                <td>
+                    <select name="fileGroupPermission">
+                        <option <?php if ($jarves->getSystemConfig()->getFile()->getGroupPermission() == 'rw') echo 'selected="selected"'; ?> value="rw">Read and Write</option>
+                        <option <?php if ($jarves->getSystemConfig()->getFile()->getGroupPermission() == 'r') echo 'selected="selected"'; ?>value="r">Read</option>
+                        <option <?php if ($jarves->getSystemConfig()->getFile()->getGroupPermission() == '') echo 'selected="selected"'; ?> value="">None</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Default everyone permission</td>
+                <td>
+                    <select name="fileEveryonePermission">
+                        <option <?php if ($jarves->getSystemConfig()->getFile()->getEveryonePermission() == '') echo 'selected="selected"'; ?> value="">None</option>
+                        <option <?php if ($jarves->getSystemConfig()->getFile()->getEveryonePermission() == 'r') echo 'selected="selected"'; ?> value="r">Read</option>
+                        <option <?php if ($jarves->getSystemConfig()->getFile()->getEveryonePermission() == 'rw') echo 'selected="selected"'; ?> value="rw">Read and Write</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Do not change file permission</td>
+                <td>
+                    <input type="checkbox" <?php if ($jarves->getSystemConfig()->getFile()->getDisableModeChange()) echo 'checked="checked"'; ?> value="1" name="fileNoChangeMode"/>
+                </td>
+            </tr>
+        </table>
+
+        <h3>Database</h3>
+
+        <div style="color: #aaa">This is the main connection. You can define later more slave connections in the administration.</div>
+
+        <table style="width: 100%" cellpadding="3">
+            <tr>
+                <td width="450">Database PDO driver *</td>
+                <td><select required name="type" id="db_type">
+                        <?php
+
+                        $drivers = array(
+                            'mysql' => 'MySQL',
+                            'pgsql' => 'PostgreSQL',
+                            'sqlite' => 'SQLite',
+                            'sqlsrv' => 'MSSQL'
+                        );
+
+                        foreach ($drivers as $driver => $label) {
+                            $enabled = extension_loaded('pdo_' . $driver) ? '' : 'disabled="disabled"';
+                            $selected = $driver == $jarves->getSystemConfig()->getDatabase(true)->getMainConnection()->getType() ? 'selected="selected"' : '';
+                            print "<option $enabled $selected value=\"$driver\">$label</option>";
+                        }
+                        ?>
+                    </select></td>
+            </tr>
+
+            <tr>
+                <td>
+
+                    Persistent connections
+                    <div style="color: #aaa">You should probably deactivate this on the most low-cost and free web hoster.
+                    </div>
+                </td>
+                <td><input type="checkbox" <?php if ($jarves->getSystemConfig()->getDatabase(true)->getMainConnection()->getPersistent()) echo 'checked="checked"'; ?> id="db_persistent" name="persistent" value="1"/></td>
+            </tr>
+            <tr>
+                <td>
+                    Host *
+                </td>
+                <td><input required type="text" class="jarves-Input-text" name="server" id="db_server" value="<?php echo $jarves->getSystemConfig()->getDatabase()->getMainConnection()->getServer() ?>"/></td>
+            </tr>
+            <tr id="ui_username">
+                <td>Username *</td>
+                <td><input required type="text" class="jarves-Input-text" name="username" id="db_username" value="<?php echo $jarves->getSystemConfig()->getDatabase()->getMainConnection()->getUsername() ?>"/></td>
+            </tr>
+            <tr id="ui_password">
+                <td>Password</td>
+                <td><input type="password" name="password" id="db_password" class="jarves-Input-text" value="<?php echo $jarves->getSystemConfig()->getDatabase()->getMainConnection()->getPassword(); ?>"/></td>
+            </tr>
+            <tr id="ui_db">
+                <td>
+                    Database/Schema name *
+                    <div id="db_name_sqlite_info" style="display: none; color: #aaa">For SQLite enter here the file name
+                    </div>
+                </td>
+                <td><input required type="text" class="jarves-Input-text" name="db" id="db_name" value="<?php echo $jarves->getSystemConfig()->getDatabase()->getMainConnection()->getName() ?>"/></td>
+            </tr>
+            <tr>
+                <td>Table Prefix
+                    <div style="color: #aaa">
+                        Please use only a lowercase string.<br />
+                        In the next step all tables with a name that starts with this prefix WILL BE DROPPED!<br/>
+                        If you don't enter a prefix ALL TABLES WILL BE REMOVED in this database/schema.
+
+                    </div>
+                </td>
+                <td><input style="width: 80px" type="text" class="jarves-Input-text" name="prefix" id="db_prefix"
+                           value="<?php echo $jarves->getSystemConfig()->getDatabase()->getPrefix() ?: 'jarves_' ?>"/></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <br/>
+                    * Required fields.
+                </td>
+            </tr>
+        </table>
+
+        <h3>Other</h3>
+        <table style="width: 100%" cellpadding="3">
+            <tr>
+                <td width="450">
+                    Remove install.php the end of the installation.
+                    <div style="color: #aaa">Highly recommended for security reasons.</div>
+                </td>
+                <td><input type="checkbox" checked="checked" name="removeScript" value="1"/></td>
+            </tr>
+        </table>
+        <div id="status" style="padding: 4px;"></div>
+        <br/>
+        <a href="?step=2" class="jarves-Button">Back</a>
+        <input type="submit" class="jarves-Button" value="Test connection and write config.php"/>
+    </form>
+
+<?php
+}
+
+?>
+</div>
+</body>
+</html>

@@ -1,0 +1,108 @@
+.jarves-Table,
+.jarves-Table-head,
+.jarves-Table-body {
+    width: 100%;
+    background-color: #f7f7f7;
+}
+
+.jarves-Table-valign-center td,
+.jarves-Table-valign-middle td {
+    vertical-align: middle;
+}
+
+
+.jarves-Table-valign-bottom td {
+    vertical-align: bottom;
+}
+
+
+.jarves-Table-absolute .jarves-Table-body,
+.jarves-Table-absolute .jarves-Table-head {
+    border: 0;
+}
+
+.jarves-Table {
+    border: 1px solid #dcdcdc;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+.jarves-Table-absolute {
+    border: 0;
+}
+
+.jarves-Table-head {
+    border-bottom: 0;
+    table-layout: fixed;
+}
+
+.jarves-Table-absolute {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px;
+}
+
+.jarves-Table > thead > tr > th,
+.jarves-Table-head th,
+.jarves-Table > tbody > tr > td,
+.jarves-Table-body td {
+    border-bottom: 1px solid #E9E9E9;
+}
+
+.jarves-Table > thead > tr > th,
+.jarves-Table-head > tr > th {
+    font-weight: normal;
+    font-size: 13px;
+    text-align: left;
+    padding: 5px;
+    color: #555;
+    border-top: 1px solid #ececec;
+    line-height: 20px;
+    background: #f2f2f2;
+}
+
+.jarves-Table-absolute tr > th {
+    border-top: 0;
+}
+
+.jarves-Table-head-container {
+    position: absolute;
+    height: 31px;
+    top: 0px;
+    left: 0px;
+    right: 16px;
+}
+
+.jarves-Table-body-container {
+    position: absolute;
+    left: 0px;
+    top: 31px;
+    right: 0px;
+    bottom: 0px;
+}
+
+.jarves-Table > tbody  > tr > td,
+.jarves-Table-body > tr > td {
+    padding: 5px;
+    cursor: default;
+    line-height: 18px;
+}
+
+.jarves-Table tr.active > td,
+.jarves-Table tr.active:hover > td,
+.jarves-Table-body tr.active > td,
+.jarves-Table-body tr.active:hover > td {
+    background-color: #22638e;
+    color: white;
+}
+
+.jarves-Table tr.active > td a,
+.jarves-Table-body tr.active a:link {
+    color: white;
+}
+
+.jarves-Table-hover tr:hover > td {
+    background-color: rgba(243, 243, 243, 0.48);
+}

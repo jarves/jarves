@@ -1,0 +1,142 @@
+<config>
+  <bundle>
+    <entryPoints>
+      <entryPoint path="backend">
+        <label>Backend</label>
+        <children>
+          <entryPoint path="chooser" type="custom">
+            <label>Chooser</label>
+          </entryPoint>
+        </children>
+      </entryPoint>
+      <entryPoint path="dashboard" icon="#icon-chart-5">
+        <label>Dashboard</label>
+      </entryPoint>
+      <entryPoint path="pages" type="custom" icon="#icon-monitor" link="true">
+        <label>Pages</label>
+      </entryPoint>
+      <entryPoint path="nodes" type="combine" icon="#icon-tree" link="true" multi="true">
+        <class>Jarves\Controller\Windows\NodeCrudController</class>
+        <label>Nodes</label>
+        <children>
+          <entryPoint path="add" type="custom" multi="true">
+            <label>Add pages</label>
+          </entryPoint>
+          <entryPoint path="addDomains" type="custom" multi="true">
+            <label>Add domains</label>
+          </entryPoint>
+          <entryPoint path="root" type="combine">
+            <class>Jarves\Controller\Windows\DomainCrudController</class>
+            <label>Domain</label>
+          </entryPoint>
+        </children>
+      </entryPoint>
+      <entryPoint path="files" type="custom" icon="#icon-folder-5" link="true" multi="true">
+        <label>Files</label>
+        <children>
+          <entryPoint path="edit" type="custom" multi="true">
+            <label>File edit</label>
+          </entryPoint>
+          <entryPoint path="diff" type="custom" multi="true">
+            <label>File diff</label>
+          </entryPoint>
+          <entryPoint path="system">
+            <label>System files</label>
+          </entryPoint>
+          <entryPoint path="properties" type="custom" multi="true">
+            <label>Properties</label>
+          </entryPoint>
+        </children>
+      </entryPoint>
+      <entryPoint path="help" type="custom">
+        <label>Help</label>
+      </entryPoint>
+      <entryPoint path="system" type="custom" icon="#icon-cog-4">
+        <label>System</label>
+        <children>
+          <entryPoint path="desktop-settings" type="custom" multi="true">
+            <label>Desktop settings</label>
+          </entryPoint>
+          <entryPoint path="layout" type="custom" system="true" icon="#icon-code" link="true" multi="true">
+            <label>Layouts</label>
+          </entryPoint>
+          <entryPoint path="languages" type="custom" system="true" icon="#icon-flag" link="true" multi="true">
+            <label>Languages</label>
+            <children>
+              <entryPoint path="edit" type="custom" multi="true">
+                <label>Edit</label>
+              </entryPoint>
+            </children>
+          </entryPoint>
+          <entryPoint path="backup" type="custom" system="true" icon="#icon-database-2" link="true" multi="true">
+            <label>Backup</label>
+          </entryPoint>
+          <entryPoint path="module" type="custom" system="true" icon="#icon-cube-2" link="true" multi="true">
+            <label>Bundles</label>
+            <children>
+              <entryPoint path="edit" type="custom" icon="#icon-cube-2" multi="true">
+                <label>Edit extension</label>
+              </entryPoint>
+              <entryPoint path="add" type="custom" icon="#icon-cube-2" multi="true">
+                <label>Create extension</label>
+              </entryPoint>
+              <entryPoint path="view" type="custom" icon="#icon-cube-2" multi="true">
+                <label>Extension</label>
+              </entryPoint>
+              <entryPoint path="editWindow" type="custom" icon="#icon-window" multi="true">
+                <label>Edit window</label>
+              </entryPoint>
+            </children>
+          </entryPoint>
+            <entryPoint path="logs" type="custom" system="true" icon="#icon-list-9" link="true">
+                <label>Logs</label>
+            </entryPoint>
+          <entryPoint path="settings" type="custom" system="true" icon="#icon-cog-4" link="true" multi="true">
+            <label>Settings</label>
+          </entryPoint>
+          <entryPoint path="development" system="true" link="true">
+            <label>Development</label>
+            <children>
+              <entryPoint path="database" type="custom" system="true" icon="#icon-database" link="true" multi="true">
+                <label>Database</label>
+              </entryPoint>
+              <entryPoint path="fields" type="custom" system="true" icon="#icon-console" link="true">
+                <label>Fields</label>
+              </entryPoint>
+            </children>
+          </entryPoint>
+        </children>
+      </entryPoint>
+      <entryPoint path="user" system="true" link="true">
+        <label>User Management</label>
+        <children>
+          <entryPoint path="users" type="combine" system="true" icon="#icon-user-9" link="true">
+            <class>Jarves\Controller\Windows\UserCrudController</class>
+            <label>Users</label>
+            <children>
+              <entryPoint path="editMe">
+                <class>\Users\Controller\Admin\EditMe</class>
+                <label>User self edit</label>
+                <children>
+                  <entryPoint path="groups">
+                    <label>Can edit groups</label>
+                  </entryPoint>
+                  <entryPoint path="username">
+                    <label>Can change username</label>
+                  </entryPoint>
+                </children>
+              </entryPoint>
+            </children>
+          </entryPoint>
+          <entryPoint path="groups" type="combine" system="true" icon="#icon-users-2" link="true">
+            <class>Jarves\Controller\Windows\GroupCrudController</class>
+            <label>Groups</label>
+          </entryPoint>
+          <entryPoint path="acl" type="custom" system="true" icon="#icon-key-4" link="true">
+            <label>Access management</label>
+          </entryPoint>
+        </children>
+      </entryPoint>
+    </entryPoints>
+  </bundle>
+</config>

@@ -1,0 +1,90 @@
+<config>
+  <!--A installation id. If you have several jarves instances you should define a unique one. Gets defines through the installer.-->
+  <id></id>
+  <!--The system title of this installation.-->
+  <systemTitle></systemTitle>
+  <!--Comma separated list of supported languages. (systemwide)-->
+  <languages>en</languages>
+  <!--Is displayed as the administrator's email in error messages etc.-->
+  <email></email>
+  <!--
+    IMPORTANT: Set this to your php timezone.
+    see: http://www.php.net/manual/en/timezones.php
+    -->
+  <timezone></timezone>
+  <!--This is a key generated through the installation process. You should not change it!
+    The system needs this key to decrypt the passwords in the users database.-->
+  <passwordHashKey></passwordHashKey>
+  <database>
+    <!--All tables will be prefixed with this string. Best practise is to suffix it with a underscore.
+    Examples: dev_, domain_ or prod_-->
+    <prefix>jarves_</prefix>
+    <connections>
+      <!--
+        type: mysql|pgsql|sqlite (the pdo driver name)
+        persistent: true|false (if the connection should be persistent)
+        slave: true|false (if the connection is a slave or not (readonly or not))
+        charset: 'utf8'
+      -->
+      <connection type="mysql" persistent="false" charset="utf8" slave="false">
+        <!--Can be a IP or a hostname. For SQLite enter here the path to the file.-->
+        <server>127.0.0.1</server>
+        <port></port>
+        <!--The schema/database name-->
+        <name>test</name>
+        <username>root</username>
+        <password></password>
+      </connection>
+    </connections>
+  </database>
+  <!--
+  The cache layer we use for the distributed caching.
+  (The `fast caching` is auto determined (Order: APC, XCache, Files))
+  -->
+  <cache>
+    <!--The full classname of the storage. MUST have `Core\Cache\CacheInterface` as interface.-->
+    <class>Jarves\Cache\Files</class>
+    <options/>
+  </cache>
+  <!--Log handling. ClientInfo and stackTrace start with level >= ERROR (400) or level=Debug(100).
+        deactivate: Deactivates the internal log handler. Does not affect the additional log handler.
+        stackTrace: If the system should include the php stackTrace to each log entry. DEACTIVATE THIS IN PRODUCTIVE SYSTEMS!
+        performance: If the system should include the memory usage, duration for each log entry. Is only for Debug(100) logs handled. DEACTIVATE THIS IN PRODUCTIVE SYSTEMS!
+        events: If the system should log all fired events. DEACTIVATE THIS IN PRODUCTIVE SYSTEMS!
+    -->
+  <logs deactivate="false" clientInfo="false" performance="false" events="false">
+    <stackTrace>false</stackTrace>
+  </logs>
+  <!--The client session/authorisation/authentication handling.
+  Attributes: (default)
+    autoStart: true|false (false) If the systems starts always a session for each request and therefore sends for each
+                                visitor/request a cookie (if none is delivered).
+  -->
+  <client autoStart="false">
+    <class>Jarves\Client\JarvesUsers</class>
+    <options>
+      <option key="emailLogin">true</option>
+    </options>
+    <!--
+        A class that handles the actual data storage.
+
+        class: The full classname of the storage. MUST have `Core\Cache\CacheInterface` as interface.
+        Define `database` for the database storage.
+    -->
+    <sessionStorage class="Jarves\Client\StoreDatabase">
+      <options/>
+    </sessionStorage>
+  </client>
+  <mountPoints/>
+  <!--
+    Whenever Jarves creates files we try to set the correct permission and file owner.
+    Attributes (default):
+    groupPermission:    rw|r|empty (rw)
+    everyonePermission: rw|r|empty (r)
+    disableModeChange:  true|false (false)
+    -->
+  <file groupPermission="rw" everyonePermission="r" disableModeChange="false">
+    <!--The group owner name-->
+    <groupOwner></groupOwner>
+  </file>
+</config>

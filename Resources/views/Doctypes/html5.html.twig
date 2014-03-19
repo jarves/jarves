@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ pageResponse.getTitle() }}</title>
+    <base href="{{ pageResponse.getBaseHref() }}" >
+    <meta name="language" content="{{ pageResponse.getLanguage() }}" >
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" >
+    <link rel="shortcut icon" href="{{ pageResponse.getFaviconPath() }}" type="image/x-icon" >
+    {{ additionalHeaderTags|raw }}
+
+    {{ cssTags|raw }}
+    {{ jsTags|raw }}
+    {{ assetTags|raw }}
+</head>
+<body>
+    {{ body|raw }}
+    {{ jsTagsBottom|raw }}
+</body>
+</html>

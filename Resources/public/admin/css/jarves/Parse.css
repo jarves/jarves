@@ -1,0 +1,4 @@
+.jarves-parse-table > tbody > tr > td,
+.jarves-parse-table > tr > td {
+    padding: 2px 4px;
+}

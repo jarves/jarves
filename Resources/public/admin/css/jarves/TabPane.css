@@ -1,0 +1,57 @@
+.kwindow-win-tabPane-pane {
+    border: 1px solid #c9c9c9;
+    border-top: 0;
+}
+
+.kwindow-win-tabPane .kwindow-win-tabWrapperLast {
+    border-right: 0px;
+}
+
+.kwindow-win-tabPane .kwindow-win-tabGroup {
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    border-top: 1px solid #888;
+}
+
+.jarves-tabPane-pane {
+    display: none;
+    position: relative;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+.jarves-tabPane-full > .kwindow-win-tabPane-pane,
+.jarves-tabPane-full > .kwindow-win-tabPane-pane > .jarves-tabPane-pane,
+.jarves-tabPane-full {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    margin: 0px;
+}
+
+.jarves-tabPane-full > .jarves-tabGroup-small {
+    position: relative;
+    top: 0px;
+}
+
+.jarves-tabPane-full > .kwindow-win-tabPane-pane > .jarves-tabPane-pane {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.jarves-tabPane-full > .kwindow-win-tabPane-pane {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 42px;
+    padding: 0;
+}
+
+.jarves-tabPane-tabsInWindowHeader > .kwindow-win-tabPane-pane {
+    top: 0px;
+    margin: 0px;
+    -moz-border-radius: 0px;
+}

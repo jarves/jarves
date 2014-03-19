@@ -1,0 +1,65 @@
+services:
+     jarves.twig.extension.navigation:
+         class: Jarves\Twig\NavigationExtension
+         arguments: ["@jarves"]
+         tags:
+            - { name: twig.extension }
+
+     jarves.twig.extension.nodeIsActive:
+         class: Jarves\Twig\NodeIsActiveExtension
+         arguments: ["@jarves"]
+         tags:
+            - { name: twig.extension }
+
+     jarves.twig.extension.nodeUrl:
+         class: Jarves\Twig\NodeUrlExtension
+         arguments: ["@jarves"]
+         tags:
+            - { name: twig.extension }
+
+     jarves.twig.extension.loadAsset:
+         class: Jarves\Twig\LoadAssetExtension
+         arguments: ["@jarves"]
+         tags:
+            - { name: twig.extension }
+
+     jarves.twig.extension.resizeImage:
+         class: Jarves\Twig\ResizeImageExtension
+         arguments: ["@jarves"]
+         tags:
+            - { name: twig.extension }
+
+     jarves.twig.extension.breadcrumb:
+         class: Jarves\Twig\BreadcrumbExtension
+         arguments: ["@jarves"]
+         tags:
+            - { name: twig.extension }
+
+     jarves.twig.extension.contentSlot:
+         class: Jarves\Twig\ContentSlotExtension
+         arguments: ["@jarves"]
+         tags:
+            - { name: twig.extension }
+
+     jarves.twig.extension.globals:
+         class: Jarves\Twig\GlobalsExtension
+         arguments: ["@jarves"]
+         tags:
+            - { name: twig.extension }
+
+     jarves.twig.extension.unsearchable:
+         class: Jarves\Twig\UnsearchableExtension
+         tags:
+            - { name: twig.extension }
+
+     jarves.twig.extension.translate:
+         class: Jarves\Twig\TranslateExtension
+         arguments: ["@jarves.translator"]
+         tags:
+            - { name: twig.extension }
+
+     jarves.twig.extension.renderContents:
+         class: Jarves\Twig\RenderContentsExtension
+         arguments: ["@jarves"]
+         tags:
+            - { name: twig.extension }

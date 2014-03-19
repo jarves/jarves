@@ -1,0 +1,64 @@
+.jarves-ButtonGroup {
+    margin: 0 4px;
+    display: inline-block;
+
+    white-space: nowrap;
+    position: relative;
+    vertical-align: top;
+}
+
+.jarves-ButtonGroup:first-child {
+    margin-left: 0;
+}
+
+.jarves-ButtonGroup:last-child {
+    margin-right: 0;
+}
+
+.jarves-ButtonGroup object {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 27px;
+    height: 21px;
+}
+
+.jarves-ButtonGroupContent {
+    position: relative;
+}
+
+
+.jarves-ActionBar > .jarves-ButtonGroup:last-child {
+    margin-right: 0;
+}
+
+.jarves-ActionBar > .jarves-ButtonGroup:first-child {
+    margin-left: 0;
+}
+
+a.jarves-buttonGroup-item,
+a.jarves-buttonGroup-item:link {
+    cursor: default;
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    padding: 0px 9px;
+    border-top: 1px solid #ddd;
+    border-bottom: 0;
+    border: 1px solid #ddd;
+    margin: 0;
+    border-left: 0;
+}
+
+a.jarves-buttonGroup-item:first-child {
+    border-left: 1px solid #ddd;
+}
+
+a.jarves-buttonGroup-item-only-icon:before {
+    padding-right: 0;
+}
+
+a.jarves-buttonGroup-item img {
+    vertical-align: middle;
+    opacity: 0.5;
+}

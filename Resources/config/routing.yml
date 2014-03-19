@@ -1,0 +1,12 @@
+jarves_admin_login:
+    resource: "@JarvesBundle/Controller/AdminLoginController.php"
+    type:     annotation
+
+jarves_admin:
+    prefix: %jarves_admin_prefix%
+    resource: "@JarvesBundle/Controller/Admin/"
+    type:     annotation
+
+jarves_objects:
+    resource: .
+    type: jarves_rest
