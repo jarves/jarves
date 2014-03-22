@@ -81,12 +81,25 @@ jarves.Content = new Class({
             'class': 'jarves-normalize jarves-content-actionBar'
         }).inject(this.main);
 
+        this.contentContainer = new Element('div', {
+            'class': 'content-element'
+        }).inject(this.main);
+
+        this.placer = new Element('div', {
+            'class': 'jarves-content-placer'
+        }).inject(this.main);
+
+        new Element('a', {
+            text: '+',
+            'class': 'jarves-content-placer-place'
+        }).inject(this.placer);
+
         this.addActionBarItems();
     },
 
     destroy: function() {
-        if (this === this.getEditor().getContentField().getSelected()) {
-            this.getEditor().getContentField().deselect();
+        if (this === this.getEditor().getSelected()) {
+            this.getEditor().deselect();
         }
         this.getContentObject().destroy();
         this.main.destroy();
@@ -99,6 +112,15 @@ jarves.Content = new Class({
     },
 
     addActionBarItems: function() {
+
+        var inspectorBtn = new Element('a', {
+            'class': 'icon-wrench',
+            href: 'javascript: ;',
+            title: t('Open Settings')
+        }).addEvent('click', function(e) {
+            e.stop();
+            this.getEditor().openInspector(this);
+        }.bind(this)).inject(this.actionBar);
 
         var moveBtn = new Element('span', {
             html: '&#xe0c6;',
@@ -193,7 +215,6 @@ jarves.Content = new Class({
     },
 
     /**
-     *
      * @param {Boolean} visible
      * @param {jarves.ProgressWatch} progressWatch
      */
@@ -210,6 +231,9 @@ jarves.Content = new Class({
      * @param {jarves.ProgressWatch} progressWatch
      */
     loadPreview: function(progressWatch) {
+        if (!this.getContentObject().isPreviewPossible()) {
+            return false;
+        }
         delete this.currentTemplate;
 
         if (this.lastRq) {
@@ -223,7 +247,7 @@ jarves.Content = new Class({
             domainId: this.getEditor().getDomainId()
         });
 
-        this.getEditor().deactivateLinks(this.main);
+        this.getEditor().deactivateLinks(this.contentContainer);
         this.lastRq = new Request.JSON({url: _pathAdmin + 'admin/content/preview?' + req, noCache: true,
             onFailure: function() {
                 if (progressWatch) {
@@ -232,10 +256,12 @@ jarves.Content = new Class({
             },
             onComplete: function(pResponse) {
                 this.actionBar.dispose();
+                this.placer.dispose();
                 this.main.empty();
 
                 this.main.set('html', pResponse.data);
                 this.actionBar.inject(this.main, 'top');
+                this.placer.inject(this.main);
 
                 if (progressWatch) {
                     progressWatch.done();
@@ -248,44 +274,46 @@ jarves.Content = new Class({
     /**
      * @param {jarves.ProgressWatch} progressWatch
      */
-    loadTemplate: function(progressWatch) {
-        if (null !== this.currentTemplate && this.currentTemplate == this.value.template) {
-            return;
-        }
-
-        if (this.lastRq) {
-            this.lastRq.cancel();
-        }
-
-        this.getEditor().activateLinks(this.main);
-        this.lastRq = new Request.JSON({url: _pathAdmin + 'admin/content/template', noCache: true,
-            onFailure: function() {
-                progressWatch.error();
-            },
-            onComplete: function(pResponse) {
-                this.actionBar.dispose();
-                this.main.setStyle('height', this.main.getSize().y);
-
-                if (this.contentObject) {
-                    this.contentObject.destroy();
-                }
-                this.main.empty();
-                this.main.set('html', pResponse.data);
-
-                this.contentContainer = this.main.getElement('.jarves-content-container') || new Element('div').inject(this.main);
-
-                delete this.contentObject;
-                this.currentTemplate = this.value.template;
-                this.actionBar.inject(this.main, 'top');
-
-                this.setValue(this.value);
-
-                this.main.setStyle.delay(50, this.main, ['height']);
-            }.bind(this)}).get({
-                template: this.value.template,
-                type: this.value.type
-            });
-    },
+//    loadTemplate: function(progressWatch) {
+//        if (null !== this.currentTemplate && this.currentTemplate == this.value.template) {
+//            return;
+//        }
+//
+//        if (this.lastRq) {
+//            this.lastRq.cancel();
+//        }
+//
+//        this.getEditor().activateLinks(this.main);
+//        this.lastRq = new Request.JSON({url: _pathAdmin + 'admin/content/template', noCache: true,
+//            onFailure: function() {
+//                progressWatch.error();
+//            },
+//            onComplete: function(pResponse) {
+//                this.actionBar.dispose();
+//                this.placer.dispose();
+//                this.main.setStyle('height', this.main.getSize().y);
+//
+//                if (this.contentObject) {
+//                    this.contentObject.destroy();
+//                }
+//                this.main.empty();
+//                this.main.set('html', pResponse.data);
+//
+//                this.contentContainer = this.main.getElement('.jarves-content-container') || new Element('div').inject(this.main);
+//
+//                delete this.contentObject;
+//                this.currentTemplate = this.value.template;
+//                this.actionBar.inject(this.main, 'top');
+//                this.placer.inject(this.main);
+//
+//                this.setValue(this.value);
+//
+//                this.main.setStyle.delay(50, this.main, ['height']);
+//            }.bind(this)}).get({
+//                template: this.value.template,
+//                type: this.value.type
+//            });
+//    },
 
     focus: function() {
         if (this.contentObject) {
@@ -304,8 +332,6 @@ jarves.Content = new Class({
     getValue: function(progressWatch) {
         if (this.selected) {
             this.value = this.value || {};
-
-            this.value.template = this.template.getValue();
         }
 
         if (this.contentObject) {
@@ -331,9 +357,39 @@ jarves.Content = new Class({
         return this.value;
     },
 
-    loadInspector: function() {
-        var inspectorContainer = this.getEditor().getContentField().getInspectorContainer();
+    updateUI: function() {
+        this.value = this.getValue();
 
+        this.showVisibilityState();
+        this.showPasteState();
+
+//        if (this.preview) {
+            this.loadPreview();
+//        } else {
+//            this.loadTemplate();
+//        }
+    },
+
+    setSelected: function(selected) {
+        if (selected) {
+            this.main.addClass('jarves-content-selected');
+//            this.loadInspector();
+            if (this.contentObject && this.contentObject.selected) {
+                this.contentObject.selected();
+            }
+        } else {
+            this.main.removeClass('jarves-content-selected');
+            if (this.contentObject && this.contentObject.deselected) {
+                this.contentObject.deselected();
+            }
+//            if (this.inspectorContainer) {
+//                this.inspectorContainer.destroy();
+//            }
+        }
+        this.selected = selected;
+    },
+
+    loadDefaultInspector: function(inspectorContainer) {
         inspectorContainer.empty();
 
         this.template = new jarves.Field({
@@ -354,56 +410,32 @@ jarves.Content = new Class({
         }).inject(inspectorContainer);
     },
 
-    updateUI: function() {
-        this.value = this.getValue();
+    openInspector: function(inspectorContainer) {
+        this.loadDefaultInspector(inspectorContainer);
 
-        this.showVisibilityState();
-        this.showPasteState();
-
-        if (this.preview) {
-            this.loadPreview();
-        } else {
-            this.loadTemplate();
+        if (this.contentObject && this.contentObject.openedInspector) {
+            this.contentObject.openedInspector(this.inspectorContainer);
         }
     },
 
-    setSelected: function(selected) {
-        if (selected) {
-            this.main.addClass('jarves-content-selected');
-            this.loadInspector();
-            if (this.contentObject && this.contentObject.selected) {
-                this.contentObject.selected(this.inspectorContainer);
-            }
-        } else {
-            this.main.removeClass('jarves-content-selected');
-            if (this.contentObject && this.contentObject.deselected) {
-                this.contentObject.deselected();
-            }
-            if (this.inspectorContainer) {
-                this.inspectorContainer.destroy();
-            }
-        }
-        this.selected = selected;
-    },
+    setValue: function(value) {
+        this.value = value;
 
-    setValue: function(pValue) {
-        this.value = pValue;
+        if (!this.currentType || !this.contentObject || value.type != this.currentType || !this.currentTemplate || this.currentTemplate != value.template) {
 
-        if (!this.currentType || !this.contentObject || pValue.type != this.currentType || !this.currentTemplate || this.currentTemplate != pValue.template) {
-
-            if (null === this.currentTemplate || this.currentTemplate != pValue.template) {
-                return this.loadTemplate(pValue);
-            }
+//            if (null === this.currentTemplate || this.currentTemplate != pValue.template) {
+//                return this.loadTemplate(pValue);
+//            }
 
             if (!jarves.ContentTypes) {
                 throw 'No jarves.ContentTypes loaded.';
             }
 
-            var clazz = jarves.ContentTypes[pValue.type] || jarves.ContentTypes[pValue.type.capitalize()];
+            var clazz = jarves.ContentTypes[value.type] || jarves.ContentTypes[value.type.capitalize()];
             if (clazz) {
                 this.contentObject = new clazz(this, this.options);
             } else {
-                console.error(tf('jarves.ContentType `%s` not found.', pValue.type));
+                console.error(tf('jarves.ContentType `%s` not found.', value.type));
             }
 
             this.contentObject.addEvent('change', this.fireChange);
@@ -411,13 +443,14 @@ jarves.Content = new Class({
             if (this.nextFocus) {
                 this.focus();
             }
-            this.currentType = pValue.type;
+            this.currentType = value.type;
         }
-//
+
         this.showVisibilityState();
         this.showPasteState();
 
-        this.contentObject.setValue(pValue.content);
+        this.contentObject.setValue(value.content);
+        this.loadPreview();
 
         if (this.selected) {
             this.setSelected(true);

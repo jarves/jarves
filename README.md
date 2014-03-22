@@ -17,7 +17,7 @@ This describes the customized installation, usually used by developers.
 
 A end-user zip package can be downloaded at http://jarves.org when we've released the first alpha version
 
-Read the [installation documentation](https://github.com/jarves/JarvesBundle/blob/master/Resources/doc/installation.md).
+Read the [installation documentation](Resources/doc/installation.md).
 
 Requirements
 ------------
@@ -52,14 +52,14 @@ Features
 Screenshot
 ----------
 
-![Administration Dashboard](https://raw.github.com/jarves/JarvesBundle/master/Resources/doc/images/admin-dashboard.png)
-![Administration Frontend Edit](https://raw.github.com/jarves/JarvesBundle/master/Resources/doc/images/admin-frontend-edit.png)
-![Administration File manager](https://raw.github.com/jarves/JarvesBundle/master/Resources/doc/images/admin-files-context-image.png)
-![Administration File manager Images](https://raw.github.com/jarves/JarvesBundle/master/Resources/doc/images/admin-files-context-image2.png)
-![Administration CRUD Framework Window List](https://raw.github.com/jarves/JarvesBundle/master/Resources/doc/images/admin-list.png)
-![Administration CRUD Framework Window](https://raw.github.com/jarves/JarvesBundle/master/Resources/doc/images/admin-users.png)
+![Administration Dashboard](Resources/doc/images/admin-dashboard.png)
+![Administration Frontend Edit](Resources/doc/images/admin-frontend-edit.png)
+![Administration File manager](Resources/doc/images/admin-files-context-image.png)
+![Administration File manager Images](Resources/doc/images/admin-files-context-image2.png)
+![Administration CRUD Framework Window List](Resources/doc/images/admin-list.png)
+![Administration CRUD Framework Window](Resources/doc/images/admin-users.png)
 
-[More Screenshots](https://github.com/jarves/JarvesBundle/blob/master/Resources/doc/screenshots.markdown)
+[More Screenshots](Resources/doc/screenshots.markdown)
 
 More information:
 https://www.facebook.com/jarves

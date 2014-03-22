@@ -18,10 +18,7 @@ jarves.FieldTypes.Content = new Class({
         this.mainLayout = new jarves.Layout(this.getContainer(), {
             layout: [
                 {columns: [null], height: 50},
-                {columns: [null, 180]}
-            ],
-            splitter: [
-                [2, 2, 'left']
+                {columns: [null]}
             ]
         });
 
@@ -63,7 +60,10 @@ jarves.FieldTypes.Content = new Class({
             this.actionGroup.addButton(t('Reset'), '#icon-escape');
             this.actionGroup.addButton(t('Versions'), '#icon-history');
 
-            this.saveBtn = new jarves.Button(t('Save')).setButtonStyle('blue').addEvent('click', this.saveStandalone.bind(this)).inject(this.headerLayout.getCell(1, 2));
+            this.saveBtn = new jarves.Button(t('Save'))
+                .setButtonStyle('blue')
+                .addEvent('click', this.saveStandalone.bind(this))
+                .inject(this.headerLayout.getCell(1, 2));
         } else {
             this.mainLayout.getCell(1, 1).addClass('jarves-Field-content-actionBar');
         }
@@ -71,7 +71,7 @@ jarves.FieldTypes.Content = new Class({
         this.win.setTitle(t('Home'));
 
         this.editableAreaContainer = new Element('div', {
-            style: 'position: absolute; left: 0px; right: 15px; top: 0px; bottom: 0px;'
+            style: 'position: absolute; left: 0px; right: 0px; top: 0px; bottom: 0px;'
         }).inject(this.mainLayout.getCell(2, 1));
 
         this.editableAreaLayout = new jarves.Layout(this.editableAreaContainer, {
@@ -136,14 +136,14 @@ jarves.FieldTypes.Content = new Class({
             }
         });
 
-        var splitter = this.mainLayout.getSplitter(2, 2, 'left');
-        splitter.addEvent('start', function() {
-            this.iframeOverlay.inject(iframeContainer);
-        }.bind(this));
-
-        splitter.addEvent('end', function() {
-            this.iframeOverlay.dispose()
-        }.bind(this));
+//        var splitter = this.mainLayout.getSplitter(2, 2, 'left');
+//        splitter.addEvent('start', function() {
+//            this.iframeOverlay.inject(iframeContainer);
+//        }.bind(this));
+//
+//        splitter.addEvent('end', function() {
+//            this.iframeOverlay.dispose()
+//        }.bind(this));
 
         this.slider.addEvent('change', function(step) {
             if (0 == step) step = 1;
@@ -152,7 +152,6 @@ jarves.FieldTypes.Content = new Class({
             document.id(this.iframe.contentWindow.document.body).setStyle('zoom', step + '%');
         }.bind(this));
 
-        this.renderSidebar();
         this.setupEvents();
     },
 
@@ -398,208 +397,12 @@ jarves.FieldTypes.Content = new Class({
         return _pathAdmin + 'object/jarves/node/' + this.editor.options.node.id;
     },
 
-    selectElement: function(element) {
-        this.select(element.kaContentInstance);
-    },
-
-    select: function(content) {
-        if (this.lastContent === content) return;
-
-        this.deselect();
-
-        this.inspectorContainer.setStyle('color');
-        this.inspectorContainer.setStyle('text-align');
-
-        if (content.value) {
-            this.inspectorTitle.set('text', tf('Inspector (%s)', content.value.type));
-        } else {
-            this.inspectorTitle.set('text', t('Inspector'));
-        }
-        content.setSelected(true);
-
-        this.lastContent = content;
-    },
-
-    getSelected: function() {
-        return this.lastContent;
-    },
-
-    deselect: function() {
-        if (this.lastContent) {
-            this.lastContent.setSelected(false);
-            delete this.lastContent;
-        }
-
-        this.nothingSelected();
-    },
-
     setEditor: function(editor) {
         this.editor = editor;
     },
 
     getEditor: function() {
         return this.editor;
-    },
-
-    renderSidebar: function() {
-        this.sidebar = new Element('div', {
-            'class': 'jarves-normalize jarves-scrolling jarves-editor-sidebar'
-        }).inject(this.mainLayout.getCell(2, 2), 'top');
-
-        new Element('div', {
-            text: t('Show slots'),
-            style: 'cursor: default',
-            'class': 'jarves-editor-sidebar-item icon-checkbox-partial'
-        }).addEvent('mouseover', function() {
-                if (this.editor)
-                    this.editor.highlightSlots(true);
-            }.bind(this)).addEvent('mouseout', function() {
-                if (this.editor)
-                    this.editor.highlightSlots(false);
-            }.bind(this)).inject(this.sidebar);
-
-        this.showPreview = new Element('div', {
-            text: t('Toggle preview'),
-            'class': 'jarves-editor-sidebar-item icon-eye-4'
-        }).addEvent('click', function() {
-                this.togglePreview();
-            }.bind(this)).inject(this.sidebar);
-
-        this.inspector = new Element('div', {
-            'class': 'jarves-editor-inspector'
-        }).inject(this.sidebar);
-
-        this.inspectorTitle = new Element('div', {
-            'class': 'jarves-editor-inspector-title',
-            text: t('Inspector')
-        }).inject(this.inspector);
-
-        this.inspectorContainer = new Element('div', {
-            'class': 'jarves-editor-inspector-container',
-            text: t('Nothing selected.'),
-            style: 'color: gray; text-align: center;'
-        }).inject(this.inspector);
-
-        this.contentElements = new Element('div', {
-            'class': 'jarves-editor-contentElements'
-        }).inject(this.sidebar);
-
-        this.contentElementsTitle = new Element('div', {
-            'class': 'jarves-editor-contentElements-title',
-            text: t('Content elements')
-        }).inject(this.contentElements);
-
-        this.contentElementsContainer = new Element('div', {
-            'class': 'jarves-editor-contentElements-container'
-        }).inject(this.contentElements);
-
-        Object.each(jarves.ContentTypes, function(content, type) {
-            this.addContentTypeIcon(type, content);
-        }.bind(this));
-
-        this.plugins = new Element('div', {
-            'class': 'jarves-editor-plugins'
-        }).inject(this.sidebar);
-
-        this.pluginsTitle = new Element('div', {
-            'class': 'jarves-editor-plugins-title',
-            text: t('Plugins')
-        }).inject(this.plugins);
-
-        this.pluginsContainer = new Element('div', {
-            'class': 'jarves-editor-plugins-container'
-        }).inject(this.plugins);
-
-        Object.each(jarves.settings.configs, function(config, bundleName) {
-            this.addPlugins(bundleName, config);
-        }.bind(this));
-
-        this.contentElementsContainer.addEvent('click', function() {
-            this.teaseSlotBubbles();
-        }.bind(this));
-        this.pluginsContainer.addEvent('click', function() {
-            this.teaseSlotBubbles();
-        }.bind(this));
-    },
-
-    teaseSlotBubbles: function() {
-        this.getEditor().highlightSlotsBubbles(true);
-        (function() {
-            this.getEditor().highlightSlotsBubbles(false);
-        }).delay(1000, this);
-    },
-
-    togglePreview: function() {
-        var active = ++this.preview % 2;
-
-        if (active) {
-            this.showPreview.addClass('jarves-editor-sidebar-item-active');
-        } else {
-            this.showPreview.removeClass('jarves-editor-sidebar-item-active');
-        }
-
-        if (this.editor) {
-            this.editor.setPreview(active);
-        }
-    },
-
-    nothingSelected: function() {
-        this.inspectorContainer.set('text', t('Nothing selected.'));
-        this.inspectorContainer.setStyle('color', 'gray');
-        this.inspectorContainer.setStyle('text-align', 'center');
-    },
-
-    getInspectorContainer: function() {
-        return this.inspectorContainer;
-    },
-
-    addPlugins: function(bundleName, config) {
-        var self = this;
-        if (config.plugins) {
-            var a;
-
-            new Element('div', {
-                'class': 'jarves-editor-plugins-subTitle',
-                text: config.label || bundleName
-            }).inject(this.pluginsContainer);
-
-            Object.each(config.plugins, function(plugin, pluginId) {
-                a = new Element('div', {
-                    draggable: true,
-                    text: plugin.label || plugin.id,
-                    'class': 'jarves-editor-sidebar-item jarves-editor-sidebar-draggable ' + (plugin.icon || 'icon-cube-2')
-                }).inject(this.pluginsContainer);
-
-                a.addListener('dragstart', function(e) {
-                    self.dragStart(this, e);
-                });
-                a.addListener('dragend', function(e) {
-                    self.dragEnd(this, e);
-                });
-
-                a.kaContentType = 'plugin';
-                a.kaContentValue = {bundle: bundleName, plugin: pluginId};
-            }.bind(this));
-        }
-    },
-
-    addContentTypeIcon: function(pType, pContent) {
-        var self = this;
-
-        var a = new Element('div', {
-            text: pContent.label,
-            draggable: true,
-            'class': 'jarves-editor-sidebar-item jarves-editor-sidebar-draggable ' + (pContent.icon || '')
-        }).inject(this.contentElementsContainer);
-
-        a.addListener('dragstart', function(e) {
-            self.dragStart(this, e);
-        });
-        a.addListener('dragend', function(e) {
-            self.dragEnd(this, e);
-        });
-
-        a.kaContentType = pType;
     },
 
     dragStart: function(item, e) {

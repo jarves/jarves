@@ -59,7 +59,7 @@ jarves.ContentTypes.Tray = new Class({
     /**
      * adds/loads all additional fields to the inspector.
      */
-    selected: function(inspectorContainer) {
+    openedInspector: function(inspectorContainer) {
         var toolbarContainer = new Element('div', {
             'class': 'jarves-content-deposit-toolbarContainer'
         }).inject(inspectorContainer);

@@ -135,7 +135,7 @@ jarves.ContentTypes.Text = new Class({
         this.main.destroy(this.main);
     },
 
-    selected: function(inspectorContainer) {
+    selected: function() {
         this.isSelected = true;
 
         if (!this.mainToolbarContainer) {

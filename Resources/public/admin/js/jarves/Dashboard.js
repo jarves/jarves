@@ -23,7 +23,7 @@ jarves.Dashboard = new Class({
 
         this.mainLayout = new jarves.Layout(this.main, {
             layout: [
-                {columns: ['50%', 11, '50%']}
+                {columns: ['40%', 11, '60%']}
             ],
             fixed: false
         });

@@ -29,7 +29,7 @@ jarves.ContentTypes.Markdown = new Class({
         }, this.main);
     },
 
-    selected: function(inspectorContainer) {
+    openedInspector: function(inspectorContainer) {
         var toolbarContainer = new Element('div', {
             'class': 'jarves-content-markdown-toolbarContainer'
         }).inject(inspectorContainer);

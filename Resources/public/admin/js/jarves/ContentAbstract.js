@@ -32,8 +32,12 @@ jarves.ContentAbstract = new Class({
         /* Override it to your needs */
     },
 
-    selected: function(inspectorContainer) {
+    selected: function() {
         //your field got selected
+    },
+
+    openedInspector: function(inspectorContainer) {
+        //the inspector has been opened
     },
 
     deselected: function() {

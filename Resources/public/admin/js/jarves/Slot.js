@@ -193,6 +193,14 @@ jarves.Slot = new Class({
 
     renderLayout: function() {
         this.slot.empty();
+        this.placer = new Element('div', {
+            'class': 'jarves-content-placer'
+        }).inject(this.slot);
+
+        new Element('a', {
+            text: '+',
+            'class': 'jarves-content-placer-place'
+        }).inject(this.placer);
     },
 
     fireChange: function() {
@@ -214,7 +222,7 @@ jarves.Slot = new Class({
     },
 
     setValue: function(contents) {
-        this.slot.empty();
+        this.renderLayout();
         if ('array' === typeOf(contents)) {
             Array.each(contents, function(content) {
                 this.addContent(content)
@@ -327,30 +335,31 @@ jarves.Slot = new Class({
 
     /**
      *
-     * @param {Object}  pContent
-     * @param {Boolean} pFocus
-     * @param {Array}   pDrop
+     * @param {Object}  content
+     * @param {Boolean} focus
+     * @param {Array}   drop
      *
      * @returns {jarves.Content}
      */
-    addContent: function(pContent, pFocus, pDrop) {
-        if (!pContent) {
-            pContent = {type: 'text'};
+    addContent: function(content, focus, drop) {
+        if (!content) {
+            content = {type: 'text'};
         }
 
-        if (!pContent.template) {
-            pContent.template = 'JarvesBundle:Default:content.html.twig';
+        if (!content.template) {
+            content.template = 'JarvesBundle:Default:content.html.twig';
         }
 
-        var content = new jarves.Content(pContent, this.slot, pDrop);
-        content.addEvent('change', this.fireChange);
+        var contentInstance = new jarves.Content(content, this.slot, drop);
+        contentInstance.addEvent('change', this.fireChange);
 
-        if (pFocus) {
-            this.getEditor().getContentField().select(content);
-            content.focus();
+        if (focus) {
+            this.getEditor().select(contentInstance);
+            contentInstance.focus();
         }
 
-        return content;
+        this.fireChange();
+        return contentInstance;
     }
 
 });

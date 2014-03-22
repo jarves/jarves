@@ -93,7 +93,7 @@ jarves.ContentTypes.Plugin = new Class({
     /**
      * adds/loads all additional fields to the inspector.
      */
-    selected: function(inspectorContainer) {
+    openedInspector: function(inspectorContainer) {
         var toolbarContainer = new Element('div', {
             'class': 'jarves-content-plugin-toolbarContainer'
         }).inject(inspectorContainer);

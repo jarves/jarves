@@ -37,23 +37,23 @@ jarves.Dialog = new Class({
 
     canClosed: true,
 
-    initialize: function (pParent, pOptions) {
-        if (!pParent) {
-            pParent = jarves.wm.getActiveWindow();
+    initialize: function (parent, options) {
+        if (!parent) {
+            parent = jarves.wm.getActiveWindow();
         }
 
-        if (!pParent) {
+        if (!parent) {
             throw 'No parent found.';
         }
 
         this.lastFocusedElement = document.activeElement;
-        this.container = instanceOf(pParent, jarves.Window) ? pParent.toElement() : pParent;
+        this.container = instanceOf(parent, jarves.Window) ? parent.toElement() : parent;
 
-        this.setOptions(pOptions);
+        this.setOptions(options);
         this.renderLayout();
 
-        if (instanceOf(pParent, jarves.Window)) {
-            this.window = pParent;
+        if (instanceOf(parent, jarves.Window)) {
+            this.window = parent;
             this.window.addEvent('resize', this.checkResized);
         } else {
             this.container.getDocument().getWindow().addEvent('resize', this.checkResized);

@@ -1,7 +1,11 @@
+@import "../variables";
+@import "../bourbon";
+
 .jarves-content {
     min-height: 15px;
     position: relative;
 }
+
 
 .jarves-editor-dragMode .jarves-content:hover {
     outline: 0;
@@ -29,14 +33,15 @@
     padding: 0 5px;
     line-height: 25px;
     position: absolute;
-    left: 3px;
+    z-index: 1001;
+    right: 3px;
     top: -27px;
     display: none;
 }
 
 .jarves-content:hover .jarves-content-actionBar {
     display: block;
-    border: 1px solid #ababb5;
+    border: 1px solid rgba(171, 171, 181, 0.45);
     border-bottom: 0px;
 }
 
@@ -55,12 +60,12 @@
     padding: 0 5px;
 }
 
-.jarves-content:hover {
-    outline: 1px solid #ababb5;
+.jarves-content:hover .content-element {
+    outline: 1px solid rgba(171, 171, 181, 0.45);
 }
 
-.jarves-content-selected,
-.jarves-content-selected:hover {
+.jarves-content-selected .content-element,
+.jarves-content-selected:hover .content-element {
     outline: 1px solid #22638E;
     box-shadow: 0 0 1px #fff;
 }
@@ -126,6 +131,7 @@
 
 .jarves-content-actionBar-move {
     cursor: move;
+    margin: 0 3px;
 }
 
 .jarves-content-html-toolbarContainer {
@@ -186,4 +192,66 @@
     width: 250px;
     min-height: 50px;
     border: 5px solid #222;
+}
+
+.content-element p:last-child {
+    margin-bottom: 0;
+}
+
+.content-element p:first-child {
+    margin-top: 0;
+}
+
+.jarves-content-placer {
+    position: relative;
+    z-index: 1000;
+    height: 0;
+    top: -3px;
+    opacity: 0;
+    visibility: hidden;
+    @include transition(all 0.2s ease-in-out);
+    cursor: pointer;
+}
+
+.jarves-content-placer-visible {
+    visibility: visible;
+    opacity: 1;
+}
+
+.jarves-content-placer:before {
+    border-top: 3px solid $mainColor;
+    display: block;
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0px;
+    height: 0px;
+}
+
+.jarves-content-placer a.jarves-content-placer-place,
+.jarves-content-placer a.jarves-content-placer-place:link {
+    display: block;
+    position: relative;
+    top: -9px;
+    width: 20px;
+    left: -10px;
+    height: 20px;
+    border-radius: 2px;
+    text-align: center;
+    line-height: 20px;
+    background-color: $mainColor;
+    color: white;
+}
+
+.jarves-content-placer:hover a.jarves-content-placer-place,
+.jarves-content-placer:hover a.jarves-content-placer-place:link {
+    background-color: lighten($mainColor, 20%);
+}
+
+.jarves-content-placer-visible > a.jarves-content-placer-place,
+.jarves-content-placer-visible > a.jarves-content-placer-place:link {
+    display: block;
+    left: -20px;
+    @include transition(all 0.2s ease-in-out);
 }

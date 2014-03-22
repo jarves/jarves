@@ -29,11 +29,12 @@ jarves.ContentTypes.Html = new Class({
         }).inject(this.main);
     },
 
-    selected: function(inspectorContainer) {
+    openedInspector: function(inspectorContainer) {
         var toolbarContainer = new Element('div', {
             'class': 'jarves-content-html-toolbarContainer'
         }).inject(inspectorContainer);
 
+        //add it directly to inspectorContainer since its now bigger
         this.openDialogBtn = new jarves.Button(t('Edit HTML')).setButtonStyle('blue').inject(toolbarContainer);
 
         this.openDialogBtn.addEvent('click', this.openDialog.bind(this));
