@@ -2,7 +2,7 @@
 
 namespace Jarves;
 
-use Jarves\Model\Base\LanguageQuery;
+use Jarves\Model\LanguageQuery;
 use Jarves\Model\Content;
 use Jarves\Model\Domain;
 use Jarves\Model\Language;

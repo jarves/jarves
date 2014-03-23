@@ -1,0 +1,26 @@
+@import "bourbon";
+@import "variables";
+
+@mixin button() {
+    @include linear-gradient(lighten($buttonColor, 20%), $buttonColor);
+    border-radius: 2px;
+    color: #444;
+    &:hover {
+        @include linear-gradient($buttonColor, darken($buttonColor, 2%));
+    }
+}
+
+@mixin button-pressed() {
+    @include button();
+    @include linear-gradient(#e7e7e7, darken($buttonColor, 6%));
+    &:hover {
+        @include linear-gradient(#e7e7e7, darken($buttonColor, 6%));
+    }
+}
+
+@mixin button-primary() {
+    @include button();
+    @include linear-gradient(lighten($buttonColorPrimary, 1%), $buttonColorPrimary);
+    color: white;
+    border: 1px solid darken($buttonColorPrimary, 6%);
+}

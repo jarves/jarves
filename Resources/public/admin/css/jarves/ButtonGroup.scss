@@ -1,3 +1,5 @@
+@import "../base";
+
 .jarves-ButtonGroup {
     margin: 0 4px;
     display: inline-block;
@@ -42,16 +44,18 @@ a.jarves-buttonGroup-item:link {
     position: relative;
     display: inline-block;
     text-decoration: none;
-    padding: 0px 9px;
-    border-top: 1px solid #ddd;
-    border-bottom: 0;
-    border: 1px solid #ddd;
     margin: 0;
     border-left: 0;
+    border-radius: 0;
 }
 
 a.jarves-buttonGroup-item:first-child {
     border-left: 1px solid #ddd;
+    @include border-left-radius(2px);
+}
+
+a.jarves-buttonGroup-item:last-child {
+    @include border-right-radius(2px);
 }
 
 a.jarves-buttonGroup-item-only-icon:before {

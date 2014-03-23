@@ -1,3 +1,5 @@
+@import "../base";
+
 .kwindow-border {
     position: absolute;
     left: 0;
@@ -474,6 +476,7 @@ h3.jarves-headline {
 
 .jarves-Window-sidebar a.jarves-Button {
     display: block;
+    background-image: none;
     background-color: transparent;
     box-shadow: none;
     color: white;
@@ -482,6 +485,7 @@ h3.jarves-headline {
     text-align: left;
     margin: 0;
     cursor: pointer;
+    @include transition(all 0.2s ease-out);
 }
 
 .jarves-Window-sidebar a.jarves-Button-pressed,
@@ -490,9 +494,9 @@ h3.jarves-headline {
 .jarves-Window-sidebar a.jarves-Button-pressed:active {
     top: 0;
     box-shadow: none;
+    background-image: none;
     background-color: #3d3d3d;
 }
-
 
 .jarves-Window-sidebar a.jarves-Button-deactivate,
 .jarves-Window-sidebar a.jarves-Button-deactivate:link,
@@ -514,12 +518,12 @@ h3.jarves-headline {
     border-top: 1px solid gray;
 }
 
-
 .jarves-Window-sidebar .jarves-ButtonGroup:first-child {
     border-top: 0;
 }
 
 .jarves-Window-sidebar a.jarves-Button:hover {
+    background-image: none;
     background-color: #6e6e6e;
 }
 

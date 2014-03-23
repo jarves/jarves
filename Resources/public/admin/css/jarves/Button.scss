@@ -1,38 +1,29 @@
+@import "../base";
+
 a.jarves-Button,
 a.jarves-Button:link {
     white-space: nowrap;
     padding: 0px 10px;
 
     position: relative;
-
     cursor: default;
     color: #444;
     line-height: 28px;
     height: 30px;
     font-weight: normal;
     text-align: center;
-
     margin: 0 4px;
-    background-color: #fefefe;
 
     text-decoration: none;
     outline: 0;
-    position: relative;
     vertical-align: top;
-
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
 
     display: inline-block;
     border: 1px solid #ddd;
 
-    -webkit-transition: all 0.3s ease-out;
-    -moz-transition: all 0.3s ease-out;
-    -o-transition: all 0.3s ease-out;
-    transition: all 0.3s ease-out;
+    @include box-sizing(border-box);
+    @include button();
 }
-
 
 a.jarves-button-icon,
 a.jarves-button-icon:link {
@@ -43,10 +34,6 @@ a.jarves-button-icon:link {
     margin: 0 4px;
     text-decoration: none;
     outline: 0;
-}
-
-a.jarves-button-icon:hover {
-    color: #47799B;
 }
 
 a.jarves-Button > span {
@@ -88,20 +75,12 @@ a.jarves-Button:hover {
 
 a.jarves-Button:focus {
     border: 1px solid #3E9BCB;
-
     outline: 0;
     border-color: rgba(47, 140, 189, 0.9);
     -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
     box-shadow: 0 0 0 3px rgba(47, 140, 189, 0.2);
-
-    -moz-transition-duration: .1s;
-    -webkit-transition-duration: .1s;
-    -o-transition-duration: .1s;
-    -ms-transition-duration: .1s;
-    transition-duration: .1s;
-
     color: black;
 }
 
@@ -110,8 +89,7 @@ a.jarves-Button-pressed,
 a.jarves-Button-pressed:link,
 a.jarves-Button-pressed:hover,
 a.jarves-Button-pressed:active {
-    background-color: #dfdfdf;
-    border: 1px solid #d6d6d6;
+    @include button-pressed();
 }
 
 div.button-list {
@@ -148,9 +126,7 @@ a.jarves-Button-red:active {
 
 a.jarves-Button-blue,
 a.jarves-Button-blue:link {
-    color: white;
-    background-color: #22638E;
-    border: 1px solid #265F85;
+    @include button-primary();
 }
 
 a.jarves-Button-blue:hover {

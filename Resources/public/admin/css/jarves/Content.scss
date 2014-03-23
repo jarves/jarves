@@ -206,7 +206,7 @@
     position: relative;
     z-index: 1000;
     height: 0;
-    top: -3px;
+    top: -1px;
     opacity: 0;
     visibility: hidden;
     @include transition(all 0.2s ease-in-out);
@@ -219,7 +219,7 @@
 }
 
 .jarves-content-placer:before {
-    border-top: 3px solid $mainColor;
+    border-top: 1px solid $mainColor;
     display: block;
     content: '';
     position: absolute;

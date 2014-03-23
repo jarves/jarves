@@ -136,7 +136,9 @@ class JarvesHandler extends AbstractProcessingHandler
 //            }
 //        }
 //
-        $log->save();
+        try {
+            $log->save();
+        } catch (\Exception $e) {}
         $this->inSaving = false;
     }
 

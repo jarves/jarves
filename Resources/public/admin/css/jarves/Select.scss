@@ -1,3 +1,5 @@
+@import "../base";
+
 .jarves-Select-wrapper {
     display: inline-block;
     position: relative;
@@ -25,17 +27,14 @@ a.jarves-Select-box:link {
     vertical-align: top;
     min-width: 40px;
     margin: 0 4px;
-
-    background-color: #fefefe;
     border: 1px solid #ddd;
-
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
 
     text-align: left;
 
     max-width: 100%;
+
+    @include box-sizing(border-box);
+    @include button();
 }
 
 .jarves-Select-box:first-child {
@@ -206,7 +205,8 @@ a.jarves-select-chooser-item {
 }
 
 .jarves-select-chooser-item:hover {
-    background-color: #eee;
+    background-color: $mainColor;
+    color: white;
 }
 
 a.jarves-Select-separator,

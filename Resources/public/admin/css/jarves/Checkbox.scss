@@ -1,3 +1,5 @@
+@import "../base";
+
 .jarves-Checkbox:link {
     height: 30px;
     width: 60px;
@@ -49,7 +51,7 @@
 }
 
 .jarves-Checkbox-on {
-    background-color: #22638E;
+    background-color: $mainColor;
 }
 
 .jarves-Checkbox-knob {
@@ -58,6 +60,8 @@
     -moz-border-radius: 28px;
     -webkit-border-radius: 28px;
     border-radius: 24px;
+
+    @include transition(all 0.2s ease-out);
 
     width: 28px;
     height: 28px;

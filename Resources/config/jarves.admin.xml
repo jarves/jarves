@@ -47,8 +47,8 @@
             <asset>@JarvesBundle/font/OpenSans/open-sans.css</asset>
             <asset>@JarvesBundle/font/OpenSans/open-sans-condensed.css</asset>
             <assets>@JarvesBundle/admin/css/jarves.scss</assets>
-            <asset>@JarvesBundle/admin/css/jarves/Button.css</asset>
-            <asset>@JarvesBundle/admin/css/jarves/ButtonGroup.css</asset>
+            <asset>@JarvesBundle/admin/css/jarves/Button.scss</asset>
+            <asset>@JarvesBundle/admin/css/jarves/ButtonGroup.scss</asset>
             <assets>@JarvesBundle/admin/css/jarves/*.css</assets>
             <assets>@JarvesBundle/admin/css/jarves/*.scss</assets>
             <assets>@JarvesBundle/admin/css/jarves/ui/*.css</assets>
