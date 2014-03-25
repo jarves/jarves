@@ -50,7 +50,7 @@ jarves.ProgressWatch = new Class({
 
     /**
      *
-     * @returns {Boolean}
+     * @returns {boolean}
      */
     getDone: function() {
         return this.state;
@@ -66,6 +66,22 @@ jarves.ProgressWatch = new Class({
         this.state = true;
         this.currentProgress = this.progressRange;
         this.fireEvent('done', this);
+    },
+
+    /**
+     * Cancels the progress.
+     */
+    cancel: function() {
+        this.canceled = true;
+        this.fireEvent('cancel');
+    },
+
+    /**
+     * Cancels the progress.
+     */
+    error: function() {
+        this.errored = true;
+        this.fireEvent('error');
     },
 
     /**
@@ -96,8 +112,8 @@ jarves.ProgressWatch = new Class({
     },
 
     /**
-     * @param {Boolean} done
-     * @param {Boolean} internal
+     * @param {boolean} done
+     * @param {boolean} internal
      */
     setDone: function(done, internal) {
         this.state = !!done;
@@ -123,7 +139,7 @@ jarves.ProgressWatch = new Class({
 
     /**
      * @param {Number} progress
-     * @param {Boolean} internal if we fire the event or not.
+     * @param {boolean} internal if we fire the event or not.
      */
     setProgress: function(progress, internal) {
         this.currentProgress = progress;
@@ -137,22 +153,6 @@ jarves.ProgressWatch = new Class({
      */
     getProgress: function() {
         return this.currentProgress;
-    },
-
-    /**
-     * Cancels the progress.
-     */
-    cancel: function() {
-        this.canceled = true;
-        this.fireEvent('cancel');
-    },
-
-    /**
-     * Cancels the progress.
-     */
-    error: function() {
-        this.errored = true;
-        this.fireEvent('error');
     },
 
     /**

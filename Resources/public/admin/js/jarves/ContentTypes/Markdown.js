@@ -14,32 +14,27 @@ jarves.ContentTypes.Markdown = new Class({
 
     },
 
-    createLayout: function() {
-        this.main = new Element('div', {
-            'class': 'jarves-normalize jarves-content-markdown'
-        }).inject(this.getContentInstance().getContentContainer());
-
+    initInspector: function(inspectorContainer) {
         this.input = new jarves.Field({
             type: 'textarea',
             inputHeight: 'auto',
-            noWrapper: true,
+            label: 'Markdown',
             onChange: function(value) {
                 this.value = value;
+                this.fireChange();
             }.bind(this)
-        }, this.main);
+        }, inspectorContainer);
     },
 
-    openedInspector: function(inspectorContainer) {
-        var toolbarContainer = new Element('div', {
-            'class': 'jarves-content-markdown-toolbarContainer'
-        }).inject(inspectorContainer);
-    },
-
-    setValue: function(pValue) {
-        this.value = pValue;
+    setValue: function(value) {
+        this.value = value;
         if (this.input) {
-            this.input.setValue(pValue);
+            this.input.setValue(value);
         }
+    },
+
+    openInspectorOnInit: function() {
+        return true;
     },
 
     getValue: function() {

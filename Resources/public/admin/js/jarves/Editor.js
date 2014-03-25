@@ -42,7 +42,7 @@ jarves.Editor = new Class({
         this.placerDimensions = [];
         Array.each(this.container.getElements('.jarves-content-placer'), function(placer) {
             this.placerDimensions.push({
-                dimension: placer.getCoordinates(this.container.documentElement),
+                dimension: placer.getElement('a.jarves-content-placer-place').getCoordinates(this.container.documentElement),
                 element: placer
             });
         }.bind(this));
@@ -115,7 +115,12 @@ jarves.Editor = new Class({
                 content: value
             };
             var instance = slot.addContent(content, true);
-            document.id(instance).inject(placerElement, 'after');
+            var parentElement = placerElement.getParent();
+            if (parentElement.hasClass('jarves-content')) {
+                document.id(instance).inject(parentElement, 'after');
+            } else {
+                document.id(instance).inject(placerElement, 'after');
+            }
         };
 
         new Element('h3', {
@@ -219,24 +224,34 @@ jarves.Editor = new Class({
     openInspector: function(content) {
         if (this.lastInspectorContent === content) return;
 
+        if (this.inspector) {
+            this.closeInspector();
+        }
+
         this.inspector = new Element('div', {
             'class': 'jarves-Editor-inspector'
-        }).inject(this.getContentField().getWin());
+        });
+
+        this.inspector.inject(this.getContentField().getWin());
 
         this.inspector.addEvent('click', function(e) {
             e.stop();
         });
 
+        var type = content.getCurrentType();
+        var clazz = jarves.ContentTypes[type] || jarves.ContentTypes[type.capitalize()];
+
+        var title = 'Content Element';
+        var iconClass = '';
+        if (clazz) {
+            title = clazz.label;
+            iconClass = clazz.icon;
+        }
+
         this.inspectorTitle = new Element('h3', {
-            'class': 'light',
-            text: t('Settings')
+            'class': 'light ' + iconClass + ' jarves-Editor-inspector-title',
+            text: tf('%s - Settings', title)
         }).inject(this.inspector);
-
-        var windowSize = document.id(this.getContentField().getWin()).getSize();
-
-//        var position = document.id(content).getPosition(this.getContentField().getWin());
-        this.inspector.setStyle('top', 250);
-        this.inspector.setStyle('left', windowSize.x - 450);
 
         this.inspectorContainer = new Element('div').inject(this.inspector);
 
@@ -247,27 +262,97 @@ jarves.Editor = new Class({
         this.inspectorCancelButton = new jarves.Button(t('Cancel')).inject(this.inspectorActionBar);
         this.inspectorSaveButton = new jarves.Button(t('Apply')).setButtonStyle('blue').inject(this.inspectorActionBar);
 
-        this.inspectorCancelButton.addEvent('click', this.closeInspector.bind(this));
+        this.inspectorCancelButton.addEvent('click', this.closeInspector.bind(this, null));
+        this.inspectorSaveButton.addEvent('click', this.applyInspector.bind(this));
 
         this.inspector.makeDraggable({
             handle: this.inspectorTitle
         });
-        this.inspector.makeDraggable({
-            handle: this.inspectorActionBar
-        });
 
-        content.openInspector(this.getInspectorContainer());
+        content.initInspector(this.getInspectorContainer());
 
         this.lastInspectorContent = content;
+        this.updateInspectorPosition();
+        this.inspector.addClass('jarves-Editor-inspector-visible');
     },
 
-    closeInspector: function() {
-        this.inspector.destroy();
+    applyInspector: function() {
+        this.lastInspectorContent.applyInspector();
+        this.closeInspector(true);
+    },
+
+    updateInspectorPosition: function() {
+        var win = this.getContentField().getWin();
+        var winSize = document.id(win).getSize();
+        var contentElement = document.id(this.lastInspectorContent);
+        var contentPosition = contentElement.getPosition();
+        contentPosition.y += this.getContentField().getFrame().getPosition(win).y; //relative to current window
+        if ('iframe' === this.getContentField().getFrame().get('tag')) {
+            contentPosition.y -= this.getContentField().getFrame().contentWindow.document.body.getScroll().y;
+        }
+        var contentSize = document.id(this.lastInspectorContent).getSize();
+        var inspectorSize = this.inspector.getSize();
+
+        var positionTop = contentPosition.y - 20;
+        var positionLeft = contentPosition.x + contentSize.x - 20;
+
+        if (positionTop+inspectorSize.y > winSize.y) {
+            positionTop = positionTop - (positionTop+inspectorSize.y - winSize.y)
+        }
+
+        if (positionTop < 0) positionTop = 0;
+
+        if (positionLeft + inspectorSize.x > winSize.x) {
+            //fit left side?
+            if (inspectorSize.x < contentPosition.x) {
+                positionLeft = contentPosition.x - inspectorSize.x - 20;
+            } else {
+                //nope, doesnt fit. Move to very right minus some padding
+                positionLeft = winSize.x - inspectorSize.x - 20;
+            }
+        }
+
+        this.inspector.setStyle('top', positionTop);
+        this.inspector.setStyle('left', positionLeft);
+    },
+
+    closeInspector: function(fromApply) {
+        if (!this.isInspectorVisible()) return;
+
+        this.inspector.removeClass('jarves-Editor-inspector-visible');
+        if (!fromApply) {
+            this.lastInspectorContent.cancelInspector();
+        }
         delete this.lastInspectorContent;
+        this.inspector.destroy();
     },
 
+    /**
+     * @returns {jarves.Content}
+     */
+    getCurrentInspectorContentObject: function() {
+        return this.lastInspectorContent;
+    },
+
+    /**
+     * @returns {HTMLElement}
+     */
     getInspectorContainer: function() {
         return this.inspectorContainer;
+    },
+
+    /**
+     * @returns {HTMLElement}
+     */
+    getInspector: function() {
+        return this.inspector;
+    },
+
+    /**
+     * @returns {boolean}
+     */
+    isInspectorVisible: function() {
+        return this.inspector && this.inspector.hasClass('jarves-Editor-inspector-visible');
     },
 
     /**

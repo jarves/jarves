@@ -23,4 +23,7 @@
     @include linear-gradient(lighten($buttonColorPrimary, 1%), $buttonColorPrimary);
     color: white;
     border: 1px solid darken($buttonColorPrimary, 6%);
+    &:hover {
+        @include linear-gradient(darken($buttonColorPrimary, 2%), darken($buttonColorPrimary, 3%));
+    }
 }

@@ -19,13 +19,13 @@ jarves.ContentTypes.Tray = new Class({
             'class': 'jarves-normalize jarves-content-plugin'
         }).inject(this.getContentInstance().getContentContainer());
 
-        this.iconDiv = new Element('div', {
-            'class': 'jarves-content-inner-icon icon-clipboard-2'
-        }).inject(this.main);
-
         this.inner = new Element('div', {
             'class': 'jarves-content-inner jarves-normalize'
         }).inject(this.main);
+        this.inner.addEvent('click', function(e) {
+            e.stop();
+            this.getContentInstance().openInspector();
+        }.bind(this));
     },
 
     renderValue: function () {
@@ -35,8 +35,10 @@ jarves.ContentTypes.Tray = new Class({
         }
 
         if (this.lastRenderedNode !== this.value.node || !this.value.node) {
+            this.validNode = false;
             if (!this.value.node) {
                 this.inner.set('text', t('Please choose a tray node.'));
+                this.fireChange();
             } else {
                 this.inner.set('text', 'Loading ...');
                 jarves.getObjectLabel('jarves/node/' + this.value.node, function(label, item) {
@@ -44,11 +46,13 @@ jarves.ContentTypes.Tray = new Class({
                         this.inner.set('text', t('Tray not found.'));
                     } else {
                         if (3 === item.type) {
+                            this.validNode = true;
                             this.inner.set('text', '» ' + label);
                         } else {
                             this.inner.set('text', t('Not a depot chosen.'));
                         }
                     }
+                    this.fireChange();
                 }.bind(this));
             }
         }
@@ -59,7 +63,7 @@ jarves.ContentTypes.Tray = new Class({
     /**
      * adds/loads all additional fields to the inspector.
      */
-    openedInspector: function(inspectorContainer) {
+    initInspector: function(inspectorContainer) {
         var toolbarContainer = new Element('div', {
             'class': 'jarves-content-deposit-toolbarContainer'
         }).inject(inspectorContainer);
@@ -68,8 +72,9 @@ jarves.ContentTypes.Tray = new Class({
             'label': t('Tray'),
             type: 'page',
             width: 'auto',
-            onChange: function(){
-                this.fireChange();
+            onChange: function(value){
+                this.value.node = value;
+                this.renderValue();
             }.bind(this)
         }, toolbarContainer);
 
@@ -78,13 +83,12 @@ jarves.ContentTypes.Tray = new Class({
         }
     },
 
-    fireChange: function() {
-        if ('object' !== typeOf(this.value)) {
-            this.value = {};
-        }
+    isPreviewPossible: function() {
+        return this.value && this.value.node && this.validNode;
+    },
 
-        this.value.node = this.nodeInput.getValue();
-        this.renderValue();
+    openInspectorOnInit: function() {
+        return true;
     },
 
     setValue: function (pValue) {

@@ -155,6 +155,10 @@ jarves.FieldTypes.Content = new Class({
         this.setupEvents();
     },
 
+    getFrame: function() {
+        return this.iframe;
+    },
+
     toggleTree: function() {
         if (this.treeBtn.isPressed()) {
             this.treeBtn.setPressed(false);

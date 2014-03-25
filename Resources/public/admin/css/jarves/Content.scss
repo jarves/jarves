@@ -4,8 +4,23 @@
 .jarves-content {
     min-height: 15px;
     position: relative;
+    @include animation(jarves-Content-fadeIn 0.2s ease-out);
 }
 
+@include keyframes(jarves-Content-fadeIn) {
+    from {
+        opacity: 0;
+        margin-top: 2px;
+    }
+    to {
+        opacity: 1;
+        margin-top: 0px;
+    }
+}
+
+.jarves-content-wrapper {
+    min-height: 15px;
+}
 
 .jarves-editor-dragMode .jarves-content:hover {
     outline: 0;
@@ -28,50 +43,64 @@
 .jarves-content-actionBar {
     min-height: 25px;
     min-width: 50px;
-    background-color: white;
     border-bottom: 0px;
     padding: 0 5px;
     line-height: 25px;
     position: absolute;
     z-index: 1001;
     right: 3px;
-    top: -27px;
+    top: -26px;
     display: none;
+    background-color: #333;
+    border-radius: 3px;
+    color: white;
 }
 
 .jarves-content:hover .jarves-content-actionBar {
     display: block;
-    border: 1px solid rgba(171, 171, 181, 0.45);
-    border-bottom: 0px;
+    @include animation(jarves-Content-ActionBar-fadeIn 0.2s ease-out);
 }
 
-.jarves-content-selected .jarves-content-actionBar,
-.jarves-content-selected:hover .jarves-content-actionBar {
-    display: block;
-    border: 1px solid #22638E;
-    border-bottom: 0px;
+@include keyframes(jarves-Content-ActionBar-fadeIn) {
+    from {
+        opacity: 0;
+        margin-top: 2px;
+    }
+    to {
+        opacity: 1;
+        margin-top: 0px;
+    }
 }
 
 .jarves-content-actionBar a:link {
-    color: black;
+    color: white !important;
     font-size: 14px;
     text-decoration: none;
     line-height: 25px;
     padding: 0 5px;
 }
 
-.jarves-content:hover .content-element {
-    outline: 1px solid rgba(171, 171, 181, 0.45);
+.jarves-content-actionBar-typeIcon {
+    border-right: 1px solid #555;
+    padding-right: 5px;
+    margin-right: 3px;
+    padding-left: 2px;
 }
 
-.jarves-content-selected .content-element,
-.jarves-content-selected:hover .content-element {
-    outline: 1px solid #22638E;
+.jarves-content:hover .jarves-content-wrapper {
+    outline: 1px dashed rgba(171, 171, 181, 0.45);
     box-shadow: 0 0 1px #fff;
 }
 
+//
+//.jarves-content-selected .content-element,
+//.jarves-content-selected:hover .content-element {
+//    outline: 1px solid #22638E;
+//    box-shadow: 0 0 1px #fff;
+//}
+
 .jarves-content-actionBar a:hover {
-    color: #444;
+    color: #dadada !important;
 }
 
 .jarves-content-plugin {
@@ -83,35 +112,15 @@
 }
 
 .jarves-content-inner {
-    background: #22638E;
+    background: #e7e7e7;
     padding: 5px;
-    color: white;
+    color: #333;
+    border-radius: 3px;
     padding-right: 40px;
-    text-shadow: 0 1px 0 #333;
     cursor: pointer;
     min-height: 25px;
-}
-
-.jarves-content-plugin {
-    border: 1px solid #6C8FA8;
-}
-
-.jarves-content-selected .jarves-content-plugin,
-.jarves-content:hover .jarves-content-plugin {
-    border: 1px solid white;
-}
-
-.jarves-content-selected .jarves-content-inner {
-    background: #25567e;
-}
-
-.jarves-content-inner-icon {
-    position: absolute;
-    right: 6px;
-    top: 4px;
-    font-size: 24px;
-    color: white;
-    text-shadow: 1px 1px 0px #6F6F6F;
+    line-height: 25px;
+    text-align: center;
 }
 
 .jarves-content-inner-title {
@@ -119,14 +128,6 @@
 }
 
 .jarves-content-inner-subtitle {
-}
-
-.jarves-content-plugin-options {
-    display: none;
-}
-
-.jarves-content-plugin:hover .jarves-content-plugin-options {
-    display: block;
 }
 
 .jarves-content-actionBar-move {
@@ -194,32 +195,29 @@
     border: 5px solid #222;
 }
 
-.content-element p:last-child {
-    margin-bottom: 0;
-}
-
-.content-element p:first-child {
-    margin-top: 0;
-}
+//.jarves-content-wrapper p:last-child {
+//    margin-bottom: 0;
+//}
+//
+//.jarves-content-wrapper p:first-child {
+//    margin-top: 0;
+//}
 
 .jarves-content-placer {
     position: relative;
     z-index: 1000;
     height: 0;
     top: -1px;
-    opacity: 0;
-    visibility: hidden;
-    @include transition(all 0.2s ease-in-out);
+    opacity: 0.3;
+    @include transition(all 0.1s ease-in-out);
     cursor: pointer;
 }
 
 .jarves-content-placer-visible {
-    visibility: visible;
     opacity: 1;
 }
 
 .jarves-content-placer:before {
-    border-top: 1px solid $mainColor;
     display: block;
     content: '';
     position: absolute;
@@ -229,29 +227,42 @@
     height: 0px;
 }
 
+.jarves-content-placer-visible:before {
+    border-top: 1px solid $mainColor;
+}
+
 .jarves-content-placer a.jarves-content-placer-place,
 .jarves-content-placer a.jarves-content-placer-place:link {
     display: block;
     position: relative;
-    top: -9px;
-    width: 20px;
-    left: -10px;
-    height: 20px;
-    border-radius: 2px;
     text-align: center;
-    line-height: 20px;
     background-color: $mainColor;
     color: white;
+    top: -5px;
+    width: 10px;
+    left: -11px;
+    height: 10px;
+    border-radius: 7px;
+    line-height: 8px;
+    font-size: 7px;
+    border: 1px solid #D3D3D3;
+}
+
+.jarves-content-placer-visible a.jarves-content-placer-place,
+.jarves-content-placer-visible a.jarves-content-placer-place:link {
+    top: -11px;
+    width: 21px;
+    left: -16px;
+    height: 21px;
+    color: lighten($mainColor, 45%);
+    border-radius: 15px;
+//    font-size: 14px;
+    line-height: 21px;
+    border: 0px;
+    @include transition(all 0.1s ease-out);
 }
 
 .jarves-content-placer:hover a.jarves-content-placer-place,
 .jarves-content-placer:hover a.jarves-content-placer-place:link {
-    background-color: lighten($mainColor, 20%);
-}
-
-.jarves-content-placer-visible > a.jarves-content-placer-place,
-.jarves-content-placer-visible > a.jarves-content-placer-place:link {
-    display: block;
-    left: -20px;
-    @include transition(all 0.2s ease-in-out);
+    background-color: darken($mainColor, 20%);
 }

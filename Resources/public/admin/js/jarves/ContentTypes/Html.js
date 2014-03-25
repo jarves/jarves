@@ -15,60 +15,34 @@ jarves.ContentTypes.Html = new Class({
     },
 
     createLayout: function() {
-        this.main = new Element('div', {
-            'class': 'jarves-normalize jarves-content-plugin'
-        }).inject(this.getContentInstance().getContentContainer());
-
-        this.iconDiv = new Element('div', {
-            'class': 'jarves-content-inner-icon icon-html5'
-        }).inject(this.main);
-
-        this.inner = new Element('div', {
-            'class': 'jarves-content-inner jarves-normalize',
-            text: 'HTML'
-        }).inject(this.main);
     },
 
-    openedInspector: function(inspectorContainer) {
-        var toolbarContainer = new Element('div', {
-            'class': 'jarves-content-html-toolbarContainer'
-        }).inject(inspectorContainer);
-
-        //add it directly to inspectorContainer since its now bigger
-        this.openDialogBtn = new jarves.Button(t('Edit HTML')).setButtonStyle('blue').inject(toolbarContainer);
-
-        this.openDialogBtn.addEvent('click', this.openDialog.bind(this));
-    },
-
-    openDialog: function() {
-        var dialog = new jarves.Dialog(this.getWin(), {
-            autoDisplay: true,
-            withButtons: true,
-            minWidth: '80%',
-            mode: 'html',
-            minHeight: '80%'
-        });
-
+    initInspector: function(inspectorContainer) {
+        this.oldValue = this.value;
         this.input = new jarves.Field({
             noWrapper: true,
             type: 'codemirror',
             onChange: function(value) {
                 this.value = value;
+                this.getContentInstance().getContentContainer().set('html', value);
             }.bind(this)
-        }, dialog.getContentContainer());
+        }, inspectorContainer);
 
         this.input.setValue(this.value);
-
-        dialog.addEvent('apply', function() {
-            this.value = this.input.getValue();
-            delete this.input;
-        }.bind(this));
     },
 
-    setValue: function(pValue) {
-        this.value = pValue;
+    applyInspector: function() {
+        this.value = this.previewedValue;
+    },
+
+    cancelInspector: function() {
+        this.value = this.oldValue;
+    },
+
+    setValue: function(value) {
+        this.value = value;
         if (this.input) {
-            this.input.setValue(pValue);
+            this.input.setValue(value);
         }
     },
 

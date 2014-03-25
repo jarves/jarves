@@ -5,6 +5,7 @@ parameters:
      jarves.content.types.plugin.class: Jarves\ContentTypes\TypePlugin
      jarves.content.types.markdown.class: Jarves\ContentTypes\TypeMarkdown
      jarves.content.types.tray.class: Jarves\ContentTypes\TypeTray
+     jarves.content.types.html.class: Jarves\ContentTypes\TypeHtml
 
 services:
      jarves.content.types:
@@ -20,6 +21,12 @@ services:
          arguments: ["@jarves"]
          tags:
              - { name: jarves.content.type, alias: image }
+
+     jarves.content.types.html:
+         class: %jarves.content.types.html.class%
+         arguments: ["@jarves"]
+         tags:
+             - { name: jarves.content.type, alias: html }
 
      jarves.content.types.plugin:
          class: %jarves.content.types.plugin.class%

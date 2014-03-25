@@ -2,20 +2,6 @@ jarves.ContentAbstract = new Class({
     Extends: jarves.FieldAbstract,
 
     /**
-     * @returns {jarves.Editor}
-     */
-    getEditor: function() {
-        return this.getContentInstance().getEditor();
-    },
-
-    /**
-     * @returns {jarves.Slot}
-     */
-    getSlot: function() {
-        return this.getContentInstance().getSlot();
-    },
-
-    /**
      * Destroys everything related to this contentType.
      */
     destroy: function(){
@@ -24,7 +10,7 @@ jarves.ContentAbstract = new Class({
 
     /**
      * Use this method to create your field layout.
-     * Please do not the constructor for this job.
+     * Please do not use the constructor for this job.
      *
      * Inject your elements to this.fieldInstance.fieldPanel.
      */
@@ -36,12 +22,38 @@ jarves.ContentAbstract = new Class({
         //your field got selected
     },
 
-    openedInspector: function(inspectorContainer) {
+    initInspector: function(inspectorContainer) {
         //the inspector has been opened
     },
 
     deselected: function() {
-        //your field got deselected
+        //your field has been deselected
+    },
+
+    openInspectorOnInit: function() {
+        return false;
+    },
+
+    /**
+     * Defines whether this type can be previewed.
+     *
+     * @returns {boolean}
+     */
+    isPreviewPossible: function() {
+        return true;
+    },
+
+    /**
+     * User pressed 'apply', we save the value from getValue() and the inspector is going to close after this call.
+     */
+    applyInspector: function() {
+
+    },
+    /**
+     * User pressed 'cancel' or the dialog just disappeared without saving, so the inspector is going to close after this call.
+     */
+    cancelInspector: function() {
+
     },
 
     /**
@@ -59,11 +71,16 @@ jarves.ContentAbstract = new Class({
     },
 
     /**
-     * Defines whether this type can be previewed.
-     *
-     * @returns {boolean}
+     * @returns {jarves.Editor}
      */
-    isPreviewPossible: function() {
-        return true;
+    getEditor: function() {
+        return this.getContentInstance().getEditor();
+    },
+
+    /**
+     * @returns {jarves.Slot}
+     */
+    getSlot: function() {
+        return this.getContentInstance().getSlot();
     }
 });

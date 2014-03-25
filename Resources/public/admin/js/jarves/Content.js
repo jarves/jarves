@@ -4,6 +4,9 @@ jarves.Content = new Class({
 
     drop: null,
 
+    /**
+     * @var {jarves.ContentAbstract}
+     */
     contentObject: null,
     currentType: null,
     currentTemplate: null,
@@ -13,10 +16,16 @@ jarves.Content = new Class({
 
     contentContainer: null,
 
-    initialize: function(pContent, pContainer, pDrop) {
-        this.drop = pDrop;
-        this.renderLayout(pContainer);
-        this.setValue(pContent);
+    /**
+     *
+     * @param {*} value
+     * @param {Element} container
+     * @param {Array} drop
+     */
+    initialize: function(value, container, drop) {
+        this.drop = drop;
+        this.renderLayout(container);
+        this.setValue(value);
 
         this.clipboardListener = this.showPasteState.bind(this);
         window.addEvent('clipboard', this.clipboardListener);
@@ -81,8 +90,8 @@ jarves.Content = new Class({
             'class': 'jarves-normalize jarves-content-actionBar'
         }).inject(this.main);
 
-        this.contentContainer = new Element('div', {
-            'class': 'content-element'
+        this.contentWrapper = new Element('div', {
+            'class': 'jarves-content-wrapper'
         }).inject(this.main);
 
         this.placer = new Element('div', {
@@ -112,6 +121,9 @@ jarves.Content = new Class({
     },
 
     addActionBarItems: function() {
+        this.typeIcon = new Element('span', {
+            'class': 'jarves-content-actionBar-typeIcon'
+        }).inject(this.actionBar);
 
         var inspectorBtn = new Element('a', {
             'class': 'icon-wrench',
@@ -228,7 +240,7 @@ jarves.Content = new Class({
     },
 
     /**
-     * @param {jarves.ProgressWatch} progressWatch
+     * @param {jarves.ProgressWatch} [progressWatch]
      */
     loadPreview: function(progressWatch) {
         if (!this.getContentObject().isPreviewPossible()) {
@@ -236,84 +248,112 @@ jarves.Content = new Class({
         }
         delete this.currentTemplate;
 
+        var value;
+
+        if (this.isOpenInspector()) {
+            value = this.getPreviewValue();
+        } else {
+            value = this.getValue();
+        }
+
         if (this.lastRq) {
             this.lastRq.cancel();
         }
 
         var req = Object.toQueryString({
-            template: this.value.template,
-            type: this.value.type,
+            template: value.template,
+            type: value.type,
             nodeId: this.getEditor().getNodeId(),
             domainId: this.getEditor().getDomainId()
         });
 
-        this.getEditor().deactivateLinks(this.contentContainer);
+//        this.getEditor().deactivateLinks(this.contentContainer);
         this.lastRq = new Request.JSON({url: _pathAdmin + 'admin/content/preview?' + req, noCache: true,
             onFailure: function() {
+                this.contentWrapper.set('html', '-- loading preview failed --');
                 if (progressWatch) {
                     progressWatch.error();
                 }
-            },
-            onComplete: function(pResponse) {
-                this.actionBar.dispose();
-                this.placer.dispose();
-                this.main.empty();
-
-                this.main.set('html', pResponse.data);
-                this.actionBar.inject(this.main, 'top');
-                this.placer.inject(this.main);
+            }.bind(this),
+            onComplete: function(response) {
+                this.contentContainer.dispose();
+                this.contentWrapper.set('html', response.data);
 
                 if (progressWatch) {
                     progressWatch.done();
                 }
             }.bind(this)}).post({
-                content: this.value.content
+                content: value.content
             });
     },
 
+    getPreviewValue: function() {
+        var contentValue = this.getContentObject().getValue();
+        var value = Object.clone(this.value);
+        value.template = this.template.getValue();
+        value.content = contentValue;
+
+        return value;
+    },
+
+    isOpenInspector: function() {
+        return this.getEditor().isInspectorVisible() && this.getEditor().getCurrentInspectorContentObject() === this;
+    },
+
     /**
-     * @param {jarves.ProgressWatch} progressWatch
+     * @param {jarves.ProgressWatch} [progressWatch]
      */
-//    loadTemplate: function(progressWatch) {
-//        if (null !== this.currentTemplate && this.currentTemplate == this.value.template) {
-//            return;
-//        }
-//
-//        if (this.lastRq) {
-//            this.lastRq.cancel();
-//        }
-//
-//        this.getEditor().activateLinks(this.main);
-//        this.lastRq = new Request.JSON({url: _pathAdmin + 'admin/content/template', noCache: true,
-//            onFailure: function() {
-//                progressWatch.error();
-//            },
-//            onComplete: function(pResponse) {
-//                this.actionBar.dispose();
-//                this.placer.dispose();
-//                this.main.setStyle('height', this.main.getSize().y);
-//
-//                if (this.contentObject) {
-//                    this.contentObject.destroy();
-//                }
-//                this.main.empty();
-//                this.main.set('html', pResponse.data);
-//
-//                this.contentContainer = this.main.getElement('.jarves-content-container') || new Element('div').inject(this.main);
-//
-//                delete this.contentObject;
-//                this.currentTemplate = this.value.template;
-//                this.actionBar.inject(this.main, 'top');
-//                this.placer.inject(this.main);
-//
-//                this.setValue(this.value);
-//
-//                this.main.setStyle.delay(50, this.main, ['height']);
-//            }.bind(this)}).get({
-//                template: this.value.template,
-//                type: this.value.type
-//            });
-//    },
+    loadTemplate: function(progressWatch) {
+        var value;
+
+        if (this.isOpenInspector()) {
+            value = this.getPreviewValue();
+        } else {
+            value = this.getValue();
+        }
+
+        if (null !== this.currentTemplate && this.currentTemplate == value.template) {
+            if (progressWatch) {
+                progressWatch.done();
+            }
+            return false;
+        }
+
+        if (this.lastRq) {
+            this.lastRq.cancel();
+        }
+
+        this.getEditor().activateLinks(this.main);
+        this.lastRq = new Request.JSON({url: _pathAdmin + 'admin/content/template', noCache: true,
+            onFailure: function() {
+                this.contentWrapper.set('html', ' -- loading tempalte failed --');
+                if (progressWatch) {
+                    progressWatch.error();
+                }
+            },
+            onComplete: function(response) {
+                this.main.setStyle('height', this.main.getSize().y);
+
+                var children = this.contentContainer ? this.contentContainer.getChildren() : new Elements();
+                children.dispose();
+                this.contentWrapper.set('html', response.data);
+                this.contentContainer = this.contentWrapper.getElement('.jarves-content-container') || new Element('div').inject(this.contentWrapper);
+                children.inject(this.contentContainer);
+
+                this.currentTemplate = value.template;
+
+                this.main.setStyle.delay(50, this.main, ['height']);
+
+                if (progressWatch) {
+                    progressWatch.done();
+                }
+            }.bind(this)}).get({
+                template: value.template,
+                type: value.type
+            });
+
+        return true;
+    },
 
     focus: function() {
         if (this.contentObject) {
@@ -325,13 +365,17 @@ jarves.Content = new Class({
     },
 
     /**
-     * @param {jarves.ProgressWatch} progressWatch
+     * @param {jarves.ProgressWatch} [progressWatch]
      *
      * @returns {*}
      */
     getValue: function(progressWatch) {
         if (this.selected) {
             this.value = this.value || {};
+        }
+
+        if (this.isOpenInspector()) {
+            return this.getPreviewValue();
         }
 
         if (this.contentObject) {
@@ -349,7 +393,7 @@ jarves.Content = new Class({
                 this.setValue(self.value);
             });
 
-            if (this.contentObject && progressWatch) {
+            if (this.contentObject) {
                 this.contentObject.save(progressWatch);
             }
         }
@@ -358,22 +402,19 @@ jarves.Content = new Class({
     },
 
     updateUI: function() {
-        this.value = this.getValue();
-
         this.showVisibilityState();
         this.showPasteState();
 
-//        if (this.preview) {
+        if (this.getContentObject().isPreviewPossible()) {
             this.loadPreview();
-//        } else {
-//            this.loadTemplate();
-//        }
+        } else {
+            this.loadTemplate();
+        }
     },
 
     setSelected: function(selected) {
         if (selected) {
             this.main.addClass('jarves-content-selected');
-//            this.loadInspector();
             if (this.contentObject && this.contentObject.selected) {
                 this.contentObject.selected();
             }
@@ -382,9 +423,6 @@ jarves.Content = new Class({
             if (this.contentObject && this.contentObject.deselected) {
                 this.contentObject.deselected();
             }
-//            if (this.inspectorContainer) {
-//                this.inspectorContainer.destroy();
-//            }
         }
         this.selected = selected;
     },
@@ -410,12 +448,37 @@ jarves.Content = new Class({
         }).inject(inspectorContainer);
     },
 
-    openInspector: function(inspectorContainer) {
+    initInspector: function(inspectorContainer) {
         this.loadDefaultInspector(inspectorContainer);
 
-        if (this.contentObject && this.contentObject.openedInspector) {
-            this.contentObject.openedInspector(this.inspectorContainer);
+        if (this.contentObject && this.contentObject.initInspector) {
+            this.contentObject.initInspector(this.inspectorContainer);
         }
+    },
+
+    openInspector: function() {
+        this.getEditor().openInspector(this);
+    },
+
+    applyInspector: function() {
+         if (this.contentObject) {
+             this.contentObject.applyInspector();
+             this.value.template = this.template.getValue();
+             this.value.content = this.getContentObject().getValue();
+         }
+         this.updateUI();
+    },
+
+    cancelInspector: function() {
+         if (this.contentObject) {
+             this.contentObject.cancelInspector();
+             this.contentObject.setValue(this.value.content);
+         }
+         this.updateUI();
+    },
+
+    getCurrentType: function() {
+        return this.currentType;
     },
 
     setValue: function(value) {
@@ -423,9 +486,15 @@ jarves.Content = new Class({
 
         if (!this.currentType || !this.contentObject || value.type != this.currentType || !this.currentTemplate || this.currentTemplate != value.template) {
 
-//            if (null === this.currentTemplate || this.currentTemplate != pValue.template) {
-//                return this.loadTemplate(pValue);
-//            }
+            if (null === this.currentTemplate || this.currentTemplate != value.template) {
+                var progressWatch = new jarves.ProgressWatch({
+                    onDone: function() {
+                        this.setValue(this.value);
+                    }.bind(this)
+                });
+                this.loadTemplate(progressWatch);
+                return;
+            }
 
             if (!jarves.ContentTypes) {
                 throw 'No jarves.ContentTypes loaded.';
@@ -439,11 +508,22 @@ jarves.Content = new Class({
             }
 
             this.contentObject.addEvent('change', this.fireChange);
+            this.currentType = value.type;
+
+            if (this.lastAddedIcon) {
+                this.typeIcon.removeClass(this.lastAddedIcon);
+            }
+            this.lastAddedIcon = clazz.icon;
+            this.typeIcon.addClass(this.lastAddedIcon);
+            this.typeIcon.set('title', clazz.label);
+
+            if (this.contentObject.openInspectorOnInit()) {
+                this.openInspector();
+            }
 
             if (this.nextFocus) {
                 this.focus();
             }
-            this.currentType = value.type;
         }
 
         this.showVisibilityState();

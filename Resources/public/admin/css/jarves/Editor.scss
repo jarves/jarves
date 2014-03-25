@@ -78,10 +78,41 @@
     position: absolute;
     min-width: 400px;
     max-width: 80%;
+    max-height: 90%;
+    overflow: auto;
     border-top: 3px solid $mainColor;
     border-bottom: 3px solid $mainColor;
     background-color: #F5F5F5;
     padding: 2px 15px;
+    padding-top: 0;
+    box-shadow: 0 0 2px #808080;
+    visibility: hidden;
+}
+
+@include keyframes(jarves-Editor-fade-in) {
+    from {
+        opacity: 0;
+        margin-top: -6px;
+    }
+    to {
+        opacity: 1;
+        margin-top: 0px;
+    }
+}
+
+.jarves-Editor-inspector-visible {
+    visibility: visible;
+    @include animation(jarves-Editor-fade-in 0.2s ease-out);
+}
+
+.jarves-Editor-inspector-title {
+    cursor: move;
+}
+
+.jarves-Editor-inspector-title:before {
+    position: relative;
+    left: -6px;
+    font-size: 14px;
 }
 
 //.jarves-editor-plugins-subTitle {

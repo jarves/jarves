@@ -191,7 +191,7 @@ jarves.ContentTypes.Image = new Class({
         }).inject(this.main);
     },
 
-    openedInspector: function(inspectorContainer) {
+    initInspector: function(inspectorContainer) {
         var toolbarContainer = new Element('div', {
             'class': 'jarves-content-image-toolbarContainer'
         }).inject(inspectorContainer);

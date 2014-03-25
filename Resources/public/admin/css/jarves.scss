@@ -19,66 +19,67 @@ $base-font-size: 13px;
     font-smooth: never;
 }
 
-table {
-    border-collapse: separate;
-    border-spacing: 0px;
+.jarves-admin {
+    table {
+        border-collapse: separate;
+        border-spacing: 0px;
+    }
+
+    .CodeMirror-gutter {
+        z-index: auto;
+    }
+
+    h1,
+    h2,
+    h3 {
+        font-weight: 300;
+    }
+
+    h1 {
+        font-size: 38px;
+        color: #797979;
+        line-height: 50px;
+        margin: 5px 0;
+        padding: 0;
+    }
+
+    h2 {
+        font-size: 26px;
+        color: #666;
+        margin: 5px 0;
+        padding: 0;
+    }
+
+    h2.light,
+    h3.light {
+        font-weight:300;
+    }
+
+
+    .jarves-clear {
+        clear: both;
+    }
+
+    h3 {
+        text-transform: uppercase;
+    }
+
+    body.hide-scrollbar {
+        overflow: hidden;
+    }
+
+    a[class^="icon-"],
+    a[class*=" icon-"]{
+        color: #444;
+        text-decoration: none;
+        line-height: 28px;
+        padding: 0 2px;
+    }
+
+    td {
+        vertical-align: top;
+    }
 }
-
-.CodeMirror-gutter {
-    z-index: auto;
-}
-
-h1,
-h2,
-h3 {
-    font-weight: 300;
-}
-
-h1 {
-    font-size: 38px;
-    color: #797979;
-    line-height: 50px;
-    margin: 5px 0;
-    padding: 0;
-}
-
-h2 {
-    font-size: 26px;
-    color: #666;
-    margin: 5px 0;
-    padding: 0;
-}
-
-h2.light,
-h3.light {
-    font-weight:300;
-}
-
-
-.jarves-clear {
-    clear: both;
-}
-
-h3 {
-    text-transform: uppercase;
-}
-
-body.hide-scrollbar {
-    overflow: hidden;
-}
-
-a[class^="icon-"],
-a[class*=" icon-"]{
-    color: #444;
-    text-decoration: none;
-    line-height: 28px;
-    padding: 0 2px;
-}
-
-td {
-    vertical-align: top;
-}
-
 .jarves-scrolling {
     overflow: auto;
     position: relative;
@@ -306,29 +307,31 @@ span.selectable span, div.selectable div {
     position: relative;
 }
 
-.jarves-wm-tab > a,
-.jarves-wm-tab > a:link {
-    position: absolute;
-    right: 3px;
-    top: 8px;
-    display: block;
-    height: 12px;
-    padding: 2px;
-    line-height: 13px;
-    text-decoration: none;
-}
+.jarves-admin {
+    .jarves-wm-tab > a,
+    .jarves-wm-tab > a:link {
+        position: absolute;
+        right: 3px;
+        top: 8px;
+        display: block;
+        height: 12px;
+        padding: 2px;
+        line-height: 13px;
+        text-decoration: none;
+    }
 
-.jarves-wm-tab > a:hover {
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    background-color: silver;
-    color: white;
-}
+    .jarves-wm-tab > a:hover {
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
+        border-radius: 3px;
+        background-color: silver;
+        color: white;
+    }
 
 
-.jarves-wm-tab > a:active {
-    background-color: gray;
+    .jarves-wm-tab > a:active {
+        background-color: gray;
+    }
 }
 
 .jarves-wm-tab:before {
@@ -515,34 +518,37 @@ a.jarves-menu-dialog-link:hover {
     margin: 14px;
 }
 
-.jarves-main-menu a {
-    position: relative;
-    top: 2px;
-    cursor: pointer;
-    display: inline-block;
-    padding: 6px 11px;
-    border-top-right-radius: 4px;
-    border-top-left-radius: 4px;
-    background-color: #175074;
-    color: white;
-    line-height: 14px;
-}
+.jarves-admin {
 
-.jarves-main-menu a.jarves-main-menu-active,
-.jarves-main-menu a.jarves-main-menu-active:hover {
-    background-color: #173244;
-}
+    .jarves-main-menu a {
+        position: relative;
+        top: 2px;
+        cursor: pointer;
+        display: inline-block;
+        padding: 6px 11px;
+        border-top-right-radius: 4px;
+        border-top-left-radius: 4px;
+        background-color: #175074;
+        color: white;
+        line-height: 14px;
+    }
 
-.jarves-main-menu a:before {
-    padding-right: 5px;
+    .jarves-main-menu a.jarves-main-menu-active,
+    .jarves-main-menu a.jarves-main-menu-active:hover {
+        background-color: #173244;
+    }
+
+    .jarves-main-menu a:before {
+        padding-right: 5px;
+    }
+
+    .jarves-main-menu a:hover {
+        background-color: #47799B;
+    }
 }
 
 a.jarves-main-menu-start {
     width: 40px;
-}
-
-.jarves-main-menu a:hover {
-    background-color: #47799B;
 }
 
 img.jarves-main-menu-start {

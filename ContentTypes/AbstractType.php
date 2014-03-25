@@ -33,6 +33,14 @@ abstract class AbstractType implements TypeInterface
     }
 
     /**
+     * @return string
+     */
+    public function getContentValue()
+    {
+        return $this->content->getContent();
+    }
+
+    /**
      * @param array $parameters
      */
     public function setParameters(array $parameters)

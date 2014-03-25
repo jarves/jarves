@@ -197,7 +197,7 @@ class Objects
 
         $objectIds = $this->parsePk($objectKey, $objectIds);
 
-        if ($params && $params['condition']) {
+        if ($params && isset($params['condition'])) {
             $params['condition'] = json_decode($params['condition'], true);
         }
 
