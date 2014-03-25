@@ -1830,7 +1830,15 @@ jarves.Files = new Class({
             return;
         }
 
-        if (files && 0 < files.length) {
+        var dragged = event.dataTransfer.getData('text/x-jarves-file');
+
+        if (dragged) {
+            //maybe internal drag'n'drop
+            this.move(dragged, file.path + '/' + dragged.basename(), null, function() {
+                this.sideTree.getFieldObject().updateBranch(file);
+                this.sideTree.getFieldObject().updateBranch(this.currentFile);
+            }.bind(this));
+        } else if (files && 0 < files.length) {
             //external file drop
             var filesToUpload = [];
             Array.each(files, function(chosenFile, idx) {
@@ -1843,6 +1851,7 @@ jarves.Files = new Class({
                 }
             });
             Array.each(filesToUpload, function(chosenFile) {
+                if (!chosenFile) return;
                 if (typeOf(chosenFile.file) === 'function') {
                     chosenFile.file(function(fileToUpload) {
                         if (file) {
@@ -1859,15 +1868,6 @@ jarves.Files = new Class({
                     this.newFileUpload(chosenFile);
                 }
             }.bind(this));
-        } else {
-            //maybe internal drag'n'drop
-            var dragged = event.dataTransfer.getData('text/x-jarves-file');
-            if (dragged) {
-                this.move(dragged, file.path + '/' + dragged.basename(), null, function() {
-                    this.sideTree.getFieldObject().updateBranch(file);
-                    this.sideTree.getFieldObject().updateBranch(this.currentFile);
-                }.bind(this));
-            }
         }
     },
 
