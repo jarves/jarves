@@ -987,8 +987,8 @@
             "authors": [
                 {
                     "name": "Marc J. Schmidt",
-                    "email": "marc@jarves.org",
-                    "homepage": "http://www.jarves.org"
+                    "email": "marc@jarves.io",
+                    "homepage": "http://www.jarves.io"
                 }
             ],
             "time": "2014-02-15 00:40:37"
@@ -1021,12 +1021,12 @@
             "authors": [
                 {
                     "name": "Marc J. Schmidt",
-                    "email": "marc@jarves.org",
-                    "homepage": "http://www.jarves.org"
+                    "email": "marc@jarves.io",
+                    "homepage": "http://www.jarves.io"
                 }
             ],
             "description": "A small news and blog system.",
-            "homepage": "http://www.jarves.org/",
+            "homepage": "http://www.jarves.io/",
             "keywords": [
                 "blog",
                 "news"
@@ -1063,7 +1063,7 @@
             "authors": [
                 {
                     "name": "Marc J. Schmidt",
-                    "email": "marc@jarves.org",
+                    "email": "marc@jarves.io",
                     "homepage": "http://marcjschmidt.de"
                 }
             ],

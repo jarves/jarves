@@ -61,6 +61,7 @@ jarves.FileUploadWatcher = new Class({
 
     /**
      * @param {Boolean} done
+     * @param {Boolean} internal
      */
     setDone: function(done, internal) {
         this.done = !!done;

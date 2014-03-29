@@ -79,7 +79,53 @@ $base-font-size: 13px;
     td {
         vertical-align: top;
     }
+
+    div,
+    span {
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: -moz-none;
+        -o-user-select: none;
+        user-select: none;
+    }
+
+    a,
+    a:link {
+        color: gray;
+    }
+
+    a:hover {
+        color: #333;
+    }
+
+    a img,
+    a:link img {
+        border: 0px;
+    }
+
+    img {
+        border: 0px;
+    }
+
+    input,
+    select,
+    textarea {
+        outline: 0;
+    }
+
+    .selectable,
+    div.selectable span, div.selectable div,
+    td.selectable span, td.selectable div,
+    span.selectable span, div.selectable div {
+        -webkit-user-select: text;
+        -khtml-user-select: text;
+        -moz-user-select: text;
+        -o-user-select: text;
+        user-select: text;
+    }
+
 }
+
 .jarves-scrolling {
     overflow: auto;
     position: relative;
@@ -177,50 +223,6 @@ $base-font-size: 13px;
 
 .jarves_wysiwyg_toolbar .mce-btn {
   background-color: #fafafa;
-}
-
-div,
-span {
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: -moz-none;
-    -o-user-select: none;
-    user-select: none;
-}
-
-a,
-a:link {
-    color: gray;
-}
-
-a:hover {
-    color: #333;
-}
-
-a img,
-a:link img {
-    border: 0px;
-}
-
-img {
-    border: 0px;
-}
-
-input,
-select,
-textarea {
-    outline: 0;
-}
-
-.selectable,
-div.selectable span, div.selectable div,
-td.selectable span, td.selectable div,
-span.selectable span, div.selectable div {
-    -webkit-user-select: text;
-    -khtml-user-select: text;
-    -moz-user-select: text;
-    -o-user-select: text;
-    user-select: text;
 }
 
 .jarves-border {

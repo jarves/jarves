@@ -27,30 +27,30 @@ jarves.FieldTypes.View = new Class({
     module: '',
     path: '',
 
-    initialize: function (pFieldInstance, pOptions) {
+    initialize: function (fieldInstance, options) {
 
-        pOptions.object = 'jarves/view';
+        options.object = 'jarves/view';
 
-        if (!pOptions.directory) {
+        if (!options.directory) {
             throw 'Option `directory` is empty in jarves.Field `view`.';
         }
 
-        if (pOptions.directory.substr(0, 1) == '/') {
-            pOptions.directory = pOptions.directory.substr(1);
+        if (options.directory.substr(0, 1) == '/') {
+            options.directory = options.directory.substr(1);
         }
 
-        if (pOptions.directory.substr(0, 1) == '@') {
-            pOptions.directory = pOptions.directory.substr(1);
+        if (options.directory.substr(0, 1) == '@') {
+            options.directory = options.directory.substr(1);
         }
 
-        if (pOptions.directory.substr(pOptions.directory.length - 1, 1) != '/') {
-            pOptions.directory += '/';
+        if (options.directory.substr(options.directory.length - 1, 1) != '/') {
+            options.directory += '/';
         }
 
-        this.directory = pOptions.directory;
+        this.directory = options.directory;
 
-        pOptions.objectBranch = pOptions.directory ? pOptions.directory : true;
-        this.parent(pFieldInstance, pOptions);
+        options.objectBranch = options.directory ? options.directory : true;
+        this.parent(fieldInstance, options);
     },
 
     getValue: function () {
@@ -58,10 +58,10 @@ jarves.FieldTypes.View = new Class({
         return this.options.fullPath ? value : value.substr(this.directory.length);
     },
 
-    setValue: function (pValue) {
-        if (pValue && !this.options.fullPath) {
-            pValue = this.directory + pValue;
+    setValue: function (value) {
+        if (value && !this.options.fullPath) {
+            value = this.directory + value;
         }
-        this.parent(pValue);
+        this.parent(value);
     }
 });

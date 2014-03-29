@@ -52,7 +52,7 @@ class Objects
      *          getUrl('news://4') => '/newspage/detail/my-news-title'
      *          getUrl('user://1') => '/userdetail/admini-strator'
      *
-     * @link http://docu.jarves.org/developer/extensions/internal-url
+     * @link http://docu.jarves.io/developer/extensions/internal-url
      *
      * Can return additionally 'http(s)://myDomain/' at the beginning if the target
      * is on a different domain.

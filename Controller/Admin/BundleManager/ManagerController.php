@@ -131,7 +131,7 @@ class ManagerController extends Controller
             'repositories' => array(
                 array(
                     'type' => 'composer',
-                    'url' => 'http:\/\/packages.jarves.org\/'
+                    'url' => 'http:\/\/packages.jarves.io\/'
                 )
             ),
             'name' => $package,

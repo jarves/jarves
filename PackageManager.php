@@ -134,7 +134,7 @@ class PackageManager extends ContainerAware {
                             'text',
                             'Jarves cms has been installed!',
                             $defaultContentTemplate,
-                            '<p>Jarves cms has been installed correctly.</p><p>&nbsp;</p><p><a href="http://www.jarves.org">Jarves cms Website</a></p><p>&nbsp;</p><p>&nbsp;</p><p>Go to <a href="jarves">administration</a> to manage your new website.</p><p>&nbsp;</p><p><strong>Default login:</strong></p><p><strong><br /></strong></p><p style="padding-left: 10px;">Username: admin</p><p style="padding-left: 10px;">Password: admin</p>'
+                            '<p>Jarves cms has been installed correctly.</p><p>&nbsp;</p><p><a href="http://www.jarves.io">Jarves cms Website</a></p><p>&nbsp;</p><p>&nbsp;</p><p>Go to <a href="jarves">administration</a> to manage your new website.</p><p>&nbsp;</p><p><strong>Default login:</strong></p><p><strong><br /></strong></p><p style="padding-left: 10px;">Username: admin</p><p style="padding-left: 10px;">Password: admin</p>'
                         ),
                         array(
                             'plugin',
@@ -176,9 +176,9 @@ class PackageManager extends ContainerAware {
                     )
                 ),
                 array(
-                    array(1, 'Jarves cms Official Website', $defaultLayout, 'www-jarves-org', 'http://www.jarves.org/'),
-                    array(1, 'Jarves cms Documentation', $defaultLayout, 'docu-jarves-org', 'http://docu.jarves.org/'),
-                    array(1, 'Jarves cms Extensions', $defaultLayout, 'www-jarves-org-extensions', 'http://www.jarves.org/extensions')
+                    array(1, 'Jarves cms Official Website', $defaultLayout, 'www-jarves-org', 'http://www.jarves.io/'),
+                    array(1, 'Jarves cms Documentation', $defaultLayout, 'docu-jarves-org', 'http://docu.jarves.io/'),
+                    array(1, 'Jarves cms Extensions', $defaultLayout, 'www-jarves-org-extensions', 'http://www.jarves.io/extensions')
                 )
             ),
             array(
@@ -305,7 +305,7 @@ class PackageManager extends ContainerAware {
                             'text',
                             '',
                             $defaultContentTemplate,
-                            '<p>&copy; my Node | <a href="http://www.jarves.org/">CMS</a> powered by Jarves cms - simply different</p>'
+                            '<p>&copy; my Node | <a href="http://www.jarves.io/">CMS</a> powered by Jarves cms - simply different</p>'
                         )
                     )
                 ),

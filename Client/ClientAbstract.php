@@ -3,7 +3,7 @@
 /**
  * jarvesAuth - class to handle the sessions and authentication.
  *
- * @author MArc Schmidt <marc@Jarves.org>
+ * @author MArc Schmidt <marc@jarves.io>
  */
 
 namespace Jarves\Client;

@@ -813,7 +813,7 @@ var jarves_system_module = new Class({
 //                jarves.wm.open('jarvesbundle/system/module/view', {name: pItem.code, type: 1});
 //            }).inject(line);
 //
-//        new jarves.Button(_('To website')).set('href', 'http://www.jarves.org/extensions/' + pItem.name).set('target',
+//        new jarves.Button(_('To website')).set('href', 'http://www.jarves.io/extensions/' + pItem.name).set('target',
 //            '_blank').inject(line);
 //
 //        return box;

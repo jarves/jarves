@@ -33,7 +33,7 @@ jarves.ContentTypes.Markdown = new Class({
         }
     },
 
-    openInspectorOnInit: function() {
+    openInspectorOnAdd: function() {
         return true;
     },
 

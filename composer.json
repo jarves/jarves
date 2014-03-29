@@ -7,17 +7,16 @@
         "WCMS"
     ],
     "license": "LGPL-3.0",
-    "homepage": "http:\/\/www.jarves.org\/",
+    "homepage": "http:\/\/www.jarves.io\/",
     "authors": [
         {
             "name": "Marc J. Schmidt",
             "homepage": "https:\/\/github.com\/marcj",
-            "email": "marc@jarves.org"
+            "email": "marc@jarves.io"
         }
     ],
-    "target-dir": "Jarves",
     "autoload": {
-        "psr-0": {
+        "psr-4": {
             "Jarves": ""
         }
     },
@@ -31,7 +30,6 @@
         "sensio/framework-extra-bundle": ">=2.3",
         "incenteev/composer-parameter-handler": ">=2.0",
         "propel/propel-bundle": "2.0.*@dev",
-        "marcj/php-rest-service": ">=0.1.7",
         "sybio/image-workshop": ">=2",
         "michelf/php-markdown": ">=1.3",
         "composer\/composer": "1.0.*@dev",

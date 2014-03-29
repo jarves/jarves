@@ -1,3 +1,4 @@
+jarves.FieldAbstractId = 1;
 jarves.FieldAbstract = new Class({
     Extends: jarves.Base,
     Binds: ['fireChange'],
@@ -41,12 +42,17 @@ jarves.FieldAbstract = new Class({
      * @param  {Object} options
      */
     initialize: function (fieldInstance, options) {
+        this.id = jarves.FieldAbstractId++;
         this.fieldInstance = fieldInstance;
         this.win = this.fieldInstance.win;
         options = options || {};
         this.setOptions(options);
         this.options = Object.merge(options, this.options); //keep on* keys available. setOptions will delete those
         this.createLayout(this.fieldInstance.fieldPanel);
+    },
+
+    getId: function() {
+        return this.id;
     },
 
     /**

@@ -24,48 +24,48 @@ jarves.Editor = new Class({
 
         this.container.addEvent('click:relay(.jarves-content-placer)', this.clickPlacer.bind(this));
         this.container.addEvent('click:relay(.jarves-content)', this.click.bind(this));
-        this.container.addEvent('mousemove', this.mouseMove.bind(this));
+//        this.container.addEvent('mousemove', this.mouseMove.bind(this));
         this.container.addEvent('click', this.click.bind(this));
 
         top.window.fireEvent('jarvesEditorLoaded', this);
     },
 
-    mouseMove: function(e) {
-        if (this.lastCheckPlacerTimer) {
-            clearTimeout(this.lastCheckPlacerTimer);
-        }
-
-        this.lastCheckPlacerTimer = this.checkPlacer.delay(10, this, [e]);
-    },
-
-    checkPlacer: function(e) {
-        this.placerDimensions = [];
-        Array.each(this.container.getElements('.jarves-content-placer'), function(placer) {
-            this.placerDimensions.push({
-                dimension: placer.getElement('a.jarves-content-placer-place').getCoordinates(this.container.documentElement),
-                element: placer
-            });
-        }.bind(this));
-
-        var range = 18;
-        var posY = e.page.y;
-        var posX = e.page.x;
-
-        Array.each(this.placerDimensions, function(placer) {
-            var valid = true;
-
-            valid &= placer.dimension.top-range < posY;
-            valid &= placer.dimension.left-range < posX;
-            valid &= placer.dimension.right+range > posX;
-            valid &= placer.dimension.bottom+range > posY;
-
-            if (valid) {
-                placer.element.addClass('jarves-content-placer-visible');
-            } else {
-                placer.element.removeClass('jarves-content-placer-visible');
-            }
-        });
-    },
+//    mouseMove: function(e) {
+//        if (this.lastCheckPlacerTimer) {
+//            clearTimeout(this.lastCheckPlacerTimer);
+//        }
+//
+//        this.lastCheckPlacerTimer = this.checkPlacer.delay(10, this, [e]);
+//    },
+//
+//    checkPlacer: function(e) {
+//        this.placerDimensions = [];
+//        Array.each(this.container.getElements('.jarves-content-placer'), function(placer) {
+//            this.placerDimensions.push({
+//                dimension: placer.getElement('a.jarves-content-placer-place').getCoordinates(this.container.documentElement),
+//                element: placer
+//            });
+//        }.bind(this));
+//
+//        var range = 18;
+//        var posY = e.page.y;
+//        var posX = e.page.x;
+//
+//        Array.each(this.placerDimensions, function(placer) {
+//            var valid = true;
+//
+//            valid &= placer.dimension.top-range < posY;
+//            valid &= placer.dimension.left-range < posX;
+//            valid &= placer.dimension.right+range > posX;
+//            valid &= placer.dimension.bottom+range > posY;
+//
+//            if (valid) {
+//                placer.element.addClass('jarves-content-placer-visible');
+//            } else {
+//                placer.element.removeClass('jarves-content-placer-visible');
+//            }
+//        });
+//    },
 
     click: function(e, element) {
         if (element) {
@@ -94,19 +94,23 @@ jarves.Editor = new Class({
             var slotElement = element.getParent('.jarves-slot');
 
             if (slotElement) {
-                this.showAddContent(slotElement, element);
+                this.showAddContent(slotElement.kaSlotInstance, element);
             }
         }
     },
 
-    showAddContent: function(slotElement, placerElement) {
+    /**
+     *
+     * @param {jarves.Slot} slot
+     * @param {Element} placerElement
+     * @param {Array} [limitTypes]
+     */
+    showAddContent: function(slot, placerElement, limitTypes) {
         var dialog = new jarves.Dialog(null, {
             autoClose: true,
             maxWidth: 530
         });
         var container = dialog.getContentContainer();
-
-        var slot = slotElement.kaSlotInstance;
 
         var cb = function(type, value) {
             dialog.close();
@@ -114,13 +118,24 @@ jarves.Editor = new Class({
                 type: type,
                 content: value
             };
-            var instance = slot.addContent(content, true);
+
+            var dummy = new Element('div');
+
             var parentElement = placerElement.getParent();
             if (parentElement.hasClass('jarves-content')) {
-                document.id(instance).inject(parentElement, 'after');
+                document.id(dummy).inject(parentElement, 'after');
+            } else if (parentElement.hasClass('jarves-slot')) {
+                document.id(dummy).inject(parentElement);
             } else {
-                document.id(instance).inject(placerElement, 'after');
+                document.id(dummy).inject(placerElement, 'after');
             }
+
+            var instance = slot.addContent(content, true, null, true);
+
+            document.id(instance).inject(dummy, 'after');
+            dummy.destroy();
+
+            slot.fireChange();
         };
 
         new Element('h3', {
@@ -131,6 +146,7 @@ jarves.Editor = new Class({
         this.contentElementsContainer = new Element('div', {
             'class': 'jarves-Editor-content-items-container'
         }).inject(container);
+
         Object.each(jarves.ContentTypes, function(content, type) {
             this.addContentTypeIcon(type, content, cb);
         }.bind(this));

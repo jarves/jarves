@@ -60,7 +60,8 @@ jarves.FieldTypes.Select = new Class({
         combobox: false,
         items: false, //array or object
         store: false, //string
-        object: false //for object chooser
+        object: false, //for object chooser
+        objectIdAsUrlId: false
 
     },
 
@@ -88,12 +89,16 @@ jarves.FieldTypes.Select = new Class({
         return this.select;
     },
 
-    setValue: function (pValue, pInternal) {
-        this.select.setValue(pValue, pInternal);
+    setValue: function (value, internal) {
+        this.select.setValue(value, internal);
     },
 
     getValue: function () {
-        return this.select.getValue();
+        var value = this.select.getValue();
+        if (this.options.object && !this.options.objectIdAsUrlId) {
+            value = jarves.getObjectPkFromUrlId(this.options.object, value);
+        }
+        return value;
     },
 
     setDisabled: function(disabled) {

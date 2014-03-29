@@ -39,21 +39,21 @@ jarves.FieldForm = new Class({
 
     /**
      * Constructor
-     * @param {Element} pContainer
-     * @param {Object} pFieldDefinition
-     * @param {Object} pOptions
+     * @param {Element} container
+     * @param {Object} fieldDefinition
+     * @param {Object} options
      * @param {Object} pRefs
      */
-    initialize: function (pContainer, pFieldDefinition, pOptions, pRefs) {
+    initialize: function (container, fieldDefinition, options, pRefs) {
         var self = this;
 
-        this.setOptions(pOptions);
+        this.setOptions(options);
         this.refs = pRefs;
-        this.main = document.id(pContainer);
-        this.definition = pFieldDefinition;
+        this.main = document.id(container);
+        this.definition = fieldDefinition;
 
-        if (pFieldDefinition && 0 < Object.getLength(pFieldDefinition)) {
-            this.parseLevel(pFieldDefinition, this.main);
+        if (fieldDefinition && 0 < Object.getLength(fieldDefinition)) {
+            this.parseLevel(fieldDefinition, this.main);
         }
 
     },

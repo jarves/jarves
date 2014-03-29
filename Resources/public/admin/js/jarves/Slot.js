@@ -12,27 +12,51 @@ jarves.Slot = new Class({
     slotParams: {},
     editor: null,
 
-    initialize: function(pDomSlot, pOptions, pEditor) {
-        this.slot = pDomSlot;
+    initialize: function(domSlot, options, editor) {
+        this.slot = domSlot;
         this.slot.kaSlotInstance = this;
-        this.setOptions(pOptions);
-        this.editor = pEditor;
+        this.setOptions(options);
+        this.editor = editor;
 
         var params = this.slot.get('params') || '';
         this.slotParams = JSON.decode(params) || {};
 
+        this.singleSlot = domSlot.hasClass('jarves-single-slot');
+
         this.renderLayout();
         this.mapDragEvents();
+        this.addEvent('change', this.onChange.bind(this));
 
         if (this.options.standalone) {
             this.loadContents();
         }
     },
 
+    onChange: function() {
+        if (this.isSingleSlot()) {
+            var children = document.id(this).getChildren('.jarves-content');
+            if (0 !== children.length) {
+                this.placer.dispose();
+            } else {
+                this.placer.inject(this, 'top');
+            }
+        }
+    },
+
+    /**
+     * @returns {Boolean}
+     */
+    isSingleSlot: function() {
+        return this.singleSlot;
+    },
+
     getParam: function(key) {
         return this.slotParams[key];
     },
 
+    /**
+     * @returns {jarves.Editor}
+     */
     getEditor: function() {
         return this.editor;
     },
@@ -61,8 +85,8 @@ jarves.Slot = new Class({
         }.bind(this), false);
     },
 
-    checkDrop: function(pEvent) {
-        var target = pEvent.toElement || pEvent.target;
+    checkDrop: function(event) {
+        var target = event.toElement || event.target;
         var slot = this.slot;
 
         if (target) {
@@ -74,13 +98,13 @@ jarves.Slot = new Class({
                 }
             }
 
-            var items = pEvent.dataTransfer.files.length > 0 ? pEvent.dataTransfer.files : pEvent.dataTransfer.items,
+            var items = event.dataTransfer.files.length > 0 ? event.dataTransfer.files : event.dataTransfer.items,
                 data, content;
 
-            if (!items && pEvent.dataTransfer.types) {
+            if (!items && event.dataTransfer.types) {
                 items = [];
-                Array.each(pEvent.dataTransfer.types, function(type) {
-                    var dataType = pEvent.dataTransfer.getData(type);
+                Array.each(event.dataTransfer.types, function(type) {
+                    var dataType = event.dataTransfer.getData(type);
                     items.push({
                         type: type,
                         getAsString: function(cb) {
@@ -131,14 +155,14 @@ jarves.Slot = new Class({
                 }
             }
 
-            pEvent.stopPropagation();
-            pEvent.preventDefault();
+            event.stopPropagation();
+            event.preventDefault();
             return false;
         }
     },
 
-    checkDragOver: function(pEvent) {
-        var target = pEvent.toElement || pEvent.target;
+    checkDragOver: function(event) {
+        var target = event.toElement || event.target;
         var slot = this.slot, content;
 
         if (target) {
@@ -150,7 +174,7 @@ jarves.Slot = new Class({
                 }
             }
 
-            //pEvent.dataTransfer.dropEffect = 'move';
+            //event.dataTransfer.dropEffect = 'move';
 
             delete this.removePlaceholder;
 
@@ -167,13 +191,13 @@ jarves.Slot = new Class({
             //upper area or bottom?
             if (content) {
                 var injectPosition = 'after';
-                if (pEvent.pageY / zoom - content.getPosition(document.body).y < (content.getSize().y / 2)) {
+                if (event.pageY / zoom - content.getPosition(document.body).y < (content.getSize().y / 2)) {
                     injectPosition = 'before';
                 }
                 this.lastPlaceHolder.inject(content, injectPosition);
             } else {
                 slot.getChildren().each(function(child) {
-                    if (pEvent.pageY / zoom > child.getPosition(document.body).y + 5) {
+                    if (event.pageY / zoom > child.getPosition(document.body).y + 5) {
                         content = child;
                     }
                 });
@@ -181,26 +205,74 @@ jarves.Slot = new Class({
                 if (content) {
                     this.lastPlaceHolder.inject(content, 'after');
                 } else {
-                    this.lastPlaceHolder.inject(slot, pEvent.pageY / zoom > (slot.getSize().y / 2 ) ? 'top' : 'bottom');
+                    this.lastPlaceHolder.inject(slot, event.pageY / zoom > (slot.getSize().y / 2 ) ? 'top' : 'bottom');
                 }
             }
 
-            pEvent.stopPropagation();
-            pEvent.preventDefault();
+            event.stopPropagation();
+            event.preventDefault();
             return false;
         }
     },
 
     renderLayout: function() {
         this.slot.empty();
-        this.placer = new Element('div', {
-            'class': 'jarves-content-placer'
-        }).inject(this.slot);
 
-        new Element('a', {
-            text: '+',
-            'class': 'jarves-content-placer-place'
-        }).inject(this.placer);
+        if (this.isSingleSlot()) {
+            this.placer = new Element('div', {
+                'class': 'jarves-single-content-placer'
+            }).inject(this.slot);
+
+            var label = t('Press to add content.');
+            if (this.getParam('type')) {
+                var type = this.getParam('type');
+                var clazz = jarves.ContentTypes[type] || jarves.ContentTypes[type.capitalize()];
+                label = t('Press to add content of type %s.', clazz.label);
+            }
+
+            new Element('span', {
+                'class': 'icon-plus-5',
+                html: t('Empty content.') + '<br/>' + label
+            }).inject(this.placer);
+
+            this.placer.addEvent('click', function() {
+                this.addSingleContent();
+            }.bind(this));
+
+            if (!this.getParam('optional') && this.getParam('type')) {
+                this.addSingleContent();
+            }
+
+        } else {
+            this.placer = new Element('div', {
+                'class': 'jarves-content-placer'
+            }).inject(this.slot);
+
+            new Element('a', {
+                text: '+',
+                'class': 'jarves-content-placer-place'
+            }).inject(this.placer);
+        }
+    },
+
+    addSingleContent: function() {
+        var types = null;
+        if (this.getParam('type')) {
+            types = this.getParam('type').replace(/\s/g, '').split(',');
+        }
+        if (!this.getParam('optional') && types && 1 === types.length) {
+            var defaultValue = this.getParam('defaultValue');
+            var value = {
+                type: this.getParam('type'),
+                content: 'null' === typeOf(defaultValue) ? '' : defaultValue
+            };
+            var content = this.addContent(value, true, null, true);
+            if (!this.getParam('optional')) {
+                content.setRemoveAble(false);
+            }
+        } else {
+            this.getEditor().showAddContent(this, this.placer, types);
+        }
     },
 
     fireChange: function() {
@@ -217,8 +289,8 @@ jarves.Slot = new Class({
         }
     },
 
-    renderContents: function(pResponse) {
-        this.setValue(pResponse.data);
+    renderContents: function(response) {
+        this.setValue(response.data);
     },
 
     setValue: function(contents) {
@@ -338,10 +410,11 @@ jarves.Slot = new Class({
      * @param {Object}  content
      * @param {Boolean} focus
      * @param {Array}   drop
+     * @param {Boolean} isAdd
      *
      * @returns {jarves.Content}
      */
-    addContent: function(content, focus, drop) {
+    addContent: function(content, focus, drop, isAdd) {
         if (!content) {
             content = {type: 'text'};
         }
@@ -350,7 +423,7 @@ jarves.Slot = new Class({
             content.template = 'JarvesBundle:Default:content.html.twig';
         }
 
-        var contentInstance = new jarves.Content(content, this.slot, drop);
+        var contentInstance = new jarves.Content(content, this.slot, drop, isAdd);
         contentInstance.addEvent('change', this.fireChange);
 
         if (focus) {

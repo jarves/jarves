@@ -13,6 +13,21 @@ jarves.ContentTypes.Plugin = new Class({
 
     },
 
+    createLayout: function() {
+        this.main = new Element('div', {
+            'class': 'jarves-contentType-plugin'
+        }).inject(this.getContentInstance().getContentContainer());
+
+        this.inner = new Element('div', {
+            'class': 'jarves-content-inner jarves-normalize',
+            text: t('Choose a plugin.')
+        }).inject(this.main);
+        this.inner.addEvent('click', function(e) {
+            e.stop();
+            this.getContentInstance().openInspector();
+        }.bind(this));
+    },
+
     /**
      * since old jarves version stores the value as string
      * we need to convert it to the new object def.
@@ -45,18 +60,22 @@ jarves.ContentTypes.Plugin = new Class({
         });
     },
 
+    isPreviewPossible: function() {
+        return 'object' === typeOf(this.value) && this.value.bundle && this.value.plugin;
+    },
+
+    openInspectorOnAdd: function() {
+        return true;
+    },
+
     /**
      * adds/loads all additional fields to the inspector.
      */
     initInspector: function(inspectorContainer) {
-        var toolbarContainer = new Element('div', {
-            'class': 'jarves-content-plugin-toolbarContainer'
-        }).inject(inspectorContainer);
-
         this.pluginChoser = new jarves.Field({
             type: 'plugin',
             noWrapper: true
-        }, toolbarContainer);
+        }, inspectorContainer);
 
         this.pluginChoser.setValue(this.value);
 

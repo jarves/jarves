@@ -3,7 +3,7 @@
 /*
  * This file is part of Jarves cms.
  *
- * (c) Marc J. Schmidt <marc@jarves.org>
+ * (c) Marc J. Schmidt <marc@jarves.io>
  *
  * To get the full copyright and license informations, please view the
  * LICENSE file, that was distributed with this source code.

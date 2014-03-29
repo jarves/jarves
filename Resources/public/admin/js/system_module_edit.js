@@ -1282,7 +1282,7 @@ var jarves_system_module_edit = new Class({
             community: {
                 label: t('Community'),
                 type: 'checkbox',
-                desc: t('Is this extension available under jarves.org/bundles.')
+                desc: t('Is this extension available under jarves.io/bundles.')
             },
             category: {
                 label: t('Category'),

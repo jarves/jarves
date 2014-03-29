@@ -1,5 +1,7 @@
 jarves.ContentTypes = jarves.ContentTypes || {};
 
+jarves.ContentTypesImageFiles = {};
+
 jarves.ContentTypes.Image = new Class({
 
     Extends: jarves.ContentAbstract,
@@ -58,58 +60,78 @@ jarves.ContentTypes.Image = new Class({
                 this.renderDrop(items[0]);
             }
         }.bind(this));
+
+        this.main.addEvent('click', function(e){
+            e.stop();
+            this.getContentInstance().openInspector();
+        }.bind(this));
+    },
+
+    getFile: function() {
+        return jarves.ContentTypesImageFiles[this.getId()];
+    },
+
+    removeFile: function() {
+        jarves.ContentTypesImageFiles[this.getId()] = null;
     },
 
     renderDrop: function(file) {
-        this.file = file;
-        var reader = new FileReader();
-
-        reader.onload = function(e) {
-            this.main.empty();
-            this.image = new Element('img', {
-                src: e.target.result,
-                styles: {
-                    'width': this.value.width || '100%'
-                }
-            }).inject(this.main);
-            this.value.image = e.target.result;
-            delete this.currentImageFile;
-        }.bind(this);
-
-        this.main.set('text', t('Reading ...'));
-
-        this.progressBar = new Element('div', {
-            text: '0%',
-            styles: {
-                textAlign: 'center'
-            }
-        }).inject(this.main);
-
-        reader.onprogress = function(e) {
-            var percentLoaded = Math.round((e.loaded / e.total) * 100);
-            this.progressBar.set('text', percentLoaded + '%');
-        }.bind(this);
-
-        reader.readAsDataURL(this.file);
+        jarves.ContentTypesImageFiles[this.getId()] = file;
+        this.renderValue();
     },
 
     renderValue: function() {
-        if (this.value.file || this.value.image) {
+        this.main.setStyle('height', this.main.getSize().y);
+        if (this.getFile()) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                this.main.empty();
+                this.image = new Element('img', {
+                    src: e.target.result,
+                    styles: {
+                        'width': this.value.width || '100%'
+                    }
+                }).inject(this.main);
+                this.main.set('class', 'jarves-contentType-image align-' + (this.value.align || 'center'));
+                delete this.currentImageFile;
+                this.main.setStyle.delay(50, this.main, ['height']);
+            }.bind(this);
+//
+//            this.progressBar = new Element('div', {
+//                text: '0%',
+//                styles: {
+//                    textAlign: 'center'
+//                }
+//            }).inject(this.main);
+
+//            reader.onprogress = function(e) {
+//                var percentLoaded = Math.round((e.loaded / e.total) * 100);
+//                this.progressBar.set('text', percentLoaded + '%');
+//            }.bind(this);
+
+            reader.readAsDataURL(this.getFile());
+        } else if (this.value.file) {
             if (this.currentImageFile !== this.value.file) {
                 this.main.empty();
                 var url = _pathAdmin + 'admin/file/image?' + Object.toQueryString({
                     path: this.value.file
                 });
                 this.image = new Element('img', {
-                    src: this.value.image || url
+                    src: url
                 }).inject(this.main);
             }
             this.image.set('width', this.value.width || '100%');
             this.main.set('class', 'jarves-contentType-image align-' + (this.value.align || 'center'));
             this.currentImageFile = this.value.file;
+            this.main.setStyle.delay(50, this.main, ['height']);
         } else {
             this.renderChooser();
+            this.main.setStyle('height');
         }
+    },
+
+    isPreviewPossible: function() {
+        return false;
     },
 
     setValue: function(value) {
@@ -125,11 +147,21 @@ jarves.ContentTypes.Image = new Class({
         }
 
         this.value = value || {};
+
+        if (this.value.hasFileAttached) {
+            jarves.ContentTypesImageFiles[this.getId()] = jarves.ContentTypesImageFiles[this.value.hasFileAttached];
+            delete this.value.hasFileAttached;
+        }
+
         this.renderValue();
     },
 
     getValue: function() {
-        return this.value;
+        if (this.getFile()) {
+            this.value.hasFileAttached = this.getId();
+        }
+
+        return JSON.encode(this.value);
     },
 
     /**
@@ -143,16 +175,18 @@ jarves.ContentTypes.Image = new Class({
             this.value.width = '100%';
         }
 
-        if (this.file && !this.fileWatcher) {
-            this.file.target = '/Unclassified/';
-            this.file.autoRename = true;
-            this.file.html5 = true;
-            var newPath = '';
+        var file = this.getFile();
 
-            delete this.value.image;
-            this.fileWatcher = jarves.getAdminInterface().getFileUploader().newFileUpload(this.file);
+        if (file && !this.fileWatcher) {
+            file.target = '/Unclassified/';
+            file.autoRename = true;
+            file.html5 = true;
+            var newPath = file.target + file.name;
+
+            this.fileWatcher = jarves.getAdminInterface().getFileUploader().newFileUpload(file);
             this.fileWatcher.addEvent('done', function() {
                 this.value.file = newPath;
+                this.removeFile();
                 this.fireChange();
                 progressWatch.done(JSON.encode(this.value));
             }.bind(this));
@@ -163,8 +197,8 @@ jarves.ContentTypes.Image = new Class({
                 progressWatch.cancel();
             });
             this.fileWatcher.addEvent('rename', function(name) {
-                newPath = this.file.target + name;
-            });
+                newPath = this.getFile().target + name;
+            }.bind(this));
             this.fileWatcher.addEvent('error', function() {
                 progressWatch.error();
             });
@@ -181,14 +215,14 @@ jarves.ContentTypes.Image = new Class({
 
     renderChooser: function() {
         this.main.empty();
-        this.iconDiv = new Element('div', {
-            'class': 'jarves-content-inner-icon icon-images'
-        }).inject(this.main);
-
         this.inner = new Element('div', {
             'class': 'jarves-content-inner jarves-normalize',
             text: t('Choose or drop a image.')
         }).inject(this.main);
+        this.inner.addEvent('click', function(e) {
+            e.stop();
+            this.getContentInstance().openInspector();
+        }.bind(this));
     },
 
     initInspector: function(inspectorContainer) {
@@ -200,7 +234,7 @@ jarves.ContentTypes.Image = new Class({
             file: {
                 label: 'Image',
                 type: 'object',
-                object: 'jarvesbundle:file',
+                object: 'jarves/file',
                 width: 'auto',
                 browserOptions: {
                     selectionOnlyFiles: true
@@ -237,7 +271,11 @@ jarves.ContentTypes.Image = new Class({
         }, {
             onChange: function(values) {
                 if (values.file != this.value.file) {
+                    console.log('change', values.file);
                     this.value.file = values.file;
+                    if (this.value.file) {
+                        this.removeFile();
+                    }
                 }
                 this.value.width = values.width;
                 this.value.align = values.align;

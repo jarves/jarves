@@ -200,6 +200,10 @@ class FileController extends Controller
     {
         $file = null;
 
+        if ('/' !== substr($path, 0, 1)) {
+            $path = '/' . $path;
+        }
+
         try {
             $file = $this->getJarves()->getWebFileSystem()->getFile($path);
         } catch (FileNotFoundException $e) {

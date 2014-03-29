@@ -87,7 +87,7 @@ jarves.ContentTypes.Tray = new Class({
         return this.value && this.value.node && this.validNode;
     },
 
-    openInspectorOnInit: function() {
+    openInspectorOnAdd: function() {
         return true;
     },
 

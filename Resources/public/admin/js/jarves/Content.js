@@ -16,14 +16,18 @@ jarves.Content = new Class({
 
     contentContainer: null,
 
+    removeable: true,
+
     /**
      *
      * @param {*} value
      * @param {Element} container
      * @param {Array} drop
+     * @param {boolean} isAdd
      */
-    initialize: function(value, container, drop) {
+    initialize: function(value, container, drop, isAdd) {
         this.drop = drop;
+        this.isAdd = isAdd;
         this.renderLayout(container);
         this.setValue(value);
 
@@ -125,7 +129,7 @@ jarves.Content = new Class({
             'class': 'jarves-content-actionBar-typeIcon'
         }).inject(this.actionBar);
 
-        var inspectorBtn = new Element('a', {
+        this.actionBarItemSettings = new Element('a', {
             'class': 'icon-wrench',
             href: 'javascript: ;',
             title: t('Open Settings')
@@ -134,21 +138,21 @@ jarves.Content = new Class({
             this.getEditor().openInspector(this);
         }.bind(this)).inject(this.actionBar);
 
-        var moveBtn = new Element('span', {
+        this.actionBarItemMove = new Element('span', {
             html: '&#xe0c6;',
             'class': 'icon jarves-content-actionBar-move',
             title: t('Move content')
         }).inject(this.actionBar);
 
-        moveBtn.addEvent('mouseover', function() {
+        this.actionBarItemMove.addEvent('mouseover', function() {
             this.main.set('draggable', true);
         }.bind(this));
 
-        moveBtn.addEvent('mouseout', function() {
+        this.actionBarItemMove.addEvent('mouseout', function() {
             this.main.set('draggable');
         }.bind(this));
 
-        new Element('a', {
+        this.actionBarItemCopy = new Element('a', {
             href: 'javascript: ;',
             title: t('Copy content'),
             'class': 'icon-copy'
@@ -182,7 +186,7 @@ jarves.Content = new Class({
                 }
             }.bind(this)).inject(this.actionBar);
 
-        new Element('a', {
+        this.actionBarItemRemove = new Element('a', {
             html: '&#xe26b;',
             href: 'javascript: ;',
             title: t('Remove content'),
@@ -191,7 +195,21 @@ jarves.Content = new Class({
                 e.stop();
                 this.remove();
             }.bind(this)).inject(this.actionBar);
+    },
 
+    setRemoveAble: function(removeable) {
+        var display = removeable ? null : 'none';
+        var elements = new Elements([
+            this.actionBarItemMove,
+            this.actionBarItemVisibility,
+            this.actionBarItemRemove
+        ]);
+        elements.setStyle('display', display);
+        this.removeable = removeable;
+    },
+
+    isRemoveAble: function() {
+        return this.removeable;
     },
 
     showVisibilityState: function() {
@@ -517,8 +535,9 @@ jarves.Content = new Class({
             this.typeIcon.addClass(this.lastAddedIcon);
             this.typeIcon.set('title', clazz.label);
 
-            if (this.contentObject.openInspectorOnInit()) {
+            if (this.isAdd && this.contentObject.openInspectorOnAdd()) {
                 this.openInspector();
+                delete this.isAdd;
             }
 
             if (this.nextFocus) {

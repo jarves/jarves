@@ -118,7 +118,7 @@ var jarves_system_module_view = new Class({
 //        var td = new Element('td', {text: pItem.module.extensionCode}).inject(tr);
 
 //        var td = new Element('td',
-//            {rowspan: 5, width: 150, html: '<img style="padding: 3px; border: 1px solid #ddd;" src="http://download.jarves.org/extThump?extension=' +
+//            {rowspan: 5, width: 150, html: '<img style="padding: 3px; border: 1px solid #ddd;" src="http://download.jarves.io/extThump?extension=' +
 //                pItem.name + '" width="150"/>'}).inject(tr);
 
         var tr = new Element('tr').inject(tablebody);
@@ -172,7 +172,7 @@ var jarves_system_module_view = new Class({
 //        if (pItem.name != 'admin' && pItem.name != 'jarves' && pItem.name != 'users') {
 //            new jarves.Button(_('To website')).addEvent('click',
 //                function () {
-//                    window.open('http://www.jarves.org/extensions/' + pItem.name, '_blank');
+//                    window.open('http://www.jarves.io/extensions/' + pItem.name, '_blank');
 //                }).inject(td);
 //        }
 //

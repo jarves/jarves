@@ -35,8 +35,8 @@ services:
          tags:
             - { name: twig.extension }
 
-     jarves.twig.extension.contentSlot:
-         class: Jarves\Twig\ContentSlotExtension
+     jarves.twig.extension.content:
+         class: Jarves\Twig\ContentExtension
          arguments: ["@jarves"]
          tags:
             - { name: twig.extension }

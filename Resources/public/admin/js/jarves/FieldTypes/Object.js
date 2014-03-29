@@ -342,7 +342,7 @@ jarves.FieldTypes.Object = new Class({
             var val = this.objectId;
 
             if (!this.options.asObjectUrl && typeOf(val) == 'string' && val.substr(0, 'object://'.length) == 'object://') {
-                return jarves.getCroppedObjectId(val);
+                return jarves.getObjectIdFromUrl(val);
             }
             return val;
         }

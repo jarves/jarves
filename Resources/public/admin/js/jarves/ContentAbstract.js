@@ -30,7 +30,7 @@ jarves.ContentAbstract = new Class({
         //your field has been deselected
     },
 
-    openInspectorOnInit: function() {
+    openInspectorOnAdd: function() {
         return false;
     },
 

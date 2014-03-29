@@ -24,19 +24,23 @@ jarves.ContentTypes.Html = new Class({
             type: 'codemirror',
             onChange: function(value) {
                 this.value = value;
-                this.getContentInstance().getContentContainer().set('html', value);
+                this.renderValue();
             }.bind(this)
         }, inspectorContainer);
 
         this.input.setValue(this.value);
     },
 
-    applyInspector: function() {
-        this.value = this.previewedValue;
+    renderValue: function() {
+        this.getContentInstance().getContentContainer().set('html', this.value);
     },
 
-    cancelInspector: function() {
-        this.value = this.oldValue;
+    isPreviewPossible: function() {
+        return false;
+    },
+
+    openInspectorOnAdd: function() {
+        return true;
     },
 
     setValue: function(value) {
@@ -44,6 +48,7 @@ jarves.ContentTypes.Html = new Class({
         if (this.input) {
             this.input.setValue(value);
         }
+        this.renderValue();
     },
 
     getValue: function() {

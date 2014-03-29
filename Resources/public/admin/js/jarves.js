@@ -379,7 +379,7 @@ jarves.urlDecode = function(value) {
     }
 
     try {
-        return decodeURIComponent(value.replace(/%25252F/g, '%2F'));
+        return decodeURIComponent(value.replace(/%252F/g, '%2F'));
     } catch (e) {
         return value;
     }
@@ -502,6 +502,34 @@ jarves.getObjectPk = function(objectKey, item) {
 };
 
 /**
+ *
+ * Return the id or array of internal url id.
+ *
+ * Example:
+ *
+ *    3 => 3
+ *    %252Fadmin%252Fimages%252Fhi.jpg => /admin/images/hi.jpg
+ *    idValue1/idValue2 => {id1: idValue1, id2: idValue2}
+ *
+ * @param {String} objectKey
+ * @param {String} urlId
+ * @returns {String|Object}
+ */
+jarves.getObjectPkFromUrlId = function(objectKey, urlId) {
+    var pks = jarves.getObjectPrimaryList(objectKey);
+
+    if (1 < pks.length) {
+        var values = jarves.urlDecode(urlId.split('/'));
+        var result = {};
+        Array.each(pks, function(pk, idx) {
+           result[pk] = values[idx];
+        });
+    }
+
+    return jarves.urlDecode(urlId);
+};
+
+/**
  * Return the internal representation (id) of object primary keys.
  *
  * @param {String} objectKey
@@ -547,7 +575,6 @@ jarves.hasCompositePk = function(objectKey) {
  * Just converts arguments into a new string :
  *
  *    object://<objectKey>/<id>
- *
  *
  * @param {String} objectKey
  * @param {String} id        Has to be urlEncoded (use jarves.urlEncode or jarves.getObjectUrlId)

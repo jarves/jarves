@@ -43,8 +43,8 @@ jarves.FieldTypes.Codemirror = new Class({
             lineNumbers: true,
             mode: this.options.mode || 'htmlmixed',
             value: '',
-            styleActiveLine: true
-            //onChange: this.fieldInstance.fireChange
+            styleActiveLine: true,
+            onChange: this.fieldInstance.fireChange
         };
 
         if (this.options.codemirrorOptions) {
@@ -53,6 +53,8 @@ jarves.FieldTypes.Codemirror = new Class({
             });
         }
         this.editor = new CodeMirror(this.editorPanel, options);
+
+        this.editor.on("change", this.fireChange.bind(this));
 
         CodeMirror.modeURL = _path + 'bundles/jarves/codemirror/mode/%N/%N.js';
         this.editor.setOption("mode", options.mode);

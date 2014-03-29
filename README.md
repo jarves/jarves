@@ -15,7 +15,7 @@ Installation
 
 This describes the customized installation, usually used by developers.
 
-A end-user zip package can be downloaded at http://jarves.org when we've released the first alpha version
+A end-user zip package can be downloaded at http://jarves.io when we've released the first alpha version
 
 Read the [installation documentation](Resources/doc/installation.md).
 

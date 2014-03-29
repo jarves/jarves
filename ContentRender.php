@@ -3,7 +3,7 @@
 /*
  * This file is part of Jarves cms.
  *
- * (c) Marc J. Schmidt <marc@jarves.org>
+ * (c) Marc J. Schmidt <marc@jarves.io>
  *
  * To get the full copyright and license information, please view the
  * LICENSE file, that was distributed with this source code.
@@ -72,11 +72,37 @@ class ContentRender
      *
      * @return string
      */
-    public function renderSlot($nodeId, $slotId = 1, $params = array())
+    public function renderSlot($nodeId = null, $slotId = 1, $params = array())
     {
         $params['id'] = $slotId;
         if ($this->getJarves()->isEditMode()) {
             return '<div class="jarves-slot" params="' . htmlspecialchars(json_encode($params)) . '"></div>';
+        }
+
+        if (!$nodeId) {
+            $nodeId = $this->jarves->getCurrentPage()->getId();
+        }
+
+        $contents =& $this->getSlotContents($nodeId, $slotId);
+        return $this->renderContents($contents, $params);
+    }
+
+    /**
+     * @param integer $nodeId
+     * @param integer $slotId
+     * @param array   $params
+     *
+     * @return string
+     */
+    public function renderSingleSlot($nodeId = null, $slotId = 1, $params = array())
+    {
+        $params['id'] = $slotId;
+        if ($this->getJarves()->isEditMode()) {
+            return '<div class="jarves-slot jarves-single-slot" params="' . htmlspecialchars(json_encode($params)) . '"></div>';
+        }
+
+        if (!$nodeId) {
+            $nodeId = $this->jarves->getCurrentPage()->getId();
         }
 
         $contents =& $this->getSlotContents($nodeId, $slotId);
@@ -111,11 +137,11 @@ class ContentRender
 
         return $this->cachedSlotContents[$nodeId.'.'.$slotId];
     }
-
-    public function renderView(&$contents, $view)
-    {
-        return json_encode(iterator_to_array($contents));
-    }
+//
+//    public function renderView(&$contents, $view)
+//    {
+//        return json_encode(iterator_to_array($contents));
+//    }
 
     /**
      * Build HTML for given contents.

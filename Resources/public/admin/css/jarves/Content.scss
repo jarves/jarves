@@ -111,16 +111,25 @@
     outline: 0;
 }
 
+.jarves-single-content-placer,
 .jarves-content-inner {
     background: #e7e7e7;
     padding: 5px;
-    color: #333;
+    color: #555;
     border-radius: 3px;
-    padding-right: 40px;
     cursor: pointer;
     min-height: 25px;
-    line-height: 25px;
+    line-height: 18px;
     text-align: center;
+    margin: 1px;
+}
+
+.jarves-single-content-placer:hover {
+    background-color: #cecece;
+}
+
+.jarves-single-content-placer > span:before {
+    margin-right: 5px;
 }
 
 .jarves-content-inner-title {
@@ -213,6 +222,12 @@
     cursor: pointer;
 }
 
+.jarves-single-slot > .jarves-content-placer,
+.jarves-single-slot > .jarves-content > .jarves-content-placer {
+    display: none;
+}
+
+.jarves-content-placer:hover,
 .jarves-content-placer-visible {
     opacity: 1;
 }
@@ -227,6 +242,7 @@
     height: 0px;
 }
 
+.jarves-content-placer:hover:before,
 .jarves-content-placer-visible:before {
     border-top: 1px solid $mainColor;
 }
@@ -234,7 +250,7 @@
 .jarves-content-placer a.jarves-content-placer-place,
 .jarves-content-placer a.jarves-content-placer-place:link {
     display: block;
-    position: relative;
+    position: absolute;
     text-align: center;
     background-color: $mainColor;
     color: white;
@@ -248,6 +264,8 @@
     border: 1px solid #D3D3D3;
 }
 
+.jarves-content-placer:hover a.jarves-content-placer-place,
+.jarves-content-placer:hover a.jarves-content-placer-place:link,
 .jarves-content-placer-visible a.jarves-content-placer-place,
 .jarves-content-placer-visible a.jarves-content-placer-place:link {
     top: -11px;
