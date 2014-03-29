@@ -125,7 +125,12 @@ jarves.Editor = new Class({
             if (parentElement.hasClass('jarves-content')) {
                 document.id(dummy).inject(parentElement, 'after');
             } else if (parentElement.hasClass('jarves-slot')) {
-                document.id(dummy).inject(parentElement);
+                var placerInSlot = parentElement.getChildren('.jarves-content-placer');
+                if (placerInSlot && 0 < placerInSlot.length) {
+                    document.id(dummy).inject(placerInSlot[0], 'after');
+                } else {
+                    document.id(dummy).inject(parentElement);
+                }
             } else {
                 document.id(dummy).inject(placerElement, 'after');
             }
