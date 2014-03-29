@@ -108,7 +108,7 @@ jarves.Editor = new Class({
     showAddContent: function(slot, placerElement, limitTypes) {
         var dialog = new jarves.Dialog(null, {
             autoClose: true,
-            maxWidth: 530
+            maxWidth: 520
         });
         var container = dialog.getContentContainer();
 
