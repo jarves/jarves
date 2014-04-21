@@ -46,6 +46,26 @@ class AdminController extends Controller
     /**
      * @ApiDoc(
      *  section="Administration",
+     *  description="Returns a layout template/view with placeholder for jarves.Editor."
+     * )
+     *
+     * @Rest\QueryParam(name="template", requirements=".+", strict=true, description="The template/view to be used for this content")
+     * @Rest\QueryParam(name="type", requirements=".+", strict=true, description="The content type")
+     *
+     * @Rest\Get("/admin/content/template")
+     *
+     * @param ParamFetcher $paramFetcher
+     *
+     * @return array
+     */
+    public function getInlineEditorAction()
+    {
+
+    }
+
+    /**
+     * @ApiDoc(
+     *  section="Administration",
      *  description="Returns a content template/view with placeholder for jarves.Editor."
      * )
      *
@@ -90,11 +110,11 @@ class AdminController extends Controller
      *
      * @Rest\QueryParam(name="type", requirements=".+", strict=true, description="The content type")
      *
-     * @Rest\QueryParam(name="nodeId", requirements="[0-9]+", strict=true,
+     * @Rest\QueryParam(name="nodeId", requirements="[0-9]+",
      *      description="The node id in which context this content should be rendered")
-     * @Rest\QueryParam(name="domainId", requirements="[0-9]+", strict=true,
+     * @Rest\QueryParam(name="domainId", requirements="[0-9]+",
      *      description="The domain id in which context this content should be rendered")
-     * @Rest\RequestParam(name="content", requirements=".*", strict=true, description="The actual content")
+     * @Rest\RequestParam(name="content", requirements=".*", description="The actual content")
      *
      * @Rest\Post("/admin/content/preview")
      *
@@ -117,11 +137,15 @@ class AdminController extends Controller
         $contentObject->setTemplate($template);
         $contentObject->setContent($content);
 
-        $domain = $this->getJarves()->getUtils()->getDomain($domainId);
-        $this->getJarves()->setCurrentDomain($domain);
+        if ($domainId) {
+            $domain = $this->getJarves()->getUtils()->getDomain($domainId);
+            $this->getJarves()->setCurrentDomain($domain);
+        }
 
-        $page = $this->getJarves()->getUtils()->getPage($nodeId);
-        $this->getJarves()->setCurrentPage($page);
+        if ($nodeId) {
+            $page = $this->getJarves()->getUtils()->getPage($nodeId);
+            $this->getJarves()->setCurrentPage($page);
+        }
 
         $render = $this->getJarves()->getContentRender();
 

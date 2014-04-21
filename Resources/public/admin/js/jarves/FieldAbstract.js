@@ -163,11 +163,38 @@ jarves.FieldAbstract = new Class({
     /**
      * Returns the current value of this field.
      *
-     * @return {Mixed}
+     * @return {*}
      */
     getValue: function () {
         /* Override it to your needs */
         return null;
+    },
+
+    /**
+     * This is slightly different than `getValue`. In this save() method you
+     * should save your data on the server or do whatever is needed
+     * to have a valid `getValue()` return value.
+     *
+     * If this is not overwritten, we directly fire progressWatch.done(this.getValue()).
+     *
+     * Example: If you have a image field where the user can choose a image
+     * then this image shouldn't be uploaded directly and also can be uploaded
+     * in the getValue() method since getValue() requires a instant return value,
+     * whereas save() can be asynchronous. So, for this image field example you
+     * should save your image in this save() method only. Save the path in the current value
+     * and call progressWatcher.done() if it's done or .cancel() or .error().
+     * getValue() should then return your path value.
+     *
+     * If image hasn't been uploaded and we call already getValue() (which can happen
+     * when we need a value of you to check if something has changed) you should
+     * return nothing (if nothing is selected), the old path/value or if the user has selected
+     * a new image (but is not saved through save() method), you should return the base64 (or anything else)
+     * representation which you can be rendered again in setValue() (because we pass it eventually in setValue() then).
+     *
+     * @param {jarves.ProgressWatch} progressWatcher
+     */
+    save: function(progressWatcher) {
+        progressWatcher.done(this.getValue());
     },
 
     /**

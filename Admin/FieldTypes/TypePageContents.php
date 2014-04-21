@@ -2,13 +2,9 @@
 
 namespace Jarves\Admin\FieldTypes;
 
-class TypeContent extends AbstractSingleColumnType
+class TypePageContents extends AbstractSingleColumnType
 {
-    protected $name = 'Node Contents';
-
-    protected $phpDataType = 'string';
-
-    protected $sqlDataType = 'LONGVARCHAR';
+    protected $name = 'Page Contents';
 
     /**
      * @return array

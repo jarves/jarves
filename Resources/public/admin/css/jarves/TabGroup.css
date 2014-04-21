@@ -10,10 +10,9 @@
 .jarves-tabGroup:first-child,
 .jarves-tabGroup-small:first-child {
     margin-left: 0;
-    border-left: 1px solid #c9c9c9;
 }
 
-a.jarves-tabGroup-item {
+.jarves-admin a.jarves-tabGroup-item {
     text-decoration: none;
     color: #424242;
     display: inline-block;
@@ -39,13 +38,13 @@ a.jarves-tabGroup-item {
     height: 12px;
 }
 
-a.jarves-tabGroup-item:hover {
+.jarves-admin a.jarves-tabGroup-item:hover {
     color: #222;
     background-color: #f1f1f1;
 }
 
-a.jarves-tabGroup-item-active,
-a.jarves-tabGroup-item-active:hover  {
+.jarves-admin a.jarves-tabGroup-item-active,
+.jarves-admin a.jarves-tabGroup-item-active:hover  {
     position: relative;
     background-color: #f9f9f9;
 }

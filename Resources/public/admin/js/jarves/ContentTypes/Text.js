@@ -68,11 +68,15 @@ jarves.ContentTypes.Text = new Class({
 
         var id = (Math.random() * 10 * (Math.random() * 10)).toString(36).slice(2).replace('.', '');
 
-        this.toolbar = new Element('div', {
-            'id': id
-        }).inject(document.body);
 
         var config = this.options.configs[this.options.config];
+
+        if (this.getContentFieldInstance().getOptionsContainer()) {
+            this.toolbar = new Element('div', {
+                'id': id
+            }).inject(document.body);
+            config.fixed_toolbar_container = '#' + id;
+        }
 
         tinymce.init(Object.merge({
             mode: 'exact',
@@ -80,7 +84,6 @@ jarves.ContentTypes.Text = new Class({
             elements: [this.main],
             content_document: this.main.getDocument(),
             content_window: this.main.getWindow(),
-            fixed_toolbar_container: '#' + id,
             setup: function(editor) {
                 this.editor = editor;
                 this.ready = true;
@@ -118,25 +121,34 @@ jarves.ContentTypes.Text = new Class({
     },
 
     deselected: function() {
-        this.toolbar.dispose();
-        this.mainToolbarContainer.dispose();
+        if (this.toolbar) {
+            this.toolbar.dispose();
+            this.mainToolbarContainer.dispose();
+        }
 
         delete this.isSelected;
     },
 
     destroy: function() {
         tinymce.remove(this.main);
-        if (this.toolbar)
-            this.toolbar.destroy();
 
-        if (this.mainToolbarContainer)
-            this.mainToolbarContainer.destroy();
+        if (this.toolbar) {
+            if (this.toolbar)
+                this.toolbar.destroy();
+
+            if (this.mainToolbarContainer)
+                this.mainToolbarContainer.destroy();
+        }
 
         this.main.destroy(this.main);
     },
 
     selected: function() {
         this.isSelected = true;
+
+        if (!this.getContentFieldInstance().getOptionsContainer()) {
+            return;
+        }
 
         if (!this.mainToolbarContainer) {
             this.mainToolbarContainer = new Element('div', {

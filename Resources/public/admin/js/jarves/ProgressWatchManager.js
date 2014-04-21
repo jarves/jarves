@@ -48,15 +48,24 @@ jarves.ProgressWatchManager = new Class({
         this.updateProgress();
 
         var allDone = true;
+        var allSuccess = true;
         Array.each(this.progressWatch, function(progress) {
-            if (!progress.isDone() && !progress.isCanceled() && !progress.isErrored()) {
+            if (!progress.isDone() && !progress.isCanceled()) {
                 allDone = false;
+            }
+            if (progress.isErrored()) {
+                allSuccess = false;
             }
         }.bind(this));
 
         if (this.allProgressDone !== allDone) {
             this.allProgressDone = allDone;
             this.allDone();
+        }
+
+        if (allDone && !this.allSuccessFired && allSuccess) {
+            this.allSuccessFired = true;
+            this.allSuccess();
         }
     },
 
@@ -80,6 +89,11 @@ jarves.ProgressWatchManager = new Class({
      */
     done: function(progressWatch) {
         this.fireEvent('done', progressWatch);
+    },
+
+    allSuccess: function() {
+        this.allDone();
+        this.fireEvent('allSuccess');
     },
 
     /**
@@ -116,12 +130,16 @@ jarves.ProgressWatchManager = new Class({
             this.fireEvent('cancel', progress);
         }.bind(this));
 
+        progress.addEvent('error', function() {
+            this.fireEvent('error', progress);
+        }.bind(this));
+
         progress.addEvent('progress', function() {
             this.fireEvent('progress', progress);
         }.bind(this));
 
         this.progressWatch.push(progress);
-        return progress
+        return progress;
     },
 
     /**

@@ -433,6 +433,7 @@ This is the bundle $bundleClassName.
 
         $finder
             ->files()
+            ->ignoreUnreadableDirs()
             ->name('*Bundle.php')
             ->exclude('Jarves/vendor')
             ->exclude('/\/Test\//')

@@ -52,6 +52,7 @@
             <assets>@JarvesBundle/admin/css/jarves/*.css</assets>
             <assets>@JarvesBundle/admin/css/jarves/*.scss</assets>
             <assets>@JarvesBundle/admin/css/jarves/ui/*.css</assets>
+            <assets>@JarvesBundle/admin/css/jarves/Field/*</assets>
         </adminAssets>
         <streams>
             <stream path="load">

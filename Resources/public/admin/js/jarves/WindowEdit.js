@@ -789,10 +789,6 @@ jarves.WindowEdit = new Class({
     },
 
     hasUnsavedChanges: function() {
-//        if (!this.ritem) {
-//            return false;
-//        }
-
         var currentData = this.retrieveData(true, true);
 
         return currentData && 0 !== Object.getLength(currentData);
@@ -874,7 +870,7 @@ jarves.WindowEdit = new Class({
         this.saveBtn.failedLoading();
     },
 
-    save: function(pClose) {
+    save: function(andClose) {
 
         if (this.lastSaveRq) {
             this.lastSaveRq.cancel();
@@ -882,53 +878,73 @@ jarves.WindowEdit = new Class({
 
         var request = this.buildRequest(this.classProperties.usePatch);
 
-        var method = this.classProperties.usePatch ? 'patch' : 'put';
-
         if (typeOf(request) != 'null') {
 
+            // data seems valid, now trigger the save() method at all fields, to make sure next getValue()
+            // returns values we want to save
+
             this.saveBtn.startLoading(t('Saving ...'));
-
-            var objectId = jarves.getObjectUrlId(this.classProperties['object'], this.winParams.item);
-
-            this.lastSaveRq = new Request.JSON({url: _pathAdmin + this.getEntryPoint() + '/' + objectId + '?_method=' + method,
-                noErrorReporting: [
-                    'Jarves\\Exceptions\\Rest\\ValidationFailedException',
-                    'DuplicateKeysException',
-                    'ObjectItemNotModified'
-                ],
-                noCache: true,
-                progressButton: this.saveBtn,
-                onFailure: this.handleFailure.bind(this),
-                onSuccess: function(response) {
-
-                    if (false === response.data) {
-                        this.saveBtn.failedLoading(t('No changes'));
-                    } else {
-                        this.saveBtn.doneLoading(t('Saved'));
-                    }
-
-                    if (typeOf(response.data) == 'object') {
-                        this.winParams.item = response.data; //our new primary keys
-                    }
-
-
-                    if (this.classProperties.loadSettingsAfterSave == true) {
-                        jarves.loadSettings();
-                    }
-
-                    this.fieldForm.resetPatch();
-
-                    this.fireEvent('save', [request, response]);
-                    jarves.getAdminInterface().objectChanged(this.classProperties['object']);
-
-                    if ((!pClose || this.inline ) && this.classProperties.versioning == true) {
-                        this.loadVersions();
-                    }
-
-                    if (this.win.isInline()) {
-                        this.win.close();
-                    }
-                }.bind(this)}).post(request);
+            var progressWatchManager = new jarves.ProgressWatchManager({
+                onAllSuccess: function() {
+                    this.doSave(andClose);
+                }.bind(this),
+                onError: function(progressWatch) {
+                    //progressWatch.getContext() let the field appear
+                    this.saveBtn.failedLoading(t('Failed'));
+                }.bind(this),
+                onAllProgress: function(progress) {
+                    this.saveBtn.setProgress(progress);
+                }.bind(this)
+            });
+            this.fieldForm.save(progressWatchManager);
         }
+    },
+
+    doSave: function(andClose) {
+        var objectId = jarves.getObjectUrlId(this.classProperties['object'], this.winParams.item);
+        var request = this.buildRequest(this.classProperties.usePatch);
+        var method = this.classProperties.usePatch ? 'patch' : 'put';
+
+        this.lastSaveRq = new Request.JSON({url: _pathAdmin + this.getEntryPoint() + '/' + objectId + '?_method=' + method,
+            noErrorReporting: [
+                'Jarves\\Exceptions\\Rest\\ValidationFailedException',
+                'DuplicateKeysException',
+                'ObjectItemNotModified'
+            ],
+            noCache: true,
+            progressButton: this.saveBtn,
+            onFailure: this.handleFailure.bind(this),
+            onSuccess: function(response) {
+
+                if (false === response.data) {
+                    this.saveBtn.failedLoading(t('No changes'));
+                } else {
+                    this.saveBtn.doneLoading(t('Saved'));
+                }
+                this.saveBtn.setProgress(false);
+
+                if (typeOf(response.data) == 'object') {
+                    this.winParams.item = response.data; //our new primary keys
+                }
+
+
+                if (this.classProperties.loadSettingsAfterSave == true) {
+                    jarves.loadSettings();
+                }
+
+                this.fieldForm.resetPatch();
+
+                this.fireEvent('save', [request, response]);
+                jarves.getAdminInterface().objectChanged(this.classProperties['object']);
+
+                if ((!andClose || this.inline ) && this.classProperties.versioning == true) {
+                    this.loadVersions();
+                }
+
+                if (this.win.isInline()) {
+                    this.win.close();
+                }
+            }.bind(this)}
+        ).post(request);
     }
 });

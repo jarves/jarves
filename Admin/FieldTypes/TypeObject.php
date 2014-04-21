@@ -57,6 +57,8 @@ class TypeObject extends AbstractType
 
             return $columns;
         }
+
+        return [];
     }
 
     /**
@@ -114,7 +116,6 @@ class TypeObject extends AbstractType
                 $virtualField = $object->getField($refName);
 
                 if (!$virtualField) {
-
                     $virtualField = new Field(null, $object->getJarves());
                     $virtualField->setVirtual(true);
                     $virtualField->setId($refName);

@@ -39,97 +39,10 @@
     top: 0px;
 }
 
-.kwindow-border-shadow {
-    box-shadow: 0 8px 3em #888;
-}
-
-.kwindow-shadow-bottom {
-    position: absolute;
-    bottom: -41px;
-    background-image: url(../../images/kwindow-shadow-bottom.png);
-    background-repeat: repeat-x;
-    left: 31px;
-    height: 41px;
-    right: 30px;
-}
-
-.kwindow-shadow-left {
-    position: absolute;
-    bottom: 25px;
-    left: -31px;
-    width: 31px;
-    background-image: url(../../images/kwindow-shadow-left.png);
-    background-repeat: repeat-y;
-    top: 70px;
-}
-
-.kwindow-shadow-right {
-    position: absolute;
-    bottom: 25px;
-    right: -31px;
-    width: 31px;
-    background-image: url(../../images/kwindow-shadow-right.png);
-    background-repeat: repeat-y;
-    top: 70px;
-}
-
-.kwindow-shadow-top-right,
-.kwindow-shadow-top-left {
-    position: absolute;
-    background-image: url(../../images/kwindow-shadow-top-lr.png);
-    background-repeat: no-repeat;
-    top: 0px;
-    width: 31px;
-    height: 70px;
-}
-
-.kwindow-shadow-top-left {
-    left: -31px;
-}
-
-.kwindow-shadow-top-right {
-    right: -31px;
-    background-position: -35px 0px;
-}
-
-.kwindow-shadow-bottom-left,
-.kwindow-shadow-bottom-right {
-    position: absolute;
-    bottom: -41px;
-    background-image: url(../../images/kwindow-shadow-bottom-lr.png);
-    background-repeat: no-repeat;
-    width: 70px;
-    height: 66px;
-}
-
-.kwindow-shadow-bottom-left {
-    left: -39px;
-}
-
-.kwindow-shadow-bottom-right {
-    right: -40px;
-    background-position: -119px 0px;
-}
-
-.kwindow-win-trans {
-    left: 0px;
-    right: 0px;
-    top: 0px;
-    bottom: 0px;
-    background-color: #aaa;
-}
-
-.kwindow-win-printer {
-    position: absolute;
-    left: 5px;
-    top: 2px;
-    cursor: pointer;
-}
-
 .kwindow-win-title,
 .kwindow-win-title-inaktive {
     position: absolute;
-    bottom: 10px;
+    bottom: 5px;
     left: 25px;
     min-height: 22px;
     line-height: 20px;
@@ -454,9 +367,10 @@ h3.jarves-headline {
     position: absolute;
     right: 0;
     top: 25px;
-    bottom: 0;
+    bottom: 35px;
     width: 150px;
     background-color: #5c5c5c;
+    @include border-left-radius(3px);
 }
 
 .jarves-Window-sidebar-container {

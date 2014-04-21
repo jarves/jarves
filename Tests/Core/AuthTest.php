@@ -10,7 +10,6 @@ class AuthTest extends AuthTestCase
 {
     protected $acls;
 
-
     public function tearDown()
     {
         if ($this->acls) {
@@ -34,7 +33,6 @@ class AuthTest extends AuthTestCase
 
     public function testNewValidUserLogin()
     {
-
         $this->acls[] = $acl = new Acl();
         $acl->toArray();
         $acl->fromArray(

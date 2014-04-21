@@ -2,8 +2,10 @@
 
 namespace Jarves\ORM;
 
+use Jarves\Admin\FieldTypes\RelationDefinition;
 use Jarves\Configuration\Condition;
 use Jarves\Configuration\ConditionSubSelect;
+use Jarves\Configuration\Field;
 use Jarves\Exceptions\FileNotFoundException;
 use Jarves\Exceptions\ObjectNotFoundException;
 use Jarves\Objects;
@@ -873,113 +875,130 @@ class Propel extends ORMAbstract
      */
     public function mapValues(&$item, &$values, $ignoreNotExistingValues = false)
     {
-        $pluralizer = new StandardEnglishPluralizer();
         $setted = [];
 
-        foreach ($this->definition->getFields(true) as $field) {
-            $fieldName = $field->getId();
-            $fieldName = lcfirst($fieldName);
+        $applyColumn = function($name) use (&$item, &$values, &$setted, &$ignoreNotExistingValues) {
+            $fieldName = lcfirst($name);
             $setted[] = $fieldName;
-
-            if (!isset($values[$fieldName]) && $ignoreNotExistingValues) {
-                continue;
-            }
-
             $fieldValue = @$values[$fieldName];
 
-            if ($field->isPrimaryKey() && $field->isAutoIncrement()) {
-                continue;
+            if (!isset($values[$fieldName]) && $ignoreNotExistingValues) {
+                return;
             }
 
             $fieldName = ucfirst($fieldName);
             $set = 'set' . $fieldName;
             $methodExist = method_exists($item, $set);
 
-            if (!$field && !$methodExist) {
-                continue;
+            if (!isset($values[$fieldName]) && $ignoreNotExistingValues) {
+                return;
             }
 
-            if ($field['type'] == 'object') {
-
-                if ($field['objectRelation'] == ORMAbstract::MANY_TO_MANY || $field['objectRelation'] == ORMAbstract::ONE_TO_MANY) {
-
-                    $name = $pluralizer->getPluralForm($pluralizer->getSingularForm(Tools::underscore2Camelcase($fieldName)));
-                    $setItems = 'set' . $name;
-                    $clearItems = 'clear' . $name;
-
-                    if ($fieldValue) {
-                        $foreignQuery = $this->getQueryClass($field['object']);
-                        $foreignClass = $this->getPhpName($field['object']);
-                        $foreignObjClass = $this->getJarves()->getObjects()->getClass($field['object']);
-
-                        if ($field['objectRelation'] == ORMAbstract::ONE_TO_MANY) {
-
-                            $coll = new ObjectCollection();
-                            $coll->setModel(ucfirst($foreignClass));
-
-                            foreach ($fieldValue as $foreignItem) {
-                                $pk = $this->getJarves()->getObjects()->getObjectPk($field['object'], $foreignItem);
-                                $item2 = null;
-                                if ($pk) {
-                                    $pk = $this->getPropelPk($pk);
-                                    $item2 = $foreignQuery->findPk($pk);
-                                }
-                                if (!$item2) {
-                                    $item2 = new $foreignClass();
-                                }
-                                $item2->fromArray($foreignItem, TableMap::TYPE_STUDLYPHPNAME);
-                                $coll[] = $item2;
-                            }
-
-                            $item->$setItems($coll);
-
-                        } else {
-
-                            $primaryKeys = array();
-                            if (is_array($fieldValue)) {
-                                foreach ($fieldValue as $value) {
-                                    $primaryKeys[] = $foreignObjClass->normalizePrimaryKey($value);
-                                }
-                            }
-
-                            $propelPks = array();
-                            foreach ($primaryKeys as $primaryKey) {
-                                $propelPks[] = $this->getPropelPk($primaryKey);
-                            }
-
-                            $collItems = $foreignQuery->findPks($propelPks);
-                            $item->$setItems($collItems);
-                        }
-                    } elseif ($ignoreNotExistingValues) {
-                        $item->$clearItems();
-                    }
-                    continue;
-                }
-
-                if ($field['objectRelation'] == ORMAbstract::MANY_TO_ONE || $field['objectRelation'] == ORMAbstract::ONE_TO_ONE) {
-                    $relation = $this->tableMap->getRelation($fieldName);
-                    $localColumns = $relation->getLocalColumns();
-                    if (is_array($fieldValue)) {
-                        foreach ($localColumns as $column) {
-                            $setter = 'set' . ucfirst($column->getPhpName());
-                            $key = lcfirst($column->getPhpName());
-                            $item->$setter($fieldValue[$key]);
-                        }
-                    } else {
-                        $firstColumn = current($localColumns);
-
-                        $setter = 'set' . ucfirst($firstColumn->getPhpName());
-                        $item->$setter($fieldValue);
-                    }
-
-                    continue;
-                }
-            }
 
             if ($methodExist) {
                 $item->$set($fieldValue);
             }
+        };
+
+        $pluralizer = new StandardEnglishPluralizer();
+
+        $self = $this;
+        /**
+         * @param RelationDefinition $relation
+         */
+        $applyRelation = function($relation) use ($self, $pluralizer, &$item, &$values, &$setted, &$ignoreNotExistingValues) {
+            $fieldName = lcfirst($relation->getName());
+            $fieldValue = @$values[$fieldName];
+
+            if (!isset($values[$fieldName]) && $ignoreNotExistingValues) {
+                return;
+            }
+
+            if ($relation->getType() == ORMAbstract::MANY_TO_MANY || $relation->getType() == ORMAbstract::ONE_TO_MANY) {
+
+                $name = $pluralizer->getPluralForm($pluralizer->getSingularForm(Tools::underscore2Camelcase($fieldName)));
+                $setItems = 'set' . $name;
+                $clearItems = 'clear' . $name;
+
+                if ($fieldValue) {
+                    $foreignQuery = $self->getQueryClass($relation->getForeignObjectKey());
+                    $foreignClass = $self->getPhpName($relation->getForeignObjectKey());
+                    $foreignObjClass = $self->getJarves()->getObjects()->getClass($relation->getForeignObjectKey());
+
+                    if ($relation->getType() == ORMAbstract::ONE_TO_MANY) {
+
+                        $coll = new ObjectCollection();
+                        $coll->setModel(ucfirst($foreignClass));
+
+                        foreach ($fieldValue as $foreignItem) {
+                            $pk = $self->getJarves()->getObjects()->getObjectPk($relation->getForeignObjectKey(), $foreignItem);
+                            $item2 = null;
+                            if ($pk) {
+                                $pk = $self->getPropelPk($pk);
+                                $item2 = $foreignQuery->findPk($pk);
+                            }
+                            if (!$item2) {
+                                $item2 = new $foreignClass();
+                            }
+                            $item2->fromArray($foreignItem, TableMap::TYPE_STUDLYPHPNAME);
+                            $coll[] = $item2;
+                        }
+
+                        $item->$setItems($coll);
+
+                    } else {
+
+                        $primaryKeys = array();
+                        if (is_array($fieldValue)) {
+                            foreach ($fieldValue as $value) {
+                                $primaryKeys[] = $foreignObjClass->normalizePrimaryKey($value);
+                            }
+                        }
+
+                        $propelPks = array();
+                        foreach ($primaryKeys as $primaryKey) {
+                            $propelPks[] = $self->getPropelPk($primaryKey);
+                        }
+
+                        $collItems = $foreignQuery->findPks($propelPks);
+                        $item->$setItems($collItems);
+                    }
+                } elseif ($ignoreNotExistingValues) {
+                    $item->$clearItems();
+                }
+            }
+
+            if ($relation->getType() == ORMAbstract::MANY_TO_ONE || $relation->getType() == ORMAbstract::ONE_TO_ONE) {
+                $propelRelation = $self->tableMap->getRelation($fieldName);
+                $localColumns = $propelRelation->getLocalColumns();
+                if (is_array($fieldValue)) {
+                    foreach ($localColumns as $column) {
+                        $setter = 'set' . ucfirst($column->getPhpName());
+                        $key = lcfirst($column->getPhpName());
+                        $item->$setter($fieldValue[$key]);
+                    }
+                } else {
+                    $firstColumn = current($localColumns);
+                    $setter = 'set' . ucfirst($firstColumn->getPhpName());
+                    $item->$setter($fieldValue);
+                }
+            }
+        };
+
+        foreach ($this->getDefinition()->getFields(true) as $field) {
+            if ($field->isPrimaryKey() && $field->isAutoIncrement()) {
+                continue;
+            }
+
+            foreach ($field->getFieldType()->getColumns() as $column) {
+                $applyColumn($column->getName());
+            }
         }
+
+        foreach ($this->getDefinition()->getRelations() as $relation) {
+            $applyRelation($relation);
+        }
+
 
         /*
          * all virtual fields which are not present in the object.

@@ -158,8 +158,8 @@
     left: 0;
     top: 0;
     bottom: 0;
-    border-left: 1px solid #DDD;
-    background-color: #fbfbfb;
+    border: 1px solid #E6E6E6;
+    border-radius: 3px;
 }
 
 .jarves-WindowList-combine-content {
@@ -170,7 +170,7 @@
 .jarves-WindowList-combine-left-itemcount {
     position: absolute;
     right: 6px;
-    top: 10px;
+    top: 14px;
     color: #999;
 }
 
@@ -235,7 +235,7 @@
 
 .jarves-WindowList-combine-left-top .jarves-Select-box,
 .jarves-WindowList-combine-left-top .jarves-Select-box:link {
-    margin-left: 0;
+    margin-left: 10px;
     line-height: 22px;
 }
 
@@ -258,6 +258,8 @@
     top: 0;
     bottom: 0;
     overflow: hidden;
+    border: 1px solid #E6E6E6;
+    border-radius: 3px;
 }
 
 .jarves-WindowList-combine-left + .jarves-Splitter-main {
@@ -273,11 +275,13 @@
     left: 0;
     right: 0;
     height: 45px;
-    border-top: 1px solid #DDD;
 }
 
 .jarves-Table-windowList {
     bottom: 46px;
+    border: 1px solid #E4E4E4;
+    overflow: hidden;
+    border-radius: 3px;
 }
 
 .jarves-Table-windowList .jarves-Table-body {
@@ -287,7 +291,7 @@
 .jarves-WindowList-actionBar-page {
     border-top: 0;
     border-bottom: 0;
-    width: 45px;
+    width: 45px !important;
     position: relative;
     text-align: center;
     text-indent: 0;
@@ -354,7 +358,7 @@ a.jarves-WindowList-search-button-active:link {
     position: relative;
     height: 33px;
     color: #444;
-    padding: 6px;
+    padding: 11px;
     padding-left: 0;
 }
 

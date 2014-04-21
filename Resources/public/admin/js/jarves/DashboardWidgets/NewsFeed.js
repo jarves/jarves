@@ -65,7 +65,7 @@ jarves.DashboardWidgets.NewsFeed = new Class({
                 var objectLabel = objectDefinition.label || item.targetObject;
                 new Element('a', {
                     'class': 'jarves-Dashboard-newsFeed-item-object-label',
-                    text: objectLabel+':'
+                    text: objectLabel
                 }).inject(div);
             }
         }

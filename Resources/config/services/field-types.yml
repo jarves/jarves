@@ -17,7 +17,7 @@ parameters:
      jarves.field.types.tab.class: Jarves\Admin\FieldTypes\TypeTab
      jarves.field.types.childrenSwitcher.class: Jarves\Admin\FieldTypes\TypeChildrenSwitcher
      jarves.field.types.array.class: Jarves\Admin\FieldTypes\TypeArray
-     jarves.field.types.content.class: Jarves\Admin\FieldTypes\TypeContent
+     jarves.field.types.pageContents.class: Jarves\Admin\FieldTypes\TypePageContents
      jarves.field.types.wysiwyg.class: Jarves\Admin\FieldTypes\TypeWysiwyg
      jarves.field.types.password.class: Jarves\Admin\FieldTypes\TypePassword
      jarves.field.types.contentElements.class: Jarves\Admin\FieldTypes\TypeContentElements
@@ -124,10 +124,10 @@ services:
          tags:
              - { name: jarves.field.type, alias: array }
 
-     jarves.field.types.content:
-         class: %jarves.field.types.content.class%
+     jarves.field.types.pageContents:
+         class: %jarves.field.types.pageContents.class%
          tags:
-             - { name: jarves.field.type, alias: content }
+             - { name: jarves.field.type, alias: pageContents }
 
      jarves.field.types.password:
          class: %jarves.field.types.password.class%

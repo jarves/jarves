@@ -227,7 +227,7 @@ jarves.Slot = new Class({
             if (this.getParam('type')) {
                 var type = this.getParam('type');
                 var clazz = jarves.ContentTypes[type] || jarves.ContentTypes[type.capitalize()];
-                label = t('Press to add content of type %s.', clazz.label);
+                label = tf('Press to add content of type %s.', clazz.label);
             }
 
             new Element('span', {
@@ -240,6 +240,7 @@ jarves.Slot = new Class({
             }.bind(this));
 
             if (!this.getParam('optional') && this.getParam('type')) {
+                this.placer.empty();
                 this.addSingleContent();
             }
 

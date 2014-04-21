@@ -399,24 +399,30 @@ jarves.Field = new Class({
     /**
      * Returns the value of the field.
      *
-     * @param {jarves.ProgressWatch} progressWatch
-     *
-     * @return {Mixed}
+     * @return {*}
      */
-    getValue: function(progressWatch) {
+    getValue: function() {
         if (!this.fieldObject) {
             return null;
-        }
-        if (progressWatch) {
-            this.fieldObject.save(progressWatch);
         }
         return this.fieldObject.getValue();
     },
 
     /**
+     * @param {jarves.ProgressWatch} progressWatch
+     */
+    save: function(progressWatch) {
+        if (!this.fieldObject) {
+            console.log('fast Done');
+            return progressWatch.done();
+        }
+        this.fieldObject.save(progressWatch);
+    },
+
+    /**
      * toString() method.
      *
-     * @return {Mixed}
+     * @return {String}
      */
     toString: function() {
         return this.getValue();

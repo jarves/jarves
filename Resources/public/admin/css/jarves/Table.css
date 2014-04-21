@@ -2,7 +2,7 @@
 .jarves-Table-head,
 .jarves-Table-body {
     width: 100%;
-    background-color: #f7f7f7;
+    background-color: #f4f4f4;
 }
 
 .jarves-Table-valign-center td,
@@ -38,10 +38,10 @@
 
 .jarves-Table-absolute {
     position: absolute;
-    left: 0px;
-    right: 0px;
-    bottom: 0px;
-    top: 0px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
 }
 
 .jarves-Table > thead > tr > th,
@@ -54,13 +54,11 @@
 .jarves-Table > thead > tr > th,
 .jarves-Table-head > tr > th {
     font-weight: normal;
-    font-size: 13px;
+    font-size: 12px;
     text-align: left;
-    padding: 5px;
+    padding: 3px;
     color: #555;
-    border-top: 1px solid #ececec;
     line-height: 20px;
-    background: #f2f2f2;
 }
 
 .jarves-Table-absolute tr > th {
@@ -69,18 +67,18 @@
 
 .jarves-Table-head-container {
     position: absolute;
-    height: 31px;
-    top: 0px;
-    left: 0px;
+    height: 27px;
+    top: 0;
+    left: 0;
     right: 16px;
 }
 
 .jarves-Table-body-container {
     position: absolute;
-    left: 0px;
-    top: 31px;
-    right: 0px;
-    bottom: 0px;
+    left: 0;
+    top: 27px;
+    right: 0;
+    bottom: 0;
 }
 
 .jarves-Table > tbody  > tr > td,

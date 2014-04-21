@@ -7,7 +7,7 @@ jarves.FieldTypes.Page = new Class({
     },
 
     initialize: function (pFieldInstance, pOptions) {
-        pOptions.objects = ['JarvesBundle:node'];
+        pOptions.objects = ['jarves/node'];
 
         this.parent(pFieldInstance, pOptions);
     }

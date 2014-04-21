@@ -433,7 +433,7 @@ class Object extends Model
      */
     public function getRelations()
     {
-        return $this->relations;
+        return $this->relations ?: [];
     }
 
     /**

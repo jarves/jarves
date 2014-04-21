@@ -4,8 +4,8 @@
     margin-top: 200px;
     text-align: center;
     position: relative;
-    background-color: #f5f5f5;
-    border: 5px solid white;
+    background-color: #f0f0f0;
+    border: 5px solid #f0f0f0;
 }
 
 .jarves-login-middle .jarves-Select-box,
@@ -58,7 +58,7 @@
 }
 
 .jarves-login-logo {
-    height: 45px;
+    height: 28px;
 }
 
 .jarves-login {
@@ -88,8 +88,8 @@
 
 .jarves-login-middle-top img {
     position: relative;
-    top: 6px;
-    margin-left: 19px;
+    top: 7px;
+    margin-left: 18px;
 }
 
 .jarves-ai-loader-con {

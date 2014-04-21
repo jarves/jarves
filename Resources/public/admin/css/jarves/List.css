@@ -10,8 +10,8 @@
 
 .jarves-List-split {
     padding: 6px;
-    border-bottom: 1px solid #ddd;
-    background-color: #eee;
+    border-bottom: 1px solid #E2E2E2;
+    background-color: #F5F5F5;
     color: gray;
 }
 
@@ -47,16 +47,8 @@
 
 .jarves-List-item.active,
 .jarves-List-item.active:hover {
-    background-color: #22638e;
-    color: white;
+    background-color: #f0f0f0;
 }
-
-.jarves-List-item.active h1,
-.jarves-List-item.active h2,
-.jarves-List-item.active h3 {
-    color: white;
-}
-
 
 .jarves-List-loader:hover {
     background-image: none;

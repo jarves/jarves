@@ -14,64 +14,91 @@ jarves.Editor = new Class({
     lastMouseOveredElement: null,
     placerDimensions: null,
 
-    initialize: function(pOptions, pContainer) {
-        this.setOptions(pOptions);
+    /**
+     *
+     * @param {Object} options
+     * @param {Element} container
+     * @param {jarves.FieldAbstract} [contentField]
+     */
+    initialize: function(options, container, contentField) {
+        this.setOptions(options);
 
-        this.container = document.id(pContainer || document.documentElement);
+        this.contentField = contentField;
+        this.container = document.id(container || document.documentElement);
 
-        this.adjustAnchors();
         this.searchSlots();
 
         this.container.addEvent('click:relay(.jarves-content-placer)', this.clickPlacer.bind(this));
         this.container.addEvent('click:relay(.jarves-content)', this.click.bind(this));
-//        this.container.addEvent('mousemove', this.mouseMove.bind(this));
-        this.container.addEvent('click', this.click.bind(this));
-
+        this.container.addEvent('mousemove', this.mouseMove.bind(this));
         top.window.fireEvent('jarvesEditorLoaded', this);
+
+        document.id(this.contentField.getWin().getMainLayout()).addEvent('click', this.click.bind(this));
     },
 
-//    mouseMove: function(e) {
-//        if (this.lastCheckPlacerTimer) {
-//            clearTimeout(this.lastCheckPlacerTimer);
-//        }
-//
-//        this.lastCheckPlacerTimer = this.checkPlacer.delay(10, this, [e]);
-//    },
-//
-//    checkPlacer: function(e) {
-//        this.placerDimensions = [];
-//        Array.each(this.container.getElements('.jarves-content-placer'), function(placer) {
-//            this.placerDimensions.push({
-//                dimension: placer.getElement('a.jarves-content-placer-place').getCoordinates(this.container.documentElement),
-//                element: placer
-//            });
-//        }.bind(this));
-//
-//        var range = 18;
-//        var posY = e.page.y;
-//        var posX = e.page.x;
-//
-//        Array.each(this.placerDimensions, function(placer) {
-//            var valid = true;
-//
-//            valid &= placer.dimension.top-range < posY;
-//            valid &= placer.dimension.left-range < posX;
-//            valid &= placer.dimension.right+range > posX;
-//            valid &= placer.dimension.bottom+range > posY;
-//
-//            if (valid) {
-//                placer.element.addClass('jarves-content-placer-visible');
-//            } else {
-//                placer.element.removeClass('jarves-content-placer-visible');
-//            }
-//        });
-//    },
+    getContainer: function() {
+        return this.container;
+    },
+
+    mouseMove: function(e) {
+        if (this.lastCheckPlacerTimer) {
+            clearTimeout(this.lastCheckPlacerTimer);
+        }
+
+        this.lastCheckPlacerTimer = this.checkPlacer.delay(10, this, [e]);
+    },
+
+    getNodeId: function() {
+        if (this.getContentField() && this.getContentField().getNodeId) {
+            return this.getContentField().getNodeId();
+        }
+    },
+
+    getDomainId: function() {
+        if (this.getContentField() && this.getContentField().getDomainId) {
+            return this.getContentField().getDomainId();
+        }
+    },
+
+    checkPlacer: function(e) {
+        this.placerDimensions = [];
+        Array.each(this.container.getElements('.jarves-content-placer'), function(placer) {
+            this.placerDimensions.push({
+                dimension: placer.getElement('a.jarves-content-placer-place').getCoordinates(this.container.documentElement),
+                element: placer
+            });
+        }.bind(this));
+
+        var range = 25;
+        var posY = e.page.y;
+        var posX = e.page.x;
+
+        Array.each(this.placerDimensions, function(placer) {
+            var valid = true;
+
+            valid &= placer.dimension.top-range < posY;
+            valid &= placer.dimension.left-range < posX;
+            valid &= placer.dimension.right+range > posX;
+            valid &= placer.dimension.bottom+range > posY;
+
+            if (valid) {
+                placer.element.addClass('jarves-content-placer-visible');
+            } else {
+                placer.element.removeClass('jarves-content-placer-visible');
+            }
+        });
+    },
 
     click: function(e, element) {
         if (element) {
             e.stopPropagation();
             this.disableNextContainerClick = true;
             this.selectElement(element);
+
+            //forward click to parent document
+            var evObj = document.createEvent('MouseEvents');
+            evObj.initMouseEvent('click', true, false);
+            document.body.dispatchEvent(evObj);
         } else if (!this.disableNextContainerClick) {
             this.deselect();
         } else {
@@ -81,11 +108,6 @@ jarves.Editor = new Class({
         if (this.inspector) {
             this.closeInspector();
         }
-
-        //forward click to parent document
-        var evObj = document.createEvent('MouseEvents');
-        evObj.initMouseEvent('click', true, false);
-        document.body.dispatchEvent(evObj);
     },
 
     clickPlacer: function(e, element) {
@@ -100,7 +122,6 @@ jarves.Editor = new Class({
     },
 
     /**
-     *
      * @param {jarves.Slot} slot
      * @param {Element} placerElement
      * @param {Array} [limitTypes]
@@ -307,10 +328,9 @@ jarves.Editor = new Class({
         var winSize = document.id(win).getSize();
         var contentElement = document.id(this.lastInspectorContent);
         var contentPosition = contentElement.getPosition();
-        contentPosition.y += this.getContentField().getFrame().getPosition(win).y; //relative to current window
-        if ('iframe' === this.getContentField().getFrame().get('tag')) {
-            contentPosition.y -= this.getContentField().getFrame().contentWindow.document.body.getScroll().y;
-        }
+
+        contentPosition.y += this.getContentField().getContainerOffsetY();
+
         var contentSize = document.id(this.lastInspectorContent).getSize();
         var inspectorSize = this.inspector.getSize();
 
@@ -411,26 +431,6 @@ jarves.Editor = new Class({
         return this.options.id;
     },
 
-    getNode: function() {
-        return this.options.node;
-    },
-
-    getNodeId: function() {
-        return this.options.node.id;
-    },
-
-    getTheme: function() {
-        return this.options.node.theme || this.options.domain.theme;
-    },
-
-    getLayout: function() {
-        return this.options.node.layout;
-    },
-
-    getDomainId: function() {
-        return this.options.node.domainId;
-    },
-
     onOver: function(event, element) {
         if (this.lastHoveredContentInstance) {
             this.lastHoveredContentInstance.onOut();
@@ -453,80 +453,51 @@ jarves.Editor = new Class({
         }
     },
 
-    adjustAnchors: function() {
-
-        var params = {
-            '_jarves_editor': 1,
-            '_jarves_editor_id': this.options.id,
-            '_jarves_editor_domain': this.options.domain.id,
-            '_jarves_editor_options': {
-                standalone: this.options.standalone
+    /**
+     * @returns {Array}
+     */
+    getValue: function() {
+        var value = [];
+        Array.each(this.slots, function(slot) {
+            if (slot.kaSlotInstance) {
+                value = value.concat(slot.kaSlotInstance.getValue());
             }
-        };
-        params = Object.toQueryString(params);
+        });
 
-        this.container.getElements('a').each(function(a) {
-            if (a.href) {
-                a.href = a.href + ((a.href.indexOf('?') > 0) ? '&' : '?') + params
-            }
-        }.bind(this));
+        return value;
+
     },
 
     /**
-     *
      * @param {jarves.ProgressWatchManager} saveManager
-     * @returns {Array}
      */
-    getValue: function(saveManager) {
-        this.slots = this.container.getElements('.jarves-slot');
-
+    save: function(saveManager) {
         var contents = [];
         Array.each(this.slots, function(slot) {
             if (slot.kaSlotInstance) {
-                contents = contents.concat(slot.kaSlotInstance.getContents());
+                contents = contents.concat(slot.kaSlotInstance.getContents()); //merges so we have one big contents array
             }
         });
 
+        if (0 === contents.length) {
+            saveManager.allSuccess();
+            return;
+        }
+
         contents.each(function(content) {
-            content.editorProgressWatch = saveManager.newProgressWatch({
-            }, content);
+            content.editorProgressWatch = saveManager.newProgressWatch({}, content);
         });
 
         contents.each(function(content) {
-             content.getValue(content.editorProgressWatch);
+             content.save(content.editorProgressWatch);
         });
-
-//        var resultManager = new jarves.ProgressWatchManager({
-//            onDone: function(progressWatch) {
-//                contents = contents.concat(progressWatch.getValue());
-//            },
-//            onAllDone: function() {
-//                saveManager.allDone(contents);
-//            },
-//            onAllProgress: function(progress) {
-//                saveManager.allProgress(progress);
-//            }
-//        });
-//
-//        Array.each(this.slots, function(slot) {
-//            if (slot.kaSlotInstance) {
-//                slot.editorProgressWatch = resultManager.newProgressWatch();
-//            }
-//        });
-//
-//        Array.each(this.slots, function(slot) {
-//            if (slot.kaSlotInstance) {
-//                slot.kaSlotInstance.getValue(slot.editorProgressWatch);
-//            }
-//        });
-//
-//        return contents;
     },
 
     setValue: function(contents) {
         var boxContents = {};
 
         if ('array' === typeOf(contents)) {
+            contents.sortOn('sort');
             Array.each(contents, function(content) {
                 if (!boxContents[content.boxId]) {
                     boxContents[content.boxId] = [];
@@ -571,18 +542,6 @@ jarves.Editor = new Class({
 
     getUrl: function() {
         return _pathAdmin + 'object/jarves/node/' + this.options.node.id + '?_method=patch';
-    },
-
-    save: function() {
-        if (this.lastSaveRq) {
-            this.lastSaveRq.cancel();
-        }
-
-        var contents = this.getValue();
-
-        this.lastSaveRq = new Request.JSON({url: this.getUrl(), onComplete: function(pResponse) {
-
-        }.bind(this)}).post({content: contents});
     },
 
     highlightSave: function(pHighlight) {
@@ -656,7 +615,9 @@ jarves.Editor = new Class({
     },
 
     checkChange: function() {
-        this.highlightSave(this.hasChanges());
+        if (this.options.standalone) {
+            this.highlightSave(this.hasChanges());
+        }
     },
 
     initSlot: function(domSlot) {

@@ -10,7 +10,7 @@
 
 .jarves-dialog {
     background-color: #f5f5f5;
-    box-shadow: 0px 0px 30px #444;
+    box-shadow: 0 0 20px #bbb;
     position: absolute;
 
     min-height: 50px;

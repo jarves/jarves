@@ -15,6 +15,7 @@ class PageResponseTest extends KernelAwareTestCase
         $response->addJsFile('@TestBundle/page-response-test/javascript2.js');
 
         $assetsTags = $response->getAssetTags();
+
         $expected = <<<EOF
 <script type="text/javascript" src="bundles/test/page-response-test/javascript1.js\?c=([a-z0-9]{6})"></script>
 <script type="text/javascript">

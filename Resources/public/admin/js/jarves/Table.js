@@ -317,13 +317,13 @@ jarves.Table = new Class({
             if (firstTr) {
                 var columns = this.tableHead.getElement('tr').getChildren('th');
                 firstTr.getChildren('td').each(function(td, index) {
-                    columns[index].setStyle('width', td.getScrollSize().x - 10); //10 padding
+                    columns[index].setStyle('width', td.getScrollSize().x - 6); //3+3 padding
                 }.bind(this));
             }
 
             var height = parseInt(this.tableHead.getSize().y);
-            if (31 > height) {
-                height = 31;
+            if (27 > height) {
+                height = 27;
             }
             this.body.setStyle('top', height);
             this.head.setStyle('height', height);

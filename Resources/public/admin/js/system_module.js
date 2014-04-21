@@ -1,12 +1,17 @@
 var jarves_system_module = new Class({
 
     /**
-     * @var {jarves.Dialog}
+     * @var {jarves.Window}
      */
     win: null,
 
-    initialize: function (pWin) {
-        this.win = pWin;
+    /**
+     *
+     * @param {jarves.Window} win
+     */
+    initialize: function (win) {
+        this.win = win;
+        document.id(win.getMainLayout()).addClass('jarves-border');
 
         this.tabGroup = this.win.addTabGroup();
 
@@ -106,7 +111,7 @@ var jarves_system_module = new Class({
                 this.categories[ item.i ] = item.v;
             }.bind(this));
 
-        this.win = pWin;
+        this.win = win;
         this._createInstallLayout();
 
         if (this.win.params && this.win.params.updates == 1) {

@@ -13,18 +13,20 @@ $width = 255px;
 $margin = 10px;
 
 .jarves-Dashboard-widget {
-  background-color: #fafafa;
+  background-color: #f7f7f7;
   margin: $margin;
   display: block;
   float: left;
   width: $width;
   height: 215px;
   color: #444;
-  border: 1px solid #ececec;
+  border: 1px solid #e7e7e7;
 
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+
+  border-radius: 4px;
 }
 
 .jarves-Dashboard-widget h3 {
@@ -78,7 +80,16 @@ $margin = 10px;
 .jarves-Dashboard-newsFeed-item-object-label,
 .jarves-Dashboard-newsFeed-item-label {
   color: $mainColor;
-  text-decoration: underline;
+}
+
+.jarves-Dashboard-newsFeed-item-label,
+.jarves-Dashboard-newsFeed-item-user {
+    font-weight: bold;
+}
+
+.jarves-Dashboard-newsFeed-item-label:before,
+.jarves-Dashboard-newsFeed-item-label:after {
+    content: '"';
 }
 
 .jarves-Dashboard-newsFeed-item-date {
@@ -92,13 +103,6 @@ $margin = 10px;
 
 .jarves-Dashboard-newsFeed-item-object-label {
   margin-right: 4px;
-}
-
-.jarves-Dashboard-newsFeed-item-object-label,
-.jarves-Dashboard-newsFeed-item-verb,
-.jarves-Dashboard-newsFeed-item-user,
-.jarves-Dashboard-newsFeed-item-label {
-  font-weight: bold;
 }
 
 .jarves-Dashboard-newsFeed-item-message {

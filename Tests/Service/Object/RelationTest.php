@@ -4,6 +4,7 @@ namespace Jarves\Tests\Service\Object;
 
 use Jarves\Propel\StandardEnglishPluralizer;
 use Jarves\Tests\KernelAwareTestCase;
+use Test\Model\ContentElementItemQuery;
 use Test\Model\ItemCategoryQuery;
 use Test\Model\ItemQuery;
 
@@ -49,6 +50,7 @@ class RelationTest extends KernelAwareTestCase
         $pluralizer = new StandardEnglishPluralizer();
         $this->assertEquals($plural, $pluralizer->getPluralForm($singular));
     }
+
     public function testPropelRefName()
     {
         $reflection = new \ReflectionClass('Test\Model\Item');
@@ -58,6 +60,40 @@ class RelationTest extends KernelAwareTestCase
         $reflection = new \ReflectionClass('Test\Model\ItemCategory');
         $this->assertTrue($reflection->hasMethod('getItems')); //<objectRefRelationName>Items</objectRefRelationName>
         $this->assertTrue($reflection->hasMethod('getCategoryCrossItems')); //<objectRefRelationName>CategoryCrossItems</objectRefRelationName>
+    }
+
+    /**
+     * @group test
+     */
+    public function testContentElements()
+    {
+        ContentElementItemQuery::create()->deleteAll();
+        $contents = array();
+
+        $contents[] = array(
+            'slotId' => 1,
+            'type' => 'text',
+            'content' => 'Hello World'
+        );
+
+        $contents[] = array(
+            'slotId' => 2,
+            'type' => 'text',
+            'content' => 'Hello Peter'
+        );
+
+        $data = array(
+            'name' => 'Peter',
+            'content' => $contents
+        );
+        $pk = $this->getJarves()->getObjects()->add('test/contentElementItem', $data);
+
+        $addedItem = $this->getJarves()->getObjects()->get('test/contentElementItem', $pk);
+
+        $this->assertEquals('Peter', $addedItem['name']);
+        $this->assertCount(2, $addedItem['content']);
+        $this->assertEquals('Hello World', $addedItem['content'][0]['content']);
+        $this->assertEquals('Hello Peter', $addedItem['content'][1]['content']);
     }
 
     public function testManyToOne()

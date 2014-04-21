@@ -344,11 +344,11 @@ jarves.Content = new Class({
         this.getEditor().activateLinks(this.main);
         this.lastRq = new Request.JSON({url: _pathAdmin + 'admin/content/template', noCache: true,
             onFailure: function() {
-                this.contentWrapper.set('html', ' -- loading tempalte failed --');
+                this.contentWrapper.set('html', ' -- loading template failed --');
                 if (progressWatch) {
                     progressWatch.error();
                 }
-            },
+            }.bind(this),
             onComplete: function(response) {
                 this.main.setStyle('height', this.main.getSize().y);
 
@@ -383,11 +383,9 @@ jarves.Content = new Class({
     },
 
     /**
-     * @param {jarves.ProgressWatch} [progressWatch]
-     *
      * @returns {*}
      */
-    getValue: function(progressWatch) {
+    getValue: function() {
         if (this.selected) {
             this.value = this.value || {};
         }
@@ -400,23 +398,24 @@ jarves.Content = new Class({
             this.value.content = this.contentObject.getValue();
         }
 
-        if (progressWatch) {
-            var content = this.value;
-
-            var self = this;
-            progressWatch.addEvent('preDone', function(sp) {
-                self.value.content = sp.getValue();
-                self.value.boxId = self.getBoxId();
-                self.value.sort = self.getSortId();
-                this.setValue(self.value);
-            });
-
-            if (this.contentObject) {
-                this.contentObject.save(progressWatch);
-            }
-        }
-
         return this.value;
+    },
+
+    /**
+     *
+     * @param {jarves.ProgressWatch} [progressWatch]
+     */
+    save: function(progressWatch) {
+        var self = this;
+        progressWatch.addEvent('preDone', function(sp) {
+            self.value.content = sp.getValue();
+            self.value.boxId = self.getBoxId();
+            self.value.sort = self.getSortId();
+        });
+
+        if (this.contentObject) {
+            this.contentObject.save(progressWatch);
+        }
     },
 
     updateUI: function() {
@@ -500,6 +499,7 @@ jarves.Content = new Class({
     },
 
     setValue: function(value) {
+        value.type = value.type || 'text';
         this.value = value;
 
         if (!this.currentType || !this.contentObject || value.type != this.currentType || !this.currentTemplate || this.currentTemplate != value.template) {

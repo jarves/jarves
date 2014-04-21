@@ -337,9 +337,9 @@ jarves.Files = new Class({
             searchContainer.tween('width', 150);
         }.bind(this));
 
-        new Element('img', {
-            src: _path + 'bundles/jarves/admin/images/icon-search-loupe.png',
-            style: 'position: absolute; right: 12px; top: 12px;'
+        new Element('span', {
+            'class': 'icon-search',
+            style: 'position: absolute; right: 9px; top: 7px; color: gray;'
         }).inject(searchContainer);
 
         this.mainLayout = new jarves.Layout(this.wrapper, {
@@ -357,7 +357,9 @@ jarves.Files = new Class({
         document.id(this.mainLayout).addClass('jarves-Files-body');
 
         var sideBarCell = this.mainLayout.getCell(1, 1);
+        sideBarCell.addClass('jarves-Files-sidebarcell');
         var fileContainerCell = this.mainLayout.getCell(1, this.options.withSidebar ? 3 : 1);
+        fileContainerCell.addClass('jarves-Files-filecontainercell');
 
         this.fileContainer = new Element('div', {
             'class': 'jarves-Files-droppables jarves-Files-fileContainer jarves-scrolling'

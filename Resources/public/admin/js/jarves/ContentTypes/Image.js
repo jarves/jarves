@@ -161,6 +161,7 @@ jarves.ContentTypes.Image = new Class({
             this.value.hasFileAttached = this.getId();
         }
 
+        console.log('iamge get Value', JSON.encode(this.value));
         return JSON.encode(this.value);
     },
 
@@ -186,6 +187,7 @@ jarves.ContentTypes.Image = new Class({
             this.fileWatcher = jarves.getAdminInterface().getFileUploader().newFileUpload(file);
             this.fileWatcher.addEvent('done', function() {
                 this.value.file = newPath;
+                delete this.value.hasFileAttached;
                 this.removeFile();
                 this.fireChange();
                 progressWatch.done(JSON.encode(this.value));

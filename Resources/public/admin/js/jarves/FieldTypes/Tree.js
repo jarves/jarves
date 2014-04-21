@@ -44,8 +44,6 @@ jarves.FieldTypes.Tree = new Class({
          */
         scopeLanguage: null,
 
-        rootObject: '',
-
         /**
          * TODO, can be useful
          * @var [Boolean}
@@ -237,8 +235,8 @@ jarves.FieldTypes.Tree = new Class({
         }
 
         var tree = new clazz(this.treesContainer, options);
-        tree.addEvent('change', this.fieldInstance.fireChange);
         tree.addEvent('select', this.selected);
+        tree.addEvent('select', this.fireChange.bind(this));
 
         var proxyEvents = ['ready', 'childrenLoaded', 'select', 'move'];
         proxyEvents.each(function (event) {

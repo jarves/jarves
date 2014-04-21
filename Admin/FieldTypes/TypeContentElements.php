@@ -32,7 +32,7 @@ class TypeContentElements extends AbstractType
 
     public function bootRunTime(Object $object, Configs $configs)
     {
-        $contentsObjectName = $object->getId() . ucfirst($this->getFieldDefinition()->getId()) . 'Contents';
+        $contentsObjectName = $object->getId() . ucfirst($this->getFieldDefinition()->getId());
         $contentsObject = $object->getBundle()->getObject($contentsObjectName);
         $changed = false;
 
@@ -79,24 +79,24 @@ class TypeContentElements extends AbstractType
             $relation->setName('ForeignObject');
             $relation->setType(ORMAbstract::MANY_TO_ONE);
             $relation->setForeignObjectKey($object->getKey());
-            $relation->setRefName($this->getFieldDefinition()->getId());
+            $relation->setRefName(ucfirst($this->getFieldDefinition()->getId()));
 
             $reference = new RelationReferenceDefinition();
 
-            $fields = $object->getPrimaryKeys();
-            if (1 < count($fields)) {
+            $primaryFields = $object->getPrimaryKeys();
+            if (1 < count($primaryFields)) {
                 throw new ModelBuildException(sprintf(
                     'FieldType `ContentElements` can not be used on the object `%s` with composite PrimaryKey',
                     $object->getId()
                 ));
             }
-            if (0 === count($fields)) {
+            if (0 === count($primaryFields)) {
                 throw new ModelBuildException(sprintf(
                     'FieldType `ContentElements` can not be used on the object `%s` with no PrimaryKey',
                     $object->getId()
                 ));
             }
-            $columns = $fields[0]->getFieldType()->getColumns();
+            $columns = $primaryFields[0]->getFieldType()->getColumns();
             if (1 < count($columns)) {
                 throw new ModelBuildException(sprintf(
                     'FieldType `ContentElements` can not be used on the object `%s` with composite PrimaryKey',
@@ -107,6 +107,7 @@ class TypeContentElements extends AbstractType
 
             $field = $contentsObject->getField('foreignId');
             $columns = $field->getFieldType()->getColumns();
+
             $reference->setLocalColumn($columns[0]);
             $relation->setReferences([$reference]);
 
@@ -116,6 +117,27 @@ class TypeContentElements extends AbstractType
 
         if (!$contentsObject->getBundle()) {
             $object->getBundle()->addObject($contentsObject);
+        }
+
+        if (!$object->hasRelation($this->getFieldDefinition()->getId())) {
+            $relation = new RelationDefinition();
+            $relation->setName(ucfirst($this->getFieldDefinition()->getId()));
+            $relation->setType(ORMAbstract::ONE_TO_MANY);
+            $relation->setForeignObjectKey($contentsObject->getKey());
+            $relation->setRefName('ForeignObject');
+
+            $reference = new RelationReferenceDefinition();
+            $primaryFields = $object->getPrimaryKeys();
+            $columns = $primaryFields[0]->getFieldType()->getColumns();
+            $reference->setLocalColumn($columns[0]);
+
+            $field = $contentsObject->getField('foreignId');
+            $columns = $field->getFieldType()->getColumns();
+            $reference->setForeignColumn($columns[0]);
+
+            $relation->setReferences([$reference]);
+            $object->addRelation($relation);
+            $changed = true;
         }
 
         return $changed;

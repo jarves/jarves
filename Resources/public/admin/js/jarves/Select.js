@@ -283,7 +283,6 @@ jarves.Select = new Class({
 
             this.chooseItem(item.kaSelectId, true);
             this.close(true);
-
         }.bind(this));
 
         this.chooser.addEvent('scroll', this.checkScroll);

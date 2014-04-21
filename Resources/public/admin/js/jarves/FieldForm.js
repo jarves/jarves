@@ -218,6 +218,9 @@ jarves.FieldForm = new Class({
                 obj.getValue = function () {
                     return true;
                 };
+                obj.save = function(progressWatch) {
+                    progressWatch.done();
+                };
 
                 obj.hasParent = function () {
                     return obj.parent;
@@ -606,61 +609,6 @@ jarves.FieldForm = new Class({
     },
 
     /**
-     * Set the value of all fields.
-     *
-     * @param values
-     * @param internal
-     */
-    setValue: function (values, internal) {
-        if (typeOf(values) == 'string') {
-            try {
-                values = JSON.decode(values);
-            } catch (e){
-                //(tf('Can not decode JSON `%s`', pValues), e);
-            }
-        }
-
-        values = values || {};
-
-        this.value = Object.clone(values);
-
-        Object.each(this.fields, function (obj, id) {
-            var value, selection;
-
-            if (instanceOf(obj, jarves.FieldForm)) {
-                obj.setValue(values, internal);
-                return;
-            }
-            id = id.replace('[', '.').replace(']', '');
-
-            selection = instanceOf(obj, jarves.Field) ? obj.getDefinition().selection : null;
-
-            if (!selection || !selection.length || 1 === selection.length) {
-                if (selection && 1 === selection.length) {
-                    id = selection[0];
-                }
-                value = -1 !== id.indexOf('.') ? this.getArrayValue(values, id) : values[id];
-            } else {
-                value = {};
-                Array.each(selection, function(idx) {
-                    idx = idx.split('.')[0];
-                    value[idx] = values[idx];
-                });
-            }
-
-            obj.setValue(value, internal);
-        }.bind(this));
-
-        this.value = Object.clone(this.getValue());
-
-        if (true !== internal) {
-            this.fireEvent('change', this.value);
-            this.fireEvent('setValue', this.value);
-        }
-
-    },
-
-    /**
      *
      * @param {Object} values
      * @param {String} path
@@ -754,30 +702,86 @@ jarves.FieldForm = new Class({
     },
 
     /**
+     * Set the value of all fields.
+     *
+     * @param values
+     * @param internal
+     */
+    setValue: function (values, internal) {
+        if (typeOf(values) == 'string') {
+            try {
+                values = JSON.decode(values);
+            } catch (e){
+                //(tf('Can not decode JSON `%s`', pValues), e);
+            }
+        }
+
+        values = values || {};
+
+        this.value = Object.clone(values);
+
+        Object.each(this.fields, function (obj, id) {
+            var value, selection;
+
+            if (instanceOf(obj, jarves.FieldForm)) {
+                obj.setValue(values, internal);
+                return;
+            }
+            id = id.replace('[', '.').replace(']', '');
+
+            selection = instanceOf(obj, jarves.Field) ? obj.getDefinition().selection : null;
+
+            if (!selection || !selection.length || 1 === selection.length) {
+                if (selection && 1 === selection.length) {
+                    id = selection[0];
+                }
+                value = -1 !== id.indexOf('.') ? this.getArrayValue(values, id) : values[id];
+            } else {
+                value = {};
+                Array.each(selection, function(idx) {
+                    idx = idx.split('.')[0];
+                    value[idx] = values[idx];
+                });
+            }
+
+            obj.setValue(value, internal);
+        }.bind(this));
+
+        this.value = Object.clone(this.getValue());
+
+        if (true !== internal) {
+            //todo, should be === ?
+            this.fireEvent('change', this.value);
+            this.fireEvent('setValue', this.value);
+        }
+
+    },
+
+    /**
      * Returns the value of a field.
      *
-     * @param {String} [pField]
+     * @param {String} [fieldKey]
      * @param {Boolean} [patch] return only values that has been changed since the last setValue() call.
      * @return {*}
      */
-    getValue: function (pField, patch) {
+    getValue: function (fieldKey, patch) {
         var val;
 
         var res = {};
 
-        if (pField) {
+        if (fieldKey) {
 
-            if (this.fields[pField]) {
-                res = this.fields[pField].getValue();
+            if (this.fields[fieldKey]) {
+                res = this.fields[fieldKey].getValue();
             }
             else {
                 return null;
             }
 
         } else {
-            Object.each(this.fields, function (obj, id) {
-                if (instanceOf(obj, jarves.FieldForm)) {
-                    res = Object.merge(res, obj.getValue());
+            Object.each(this.fields, function (field, id) {
+                if (instanceOf(field, jarves.FieldForm)) {
+                    res = Object.merge(res, field.getValue());
                     return;
                 }
 
@@ -785,11 +789,13 @@ jarves.FieldForm = new Class({
                     return;
                 }
 
-                if (obj.isHidden()) {
+                if (field.isHidden()) {
                     return;
                 }
 
                 id = id.replace('[', '.').replace(']', '');
+                val = field.getValue();
+
                 if (id.indexOf('.') != -1) {
                     var items = id.split('.');
                     var key = '';
@@ -800,11 +806,10 @@ jarves.FieldForm = new Class({
                         key = item;
 
                         if (pos == items.length - 1) {
-                            val = obj.getValue();
 
                             if (typeOf(val) !== 'null'
                                 && (val !== '' || this.options.withEmptyFields)
-                                && (val !== obj.options['default'] || obj.options.returnDefault)
+                                && (val !== field.options['default'] || field.options.returnDefault)
                                 ) {
                                 last[key] = val;
                             }
@@ -816,11 +821,10 @@ jarves.FieldForm = new Class({
                     }.bind(this));
                     res = Object.merge(res, newRes);
                 } else {
-                    val = obj.getValue();
 
                     if (typeOf(val) !== 'null'
                         && (val !== '' || this.options.withEmptyFields)
-                        && (val !== obj.options['default'] || obj.options.returnDefault)
+                        && (val !== field.options['default'] || field.options.returnDefault)
                         ) {
 
                         res[id] = val;
@@ -835,7 +839,6 @@ jarves.FieldForm = new Class({
             Object.each(res, function(v, k) {
                 if (this.isDifferent(v, this.value[k])) {
                     patchValue[k] = v;
-                    console.log('diff', k, this.value[k], v);
                 }
             }.bind(this));
 
@@ -843,6 +846,25 @@ jarves.FieldForm = new Class({
         }
 
         return res;
+    },
+
+    /**
+     *
+     * @param {jarves.ProgressWatchManager} saveManager
+     */
+    save: function(saveManager) {
+        Object.each(this.fields, function (obj) {
+            obj.fieldFormProgressWatch = saveManager.newProgressWatch({}, obj);
+        });
+
+        Object.each(this.fields, function(obj, id) {
+            obj.save(obj.fieldFormProgressWatch);
+            (function() {
+                if (!obj.fieldFormProgressWatch.isDone()) {
+                    console.log(id, 'seems to be still saving data ...', obj);
+                }
+            }).delay(15000);
+        });
     },
 
     isDifferent: function(a, b) {

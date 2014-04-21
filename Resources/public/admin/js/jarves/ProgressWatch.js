@@ -34,7 +34,7 @@ jarves.ProgressWatch = new Class({
 
     /**
      *
-     * @returns {null}
+     * @returns {*}
      */
     getContext: function() {
         return this.context;
@@ -42,7 +42,7 @@ jarves.ProgressWatch = new Class({
 
     /**
      *
-     * @param context
+     * @param {*} context
      */
     setContext: function(context) {
         this.context = context;
@@ -80,6 +80,7 @@ jarves.ProgressWatch = new Class({
      * Cancels the progress.
      */
     error: function() {
+        this.state = true;
         this.errored = true;
         this.fireEvent('error');
     },

@@ -6,8 +6,18 @@
         "PHP CMS",
         "WCMS"
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git@bitbucket.org:marcj/jarvespublicationbundle.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "git@bitbucket.org:marcj/jarvesdemotheme.git"
+        }
+    ],
     "license": "LGPL-3.0",
-    "homepage": "http:\/\/www.jarves.io\/",
+    "homepage": "http:\/\/jarves.io\/",
     "authors": [
         {
             "name": "Marc J. Schmidt",
@@ -17,7 +27,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Jarves": ""
+            "Jarves\\": ""
         }
     },
     "minimum-stability": "dev",

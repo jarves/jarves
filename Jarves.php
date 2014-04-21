@@ -367,7 +367,7 @@ class Jarves extends Controller
     }
 
     /**
-     * @return Node
+     * @return Node|null
      */
     public function getCurrentPage()
     {
@@ -375,7 +375,7 @@ class Jarves extends Controller
     }
 
     /**
-     * @return Domain
+     * @return Domain|null
      */
     public function getCurrentDomain()
     {

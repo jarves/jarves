@@ -1,4 +1,4 @@
-jarves.FieldTypes.Content = new Class({
+jarves.FieldTypes.PageContents = new Class({
     Extends: jarves.FieldAbstract,
 
     options: {
@@ -13,6 +13,8 @@ jarves.FieldTypes.Content = new Class({
     currentDomain: null,
 
     lastContents: null,
+
+    lastLoadedTreeForDomainId: null,
 
     createLayout: function() {
         this.mainLayout = new jarves.Layout(this.getContainer(), {
@@ -171,17 +173,68 @@ jarves.FieldTypes.Content = new Class({
 
     hideTree: function() {
         if (this.treeContainer) {
+            this.editableAreaContainer.setStyle('left', 0);
             this.treeContainer.destroy();
             delete this.treeContainer;
         }
     },
 
     showTree: function() {
-        this.hideTree();
+        if (!this.treeContainer) {
+            this.treeContainer = new Element('div', {
+                'class': 'jarves-scrolling jarves-Field-content-treeContainer'
+            }).inject(this.mainLayout.getCell(2, 1));
 
-        this.treeContainer = new Element('div', {
+            this.editableAreaContainer.setStyle('left', 300);
+        }
 
-        });
+        var domainId = this.domainSelection.getValue();
+        if (domainId && this.lastLoadedTreeForDomainId !== domainId) {
+            this.loadTreeForDomain(domainId);
+        }
+    },
+
+    adjustAnchors: function() {
+
+        var params = {
+            '_jarves_editor': 1,
+            '_jarves_editor_id': this.getEditor().getId(),
+            '_jarves_editor_domain': this.getDomainId(),
+            '_jarves_editor_options': {
+                standalone: this.options.standalone
+            }
+        };
+        params = Object.toQueryString(params);
+
+        this.getEditor().getContainer().getElements('a').each(function(a) {
+            if (a.href) {
+                a.href = a.href + ((a.href.indexOf('?') > 0) ? '&' : '?') + params
+            }
+        }.bind(this));
+    },
+
+
+    /**
+     * @param {Number} domainId
+     */
+    loadTreeForDomain: function(domainId) {
+        this.treeField = new jarves.Field({
+            type: 'tree',
+            object: 'jarves/node',
+            width: 'auto',
+            options: {
+                scope: domainId
+            }
+        }, this.treeContainer);
+
+        this.treeField.addEvent('change', function(value){
+            this.loadEditor(null, value.id);
+        }.bind(this));
+
+        if (this.getEditor()) {
+            this.treeField.setValue(this.getNodeId());
+        }
+        this.lastLoadedTreeForDomainId = domainId;
     },
 
     /**
@@ -201,7 +254,12 @@ jarves.FieldTypes.Content = new Class({
         }
     },
 
+    getValue: function() {
+        return this.editor ? this.editor.getValue() : this.backupedValue;
+    },
+
     setValue: function(value, internal) {
+        this.backupedValue = value;
         if (this.getField().getForm()) {
             this.setValueFromForm(value, internal);
         } else {
@@ -287,21 +345,26 @@ jarves.FieldTypes.Content = new Class({
         if (this.lastJarvesEditorLoader) {
             window.removeEvent('jarvesEditorLoaded', this.lastJarvesEditorLoader);
         }
+
         this.lastJarvesEditorLoader = function(editor) {
             if (editor && editor.getId() == id) {
                 this.setEditor(editor);
                 editor.setContentField(this);
 
-                this.currentNode = editor.getNodeId();
-                this.currentLayout = editor.getLayout();
+                this.currentNode = this.getNodeId();
+                this.currentLayout = this.getLayout();
 //                console.log('jarvesEditorLoaded', this.currentLayout, this.currentNode);
 
                 if (!this.options.standalone) {
                     editor.deactivateLinks();
                     editor.setValue(contents);
                 } else {
-                    this.reloadLayoutSelection(editor.getTheme(), editor.getLayout());
+                    this.reloadLayoutSelection(this.getTheme(), this.getLayout());
                 }
+                if (this.treeField) {
+                    this.treeField.setValue(this.getNodeId());
+                }
+                this.adjustAnchors();
             }
         }.bind(this);
         window.addEvent('jarvesEditorLoaded', this.lastJarvesEditorLoader);
@@ -333,6 +396,60 @@ jarves.FieldTypes.Content = new Class({
         this.iframe.set('src', path + '?' + Object.toQueryString(params));
     },
 
+    getContainerOffsetY: function() {
+        var y = this.getFrame().getPosition(this.getWin()).y; //relative to current window
+        if ('iframe' === this.getFrame().get('tag')) {
+            y -= this.getFrame().contentWindow.document.body.getScroll().y;
+        }
+
+        return y;
+    },
+
+    getNode: function() {
+        return this.getEditor().options.node;
+    },
+
+    getNodeId: function() {
+        return this.getEditor().options.node.id;
+    },
+
+    getDomainId: function() {
+        return this.getEditor().options.domain.id;
+    },
+
+    getTheme: function() {
+        return this.getEditor().options.node.theme || this.getEditor().options.domain.theme;
+    },
+
+    getLayout: function() {
+        return this.getEditor().options.node.layout;
+    },
+
+    /**
+     *
+     * @param {jarves.ProgressWatch} progressWatch
+     */
+    save: function(progressWatch) {
+        if (!this.editor) {
+            progressWatch.done();
+            return;
+        }
+
+        var progressWatchManager = new jarves.ProgressWatchManager({
+            onAllSuccess: function() {
+                progressWatch.done();
+            }.bind(this),
+            onError: function(progressWatch) {
+                progressWatch.error();
+            },
+            onAllProgress: function(progress) {
+                progressWatch.setProgress(progress);
+            }.bind(this)
+        });
+
+        this.editor.save(progressWatchManager);
+    },
+
     saveStandalone: function() {
         if (this.editor) {
 
@@ -342,32 +459,31 @@ jarves.FieldTypes.Content = new Class({
                 this.lastSaveRq.cancel();
             }
 
-            var value = [];
             var progressWatchManager = new jarves.ProgressWatchManager({
-                onDone: function(progressWatch) {
-                    value.push(progressWatch.getValue());
-                },
-                onAllDone: function() {
+                onAllSuccess: function() {
+                    var value = this.editor.getValue(); // all saved, we can now safely retrieve the value
                     this.saveBtn.setProgress(100);
                     this.lastSaveRq = new Request.JSON({url: this.getUrl(),
-                        onFailure: function(pResponse) {
+                        onFailure: function(response) {
                             this.saveBtn.failedLoading(t('Failed!'));
                             this.saveBtn.setProgress(false);
                         }.bind(this),
-                        onComplete: function(pResponse) {
+                        onComplete: function(response) {
                             this.saveBtn.doneLoading(t('Saved!'));
                             this.saveBtn.setProgress(false);
                         }.bind(this)
                     }).post({_method: 'patch', content: value, layout: this.layoutSelection.getValue()});
                 }.bind(this),
-
+                onError: function(progressWatch) {
+                    this.saveBtn.startLoading(t('Failed'));
+                },
                 onAllProgress: function(progress) {
                     this.saveBtn.setProgress(progress);
                 }.bind(this)
             });
 
             this.saveBtn.startLoading(t('Saving ...'));
-            this.editor.getValue(progressWatchManager);
+            this.editor.save(progressWatchManager);
         }
     },
 
@@ -393,10 +509,6 @@ jarves.FieldTypes.Content = new Class({
     //        }
     //    },
 
-    getValue: function(progressWatch) {
-        return this.lastContents;
-    },
-
     getUrl: function() {
         return _pathAdmin + 'object/jarves/node/' + this.editor.options.node.id;
     },
@@ -405,6 +517,10 @@ jarves.FieldTypes.Content = new Class({
         this.editor = editor;
     },
 
+    /**
+     *
+     * @returns {jarves.Editor}
+     */
     getEditor: function() {
         return this.editor;
     },

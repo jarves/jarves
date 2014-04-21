@@ -268,7 +268,7 @@ jarves.AdminInterface = new Class({
 
     createLayout: function() {
         this.border = new Element('div', {
-            'class': 'jarves-border jarves-admin'
+            'class': 'jarves-frame jarves-admin'
         }).inject(document.body);
 
         this.mainMenuTop = new Element('div', {

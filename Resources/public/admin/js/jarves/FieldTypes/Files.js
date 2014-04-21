@@ -8,7 +8,7 @@ jarves.FieldTypes.Files = new Class({
 
     initialize: function (pFieldInstance, pOptions) {
 
-        pOptions.object = 'JarvesBundle:File';
+        pOptions.object = 'jarves/file';
         pOptions.objectBranch = pOptions.directory;
         pOptions.objectLabel = 'name';
         pOptions.labelTemplate = '{name}';

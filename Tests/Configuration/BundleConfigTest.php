@@ -593,11 +593,11 @@ class BundleConfigTest extends KernelAwareTestCase
     <field id="title" type="text">
     </field>
     <field id="category" type="object">
-      <object>Test\ItemCategory</object>
+      <object>test/itemCategory</object>
       <objectRelation>nToM</objectRelation>
     </field>
     <field id="oneCategory" type="object">
-      <object>Test\ItemCategory</object>
+      <object>test/itemCategory</object>
       <objectRelation>nTo1</objectRelation>
     </field>
   </fields>

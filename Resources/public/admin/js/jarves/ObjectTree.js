@@ -15,7 +15,7 @@ jarves.ObjectTree = new Class({
 
         /**
          * Changes the rest interface url to the given entryPoint.
-         * It's then `admin/<entryPoint>` otherwise the default is used `admin/object/<objectKey>/`.
+         * It's then `jarves/<entryPoint>` otherwise the default is used `jarves/object/<objectKey>/`.
          *
          * @var {String}
          */
@@ -131,11 +131,11 @@ jarves.ObjectTree = new Class({
 
     objectDefinition: null,
 
-    initialize: function(pContainer, pOptions, pRefs) {
+    initialize: function(container, options, refs) {
         this.items = {};
 
-        this.setOptions(pOptions);
-        this.container = pContainer;
+        this.setOptions(options);
+        this.container = container;
 
         if (this.options.objectKey) {
             this.options.objectKey = jarves.normalizeObjectKey(this.options.objectKey);
@@ -214,9 +214,9 @@ jarves.ObjectTree = new Class({
             }.bind(this));
         }
 
-        if (pRefs) {
-            this.options.objectObj = pRefs.objectObj;
-            this.options.win = pRefs.win;
+        if (refs) {
+            this.options.objectObj = refs.objectObj;
+            this.options.win = refs.win;
         }
 
         this.main = new Element('div', {
@@ -268,8 +268,8 @@ jarves.ObjectTree = new Class({
             this.loadFirstLevel();
         }
 
-        if (pContainer && pContainer.getParent('.kwindow-border')) {
-            pContainer.getParent('.kwindow-border').windowInstance.addEvent('close', this.clean.bind(this));
+        if (container && container.getParent('.kwindow-border')) {
+            container.getParent('.kwindow-border').windowInstance.addEvent('close', this.clean.bind(this));
         }
 
         window.addEvent('mouseup', this.destroyContext.bind(this));

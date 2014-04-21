@@ -127,7 +127,7 @@ class NodeCrudController extends WindowNestedController
             'children' => array(
                 'content' => array(
                     'noWrapper' => true,
-                    'type' => 'content'
+                    'type' => 'pageContents'
                 ),
             ),
         ),

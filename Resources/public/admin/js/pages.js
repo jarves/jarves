@@ -19,7 +19,7 @@ var jarves_pages = new Class({
 
         new jarves.Field({
             noWrapper: true,
-            type: 'content',
+            type: 'PageContents',
             options: {
                 standalone: true
             }
