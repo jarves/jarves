@@ -420,6 +420,27 @@ h3.jarves-headline {
     color: #808080;
     background-color: rgba(0, 0, 0, 0);
 }
+
+.jarves-Window-sidebar a.jarves-Select-box,
+.jarves-Window-sidebar a.jarves-Select-box:link {
+    background-image: none;
+    background-color: transparent;
+    padding: 0 15px;
+    color: white;
+    width: 100% !important;
+    border: 1px solid #9C9C9C;
+}
+
+.jarves-Window-sidebar .jarves-Select-arrow {
+    background-image: none;
+    background-color: transparent;
+    border-left: 1px solid #9f9f9f;
+}
+
+.jarves-Window-sidebar .jarves-Select-arrow:before {
+    color: #eee;
+}
+
 .jarves-Window-sidebar .jarves-Splitter-main {
     left: -20px;
     border-left: 0;

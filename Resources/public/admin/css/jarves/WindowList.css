@@ -111,13 +111,13 @@
     border-top: 0;
 }
 
-.jarves-windowCombine-list-actions {
-    text-align: left;
+.jarves-WindowList-combine-left .jarves-windowCombine-list-actions {
+    text-align: right;
     position: absolute;
-    left: 1px;
+    left: 0;
     height: 0;
     bottom: -11px;
-    right: 1px;
+    right: 0;
     overflow: hidden;
     background-color: white;
 }
@@ -391,9 +391,6 @@ a.jarves-WindowList-search-button-active:link {
     right: 6px;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
-    background-image: url(../../images/jarves-list-combine-searchpane-bg.png);
-    background-repeat: repeat-x;
-    background-position: left bottom;
 }
 
 .jarves-WindowList-combine-searchpane .jarves-field-field select,
@@ -425,7 +422,7 @@ a.jarves-windowCombine-left-toggler {
     position: absolute;
     display: block;
     right: -17px;
-    width: 15px;
+    width: 14px;
     bottom: 0;
     padding-left: 0;
 }

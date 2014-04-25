@@ -1,9 +1,9 @@
 jarves.WindowAdd = new Class({
     Extends: jarves.WindowEdit,
 
-    initialize: function(pWin, pContainer) {
+    initialize: function(win, container, options) {
         this.windowAdd = true;
-        this.parent(pWin, pContainer);
+        this.parent(win, container, options);
     },
 
     loadItem: function() {

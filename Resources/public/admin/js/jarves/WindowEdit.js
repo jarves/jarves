@@ -5,14 +5,16 @@ jarves.WindowEdit = new Class({
     inline: false,
 
     options: {
-        saveLabel: ''
+        saveLabel: '',
+        renderLanguageSelector: true
     },
 
     fieldToTabOIndex: {}, //index fieldkey to main-tabid
     winParams: {}, //copy of pWin.params in constructor
 
-    initialize: function(pWin, pContainer) {
-        this.win = pWin;
+    initialize: function(win, container, options) {
+        this.win = win;
+        this.setOptions(options);
 
         this.winParams = Object.clone(this.win.getParameter());
 
@@ -27,12 +29,12 @@ jarves.WindowEdit = new Class({
             return;
         }
 
-        if (!pContainer) {
+        if (!container) {
             this.container = this.win.content;
             this.container.setStyle('overflow', 'visible');
         } else {
             this.inline = true;
-            this.container = pContainer;
+            this.container = container;
         }
 
         this.container.empty();
@@ -204,6 +206,7 @@ jarves.WindowEdit = new Class({
         if (this.languageSelect && this.languageSelect.getValue() != value.lang) {
             this.languageSelect.setValue(value.lang);
             this.changeLanguage();
+            this.itemLanguage = value.lang;
         }
     },
 
@@ -231,8 +234,7 @@ jarves.WindowEdit = new Class({
         }
 
         if (titleField && this.fields[titleField]) {
-
-            var value = jarves.getObjectFieldLabel(value, this.fieldForm.getFieldDefinition(titleField), titleField, this.classProperties['object']);
+            value = jarves.getObjectFieldLabel(value, this.fieldForm.getFieldDefinition(titleField), titleField, this.classProperties['object']);
             return value;
         }
         return '';
@@ -422,7 +424,7 @@ jarves.WindowEdit = new Class({
 
         this.renderActionBar();
 
-        //this.renderMultilanguage();
+        this.renderMultilanguage();
 
         this.renderFields();
 
@@ -499,37 +501,46 @@ jarves.WindowEdit = new Class({
         }
     },
 
-    /*    renderMultilanguage: function () {
+    setLanguage: function(lang) {
+        this.language = lang;
+        if (this.languageSelect) {
+            this.languageSelect.setValue(lang);
+        }
+    },
 
-     if (this.classProperties.multiLanguage) {
+    getLanguage: function() {
+        return this.language;
+    },
 
-     if (this.classProperties.asNested) {
-     return false;
-     }
+    renderMultilanguage: function () {
+        if (this.options.renderLanguageSelector && this.classProperties.multiLanguage) {
 
-     this.win.extendHead();
+            if (this.classProperties.asNested) {
+                return false;
+            }
 
-     this.languageSelect = new jarves.Select();
-     this.languageSelect.inject(this.saveBtn, 'before');
-     this.languageSelect.setStyle('width', 120);
+            this.win.extendHead();
 
-     this.languageSelect.addEvent('change', this.changeLanguage.bind(this));
+            this.languageSelect = new jarves.Select();
+            this.languageSelect.inject(this.saveBtn, 'before');
+            this.languageSelect.setStyle('width', 120);
 
-     this.languageSelect.add('', t('-- Please Select --'));
+            this.languageSelect.addEvent('change', this.changeLanguage.bind(this));
 
-     Object.each(jarves.settings.langs, function (lang, id) {
+            this.languageSelect.add('', t('-- Select Language --'));
 
-     this.languageSelect.add(id, lang.langtitle + ' (' + lang.title + ', ' + id + ')');
+            Object.each(jarves.settings.langs, function (lang, id) {
+                this.languageSelect.add(id, lang.langtitle + ' (' + lang.title + ', ' + id + ')');
+            }.bind(this));
 
-     }.bind(this));
+            if (this.winParams && this.winParams.item) {
+                this.languageSelect.setValue(this.winParams.item.lang);
+            } else if (this.language) {
+                this.languageSelect.setValue(this.language);
+            }
 
-     if (this.winParams && this.winParams.item) {
-     this.languageSelect.setValue(this.winParams.item.lang);
-     }
-
-     }
-
-     },*/
+        }
+     },
 
     changeVersion: function() {
         var value = this.versioningSelect.getValue();
@@ -782,6 +793,12 @@ jarves.WindowEdit = new Class({
                 this.languageTip.stop();
             }
             req['lang'] = this.languageSelect.getValue();
+        } else if (this.classProperties.multiLanguage) {
+            req['lang'] = this.getLanguage();
+        }
+
+        if (this.itemLanguage == req.lang) {
+            delete req.lang;
         }
 
         return req;
@@ -939,6 +956,10 @@ jarves.WindowEdit = new Class({
 
                 if ((!andClose || this.inline ) && this.classProperties.versioning == true) {
                     this.loadVersions();
+                }
+
+                if (this.classProperties.multiLanguage) {
+                    this.itemLanguage = request.lang;
                 }
 
                 if (this.win.isInline()) {

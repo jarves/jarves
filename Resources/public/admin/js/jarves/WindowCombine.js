@@ -611,6 +611,9 @@ jarves.WindowCombine = new Class({
 
     changeLanguage: function() {
         this.reload();
+        if (this.windowAdd && this.languageSelect) {
+            this.windowAdd.setLanguage(this.languageSelect.getValue());
+        }
     },
 
     clear: function() {
@@ -1094,6 +1097,7 @@ jarves.WindowCombine = new Class({
         this.currentAdd = new jarves.WindowAdd(win, this.mainRight);
         this.currentAdd.addEvent('add', this.addSaved.bind(this));
         this.currentAdd.addEvent('addMultiple', this.addSavedMultiple.bind(this));
+        this.currentAdd.setLanguage(this.getLanguage());
 
         this.setWinParams();
     },
@@ -1228,7 +1232,7 @@ jarves.WindowCombine = new Class({
     },
 
     loadItem: function(pk, objectKey) {
-        var _this = this;
+        var _this = this, hasUnsaved;
 
         if (!objectKey) {
             objectKey = this.classProperties['object'];
@@ -1238,7 +1242,7 @@ jarves.WindowCombine = new Class({
 
         if (this.currentAdd) {
             //TODO check unsaved
-            var hasUnsaved = this.currentAdd.hasUnsavedChanges();
+            hasUnsaved = this.currentAdd.hasUnsavedChanges();
             this.currentAdd.destroy();
             this.currentAdd = null;
         }
@@ -1289,7 +1293,7 @@ jarves.WindowCombine = new Class({
             }.bind(this));
 
         } else {
-            var hasUnsaved = this.currentEdit.hasUnsavedChanges();
+            hasUnsaved = this.currentEdit.hasUnsavedChanges();
 
             if (hasUnsaved) {
                 this.win.interruptClose = true;
@@ -1558,11 +1562,11 @@ jarves.WindowCombine = new Class({
             }
 
         }.bind(this)}).get({
-                order: this.order,
-                filter: this.searchEnable,
-                lang: (this.languageSelect) ? this.languageSelect.getValue() : null,
-                filterVals: (this.searchEnable) ? this.getSearchVals() : null
-            });
+            order: this.order,
+            filter: this.searchEnable,
+            lang: (this.languageSelect) ? this.languageSelect.getValue() : null,
+            filterVals: (this.searchEnable) ? this.getSearchVals() : null
+        });
     },
 
     saved: function(pItem, pRes) {

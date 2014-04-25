@@ -248,6 +248,12 @@ jarves.WindowList = new Class({
         }
     },
 
+    getLanguage: function() {
+        if (this.languageSelect) {
+           return this.languageSelect.getValue();
+        }
+    },
+
     renderLayout: function () {
         this.win.getTitleGroupContainer().setStyle('margin-bottom', 10);
         this.renderLayoutTable();
