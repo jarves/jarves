@@ -259,7 +259,7 @@ class ACL
     public function getListingCondition($objectKey, $table = '')
     {
         $objectKey = Objects::normalizeObjectKey($objectKey);
-        $obj = $this->getObjects()->getClass($objectKey);
+        $obj = $this->getObjects()->getStorageController($objectKey);
         $rules =& self::getRules($objectKey, static::LISTING);
 
         if (count($rules) == 0) {
@@ -648,7 +648,7 @@ class ACL
             }
         }
 
-        if ($targetId == 1) {
+        if (1 === $targetId || null === $targetId) {
             return true;
         }
 

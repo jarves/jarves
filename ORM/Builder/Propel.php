@@ -310,7 +310,12 @@ class Propel implements BuildInterface
 
     protected function addRelation(Object $object, RelationDefinitionInterface $relation, &$xmlTable)
     {
-        if (ORMAbstract::MANY_TO_ONE == $relation->getType()) {
+        $possibleRelations = [
+            ORMAbstract::MANY_TO_ONE,
+            ORMAbstract::ONE_TO_ONE
+        ];
+
+        if (in_array($relation->getType(), $possibleRelations)) {
             $this->addForeignKey($object, $relation, $xmlTable);
         }
     }

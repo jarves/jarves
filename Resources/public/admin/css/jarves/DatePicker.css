@@ -35,13 +35,14 @@
 
 .jarves-datePicker-month span,
 .jarves-datePicker-year span {
-    padding: 0px 2px;
+    padding: 0 2px;
 }
 
-.jarves-datePicker-month a,
-.jarves-datePicker-year a {
-    position: relative;
-    top: -1px;
+.jarves-datePicker-month a.jarves-Button,
+.jarves-datePicker-year a.jarves-Button {
+    width: 20px;
+    padding-left: 5px;
+    margin-left: 0;
 }
 
 .jarves-datePicker-year {

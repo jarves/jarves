@@ -164,6 +164,40 @@ class PropelBuilderTest extends KernelAwareTestCase
         $this->assertEquals($expected, $schema);
     }
 
+    /**
+     * @group test
+     */
+    public function testSchemaPageContents()
+    {
+        $xml = '
+<object id="Object1">
+  <dataModel>propel</dataModel>
+  <table>test_object1</table>
+  <fields>
+    <field id="id" type="number" autoIncrement="true" primaryKey="true"/>
+    <field id="title" type="text"/>
+    <field id="contents" type="pageContents"/>
+  </fields>
+</object>
+';
+
+        $expected = '<database>
+  <table name="test_object1" phpName="Object1">
+    <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+    <column name="title" type="VARCHAR" size="255"/>
+    <vendor type="mysql">
+      <parameter name="Charset" value="utf8"/>
+    </vendor>
+  </table>
+</database>';
+
+        $schema = $this->getSchema($xml);
+        $this->assertEquals($expected, $schema);
+    }
+
+    /**
+     * @group test
+     */
     public function testSchemaObjectNtoM()
     {
         $xml = '
@@ -201,12 +235,19 @@ class PropelBuilderTest extends KernelAwareTestCase
         $this->assertTrue($object1User->isCrossRef());
 
         $this->assertCount(2, $object1User->getFields());
+        $this->assertCount(2, $object1User->getRelations());
         $schema = $this->getBuilder()->getSchema($object1User);
 
         $expectedCrossSchema = '<database>
   <table name="test_object_one_user" phpName="ObjectOneUser" isCrossRef="true">
     <column name="object_one_id" type="INTEGER" primaryKey="true"/>
     <column name="owner_id" type="INTEGER" primaryKey="true"/>
+    <foreign-key phpName="ObjectOne" foreignTable="test_object_one" onDelete="cascade" onUpdate="cascade">
+      <reference local="object_one_id" foreign="id"/>
+    </foreign-key>
+    <foreign-key phpName="Owner" foreignTable="system_user" onDelete="cascade" onUpdate="cascade">
+      <reference local="owner_id" foreign="id"/>
+    </foreign-key>
     <vendor type="mysql">
       <parameter name="Charset" value="utf8"/>
     </vendor>

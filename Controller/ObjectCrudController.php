@@ -5,6 +5,7 @@ namespace Jarves\Controller;
 use FOS\RestBundle\Request\ParamFetcher;
 use Jarves\Admin\ObjectCrud;
 use Jarves\Configuration\EntryPoint;
+use Jarves\Objects;
 use Jarves\Tools;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -21,7 +22,7 @@ abstract class ObjectCrudController extends ObjectCrud
     protected function detectObjectKeyFromPathInfo()
     {
         $request = $this->getRequest();
-        Return $request ? $request->attributes->get('_jarves_object') : '';
+        Return $request ? Objects::normalizeObjectKey($request->attributes->get('_jarves_object')) : '';
     }
 
 //    maybe in v1.1
@@ -158,7 +159,7 @@ abstract class ObjectCrudController extends ObjectCrud
 
         $primaryKey = $this->extractPrimaryKey($request);
 
-        return $obj->update($request, $primaryKey);
+        return $obj->update($primaryKey, $request);
     }
 
     /**
@@ -179,7 +180,7 @@ abstract class ObjectCrudController extends ObjectCrud
 
         $primaryKey = $this->extractPrimaryKey($request);
 
-        return $obj->patch($request, $primaryKey);
+        return $obj->patch($primaryKey, $request);
     }
 
     /**

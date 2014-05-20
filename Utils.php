@@ -107,12 +107,15 @@ class Utils
             $itemLabel = '#' . $item[$pks[0]->getId()];
         }
 
-        if ($this->getJarves()->getClient()->getUser()->getFirstName() || $this->getJarves()->getClient()->getUser()->getLastName()) {
-            $username = $this->getJarves()->getClient()->getUser()->getFirstName();
-            if ($username) $username .= ' ';
-            $username .= $this->getJarves()->getClient()->getUser()->getLastName();
-        } else {
-            $username = $this->getJarves()->getClient()->getUser()->getUsername();
+        $username = '[Unknown]';
+        if ($this->getJarves()->getClient() && $this->getJarves()->getClient()->getUser()) {
+            if ($this->getJarves()->getClient()->getUser()->getFirstName() || $this->getJarves()->getClient()->getUser()->getLastName()) {
+                $username = $this->getJarves()->getClient()->getUser()->getFirstName();
+                if ($username) $username .= ' ';
+                $username .= $this->getJarves()->getClient()->getUser()->getLastName();
+            } else {
+                $username = $this->getJarves()->getClient()->getUser()->getUsername();
+            }
         }
 
         $newsFeed = new \Jarves\Model\NewsFeed();

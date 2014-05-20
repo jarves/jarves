@@ -2,6 +2,8 @@
 
 namespace Jarves\Tests\Service\Object;
 
+use Jarves\Model\GroupQuery;
+use Jarves\Model\UserQuery;
 use Jarves\Propel\StandardEnglishPluralizer;
 use Jarves\Tests\KernelAwareTestCase;
 use Test\Model\ContentElementItemQuery;
@@ -94,6 +96,38 @@ class RelationTest extends KernelAwareTestCase
         $this->assertCount(2, $addedItem['content']);
         $this->assertEquals('Hello World', $addedItem['content'][0]['content']);
         $this->assertEquals('Hello Peter', $addedItem['content'][1]['content']);
+    }
+
+    public function testNtoNRelation()
+    {
+        UserQuery::create()->filterByUsername('testNtoNRelation')->delete();
+        GroupQuery::create()->filterByName('testGroupNtoNRelation')->delete();
+
+        $groupPk = $this->getObjects()->add(
+            'jarves/group',
+            [
+                'name' => 'testGroupNtoNRelation'
+            ]
+        );
+
+        $this->assertGreaterThan(0, $groupPk['id']);
+
+        $pk = $this->getObjects()->add(
+            'jarves/user',
+            [
+                'username' => 'testNtoNRelation',
+                'password' => 'testNtoNRelationPassword',
+                'groupMembership' => [$groupPk['id']]
+            ]
+        );
+        $this->assertGreaterThan(0, $pk['id']);
+
+        $user = $this->getObjects()->get('jarves/user', $pk);
+        $this->assertEquals('testNtoNRelation', $user['username']);
+
+        $this->assertNotEquals('', $user['password']);
+        $this->assertNotEquals('testNtoNRelationPassword', $user['password']);
+        $this->assertNotEquals('', $user['passwordSalt']);
     }
 
     public function testManyToOne()

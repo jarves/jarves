@@ -8,11 +8,11 @@ use Jarves\Tools;
 /**
  * ORM Abstract class for objects.
  *
- * Please do not handle 'permissionCheck' in $pOptions. This is handled in \Jarves\Object.
+ * Please do not handle 'permissionCheck' in $options. This is handled in \Jarves\Object.
  * You will get in getList() a complex $pCondition object instead (if there are any ACL items)
  *
  *
- * $pPk is an array with following format
+ * $pk is an array with following format
  *
  *  array(
  *      '<keyName>'  => <value>
@@ -390,16 +390,15 @@ abstract class ORMAbstract
     /**
      * Moves a item to a new position.
      *
-     * @param  array                    $pk              Full PK as array
-     * @param  array                    $targetPk        Full PK as array
-     * @param  string                   $position        `first` (child), `last` (last child), `prev` (sibling), `next` (sibling)
-     * @param                           $targetObjectKey
-     *
-     * @throws \NotImplementedException
+     * @param  array  $pk              Full PK as array
+     * @param  array  $targetPk        Full PK as array
+     * @param  string $position        `first` (child), `last` (last child), `prev` (sibling), `next` (sibling)
+     * @param         $targetObjectKey
+     * @return boolean
      */
     public function move($pk, $targetPk, $position = 'first', $targetObjectKey = null)
     {
-        throw new \NotImplementedException('Move method is not implemented for this object layer.');
+        throw new \Exception('Move method is not implemented for this object layer.');
     }
 
     /**
@@ -421,7 +420,6 @@ abstract class ORMAbstract
      * @param  mixed                    $scope
      * @param  array                    $options
      *
-     * @throws \NotImplementedException
      * @throws \Exception
      *
      * @return array
@@ -429,17 +427,23 @@ abstract class ORMAbstract
     public function getBranch($pk = null, Condition $condition = null, $depth = 1, $scope = null, $options = null)
     {
         if (!$this->getDefinition()->isNested()) {
-            throw new \Exception(t('Object %s it not a nested set.', $this->objectKey));
+            throw new \Exception(sprintf('Object %s it not a nested set.', $this->objectKey));
         }
-        throw new \NotImplementedException(t('getBranch is not implemented.'));
+        throw new \Exception(sprintf('getBranch is not implemented.'));
     }
 
-
+    /**
+     * @param null $pk
+     * @param Condition $condition
+     * @param null $scope
+     *
+     * @return array
+     */
     public function getBranchChildrenCount($pk = null, Condition $condition = null, $scope = null){
         if (!$this->getDefinition()->isNested()) {
-            throw new \Exception(t('Object %s it not a nested set.', $this->objectKey));
+            throw new \Exception(sprintf('Object %s it not a nested set.', $this->objectKey));
         }
-        throw new \NotImplementedException(t('getBranch is not implemented.'));
+        throw new \Exception(sprintf('getBranch is not implemented.'));
     }
 
     /**
@@ -450,7 +454,7 @@ abstract class ORMAbstract
     public function getRoots(Condition $condition = null, $options = null)
     {
          if (!$this->definition['nested']) {
-            throw new \LogicException(t('Object %s it not a nested set.', $this->objectKey));
+            throw new \LogicException(sprintf('Object %s it not a nested set.', $this->objectKey));
          }
          return null;
     }
@@ -462,12 +466,11 @@ abstract class ORMAbstract
      * @param  array  $pk
      * @param  array  $options
      *
-     * @throws \NotImplementedException
      * @return mixed
      */
     public function getParent($pk, $options = null)
     {
-        throw new \NotImplementedException(t('getParent is not implemented.'));
+        throw new \Exception(sprintf('getParent is not implemented.'));
     }
 
     /**
@@ -476,13 +479,13 @@ abstract class ORMAbstract
      * Root object first.
      * Each entry has to have also '_objectKey' as value.
      *
-     * @param  array                    $pk
+     * @param array $pk
+     * @return array
      *
-     * @throws \NotImplementedException
      */
     public function getParents($pk)
     {
-        throw new \NotImplementedException(t('getParents is not implemented.'));
+        throw new \Exception(sprintf('getParents is not implemented.'));
     }
 
 

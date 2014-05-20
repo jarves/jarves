@@ -497,6 +497,14 @@ class Jarves extends Controller
     }
 
     /**
+     * @param Configuration\Configs $configs
+     */
+    public function setConfigs(Configuration\Configs $configs)
+    {
+        $this->configs = $configs;
+    }
+
+    /**
      * Returns all Symfony Bundles.
      *
      * @return \Symfony\Component\HttpKernel\Bundle\BundleInterface[]
@@ -846,16 +854,7 @@ class Jarves extends Controller
 
         if (!$this->configs) {
             $this->configs = new Configuration\Configs($this, $bundles);
-            $i = 0;
-            while (++$i && $this->configs->boot()) {
-                if ($i > 100) {
-                    $triggeredReboots = $this->configs->getTriggeredReboots();
-                    throw new \Exception(sprintf(
-                        'Can not boot bundle configuration, there is a recursive loop. [%s]',
-                        json_encode($triggeredReboots)
-                    ));
-                }
-            }
+            $this->configs->boot();
             $cached = serialize(
                 [
                     'md5' => $hash,

@@ -43,7 +43,7 @@ jarves.FieldTypes.Datetime = new Class({
             this.win.addEvent('move', this.datePicker.updatePos.bind(this.datePicker));
         }
 
-        this.datePicker.addEvent('change', this.fieldInstance.fireChange);
+        this.datePicker.addEvent('change', this.fireChange);
 
         if (this.options['default']) {
             var time = new Date(this.field['default'] == 'now' ? null : this.field['default']).getTime();

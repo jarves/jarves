@@ -2,11 +2,15 @@
 
 namespace Jarves;
 
+use Jarves\Admin\ObjectCrud;
 use Jarves\Configuration\Condition;
 use Jarves\Exceptions\AccessDeniedException;
+use Jarves\Exceptions\BundleNotFoundException;
 use Jarves\Exceptions\InvalidArgumentException;
 use Jarves\Exceptions\ObjectNotFoundException;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
+use Symfony\Component\HttpFoundation\Request;
 
 class Objects
 {
@@ -214,7 +218,7 @@ class Objects
      *
      * @param  string $objectKey `Core\Language` or `Core.Language`.
      *
-     * @return Configuration\Object
+     * @return Configuration\Object|null
      */
     public function getDefinition($objectKey)
     {
@@ -292,19 +296,17 @@ class Objects
      * Returns true of the object is nested.
      *
      * @param  string $objectKey
+     * @throws Exceptions\ObjectNotFoundException when object is not found
      *
-     * @return mixed
+     * @return boolean
      */
     public function isNested($objectKey)
     {
-        static $nested;
-        if ($nested && $nested[$objectKey]) {
-            return $nested[$objectKey];
+        $definition = $this->getDefinition($objectKey);
+        if (!$definition) {
+            throw new ObjectNotFoundException(sprintf('Object %s not found', $objectKey));
         }
-        $def = $this->getDefinition($objectKey);
-        $nested[$objectKey] = ($def['nested']) ? true : false;
-
-        return $nested[$objectKey];
+        return $definition->isNested();
     }
 
     /**
@@ -347,7 +349,7 @@ class Objects
      */
     public function parsePk($objectKey, $primaryKey)
     {
-        $obj = $this->getClass($objectKey);
+        $obj = $this->getStorageController($objectKey);
 
         $objectIds = $obj->primaryStringToArray($primaryKey);
 
@@ -544,62 +546,9 @@ class Objects
      */
     public function get($objectKey, $pk, $options = array())
     {
-        $obj = $this->getClass($objectKey);
-        $primaryKey = $obj->normalizePrimaryKey($pk);
-        $pk2s = $obj->getPrimaryKeys();
-        $deleteFieldValues = null;
+        $controller = $this->getController($objectKey, $options);
 
-        if (!@$options['fields']) {
-            if ($selection = $obj->definition->getDefaultSelection()) {
-                $options['fields'] = $selection;
-            } else {
-                $options['fields'] = '*';
-            }
-        }
-
-        if ($options['fields'] != '*' && $limitDataSets = $obj->definition->getLimitDataSets()) {
-
-            if (is_string($options['fields'])) {
-                $options['fields'] = explode(',', trim(str_replace(' ', '', $options['fields'])));
-            }
-
-            $extraFields = $limitDataSets->extractFields();
-            $deleteFieldValues = array();
-
-            foreach ($extraFields as $field) {
-                if ($obj->definition->getField($field)) {
-                    if (array_search($field, $options['fields']) === false && array_search($field, $pk2s) === false) {
-                        $options['fields'][] = $field;
-                        $deleteFieldValues[] = $field;
-                    }
-                }
-            }
-        }
-
-        $item = $obj->getItem($primaryKey, $options);
-
-        if (!$item) {
-            return null;
-        }
-
-        if (@$options['permissionCheck'] && !$this->getJarves()->getACL()->checkViewExact($objectKey, $pk)) {
-            return null;
-        }
-
-        if ($limitDataSets = $obj->definition->getLimitDataSets()) {
-            if (!$this->satisfy($item, $limitDataSets)) {
-                return null;
-            }
-        }
-
-        if ($deleteFieldValues) {
-            foreach ($deleteFieldValues as $field) {
-                unset($item[$field]);
-            }
-        }
-
-        return $item;
-
+        return $controller->getItem($pk);
     }
 
     /**
@@ -630,33 +579,9 @@ class Objects
      */
     public function getList($objectKey, $condition = null, $options = array())
     {
-        $obj = $this->getClass($objectKey);
-        $definition = $this->getDefinition($objectKey);
+        $controller = $this->getController($objectKey, $options);
 
-        if (!isset($options['fields'])) {
-            $options['fields'] = $definition->getDefaultSelection() ? : '*';
-        }
-
-        $conditionObject = new \Jarves\Configuration\Condition(null, $this->getJarves());
-
-        if ($condition && is_array($condition)) {
-            $conditionObject->fromPk($condition, $objectKey);
-        } else if ($condition instanceof Condition) {
-            $conditionObject = $condition;
-        } else {
-            $conditionObject = new \Jarves\Configuration\Condition(null, $this->getJarves());
-        }
-
-        if ($limit = $obj->getDefinition()->getLimitDataSets()) {
-            $conditionObject->mergeAnd($limit);
-        }
-
-        if (@$options['permissionCheck'] && $aclCondition = $this->getJarves()->getACL()->getListingCondition($objectKey)) {
-            $conditionObject->mergeAndBegin($aclCondition);
-        }
-
-        return $obj->getItems($conditionObject, $options);
-
+        return $controller->getItems($condition);
     }
 
     /**
@@ -668,7 +593,7 @@ class Objects
      * @throws ObjectNotFoundException
      * @throws \Exception
      */
-    public function &getClass($objectKey)
+    public function getStorageController($objectKey)
     {
         if (!isset($this->instances[$objectKey])) {
             $definition = $this->getDefinition($objectKey);
@@ -716,7 +641,7 @@ class Objects
      */
     public function clear($objectKey)
     {
-        $obj = $this->getClass($objectKey);
+        $obj = $this->getStorageController($objectKey);
 
         return $obj->clear();
     }
@@ -732,28 +657,13 @@ class Objects
      */
     public function getCount($objectKey, $condition = null, array $options = array())
     {
-        $obj = $this->getClass($objectKey);
+        $controller = $this->getController($objectKey);
 
-        $conditionObject = new \Jarves\Configuration\Condition(null, $this->getJarves());
-
-        if ($condition && is_array($condition)) {
-            $conditionObject->fromPk($condition, $objectKey);
-        } else if ($condition instanceof Condition) {
-            $conditionObject = $condition;
-        } else {
-            $conditionObject = new \Jarves\Configuration\Condition(null, $this->getJarves());
+        if (isset($options['permissionCheck'])) {
+            $controller->setPermissionCheck($options['permissionCheck']);
         }
 
-        if ($limit = $obj->getDefinition()->getLimitDataSets()) {
-            $conditionObject->mergeAnd($limit);
-        }
-
-        if (@$options['permissionCheck'] && $aclCondition = $this->getJarves()->getACL()->getListingCondition($objectKey)) {
-            $conditionObject->mergeAndBegin($aclCondition);
-        }
-
-
-        return $obj->getCount($conditionObject);
+        return $controller->getCount($condition, @$options['query']);
     }
 
     /**
@@ -774,28 +684,13 @@ class Objects
         $scope = null,
         array $options = array()
     ) {
-        $obj = $this->getClass($objectKey);
 
-        if ($pk) {
-            $pk = $obj->normalizePrimaryKey($pk);
+        $controller = $this->getController($objectKey);
+        if (isset($options['permissionCheck'])) {
+            $controller->setPermissionCheck($options['permissionCheck']);
         }
 
-        $conditionObject = new Condition(null, $this->getJarves());
-
-        if ($condition) {
-            $conditionObject->fromPk($condition, $objectKey);
-        }
-
-        if ($limit = $obj->getDefinition()->getLimitDataSets()) {
-            $conditionObject->mergeAnd($limit);
-        }
-
-        if (@$options['permissionCheck'] && $aclCondition = $this->getJarves()->getACL()->getListingCondition($objectKey)) {
-            $conditionObject->mergeAndBegin($aclCondition);
-        }
-
-        return $obj->getBranchChildrenCount($pk, $conditionObject, $scope, $options);
-
+        return $controller->getBranchChildrenCount($pk, $scope, $condition);
     }
 
     /**
@@ -829,67 +724,51 @@ class Objects
             $targetObjectKey = Objects::normalizeObjectKey($targetObjectKey);
         }
 
-        $obj = $this->getClass($objectKey);
+        $controller = $this->getController($objectKey, $options);
 
-        if (@$options['permissionCheck']) {
+        return $controller->add($values, $targetPk, $position, $targetObjectKey);
+    }
 
-            foreach ($values as $fieldName => $value) {
-
-                //todo, what if $targetObjectKey differs from $objectKey
-
-                if (!$this->getJarves()->getACL()->checkAdd($objectKey, $targetPk, $fieldName)) {
-                    throw new \NoFieldWritePermission(sprintf(
-                        "No update permission to field '%s' in item '%s' from object '%s'",
-                        $fieldName,
-                        $targetPk,
-                        $objectKey
-                    ));
-                }
+    /**
+     * @param string $objectKey
+     * @param array $options
+     * @return ObjectCrud
+     */
+    public function getController($objectKey, array $options = array())
+    {
+        $definition = $this->getDefinition($objectKey);
+        if ($controllerId = $definition->getController()) {
+            if (class_exists($controllerId)) {
+                $controller = new $controllerId();
+            } else {
+                $controller = $this->getJarves()->getContainer()->get($controllerId);
             }
-        }
-
-        $args = [
-            'pk' => $targetPk,
-            'values' => &$values,
-            'options' => &$options,
-            'position' => &$position,
-            'targetObjectKey' => &$targetObjectKey,
-            'mode' => 'add'
-        ];
-        $eventPre = new GenericEvent($objectKey, $args);
-
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify-pre', $eventPre);
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/add-pre', $eventPre);
-
-        if ($targetObjectKey && $targetObjectKey != $objectKey) {
-            if ($position == 'prev' || $position == 'next') {
-                throw new \InvalidArgumentException(
-                    sprintf('Its not possible to use `prev` or `next` to add a new entry with a different object key. [target: %s, self: %s]',
-                        $targetObjectKey, $objectKey)
-                );
-            }
-
-            $targetPk = $this->normalizePk($targetObjectKey, $targetPk);
-
-            //since propel's nested set behaviour only allows a single value as scope, we need to use the first pk
-            $scope = current($targetPk);
-
-            $result = $obj->add($values, null, $position, $scope);
         } else {
-            $result = $obj->add($values, $targetPk, $position);
+            $controller = new ObjectCrud();
         }
 
-        if (@$options['newsFeed']) {
-            $this->getJarves()->getUtils()->newNewsFeed($objectKey, $values, 'added');
+        if ($controller instanceof ContainerAwareInterface) {
+            $controller->setContainer($this->getJarves()->getContainer());
         }
 
-        $args['result'] = $result;
-        $event = new GenericEvent($objectKey, $args);
+        $controller->setPermissionCheck(false);
+        if (isset($options['permissionCheck'])) {
+            $controller->setPermissionCheck($options['permissionCheck']);
+        }
 
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify', $event);
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/add', $event);
+        $controller->setWithNewsFeed(false);
+        if (isset($options['newsFeed'])) {
+            $controller->setWithNewsFeed($options['newsFeed']);
+        }
 
-        return $result;
+        if (isset($options['fields'])) {
+            $controller->setExtraSelection($options['fields']);
+        }
+
+        $controller->setObject($objectKey);
+        $controller->initialize();
+
+        return $controller;
     }
 
     /**
@@ -919,53 +798,9 @@ class Objects
      */
     public function update($objectKey, $pk, $values, array $options = array())
     {
-        $item = $this->get($objectKey, $pk, $options);
+        $controller = $this->getController($objectKey, $options);
 
-        if (@$options['permissionCheck']) {
-
-            if (!$item) {
-                return false;
-            }
-
-            if (!$this->getJarves()->getACL()->checkUpdateExact($objectKey, $pk)) {
-                return false;
-            }
-
-            foreach ($values as $fieldName => $value) {
-                if (!$this->getJarves()->getACL()->checkUpdateExact($objectKey, $pk, [$fieldName => $value])) {
-                    throw new \NoFieldWritePermission(sprintf("No update permission to field '%s' in item '%s' from object '%s'", $fieldName, $pk, $objectKey));
-                }
-            }
-        }
-
-        $objectKey = Objects::normalizeObjectKey($objectKey);
-        $obj = $this->getClass($objectKey);
-        $primaryKey = $obj->normalizePrimaryKey($pk);
-
-        $args = [
-            'pk' => $pk,
-            'values' => &$values,
-            'options' => &$options,
-            'mode' => 'update'
-        ];
-        $eventPre = new GenericEvent($objectKey, $args);
-
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify-pre', $eventPre);
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/update-pre', $eventPre);
-
-        $result = $obj->update($primaryKey, $values);
-
-        if (@$options['newsFeed']) {
-            $this->getJarves()->getUtils()->newNewsFeed($objectKey, $item, 'updated');
-        }
-
-        $args['result'] = $result;
-        $event = new GenericEvent($objectKey, $args);
-
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify', $event);
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/update', $event);
-
-        return $result;
+        return $controller->update($pk, $values);
     }
 
     /**
@@ -981,48 +816,9 @@ class Objects
      */
     public function patch($objectKey, $pk, $values, array $options = array())
     {
-        $objectKey = Objects::normalizeObjectKey($objectKey);
-        $obj = $this->getClass($objectKey);
-        $pk = $obj->normalizePrimaryKey($pk);
+        $controller = $this->getController($objectKey, $options);
 
-        $item = $this->get($objectKey, $pk, $options);
-
-        if (@$options['permissionCheck']) {
-            if (!$item) {
-                return false;
-            }
-
-            foreach ($values as $fieldName => $value) {
-                if (!$this->getJarves()->getACL()->checkUpdateExact($objectKey, $pk, [$fieldName => $value])) {
-                    throw new AccessDeniedException(sprintf("No update permission to field '%s' in item '%s' from object '%s'", $fieldName, $pk, $objectKey));
-                }
-            }
-        }
-
-        $args = [
-            'pk' => $pk,
-            'values' => &$values,
-            'options' => &$options,
-            'mode' => 'update'
-        ];
-        $eventPre = new GenericEvent($objectKey, $args);
-
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify-pre', $eventPre);
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/patch-pre', $eventPre);
-
-        $result = $obj->patch($pk, $values);
-
-        if (@$options['newsFeed']) {
-            $this->getJarves()->getUtils()->newNewsFeed($objectKey, $item, 'updated');
-        }
-
-        $args['result'] = $result;
-        $event = new GenericEvent($objectKey, $args);
-
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify', $event);
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/patch', $event);
-
-        return $result;
+        return $controller->patch($pk, $values);
     }
 
 
@@ -1051,38 +847,9 @@ class Objects
      */
     public function remove($objectKey, $pk, array $options = array())
     {
-        $objectKey = Objects::normalizeObjectKey($objectKey);
-        $obj = $this->getClass($objectKey);
-        $primaryKey = $obj->normalizePrimaryKey($pk);
+        $controller = $this->getController($objectKey, $options);
 
-        $item = $this->get($objectKey, $pk, $options);
-
-        if (!$item) {
-            return false;
-        }
-
-        $args = [
-            'pk' => $pk,
-            'mode' => 'remove'
-        ];
-        $eventPre = new GenericEvent($objectKey, $args);
-
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify-pre', $eventPre);
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/remove-pre', $eventPre);
-
-        $result = $obj->remove($primaryKey);
-
-        $args['result'] = $result;
-        $event = new GenericEvent($objectKey, $args);
-
-        if (@$options['newsFeed']) {
-            $this->getJarves()->getUtils()->newNewsFeed($objectKey, $item, 'removed');
-        }
-
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify', $event);
-        $this->getJarves()->getEventDispatcher()->dispatch('core/object/remove', $event);
-
-        return $result;
+        return $controller->remove($pk);
     }
 
     /*
@@ -1112,15 +879,9 @@ class Objects
      */
     public function getRoot($objectKey, $scope, array $options = array())
     {
-        $definition = $this->getDefinition($objectKey);
+        $controller = $this->getController($objectKey, $options);
 
-        if ($definition->getNestedRootAsObject() && $scope === null) {
-            throw new \Exception('No `scope` defined.');
-        }
-
-        $options['fields'] = $definition->getNestedRootObjectLabelField();
-
-        return $this->get($definition->getNestedRootObject(), $scope, $options);
+        return $controller->getRoot($scope);
     }
 
     /**
@@ -1135,34 +896,9 @@ class Objects
      */
     public function getRoots($objectKey, $condition = null, array $options = array())
     {
-        $definition = $this->getDefinition($objectKey);
+        $controller = $this->getController($objectKey, $options);
 
-        if (!$definition->isNested()) {
-            throw new \Exception('Object is not a nested set.');
-        }
-
-        if ($definition->getNestedRootObjectLabelField() && !@$options['fields']) {
-            $options['fields'] = $definition->getNestedRootObjectLabelField();
-        }
-
-        if ($definition->getNestedRootAsObject()) {
-            return $this->getList($definition->getNestedRootObject(), null, $options);
-        } else {
-            $obj = $this->getClass($objectKey);
-
-            $conditionObject = new Condition(null, $this->getJarves());
-
-            if ($condition) {
-                $conditionObject->fromPk($condition, $objectKey);
-            }
-
-            if (@$options['permissionCheck'] && $aclCondition = $this->getJarves()->getACL()->getListingCondition($objectKey)) {
-                $conditionObject->mergeAndBegin($aclCondition);
-            }
-
-            return $obj->getRoots($conditionObject, $options);
-
-        }
+        return $controller->getRoots($condition);
     }
 
     /**
@@ -1186,48 +922,10 @@ class Objects
         $scope = null,
         array $options = array()
     ) {
-        $obj = $this->getClass($objectKey);
-        $definition = $this->getDefinition($objectKey);
 
-        if (null !== $pk) {
-            $pk = $obj->normalizePrimaryKey($pk);
-        }
+        $controller = $this->getController($objectKey, $options);
 
-        if (null === $pk && $definition->getNestedRootAsObject() && $scope === null) {
-            throw new \Exception('No scope defined.');
-        }
-
-        if (!@$options['fields']) {
-
-            $fields = array();
-            if ($rootField = $definition->getNestedRootObjectLabelField()) {
-                $fields[] = $rootField;
-            }
-
-            if ($extraFields = $definition->getNestedRootObjectExtraFields()) {
-                $extraFields = explode(',', trim(str_replace(' ', '', $extraFields)));
-                foreach ($extraFields as $field) {
-                    $fields[] = $field;
-                }
-            }
-            $options['fields'] = implode(',', $fields);
-        }
-
-        $conditionObject = new Condition(null, $this->getJarves());
-
-        if ($condition) {
-            $conditionObject->fromPk($condition, $objectKey);
-        }
-
-        if ($limit = $obj->getDefinition()->getLimitDataSets()) {
-            $conditionObject->mergeAnd($limit);
-        }
-
-        if (@$options['permissionCheck'] && $aclCondition = $this->getJarves()->getACL()->getListingCondition($objectKey)) {
-            $conditionObject->mergeAndBegin($aclCondition);
-        }
-
-        return $obj->getBranch($pk, $conditionObject, $depth, $scope, $options);
+        return $controller->getBranchItems($pk, $condition, null, $scope, $depth);
 
     }
 
@@ -1291,7 +989,7 @@ class Objects
      */
     public function getParentPk($objectKey, $pk)
     {
-        $obj = $this->getClass($objectKey);
+        $obj = $this->getStorageController($objectKey);
         $pk2 = $obj->normalizePrimaryKey($pk);
 
         return $obj->getParentId($pk2);
@@ -1320,12 +1018,10 @@ class Objects
      *
      * @return mixed
      */
-    public function getParent($objectKey, $pk, $options = null)
+    public function getParent($objectKey, $pk)
     {
-        $obj = $this->getClass($objectKey);
-        $pk2 = $obj->normalizePrimaryKey($pk);
-
-        return $obj->getParent($pk2, $options);
+        $controller = $this->getController($objectKey);
+        return $controller->getParent($pk);
     }
 
     /**
@@ -1360,11 +1056,13 @@ class Objects
      * @param  mixed  $pk
      * @param  array  $options
      *
+     * @todo implement it
+     *
      * @return array
      */
     public function getVersions($objectKey, $pk, $options = null)
     {
-        $obj = $this->getClass($objectKey);
+        $obj = $this->getStorageController($objectKey);
         $pk2 = $obj->normalizePrimaryKey($pk);
 
         return $obj->getVersions($pk2, $options);
@@ -1390,7 +1088,7 @@ class Objects
      */
     public function normalizePk($objectKey, $pk)
     {
-        $obj = $this->getClass($objectKey);
+        $obj = $this->getStorageController($objectKey);
 
         return $obj->normalizePrimaryKey($pk);
     }
@@ -1431,7 +1129,7 @@ class Objects
             return $pkString;
         }
 
-        $obj = $this->getClass($objectKey);
+        $obj = $this->getStorageController($objectKey);
         $objectIds = $obj->primaryStringToArray($pkString);
 
         return @$objectIds[0];
@@ -1448,10 +1146,13 @@ class Objects
      */
     public function getParents($objectKey, $pk, $options = null)
     {
-        $obj = $this->getClass($objectKey);
-        $pk2 = $obj->normalizePrimaryKey($pk);
+        $controller = $this->getController($objectKey);
 
-        return $obj->getParents($pk2, $options);
+        if (isset($options['permissionCheck'])) {
+            $controller->setPermissionCheck($options['permissionCheck']);
+        }
+
+        return $controller->getParents($pk);
     }
 
     /**
@@ -1477,7 +1178,6 @@ class Objects
      * @param  string $position        `first` (child), `last` (last child), `prev` (sibling), `next` (sibling)
      * @param  string $targetObjectKey
      * @param  array  $options
-     * @param  bool   $overwrite
      *
      * @return mixed
      */
@@ -1487,22 +1187,12 @@ class Objects
         $targetPk,
         $position = 'first',
         $targetObjectKey = null,
-        $options,
-        $overwrite = false
+        $options
+//        $overwrite = false
     ) {
-        $obj = $this->getClass($objectKey);
+        $controller = $this->getController($objectKey, $options);
 
-        $pk2 = $obj->normalizePrimaryKey($pk);
-        $targetPk = $this->normalizePk($targetObjectKey ? $targetObjectKey : $objectKey, $targetPk);
-
-        //todo check access
-
-        if (@$options['newsFeed']) {
-            $item = $this->get($objectKey, $pk);
-            $this->getJarves()->getUtils()->newNewsFeed($objectKey, $item, 'moved');
-        }
-
-        return $obj->move($pk2, $targetPk, $position, $targetObjectKey, $overwrite);
+        return $controller->moveItem($pk, $targetPk, $position, $targetObjectKey);
     }
 
     /**
@@ -1520,7 +1210,7 @@ class Objects
         list($objectKey, $objectIds, ) = $this->parseUrl($sourceObjectUrl);
         list($targetObjectKey, $targetObjectIds, ) = $this->parseUrl($targetObjectUrl);
 
-        return $this->move($objectKey, $objectIds[0], $targetObjectIds[0], $targetObjectKey, $position, $options);
+        return $this->move($objectKey, $objectIds[0], $targetObjectIds[0], $position, $targetObjectKey, $options);
     }
 
     /**

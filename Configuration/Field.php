@@ -378,18 +378,16 @@ class Field extends Model
         return $this->objectDefinition;
     }
 
-    /**
-     * Do whatever is needed to setup the build environment correctly.
-     *
-     * @param \Jarves\Configuration\Object $object
-     * @param Configs $configs
-     *
-     * @return bool true for the boot has changed something on a object/field and we need to call it on other fields again.
-     */
-    public function bootBuildTime(Object $object, Configs $configs)
-    {
-        return $this->getFieldType()->bootBuildTime($object, $configs);
-    }
+//    /**
+//     * Do whatever is needed to setup the build environment correctly.
+//     *
+//     * @param \Jarves\Configuration\Object $object
+//     * @param Configs $configs
+//     */
+//    public function bootBuildTime(Object $object, Configs $configs)
+//    {
+//        $this->getFieldType()->bootBuildTime($object, $configs);
+//    }
 
     /**
      * Do whatever is needed to setup the runtime environment correctly.
@@ -398,12 +396,10 @@ class Field extends Model
      *
      * @param \Jarves\Configuration\Object $object
      * @param Configs $configs
-     *
-     * @return bool true for the boot has changed something on a object/field and we need to call it on other fields again.
      */
     public function bootRunTime(Object $object, Configs $configs)
     {
-        return $this->getFieldType()->bootRunTime($object, $configs);
+        $this->getFieldType()->bootRunTime($object, $configs);
     }
 
     /**

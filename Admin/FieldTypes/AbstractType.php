@@ -109,6 +109,10 @@ abstract class AbstractType implements TypeInterface
         $required = $this->getFieldDefinition()->isRequired()
             || ($this->getFieldDefinition()->isPrimaryKey() && !$this->getFieldDefinition()->isAutoIncrement());
 
+        if ($this->getFieldDefinition()->isAutoIncrement()) {
+            $required = false;
+        }
+
         if (!$required) {
             return [];
         }

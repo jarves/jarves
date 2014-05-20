@@ -18,15 +18,13 @@ class User extends BaseUser
      * @param string $password plain password
      *
      */
-    public function setPassword($password)
+    public function hashPassword($password)
     {
-        if (!$this->getPasswdSalt()) {
-            $this->setPasswdSalt(ClientAbstract::getSalt());
-        }
+        $this->setPasswordSalt(ClientAbstract::getSalt());
 
-        $password = ClientAbstract::getHashedPassword($password, $this->getPasswdSalt());
+        $password = ClientAbstract::getHashedPassword($password, $this->getPasswordSalt());
 
-        $this->setPasswd($password);
+        $this->setPassword($password);
     }
 
     /**

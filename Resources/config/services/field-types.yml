@@ -20,6 +20,7 @@ parameters:
      jarves.field.types.pageContents.class: Jarves\Admin\FieldTypes\TypePageContents
      jarves.field.types.wysiwyg.class: Jarves\Admin\FieldTypes\TypeWysiwyg
      jarves.field.types.password.class: Jarves\Admin\FieldTypes\TypePassword
+     jarves.field.types.userPassword.class: Jarves\Admin\FieldTypes\TypeUserPassword
      jarves.field.types.contentElements.class: Jarves\Admin\FieldTypes\TypeContentElements
      jarves.field.types.properties.class: Jarves\Admin\FieldTypes\TypeProperties
 
@@ -133,6 +134,11 @@ services:
          class: %jarves.field.types.password.class%
          tags:
              - { name: jarves.field.type, alias: password }
+
+     jarves.field.types.userPassword:
+         class: %jarves.field.types.userPassword.class%
+         tags:
+             - { name: jarves.field.type, alias: userPassword }
 
      jarves.field.types.contentElements:
          class: %jarves.field.types.contentElements.class%

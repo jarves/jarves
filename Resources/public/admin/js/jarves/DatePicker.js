@@ -122,8 +122,8 @@ jarves.DatePicker = new Class({
             text: pDate.get('date'),
             'class': myclass
         }).addEvent('click', function() {
-                this.choose(pDate, true);
-            }.bind(this)).inject(td);
+            this.choose(pDate, true);
+        }.bind(this)).inject(td);
     },
 
     choose: function(pDate, pInternal) {
@@ -185,9 +185,9 @@ jarves.DatePicker = new Class({
             this.timeMinutes.value = 0;
         }
 
-        if (e.key.toInt() == 'NaN') {
+        if (e && e.key.toInt() == 'NaN') {
             e.stop();
-        } //TODO
+        }
 
         if (this.choosenDate != null) {
             this.choosenDate.set('hours', this.timeHours.value);
@@ -340,7 +340,7 @@ jarves.DatePicker = new Class({
         if (this.options.time == true) {
             this.time = new Element('div', {'class': 'jarves-datePicker-time'}).inject(this.body);
 
-            this.timeHours = new Element('input', {'class': 'jarves-datePicker-timeHours'}).addEvent('keydown', function(e) {
+            this.timeHours = new Element('input', {'class': 'jarves-Input-text jarves-datePicker-timeHours'}).addEvent('keydown', function(e) {
                     this.setTimes.call(this, e)
                 }.bind(this)).addEvent('keyup', function(e) {
                     this.setTimes.call(this)
@@ -348,7 +348,7 @@ jarves.DatePicker = new Class({
 
             new Element('span', {text: ':'}).inject(this.time);
 
-            this.timeMinutes = new Element('input', {'class': 'jarves-datePicker-timeMinutes'}).addEvent('keydown', function(e) {
+            this.timeMinutes = new Element('input', {'class': 'jarves-Input-text jarves-datePicker-timeMinutes'}).addEvent('keydown', function(e) {
                     this.setTimes.call(this, e)
                 }.bind(this)).addEvent('keyup', function(e) {
                     this.setTimes.call(this, e)

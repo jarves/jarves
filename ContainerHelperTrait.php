@@ -106,6 +106,11 @@ trait ContainerHelperTrait
         return $this->container->get('kernel');
     }
 
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
     /**
      * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */

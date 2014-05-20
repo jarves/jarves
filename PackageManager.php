@@ -424,7 +424,7 @@ class PackageManager extends ContainerAware {
         $admin->setLastName('strator');
         $admin->setEmail('admin@localhost');
         $admin->setActivate(1);
-        $admin->setPassword('admin', $this->getJarves());
+        $admin->hashPassword('admin');
         $liveWorkspace = WorkspaceQuery::create()->findOneById(1);
         $admin->addWorkspace($liveWorkspace);
 

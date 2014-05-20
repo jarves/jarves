@@ -13,4 +13,9 @@ class TypePageContents extends AbstractSingleColumnType
     {
         return [$this->getFieldDefinition()->getId().'.*', 'layout', 'theme'];
     }
+
+    public function getColumns()
+    {
+        return [];
+    }
 }

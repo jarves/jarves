@@ -99,7 +99,7 @@ class Stream extends Model
         $controller = new $clazz();
 
         if ($controller instanceof ContainerAwareInterface) {
-            $controller->setContainer($this->getJarves()->getKernel()->getContainer());
+            $controller->setContainer($this->getJarves()->getContainer());
         }
 
         $callable = array($controller, $method);

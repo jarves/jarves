@@ -101,8 +101,6 @@ class Bundle extends Model
      */
     private $imported = [];
 
-    private $triggeredReboot = [];
-
     /**
      * @param string|BundleInterface $bundleClass
      * @param \DOMElement $bundleDoc
@@ -142,14 +140,9 @@ class Bundle extends Model
      * All bundle configs have been loaded.
      *
      * @param Configs $configs
-     *
-     * @return array|boolean truthy means we need a reboot
      */
     public function boot(Configs $configs)
     {
-        $this->triggeredReboot = [];
-        $reboot = false;
-
         if ($this->objectAttributes) {
             foreach ($this->objectAttributes as $attribute){
                 $key = $attribute->getId();
@@ -166,24 +159,16 @@ class Bundle extends Model
                     //does not exists, so attach it
                     $attribute->setAttribute(true);
                     $targetObject->addField($attribute);
-                    $reboot = true;
+                    $configs->addReboot();
                 }
             }
         }
 
         if ($this->getObjects()) {
-            foreach ($this->getObjects() as $key => $object) {
-                if ($boots = $object->bootRunTime($configs)) {
-                    $count = (isset($this->triggeredReboot[$key]) ? $this->triggeredReboot[$key]['count'] : 0) + 1;
-                    $this->triggeredReboot[$key] = [
-                        'count' => $count,
-                        'triggeredReboots' => $boots
-                    ];
-                }
+            foreach ($this->getObjects() as $object) {
+                $object->bootRunTime($configs);
             }
         }
-
-        return $this->triggeredReboot ?: $reboot;
     }
 
     /**

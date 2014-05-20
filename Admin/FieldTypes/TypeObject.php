@@ -78,31 +78,32 @@ class TypeObject extends AbstractType
         return $selection;
     }
 
-    public function bootBuildTime(Object $object, Configs $configs)
-    {
-
-    }
-
     public function bootRunTime(Object $object, Configs $configs)
     {
-        $changed = false;
         $field = $this->getFieldDefinition();
 
         //check for n-to-n relation and create crossTable
         if (ORMAbstract::MANY_TO_MANY == $field->getObjectRelation()) {
-            if ($this->defineCrossTable($object, $configs)) {
-                $changed = true;
+            if ($this->defineCrossObject($object, $configs)) {
+                $configs->addReboot(sprintf('Added crossObject for field %s', $field->getId()));
             }
         }
 
-        //check for x-to-1 objectRelations and create cross object w/ relations
-        if (ORMAbstract::MANY_TO_ONE == $field->getObjectRelation() ||
-            ORMAbstract::ONE_TO_ONE == $field->getObjectRelation()
-        ) {
-            if ($this->defineRelation($object, $configs)) {
-                $changed = true;
-            }
+//        //check for n-to-1 and one-to-one objectRelations and create cross object with relations
+//        if (ORMAbstract::MANY_TO_ONE == $field->getObjectRelation() ||
+//            ORMAbstract::ONE_TO_ONE == $field->getObjectRelation()
+//        ) {
+        if ($this->defineRelation($object, $configs)) {
+            $configs->addReboot(
+                sprintf(
+                    'Defined relation %s from %s -> %s',
+                    $field->getObjectRelation(),
+                    $object->getKey() . '.' . $field->getId(),
+                    $field->getObject()
+                )
+            );
         }
+//        }
 
         //create virtual reference-field for many-to-one relations
         if ($this->getFieldDefinition()->getObjectRelation() == \Jarves\ORM\ORMAbstract::MANY_TO_ONE) {
@@ -125,12 +126,10 @@ class TypeObject extends AbstractType
                     $virtualField->setObjectRelation(\Jarves\ORM\ORMAbstract::ONE_TO_MANY);
                     $object->addField($virtualField);
 
-                    $changed = true;
+                    $configs->addReboot(sprintf('Added virtualField for field %s', $field->getId()));
                 }
             }
         }
-
-        return $changed;
     }
 
     /**
@@ -138,7 +137,7 @@ class TypeObject extends AbstractType
      * @param Configs $configs
      * @return bool
      */
-    protected function defineCrossTable(Object $objectDefinition, Configs $configs)
+    protected function defineCrossObject(Object $objectDefinition, Configs $configs)
     {
         $changed = false;
 
@@ -150,7 +149,6 @@ class TypeObject extends AbstractType
             ucfirst($foreignObjectDefinition->getId());
         $possibleObjectKey = $bundle->getName() . '/' . $possibleObjectName;
 
-
         if (!$crossObjectKey = $this->getFieldDefinition()->getObjectRelationCrossObjectKey()) {
             $crossObjectKey = $possibleObjectKey;
         }
@@ -161,7 +159,9 @@ class TypeObject extends AbstractType
             if (!$crossObject = $configs->getObject($possibleObjectKey)) {
                 $crossObject = new Object(null, $objectDefinition->getJarves());
                 $crossObject->setId($possibleObjectName);
-                $crossObject->setTable($objectDefinition->getTable() . '_' . Tools::camelcase2Underscore($foreignObjectDefinition->getId()));
+                $crossObject->setTable(
+                    $objectDefinition->getTable() . '_' . Tools::camelcase2Underscore($foreignObjectDefinition->getId())
+                );
                 $crossObject->setExcludeFromREST(true);
                 $changed = true;
             }
@@ -172,7 +172,7 @@ class TypeObject extends AbstractType
             $changed = true;
         }
 
-        $leftFieldName = $this->getFieldDefinition()->getObjectRefRelationName() ?: $objectDefinition->getId();
+        $leftFieldName = $this->getFieldDefinition()->getObjectRefRelationName() ? : $objectDefinition->getId();
         if (!$crossObject->getField($leftFieldName)) {
             $leftObjectField = new Field(null, $objectDefinition->getJarves());
             $leftObjectField->setId($leftFieldName);
@@ -207,7 +207,7 @@ class TypeObject extends AbstractType
 
     protected function defineRelation(Object $objectDefinition, Configs $configs)
     {
-        $relation = $this->getRelation();
+        $relation = $this->getRelation($configs);
         if ($relation && !$objectDefinition->hasRelation($relation->getName())) {
             $objectDefinition->addRelation($relation);
 
@@ -216,14 +216,15 @@ class TypeObject extends AbstractType
     }
 
     /**
+     * @param Configs $configs
      * @return RelationDefinition|null
      * @throws \Jarves\Exceptions\ModelBuildException
      */
-    protected function getRelation()
+    protected function getRelation(Configs $configs)
     {
         $field = $this->getFieldDefinition();
         $columns = [];
-        $foreignObjectDefinition = $this->objects->getDefinition($field->getObject());
+        $foreignObjectDefinition = $configs->getObject($field->getObject());
 
         if (!$foreignObjectDefinition) {
             throw new ModelBuildException(sprintf(
@@ -236,7 +237,7 @@ class TypeObject extends AbstractType
 
         $relation = new RelationDefinition();
         $relation->setName($field->getId());
-        $relation->setType(ORMAbstract::MANY_TO_ONE);
+        $relation->setType($field->getObjectRelation());
         $relation->setForeignObjectKey($field->getObject());
 
         if ($refName = $field->getObjectRefRelationName()) {

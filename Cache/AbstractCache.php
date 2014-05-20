@@ -229,7 +229,7 @@ abstract class AbstractCache implements CacheInterface
                     foreach ($parents as $parent) {
                         $code .= $parent;
                         $invalidateTime = $this->getInvalidate($code);
-                        if ($invalidateTime && $invalidateTime >= $this->cache[$key]['time']) {
+                        if (is_array($this->cache[$key]) && $invalidateTime && $invalidateTime >= $this->cache[$key]['time']) {
                             $null = null;
                             return $null;
                         }

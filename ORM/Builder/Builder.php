@@ -68,7 +68,7 @@ class Builder
             if ($objects = $bundleConfig->getObjects()) {
                 foreach ($objects as $object) {
                     $this->objects[strtolower($object->getKey())] = $object;
-                    $object->bootBuildTime($this->getJarves()->getConfigs());
+//                    $object->bootBuildTime($this->getJarves()->getConfigs());
                 }
             }
         }

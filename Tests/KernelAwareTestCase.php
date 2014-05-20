@@ -32,7 +32,8 @@ class KernelAwareTestCase extends WebTestCase
         $loggedIn = $this->restCall('/jarves/admin/logged-in');
 
         if (!$loggedIn || !$loggedIn['data']) {
-            $this->restCall('/jarves/admin/login', 'POST', ['username' => 'admin', 'password' => 'admin']);
+            $response = $this->restCall('/jarves/admin/login', 'POST', ['username' => 'admin', 'password' => 'admin']);
+            $this->assertTrue(false !== $response['data']);
         }
     }
 

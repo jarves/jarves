@@ -8,8 +8,10 @@ use Jarves\Configuration\Model;
 use Jarves\Jarves;
 use Jarves\Exceptions\ObjectNotFoundException;
 use Jarves\Exceptions\Rest\ValidationFailedException;
+use Jarves\Objects;
 use Jarves\Tools;
 use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
 
 class ObjectCrud extends ContainerAware implements ObjectCrudInterface
@@ -223,6 +225,11 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
     protected $removeEntrypoint = '';
 
     /**
+     * @var bool
+     */
+    protected $withNewsFeed = true;
+
+    /**
      * Allow a client to select own fields through the REST api.
      * (?fields=...)
      *
@@ -361,8 +368,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
     }
 
-
-
     /**
      * @param bool $withoutObjectCheck
      *
@@ -373,6 +378,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         if ($this->objectDefinition) {
             return;
         }
+
         $this->objectDefinition = $this->getJarves()->getObjects()->getDefinition($this->getObject());
 
         if (!$this->objectDefinition && $this->getObject() && !$withoutObjectCheck) {
@@ -507,6 +513,22 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
         $this->translate($this->nestedRootAddLabel);
         $this->translate($this->newLabel);
+    }
+
+    /**
+     * @param boolean $withNewsFeed
+     */
+    public function setWithNewsFeed($withNewsFeed)
+    {
+        $this->withNewsFeed = $withNewsFeed;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getWithNewsFeed()
+    {
+        return $this->withNewsFeed;
     }
 
     /**
@@ -664,7 +686,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
                 $this->prepareFieldDefinition($field['children']);
             }
         }
-
     }
 
     /**
@@ -772,12 +793,14 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         $fields = array();
         $objectFields = array_flip(array_keys($this->getObjectDefinition()->getFieldsArray()));
 
-        foreach ($this->_fields as $key => $field) {
-            if (isset($objectFields[$key]) && !$field->getCustomSave() && !$field->getStartEmpty()) {
-                $columnNames = $field->getFieldType()->getSelection();
-                $fields[] = $key;
-                $fields = array_merge($fields, $columnNames);
+        if ($this->_fields) {
+            foreach ($this->_fields as $key => $field) {
+                if (isset($objectFields[$key]) && !$field->getCustomSave() && !$field->getStartEmpty()) {
+                    $fields[] = $key;
+                }
             }
+        } else {
+            $fields = explode(',', trim(str_replace(' ', '', $this->getObjectDefinition()->getDefaultSelection())));
         }
 
         if ($this->getMultiLanguage()) {
@@ -799,7 +822,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
         $options['permissionCheck'] = $this->permissionCheck;
         */
-        $obj = $this->getJarves()->getObjects()->getClass($this->getObject());
+        $obj = $this->getJarves()->getObjects()->getStorageController($this->getObject());
         $primaryKey = $obj->normalizePrimaryKey($pk);
         $items = $this->getItems();
 
@@ -859,24 +882,30 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      */
     public function getItem($pk, $fields = null, $withAcl = false)
     {
-        $this->primaryKey = $pk;
-        $options['fields'] = $this->getSelection($fields, false);
+        $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
+        $pk = $storageController->normalizePrimaryKey($pk);
 
+        $this->primaryKey = $pk;
+
+        if ($this->getPermissionCheck() && !$this->getJarves()->getACL()->checkViewExact($this->getObject(), $pk)) {
+            return null;
+        }
+
+        $options['fields'] = $this->getSelection($fields, false);
         $options['permissionCheck'] = $this->getPermissionCheck();
 
-        $item = $this->getJarves()->getObjects()->get($this->getObject(), $pk, $options);
-
-        //add custom values
-        foreach ($this->_fields as $key => $field) {
-            if ($field['customValue'] && method_exists($this, $method = $field['customValue'])) {
-                $item[$key] = $this->$method($field, $key);
-            }
-        }
+        $item = $storageController->getItem($pk, $options);
 
         //check against additionally our own custom condition
         if ($item && ($condition = $this->getCondition()) && $condition->hasRules()) {
             if (!$condition->satisfy($item, $this->getObject())) {
                 $item = null;
+            }
+        }
+
+        if ($limitDataSets = $this->getObjectDefinition()->getLimitDataSets()) {
+            if (!$limitDataSets->satisfy($item, $this->getObject())) {
+                return null;
             }
         }
 
@@ -925,7 +954,9 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
     public function getItems($filter = null, $limit = null, $offset = null, $query = '', $fields = null, $orderBy = [], $withAcl = false)
     {
         $options = array();
-        $options['permissionCheck'] = $this->getPermissionCheck();
+
+        $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
+
         $options['offset'] = $offset;
         $options['limit'] = $limit ? $limit : $this->defaultLimit;
 
@@ -940,6 +971,10 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
         if ($filter && $filterCondition = self::buildFilter($filter)) {
             $condition->mergeAnd($filterCondition);
+        }
+
+        if ($limit = $this->getObjectDefinition()->getLimitDataSets()) {
+            $condition->mergeAnd($limit);
         }
 
         if ($this->getMultiLanguage()) {
@@ -962,7 +997,11 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
             }
         }
 
-        $items = $this->getJarves()->getObjects()->getList($this->getObject(), $condition, $options);
+        if ($this->getPermissionCheck() && $aclCondition = $this->getJarves()->getACL()->getListingCondition($this->getObject())) {
+            $condition->mergeAndBegin($aclCondition);
+        }
+
+        $items = $storageController->getItems($condition, $options);
 
         if ($withAcl && is_array($items)) {
             foreach ($items as &$item) {
@@ -982,7 +1021,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      * @param bool $getColumns
      * @return array
      */
-    protected function getSelection($fields, $getColumns = true)
+    protected function getSelection($fields = '', $getColumns = true)
     {
         $result = [];
         if ($fields && $this->getAllowCustomSelectFields()) {
@@ -1005,11 +1044,23 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
             $result = $result ? array_merge($result, $extraSelects) : $extraSelects;
         }
 
-
         return $result;
     }
 
-    protected function getExtraSelection()
+    protected function getNestedSelection($fields)
+    {
+        if (is_string($fields)) {
+            $fields = explode(',', trim(preg_replace('/[^a-zA-Z0-9_\.\-,\*]/', '', $fields)));
+        }
+
+        if ($extraSelects = $this->getExtraSelection()) {
+            $fields = $fields ? array_merge($fields, $extraSelects) : $extraSelects;
+        }
+
+        return $fields;
+    }
+
+    public function getExtraSelection()
     {
         if (is_string($this->extraSelection)) {
             return explode(',', trim(preg_replace('/[^a-zA-Z0-9_\.\-,\*]/', '', $this->extraSelection)));
@@ -1018,7 +1069,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         return $this->extraSelection;
     }
 
-    protected function setExtraSelection($selection)
+    public function setExtraSelection($selection)
     {
         $this->extraSelection = $selection;
     }
@@ -1145,25 +1196,52 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         $offset = null,
         $withAcl = false
     ) {
+
+        $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
+
+        if (null !== $pk) {
+            $pk = $storageController->normalizePrimaryKey($pk);
+        }
+
+        if (null === $pk && $this->getObjectDefinition()->getNestedRootAsObject() && $scope === null) {
+            throw new \Exception('No scope defined.');
+        }
+
         $options = array();
-        $options['permissionCheck'] = $this->getPermissionCheck();
         $options['offset'] = $offset;
         $options['limit'] = $limit ? $limit : $this->defaultLimit;
 
-        $conditionObject = new Condition(null, $this->getJarves());
-        $conditionObject->from($this->getCondition());
-        $condition = $this->getCondition();
+        if (!$fields) {
+            $fields = array();
+            if ($rootField = $this->getObjectDefinition()->getNestedRootObjectLabelField()) {
+                $fields[] = $rootField;
+            }
+
+            if ($extraFields = $this->getObjectDefinition()->getNestedRootObjectExtraFields()) {
+                $extraFields = explode(',', trim(str_replace(' ', '', $extraFields)));
+                foreach ($extraFields as $field) {
+                    $fields[] = $field;
+                }
+            }
+            $options['fields'] = implode(',', $fields);
+        }
 
         if ($filter) {
-            if ($condition) {
-                $condition = array($condition, 'AND', self::buildFilter($filter));
-            } else {
-                $condition = self::buildFilter($filter);
-            }
+            $conditionObject = $filter instanceof Condition ? $filter : self::buildFilter($filter);
+        } else {
+            $conditionObject = $this->getCondition();
+        }
+
+        if ($limit = $this->getObjectDefinition()->getLimitDataSets()) {
+            $conditionObject->mergeAnd($limit);
         }
 
         if ($extraCondition = $this->getCustomListingCondition()) {
-            $condition = !$condition ? $extraCondition : array($condition, 'AND', $extraCondition);
+            $conditionObject->mergeAnd($extraCondition);
+        }
+
+        if ($this->getPermissionCheck() && $aclCondition = $this->getJarves()->getACL()->getListingCondition($this->getObject())) {
+            $conditionObject->mergeAndBegin($aclCondition);
         }
 
         $options['order'] = $this->getOrder();
@@ -1175,10 +1253,11 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
         $options['fields'] += $this->getTreeFields();
 
+
         if ($this->getMultiLanguage()) {
 
             //does the object have a lang field?
-            if ($this->objectDefinition->getfield('lang')) {
+            if ($this->getObjectDefinition()->getField('lang')) {
 
                 //add language condition
                 $langCondition = array(
@@ -1186,23 +1265,11 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
                     'OR',
                     array('lang', 'IS NULL'),
                 );
-                if ($condition) {
-                    $condition = array($condition, 'AND', $langCondition);
-                } else {
-                    $condition = $langCondition;
-                }
+                $conditionObject->mergeAnd($langCondition);
             }
         }
 
-        $items = $this->getJarves()->getObjects()->getBranch(
-            $this->getObject(),
-            $pk,
-            $condition,
-            $depth,
-            $scope,
-            $options
-        );
-
+        $items = $storageController->getBranch($pk, $conditionObject, $depth, $scope, $options);
 
         if ($withAcl && is_array($items)) {
             foreach ($items as &$item) {
@@ -1225,107 +1292,134 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
     public function getBranchChildrenCount($pk = null, $scope = null, $filter = null)
     {
         $condition = $this->getCondition();
+        $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
+
+        if ($pk) {
+            $pk = $storageController->normalizePrimaryKey($pk);
+        }
+
+        if ($limit = $this->getObjectDefinition()->getLimitDataSets()) {
+            $condition->mergeAnd($limit);
+        }
+
+        if ($this->getPermissionCheck() && $aclCondition = $this->getJarves()->getACL()->getListingCondition($this->getObject())) {
+            $condition->mergeAndBegin($aclCondition);
+        }
 
         if ($filter) {
-            if ($condition) {
-                $condition = array($condition, 'AND', self::buildFilter($filter));
-            } else {
-                $condition = self::buildFilter($filter);
-            }
+            $filterCondition = self::buildFilter($filter);
+            $condition->mergeAnd($filterCondition);
         }
 
         if ($extraCondition = $this->getCustomListingCondition()) {
-            $condition = !$condition ? $extraCondition : array($condition, 'AND', $extraCondition);
+            $condition->mergeAnd($extraCondition);
         }
 
-        $options['order'] = $this->getOrder();
-        $options['permissionCheck'] = $this->getPermissionCheck();
-
-        $options['fields'] = array_keys($this->getColumns());
-
-        return $this->getJarves()->getObjects()->getBranchChildrenCount(
-            $this->getObject(),
-            $pk,
-            $condition,
-            $scope,
-            $options
-        );
+        return $storageController->getBranchChildrenCount($pk, $condition, $scope);
 
     }
 
-    public function getCount($filter, $query)
+    /**
+     * @param Condition|array $filter
+     * @param string $query
+     * @return int
+     */
+    public function getCount($filter, $query = '')
     {
-        $options['permissionCheck'] = $this->getPermissionCheck();
-        $options['filter'] = $filter;
-        $options['query'] = $query;
+        $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
 
-        return $this->getJarves()->getObjects()->getCount($this->getObject());
+        $condition = new \Jarves\Configuration\Condition(null, $this->getJarves());
 
+        if ($filter && is_array($filter)) {
+            $condition->fromPk($filter, $this->getObject());
+        } else if ($filter instanceof Condition) {
+            $condition = $filter;
+        } else {
+            $condition = new \Jarves\Configuration\Condition(null, $this->getJarves());
+        }
+
+        if ($limit = $this->getObjectDefinition()->getLimitDataSets()) {
+            $condition->mergeAnd($limit);
+        }
+
+        if ($this->getPermissionCheck() && $aclCondition = $this->getJarves()->getACL()->getListingCondition($this->getObject())) {
+            $condition->mergeAndBegin($aclCondition);
+        }
+
+        if ($query) {
+            if ($queryCondition = $this->getQueryCondition($query, $this->getSelection('', true))) {
+                $condition->mergeAnd($queryCondition);
+            }
+        }
+
+        return $storageController->getCount($condition);
     }
 
     public function getParent($pk)
     {
-        $options = array('permissionCheck' => $this->getPermissionCheck());
-        $primaryKey = $this->getJarves()->getObjects()->normalizePkString($this->getObject(), $pk);
+        $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
+        $pk = $storageController->normalizePrimaryKey($pk);
 
-        return $this->getJarves()->getObjects()->getParent($this->getObject(), $primaryKey, $options);
-
+        return $storageController->getParent($pk);
     }
 
     public function getParents($pk)
     {
-        $options = array('permissionCheck' => $this->getPermissionCheck());
-        $primaryKey = $this->getJarves()->getObjects()->normalizePkString($this->getObject(), $pk);
+        $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
+        $pk = $storageController->normalizePrimaryKey($pk);
 
-        return $this->getJarves()->getObjects()->getParents($this->getObject(), $primaryKey, $options);
-
+        return $storageController->getParents($pk);
     }
 
-    public function moveItem($sourceUrl, $targetUrl, $position = 'first', $targetObjectKey = '', $overwrite = false)
+    public function moveItem($pk, $targetPk, $position = 'first', $targetObjectKey = '')
     {
-        $options = array('permissionCheck' => $this->getPermissionCheck(), 'newsFeed' => true);
+        $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
 
-        $sourceObjectKey = $this->getJarves()->getObjects()->getObjectKey($sourceUrl) ? : $this->getObject();
-        $targetObjectKey = $this->getJarves()->getObjects()->getObjectKey($targetUrl) ? : $this->getObject();
-
-        $sourcePkString = $this->getJarves()->getObjects()->getCroppedObjectId($sourceUrl);
-        $targetPkString = $this->getJarves()->getObjects()->getCroppedObjectId($targetUrl);
-
-        $sourcePk = $this->getJarves()->getObjects()->normalizePkString(
-            $sourceObjectKey,
-            $sourcePkString
+        $sourcePk = $this->getJarves()->getObjects()->normalizePk(
+            $this->getObject(),
+            $pk
         );
 
-        $targetPk = $this->getJarves()->getObjects()->normalizePkString(
-            $targetObjectKey,
-            $targetPkString
+        $targetPk = $this->getJarves()->getObjects()->normalizePk(
+            $targetObjectKey ?: $this->getObject(),
+            $targetPk
         );
 
-        return $this->getJarves()->getObjects()->move(
-            $sourceObjectKey,
-            $sourcePk,
-            $targetPk,
-            $position,
-            $targetObjectKey,
-            $options,
-            $overwrite
-        );
+        return $storageController->move($sourcePk, $targetPk, $position, $targetObjectKey);
     }
 
-    public function getRoots()
+    public function getRoots($condition = null)
     {
-        $options['permissionCheck'] = $this->getPermissionCheck();
+        $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
 
-        return $this->getJarves()->getObjects()->getRoots($this->getObject(), null, $options);
+        if (!$this->getObjectDefinition()->isNested()) {
+            throw new \Exception('Object is not a nested set.');
+        }
 
+        $options['fields'] = $this->getNestedSelection($this->getObjectDefinition()->getNestedRootObjectLabelField());
+
+        if ($this->getObjectDefinition()->getNestedRootAsObject()) {
+            return $this->getJarves()->getObjects()->getList($this->getObjectDefinition()->getNestedRootObject(), null, $options);
+        } else {
+            $conditionObject = $condition ?: new Condition(null, $this->getJarves());
+
+            if ($this->getPermissionCheck() && $aclCondition = $this->getJarves()->getACL()->getListingCondition($this->getObject())) {
+                $conditionObject->mergeAndBegin($aclCondition);
+            }
+
+            return $storageController->getRoots($conditionObject, $options);
+        }
     }
 
     public function getRoot($scope = null)
     {
-        $options['permissionCheck'] = $this->getPermissionCheck();
+        if ($this->getObjectDefinition()->getNestedRootAsObject() && $scope === null) {
+            throw new \Exception('No `scope` defined.');
+        }
 
-        return $this->getJarves()->getObjects()->getRoot($this->getObject(), $scope, $options);
+        $options['fields'] = $this->getNestedSelection($this->getObjectDefinition()->getNestedRootObjectLabelField());
 
+        return $this->getJarves()->getObjects()->get($this->getObjectDefinition()->getNestedRootObject(), $scope, $options);
     }
 
     /**
@@ -1394,7 +1488,8 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         $fixedData = array();
 
         if ($fixedFields) {
-            $fixedData = $this->collectData($request, $fixedFields);
+            $data = $this->collectData($request);
+            $fixedData = $this->mapData($data, $fixedFields);
         }
 
         $fields = $this->getAddMultipleFields();
@@ -1412,11 +1507,10 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         foreach ($items as $item) {
 
             $data = $fixedData;
-            $data += $this->collectData($request, $fields, $item);
+            $data += $this->mapData($this->collectData($request), $fields, $item);
 
             try {
                 $inserted[] = $this->add(
-                    $request,
                     $data,
                     $this->getRequest()->request->get('_pk'),
                     $position,
@@ -1437,39 +1531,76 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      *
      * Data is passed as POST.
      *
-     * @param  Request $request
-     * @param  array $data
-     * @param  array $pk
-     * @param  string $position If nested set. `first` (child), `last` (child), `prev` (sibling), `next` (sibling)
-     * @param  int|string $targetObjectKey
+     * @param  Request|array $requestOrData
+     * @param  array|null $pk
+     * @param  string|null $position If nested set. `first` (child), `last` (child), `prev` (sibling), `next` (sibling)
+     * @param  string|null $targetObjectKey
      *
-     * @return mixed      False if some went wrong or a array with the new primary keys.
+     * @return mixed false if some went wrong or a array with the new primary keys.
+     *
+     * @throws \InvalidArgumentException
      */
-    public function add(Request $request, $data = null, $pk = null, $position = null, $targetObjectKey = null)
+    public function add($requestOrData, $pk = null, $position = null, $targetObjectKey = null)
     {
         //collect values
-        if (!$data) {
-            $data = $this->collectData($request);
-        }
+        $targetObjectKey = Objects::normalizeObjectKey($targetObjectKey);
+        $values = $this->collectData($requestOrData);
+        $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
 
-        //do normal add through Core\Object
-        $this->primaryKey = $this->getJarves()->getObjects()->add(
-            $this->getObject(),
-            $data,
-            $pk,
-            $position,
-            $targetObjectKey,
-            array('permissionCheck' => $this->getPermissionCheck(), 'newsFeed' => true)
-        );
+        if ($this->getPermissionCheck()) {
+            foreach ($values as $fieldName => $value) {
+                //todo, what if $targetObjectKey differs from $objectKey
 
-        //handle customPostSave
-        foreach ($this->_fields as $key => $field) {
-            if ($field['customPostSave'] && method_exists($this, $method = $field['customPostSave'])) {
-                $this->$method($field, $key);
+                if (!$this->getJarves()->getACL()->checkAdd($this->getObject(), $pk, $fieldName)) {
+                    unset($values[$fieldName]);
+                }
             }
         }
 
-        return $this->primaryKey;
+        $args = [
+            'pk' => $pk,
+            'values' => &$values,
+            'controller' => $this,
+            'position' => &$position,
+            'targetObjectKey' => &$targetObjectKey,
+            'mode' => 'add'
+        ];
+        $eventPre = new GenericEvent($this->getObject(), $args);
+
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify-pre', $eventPre);
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/add-pre', $eventPre);
+
+        $data = $this->mapData($values);
+
+        if ($targetObjectKey && $targetObjectKey != $this->getObject()) {
+            if ($position == 'prev' || $position == 'next') {
+                throw new \InvalidArgumentException(
+                    sprintf('Its not possible to use `prev` or `next` to add a new entry with a different object key. [target: %s, self: %s]',
+                        $targetObjectKey, $this->getObject())
+                );
+            }
+
+            $targetPk = $this->getJarves()->getObjects()->normalizePk($targetObjectKey, $pk);
+
+            //since propel's nested set behaviour only allows a single value as scope, we need to use the first pk
+            $scope = current($targetPk);
+            $result = $storageController->add($data, null, $position, $scope);
+        } else {
+            $result = $storageController->add($data, $pk, $position);
+        }
+
+        if ($this->getWithNewsFeed()) {
+            $values = array_merge($values, $result);
+            $this->getJarves()->getUtils()->newNewsFeed($this->getObject(), $values, 'added');
+        }
+
+        $args['result'] = $result;
+        $event = new GenericEvent($this->getObject(), $args);
+
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify', $event);
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/add', $event);
+
+        return $result;
     }
 
     /**
@@ -1479,46 +1610,98 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      */
     public function remove($pk)
     {
+        $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
+        $pk = $storageController->normalizePrimaryKey($pk);
         $this->primaryKey = $pk;
-        $options['permissionCheck'] = $this->getPermissionCheck();
-        $options['newsFeed'] = true;
 
-        return $this->getJarves()->getObjects()->remove($this->getObject(), $pk, $options);
+        $args = [
+            'pk' => $pk,
+            'mode' => 'remove'
+        ];
+        $eventPre = new GenericEvent($this->getObject(), $args);
+
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify-pre', $eventPre);
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/remove-pre', $eventPre);
+
+        $item = $this->getItem($pk);
+
+        $result = $storageController->remove($pk);
+
+        $args['result'] = $result;
+        $event = new GenericEvent($this->getObject(), $args);
+
+        if ($this->getWithNewsFeed()) {
+            $this->getJarves()->getUtils()->newNewsFeed($this->getObject(), $item, 'removed');
+        }
+
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify', $event);
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/remove', $event);
+
+        return $result;
     }
 
     /**
      * Updates a object entry. This means, all fields which are not defined will be saved as NULL.
      *
      * @param  array $pk
-     * @param  Request $request
+     * @param  Request|array $requestOrData
      *
      * @return bool
      */
-    public function update(Request $request, $pk)
+    public function update($pk, $requestOrData)
     {
+        $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
+        $pk = $storageController->normalizePrimaryKey($pk);
         $this->primaryKey = $pk;
+        $values = $this->collectData($requestOrData);
 
-        $options['fields'] = '';
-        $options['permissionCheck'] = $this->getPermissionCheck();
+        $args = [
+            'pk' => $pk,
+            'values' => &$values,
+            'controller' => $this,
+            'mode' => 'update'
+        ];
+        $eventPre = new GenericEvent($this->getObject(), $args);
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify-pre', $eventPre);
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/update-pre', $eventPre);
 
-        //collect values
-        $data = $this->collectData($request);
+        $item = $this->getItem($pk);
 
-        //check against additionally our own custom condition
+        if ($this->getPermissionCheck()) {
+            if (!$item) {
+                return null;
+            }
+
+            if (!$this->getJarves()->getACL()->checkUpdateExact($this->getObject(), $pk)) {
+                return null;
+            }
+
+            foreach ($values as $fieldName => $value) {
+                if (!$this->getJarves()->getACL()->checkUpdateExact($this->getObject(), $pk, [$fieldName => $value])) {
+                    unset($values[$fieldName]);
+                }
+            }
+        }
+
         if (($condition = $this->getCondition()) && $condition->hasRules()) {
-            $item = $this->getJarves()->getObjects()->get($this->getObject(), $pk, $options);
             if (!$condition->satisfy($item, $this->getObject())) {
                 return null;
             }
         }
 
-        //do normal update through Core\Object
-        $result = $this->getJarves()->getObjects()->update(
-            $this->getObject(),
-            $pk,
-            $data,
-            array('permissionCheck' => $this->getPermissionCheck(), 'newsFeed' => true)
-        );
+        $data = $this->mapData($values);
+
+        if ($this->getWithNewsFeed()) {
+            $this->getJarves()->getUtils()->newNewsFeed($this->getObject(), array_merge($values, $pk), 'updated');
+        }
+
+        $result = $storageController->update($pk, $data);
+
+        $args['result'] = $result;
+        $event = new GenericEvent($this->getObject(), $args);
+
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify', $event);
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/update', $event);
 
         return $result;
     }
@@ -1527,50 +1710,111 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      * Patches a object entry. This means, only defined fields will be saved. Fields which are not defined will
      * not be overwritten.
      *
-     * @param  Request $request
+     * @param  Request|array $requestOrData
      * @param  array $pk
      *
      * @return bool
      */
-    public function patch(Request $request, $pk)
+    public function patch($pk, $requestOrData)
     {
+        $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
+        $pk = $storageController->normalizePrimaryKey($pk);
         $this->primaryKey = $pk;
+        $values = $this->collectData($requestOrData);
+
+        $args = [
+            'pk' => $pk,
+            'values' => &$values,
+            'controller' => $this,
+            'mode' => 'update'
+        ];
+        $eventPre = new GenericEvent($this->getObject(), $args);
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify-pre', $eventPre);
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/patch-pre', $eventPre);
+
         $item = $this->getItem($pk);
 
-        //check against additionally our own custom condition
+        if ($this->getPermissionCheck()) {
+            if (!$item) {
+                return null;
+            }
+
+            if (!$this->getJarves()->getACL()->checkUpdateExact($this->getObject(), $pk)) {
+                return null;
+            }
+
+            foreach ($values as $fieldName => $value) {
+                if (!$this->getJarves()->getACL()->checkUpdateExact($this->getObject(), $pk, [$fieldName => $value])) {
+                    unset($values[$fieldName]);
+                }
+            }
+        }
+
+
         if (($condition = $this->getCondition()) && $condition->hasRules()) {
             if (!$condition->satisfy($item, $this->getObject())) {
                 return null;
             }
         }
 
-        $changedData = $this->collectData($request, array_keys($request->request->all()), $item);
+        $incomingFields = $requestOrData instanceof Request ? array_keys($requestOrData->request->all()) : array_keys($requestOrData);
+        $changedData = $this->mapData($values, $incomingFields, $item);
 
-        //do normal update through Core\Object
-        $result = $this->getJarves()->getObjects()->patch(
-            $this->getObject(),
-            $pk,
-            $changedData,
-            array('permissionCheck' => $this->getPermissionCheck(), 'newsFeed' => true)
-        );
+        if ($this->getWithNewsFeed()) {
+            $this->getJarves()->getUtils()->newNewsFeed($this->getObject(), array_merge($values, $pk), 'updated');
+        }
+        $result = $storageController->patch($pk, $changedData);
+
+        $args['result'] = $result;
+        $event = new GenericEvent($this->getObject(), $args);
+
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/modify', $event);
+        $this->getJarves()->getEventDispatcher()->dispatch('core/object/patch', $event);
 
         return $result;
     }
 
     /**
-     * Collects all data from GET/POST that has to be saved.
+     * @param Request|array $requestOrData
+     * @return array
+     */
+    public function collectData($requestOrData)
+    {
+        if (!$requestOrData instanceof Request) {
+            return $requestOrData;
+        }
+
+        $fields = $this->_fields;
+        $values = [];
+
+        foreach ($fields as $field) {
+            $key = lcfirst($field->getId());
+
+            $value = $requestOrData->files->get($key);
+            if (!$value) {
+                $value = $requestOrData->request->get($key);
+            }
+
+            $values[$key] = $value;
+        }
+
+        return $values;
+    }
+
+    /**
+     * Maps all $data to its field values (Admin\Type*::mapValues)
      * Iterates only through all defined fields in $fields.
      *
-     * @param  Request $request
+     * @param  array $data
      * @param  \Jarves\Configuration\Field[] $fields The fields definition. If empty we use $this->fields.
      * @param  mixed $defaultData Default data. Is used if a field is not defined through _POST or _GET
      *
      * @return array
      * @throws \Jarves\Exceptions\InvalidFieldValueException
      */
-    public function collectData(Request $request, array $fieldsToReturn = null, $defaultData = null)
+    public function mapData(array $data, array $fieldsToReturn = null, $defaultData = null)
     {
-        $data = array();
+        $values = array();
 
         $fields = $this->_fields;
 
@@ -1590,7 +1834,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
         foreach ($fields as $field) {
             $key = lcfirst($field->getId());
-            $value = $request->request->get($key);
+            $value = @$data[$key];
             if (null == $value && $defaultData) {
                 $value = @$defaultData[$key];
             }
@@ -1613,13 +1857,13 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
             }
 
             if ($field->getCustomSave() && method_exists($this, $method = $field->getCustomSave())) {
-                $this->$method($request, $data, $field);
+                $this->$method($values, $values, $field);
                 continue;
             }
 
             if (!$fieldsToReturn || isset($fieldsToReturn[$key])) {
                 if (!$errors = $field->validate()) {
-                    $field->mapValues($data);
+                    $field->mapValues($values);
                 } else {
                     $restException = new ValidationFailedException(sprintf(
                         'Field `%s` has a invalid value.',
@@ -1631,7 +1875,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
             }
         }
 
-        return $data;
+        return $values;
     }
 
     /**
@@ -1686,6 +1930,14 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
     public function getPermissionCheck()
     {
         return $this->permissionCheck;
+    }
+
+    /**
+     * @param boolean $permissionCheck
+     */
+    public function setPermissionCheck($permissionCheck)
+    {
+        $this->permissionCheck = $permissionCheck;
     }
 
     /**
@@ -1927,7 +2179,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      */
     public function getObject()
     {
-        return $this->object;
+        return Objects::normalizeObjectKey($this->object);
     }
 
     /**

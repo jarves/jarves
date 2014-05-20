@@ -34,7 +34,6 @@ class TypeContentElements extends AbstractType
     {
         $contentsObjectName = $object->getId() . ucfirst($this->getFieldDefinition()->getId());
         $contentsObject = $object->getBundle()->getObject($contentsObjectName);
-        $changed = false;
 
         if (!$contentsObject) {
             $contentsObject = new Object();
@@ -46,7 +45,9 @@ class TypeContentElements extends AbstractType
             $contentsObject->setNestedRootObject($object->getKey());
             $contentsObject->setNestedRootObjectField('foreignId');
 
-            $contentsObject->setTable($object->getTable().'_'.Tools::camelcase2Underscore($this->getFieldDefinition()->getId()));
+            $contentsObject->setTable(
+                $object->getTable() . '_' . Tools::camelcase2Underscore($this->getFieldDefinition()->getId())
+            );
             $contentsObject->setDataModel($object->getDataModel());
         }
 
@@ -70,7 +71,7 @@ class TypeContentElements extends AbstractType
                 $def['id'] = $k;
                 $field = new Field($def, $object->getJarves());
                 $contentsObject->addField($field);
-                $changed = true;
+                $configs->addReboot(sprintf('[ContentElements] Added field %s to %s', $k, $contentsObject->getKey()));
             }
         }
 
@@ -112,7 +113,10 @@ class TypeContentElements extends AbstractType
             $relation->setReferences([$reference]);
 
             $contentsObject->addRelation($relation);
-            $changed = true;
+
+            $configs->addReboot(
+                sprintf('[ContentElements] Added relation ForeignObject to %s', $contentsObject->getKey())
+            );
         }
 
         if (!$contentsObject->getBundle()) {
@@ -137,9 +141,14 @@ class TypeContentElements extends AbstractType
 
             $relation->setReferences([$reference]);
             $object->addRelation($relation);
-            $changed = true;
-        }
 
-        return $changed;
+            $configs->addReboot(
+                sprintf(
+                    '[ContentElements] Added relation %s to %s',
+                    ucfirst($this->getFieldDefinition()->getId()),
+                    $object->getKey()
+                )
+            );
+        }
     }
 }

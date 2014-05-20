@@ -40,11 +40,18 @@ class Object extends Model
     protected $table;
 
     /**
-     * The class of the object interface. Needs 'dataModel'=true.
+     * The class that handles the actual data storage (to a file e.g) of the object interface. Needs 'dataModel'=true.
      *
      * @var string
      */
     protected $class;
+
+    /**
+     * The controller php class or service id to use as controller. (Used between Jarves\Objects and your $class/ORM-class)
+     *
+     * @var string
+     */
+    protected $controller;
 
     /**
      * Which field (the value of it) shall be used as default label for the object.
@@ -279,11 +286,6 @@ class Object extends Model
     protected $browserColumns;
 
     /**
-     * @var array
-     */
-    private $triggeredReboot = [];
-
-    /**
      * The callable string pointing to a method/function that generates the actual public url for a object pk.
      *
      * example:
@@ -324,47 +326,31 @@ class Object extends Model
      * e.g. create cross foreignKeys for 1-to-n relations.
      *
      * @param Configs $configs
-     *
-     * @return bool true for the boot has changed something on a object/field and we need to call it on other fields again.
      */
     public function bootRunTime(Configs $configs)
     {
-        $this->triggeredReboot = [];
-        if ($this->getFields()) {
-            foreach ($this->getFields() as $key => $field) {
-                if ($boots = $field->bootRunTime($this, $configs)) {
-                    $count = (isset($this->triggeredReboot[$key]) ? $this->triggeredReboot[$key]['count'] : 0) + 1;
-                    $this->triggeredReboot[$key] = [
-                        'count' => $count,
-                        'triggeredReboots' => $boots
-                    ];
-                }
-            }
-        }
-        return $this->triggeredReboot;
-    }
-
-    /**
-     * Do whatever is needed to setup the build environment correctly.
-     *
-     * e.g. create crossTables for n-to-n relations.
-     *
-     * @param Configs $configs
-     *
-     * @return bool true for the boot has changed something on a object/field and we need to call it on other fields again.
-     */
-    public function bootBuildTime(Configs $configs)
-    {
-        $changed = false;
         if ($this->getFields()) {
             foreach ($this->getFields() as $field) {
-                if ($field->bootBuildTime($this, $configs)) {
-                    $changed = true;
-                }
+                $field->bootRunTime($this, $configs);
             }
         }
-        return $changed;
     }
+
+//    /**
+//     * Do whatever is needed to setup the build environment correctly.
+//     *
+//     * e.g. create crossTables for n-to-n relations.
+//     *
+//     * @param Configs $configs
+//     */
+//    public function bootBuildTime(Configs $configs)
+//    {
+//        if ($this->getFields()) {
+//            foreach ($this->getFields() as $field) {
+//                $field->bootBuildTime($this, $configs);
+//            }
+//        }
+//    }
 
     /**
      * @return array
@@ -443,6 +429,15 @@ class Object extends Model
     public function hasRelation($name)
     {
         return isset($this->relations[strtolower($name)]);
+    }
+
+    /**
+     * @param $name
+     * @return \Jarves\Admin\FieldTypes\RelationDefinitionInterface
+     */
+    public function getRelation($name)
+    {
+        return @$this->relations[strtolower($name)];
     }
 
 //    /**
@@ -566,6 +561,22 @@ class Object extends Model
     public function getClass()
     {
         return $this->class;
+    }
+
+    /**
+     * @param string $controller
+     */
+    public function setController($controller)
+    {
+        $this->controller = $controller;
+    }
+
+    /**
+     * @return string
+     */
+    public function getController()
+    {
+        return $this->controller;
     }
 
     /**
@@ -793,7 +804,7 @@ class Object extends Model
      */
     public function getKey()
     {
-        return $this->getBundle()->getName().'/'.lcfirst($this->getId());
+        return ($this->getBundle() ? $this->getBundle()->getName() : '[no-bundle]') . '/'.lcfirst($this->getId());
     }
 
     /**

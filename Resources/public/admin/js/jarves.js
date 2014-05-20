@@ -1210,6 +1210,12 @@ jarves.openDialog = function(options) {
         target = options.target.getWindow().document.body;
     }
 
+    if ('body' === target.get('tag')) {
+        if (jarvesFrame = target.getElement('.jarves-frame')) {
+            target = jarvesFrame;
+        }
+    }
+
     if (!jarves.closeDialogsBodys.contains(target)) {
         jarves.closeDialogsBodys.push(target);
     }

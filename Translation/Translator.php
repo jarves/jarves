@@ -151,7 +151,7 @@ if (!function_exists('gettext_plural_fn_$lang')) {
     public function getUtils()
     {
         $utils = new Utils();
-        $utils->setContainer($this->jarves->getKernel()->getContainer());
+        $utils->setContainer($this->jarves->getContainer());
         return $utils;
     }
 

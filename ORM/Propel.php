@@ -76,7 +76,8 @@ class Propel extends ORMAbstract
     }
 
     /**
-     * Filters $fields by allowed fields.
+     * Returns all column names by allowed and extracted fields.
+     *
      * If '*' we return all allowed fields.
      *
      * @param  array|string $fields
@@ -136,6 +137,9 @@ class Propel extends ORMAbstract
             }
 
         } else if (is_array($fields)) {
+
+            $fields = $this->extractSelection($fields);
+
             foreach ($fields as $field) {
 
                 $relationFieldSelection = [];
@@ -168,7 +172,6 @@ class Propel extends ORMAbstract
                             }
                         }
                     } else {
-
                         foreach ($relationFieldSelection as $relationField) {
                             //check if $relationField exists in the foreign table
                             if (!$relation->getRightTable()->hasColumnByPhpName($relationField)) {
@@ -196,7 +199,6 @@ class Propel extends ORMAbstract
                     $fields2[$column->getPhpName()] = $column;
                 }
             }
-
         }
 
         //filer relation fields
@@ -245,7 +247,20 @@ class Propel extends ORMAbstract
         }
 
         return array($fields2, $relations, $relationFields);
+    }
 
+    public function extractSelection($fields)
+    {
+        foreach ($fields as $fieldKey) {
+            if ($field = $this->getDefinition()->getField($fieldKey)) {
+                if ($fieldType = $field->getFieldType()) {
+                    foreach ($fieldType->getSelection() as $selection) {
+                        $fields[] = $selection;
+                    }
+                }
+            }
+        }
+        return $fields;
     }
 
     /**
@@ -599,6 +614,9 @@ class Propel extends ORMAbstract
     {
         foreach ($this->primaryKeys as $key) {
             $filter = 'filterBy' . ucfirst($key);
+            if (!isset($pk[$key])) {
+                throw new \Exception(sprintf('Primary key %s not found.', $key));
+            }
             $val = $pk[$key];
             if (method_exists($query, $filter)) {
                 $query->$filter($val);
@@ -890,11 +908,6 @@ class Propel extends ORMAbstract
             $set = 'set' . $fieldName;
             $methodExist = method_exists($item, $set);
 
-            if (!isset($values[$fieldName]) && $ignoreNotExistingValues) {
-                return;
-            }
-
-
             if ($methodExist) {
                 $item->$set($fieldValue);
             }
@@ -923,7 +936,7 @@ class Propel extends ORMAbstract
                 if ($fieldValue) {
                     $foreignQuery = $self->getQueryClass($relation->getForeignObjectKey());
                     $foreignClass = $self->getPhpName($relation->getForeignObjectKey());
-                    $foreignObjClass = $self->getJarves()->getObjects()->getClass($relation->getForeignObjectKey());
+                    $foreignObjClass = $self->getJarves()->getObjects()->getStorageController($relation->getForeignObjectKey());
 
                     if ($relation->getType() == ORMAbstract::ONE_TO_MANY) {
 
@@ -969,7 +982,12 @@ class Propel extends ORMAbstract
             }
 
             if ($relation->getType() == ORMAbstract::MANY_TO_ONE || $relation->getType() == ORMAbstract::ONE_TO_ONE) {
-                $propelRelation = $self->tableMap->getRelation($fieldName);
+
+                if (!$self->tableMap->hasRelation(ucfirst($fieldName))) {
+                    throw new \Exception(sprintf('Relation %s not found in propel object %s (%s)', ucfirst($fieldName), $self->getObjectKey(), $self->getPhpName()));
+                }
+
+                $propelRelation = $self->tableMap->getRelation(ucfirst($fieldName));
                 $localColumns = $propelRelation->getLocalColumns();
                 if (is_array($fieldValue)) {
                     foreach ($localColumns as $column) {
@@ -1000,27 +1018,27 @@ class Propel extends ORMAbstract
         }
 
 
-        /*
-         * all virtual fields which are not present in the object.
-         * Virtual fields are all methods in the model which have a setter.
-         * Examples:
-         *
-         *   setPassword => 'password'
-         */
-        foreach ($values as $fieldName => $fieldValue) {
-            $fieldName = lcfirst($fieldName);
-            if (in_array($fieldName, $setted)) {
-                continue;
-            }
-
-            $fieldName = ucfirst($fieldName);
-            $set = 'set' . $fieldName;
-            $methodExist = method_exists($item, $set);
-
-            if ($methodExist) {
-                $item->$set($fieldValue);
-            }
-        }
+//        /*
+//         * all virtual fields which are not present in the object.
+//         * Virtual fields are all methods in the model which have a setter.
+//         * Examples:
+//         *
+//         *   setPassword => 'password'
+//         */
+//        foreach ($values as $fieldName => $fieldValue) {
+//            $fieldName = lcfirst($fieldName);
+//            if (in_array($fieldName, $setted)) {
+//                continue;
+//            }
+//
+//            $fieldName = ucfirst($fieldName);
+//            $set = 'set' . $fieldName;
+//            $methodExist = method_exists($item, $set);
+//
+//            if ($methodExist) {
+//                $item->$set($fieldValue);
+//            }
+//        }
 
     }
 
@@ -1137,7 +1155,7 @@ class Propel extends ORMAbstract
                 $selects,
                 $relations,
                 $relationFields,
-                $options['permissionCheck']
+                @$options['permissionCheck']
             );
 
             if ($depth > 0) {

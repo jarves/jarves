@@ -2,6 +2,7 @@
 
 namespace Tests\Object;
 
+use Jarves\Model\Domain;
 use Jarves\Model\DomainQuery;
 use Jarves\Model\NodeQuery;
 use Jarves\Tests\KernelAwareTestCase;
@@ -101,6 +102,30 @@ class CreateTest extends KernelAwareTestCase
         $node = NodeQuery::create()->findOneById($nodePk['id']);
         $this->assertEquals('Test page changed', $node->getTitle());
         $this->assertEquals($ori->getDomainId(), $node->getDomainId());
+    }
+
+    /**
+     * @group test
+     */
+    public function testPatchDomain()
+    {
+        $newDomain = new Domain();
+        $newDomain->setPath('/');
+        $newDomain->setDomain('testDomainName');
+        $newDomain->setTheme('defaultTheme');
+        $newDomain->save();
+
+        $patched = $this->getObjects()->patch('jarves/domain', $newDomain->getId(), [
+            'domain' => 'testdomain.tld',
+            'theme' => 'coreLayouts'
+        ]);
+
+        $this->assertTrue($patched);
+
+        $domain = DomainQuery::create()->findOneById($newDomain->getId());
+        $this->assertEquals('testdomain.tld', $domain->getDomain());
+        $this->assertEquals('coreLayouts', $domain->getTheme());
+        $newDomain->delete();
     }
 
     public function tearDown()

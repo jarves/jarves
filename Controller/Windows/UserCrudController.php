@@ -42,7 +42,7 @@ class UserCrudController extends WindowController
         'groupMembership.name' =>
             array(
                 'label' => 'Group membership'
-            ),
+            )
     );
 
     public $itemLayout = '
@@ -99,11 +99,10 @@ class UserCrudController extends WindowController
                 ),
                 'password' => array( //it's a virtual field from the user model
                     'label' => 'Password',
-                    'type' => 'password',
+                    'type' => 'userPassword',
                     'desc' => 'Leave empty to change nothing',
                     'startEmpty' => true,
-                    'saveOnlyFilled' => true,
-                    'customSave' => 'savePassword',
+                    'saveOnlyFilled' => true
                 ),
                 'email' => array(
                     'label' => 'Email',
@@ -171,16 +170,6 @@ class UserCrudController extends WindowController
             )
         )
     );
-
-    public function savePassword(Request $request, array &$data, Field $field)
-    {
-        $data['passwdSalt'] = ClientAbstract::getSalt();
-
-        $jarves = $this->getJarves();
-        $password = ClientAbstract::getHashedPassword($request->request->get('password'), $data['passwdSalt'], $jarves);
-
-        $data['passwd'] = $password;
-    }
 
 
 }

@@ -96,7 +96,7 @@ class WebFilesystem extends Filesystem
         $adapter->setMountPath($firstFolder);
 
         if ($adapter instanceof ContainerAwareInterface) {
-            $adapter->setContainer($this->getJarves()->getKernel()->getContainer());
+            $adapter->setContainer($this->getJarves()->getContainer());
         }
 
         $adapter->loadConfig();

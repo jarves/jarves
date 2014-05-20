@@ -13,7 +13,7 @@ class Controller extends sController implements ContainerAwareInterface {
      */
     public function isAdmin()
     {
-        $adminPrefix = $this->getKernel()->getContainer()->getParameter('jarves_admin_prefix');
+        $adminPrefix = $this->container->getParameter('jarves_admin_prefix');
         if ('/' === substr($adminPrefix, -1)) {
             $adminPrefix = substr($adminPrefix, 0, -1);
         }

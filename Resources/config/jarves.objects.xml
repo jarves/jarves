@@ -138,6 +138,7 @@
           <field id="accessFromGroups" type="text"/>
           <field id="searchWords" type="text"/>
           <field id="unsearchable" type="checkbox"/>
+          <field id="content" type="pageContents"/>
           <field id="layout" type="layout"/>
           <field id="theme" type="text"/>
         </fields>
@@ -309,10 +310,9 @@
           <field id="authClass" type="text">
             <label>Auth class</label>
           </field>
-          <field id="passwd" type="textarea">
+          <field id="password" type="userPassword">
             <label>Password</label>
           </field>
-          <field id="passwdSalt" type="text"/>
           <field id="activationKey" type="text"/>
           <field id="email" type="text">
             <label>Email</label>

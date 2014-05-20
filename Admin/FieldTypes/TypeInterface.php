@@ -14,21 +14,19 @@ interface TypeInterface
      */
     public function getName();
 
-    /**
-     * Do whatever is needed to setup the build environment correctly.
-     *
-     * Add new objects with relations if a field is a n-to-n relation for example.
-     * This changes won't be saved, but only be used for the model building/schema migration.
-     *
-     * Make sure that this method does only change stuff once, because we call it frequently, depends
-     * if another boot has something changed.
-     *
-     * @param \Jarves\Configuration\Object $object
-     * @param Configs $configs
-     *
-     * @return bool true for the boot has changed something on a object/field and we need to call it on other fields again.
-     */
-    public function bootBuildTime(Object $object, Configs $configs);
+//    /**
+//     * Do whatever is needed to setup the build environment correctly.
+//     *
+//     * Add new objects with relations if a field is a n-to-n relation for example.
+//     * This changes won't be saved, but only be used for the model building/schema migration.
+//     *
+//     * Make sure that this method does only change stuff once, because we call it frequently, depends
+//     * if another boot has something changed.
+//     *
+//     * @param \Jarves\Configuration\Object $object
+//     * @param Configs $configs
+//     */
+//    public function bootBuildTime(Object $object, Configs $configs);
 
     /**
      * Do whatever is needed to setup the runtime environment correctly.
@@ -36,15 +34,13 @@ interface TypeInterface
      *
      * e.g. create cross foreignKeys for 1-to-n relations.
      *
-     * This changes will be saved.
+     * This changes will be cached.
      *
      * Make sure that this method does only change stuff once, because we call it frequently, depends
      * if another boot has something changed.
      *
      * @param \Jarves\Configuration\Object $object
      * @param Configs $configs
-     *
-     * @return bool true for the boot has changed something on a object/field and we need to call it on other fields again.
      */
     public function bootRunTime(Object $object, Configs $configs);
 

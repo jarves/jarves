@@ -21,6 +21,8 @@ class Configs implements \IteratorAggregate
 
     protected $triggeredReboot = [];
 
+    protected $needRebootBy = [];
+
     /**
      * @param Jarves $core
      * @param array $bundles
@@ -42,6 +44,21 @@ class Configs implements \IteratorAggregate
         }
 
         $this->configElements = $this->parseConfig($this->configElements);
+    }
+
+    public function addReboot($source = 'none')
+    {
+        $this->needRebootBy[] = $source;
+    }
+
+    public function resetReboot()
+    {
+        $this->needRebootBy = [];
+    }
+
+    public function needsReboot()
+    {
+        return !!$this->needRebootBy;
     }
 
     /**
@@ -142,18 +159,27 @@ class Configs implements \IteratorAggregate
      */
     public function boot()
     {
-        $changed = false;
-        foreach ($this->configElements as $key => $config) {
-            if ($boots = $config->boot($this)) {
-                $changed = true;
-                $count = (isset($this->triggeredReboot[$key]) ? $this->triggeredReboot[$key]['count'] : 0) + 1;
-                $this->triggeredReboot[$key] = [
-                    'count' => $count,
-                    'triggeredReboots' => $boots
-                ];
+        $i = 0;
+        $rebootSources = [];
+        while ($i == 0 || $this->needsReboot()) {
+            $this->resetReboot();
+            foreach ($this->configElements as $config) {
+                $config->boot($this);
+            }
+            if ($this->needsReboot()) {
+                $rebootSources = array_merge($rebootSources, $this->needRebootBy);
+            }
+//            foreach ($this->needRebootBy as $reboot) {
+//                var_dump($reboot);
+//            }
+            $i++;
+            if ($i > 100) {
+                throw new \RuntimeException(sprintf(
+                    'Can not boot bundle configuration, there is a infinite loop. Reboots triggered by: ',
+                    join(', ', $rebootSources)
+                ));
             }
         }
-        return $changed;
     }
 
     /**

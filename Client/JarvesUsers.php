@@ -25,13 +25,13 @@ class JarvesUsers extends ClientAbstract
         $con = Propel::getWriteConnection('default');
 
         $sql = "
-            SELECT id, passwd, passwd_salt
+            SELECT id, password, password_salt
             FROM " . $this->getJarves()->getSystemConfig()->getDatabase()->getPrefix() . "system_user
             WHERE
                 id > 0
                 AND $userColumn = ?
-                AND passwd IS NOT NULL AND passwd != ''
-                AND passwd_salt IS NOT NULL AND passwd_salt != ''
+                AND password IS NOT NULL AND password != ''
+                AND password_salt IS NOT NULL AND password_salt != ''
                 AND (auth_class IS NULL OR auth_class = 'jarves')";
 
         $stmt = $con->prepare($sql);
@@ -42,9 +42,9 @@ class JarvesUsers extends ClientAbstract
 
         if (isset($row['id']) && $row['id'] > 0) {
 
-            $hash = self::getHashedPassword($password, $row['passwd_salt'], $this->getJarves());
+            $hash = self::getHashedPassword($password, $row['password_salt'], $this->getJarves());
 
-            if (!$hash || $hash != $row['passwd']) {
+            if (!$hash || $hash != $row['password']) {
                 return false;
             }
             return $row['id'];

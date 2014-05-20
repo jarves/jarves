@@ -938,7 +938,7 @@ This is the bundle $bundleClassName.
         if (class_exists($packageManagerClass)) {
             $packageManager = new $packageManagerClass($this->getJarves());
             if ($packageManager instanceof ContainerAwareInterface) {
-                $packageManager->setContainer($this->getJarves()->getKernel()->getContainer());
+                $packageManager->setContainer($this->getJarves()->getContainer());
             }
 
             if (method_exists($packageManager, $script)) {
