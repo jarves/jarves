@@ -15,6 +15,7 @@ namespace Jarves;
 use Jarves\Model\Base\ContentQuery;
 use Jarves\Model\Content;
 use Jarves\ContentTypes\TypeNotFoundException;
+use Jarves\Model\ContentInterface;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\EventDispatcher\GenericEvent;
 
@@ -268,13 +269,13 @@ class ContentRender
     /**
      * Build HTML for given content.
      *
-     * @param Content $content
+     * @param ContentInterface $content
      * @param array   $parameters
      *
      * @return string
      * @throws ContentTypes\TypeNotFoundException
      */
-    public function renderContent(Content $content, $parameters = array())
+    public function renderContent(ContentInterface $content, $parameters = array())
     {
         $type = $content->getType();
         $title = sprintf('Content %d [%s]', $content->getId(), $type);

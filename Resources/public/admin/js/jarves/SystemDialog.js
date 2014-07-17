@@ -6,6 +6,7 @@ jarves.SystemDialog = new Class({
         parent = jarves.getAdminInterface().getDialogContainer();
         this.closeExistingDialog();
         options.noBottom = true;
+        options.withSmallCloseButton = true;
         this.parent(parent, options);
     },
 
@@ -19,15 +20,9 @@ jarves.SystemDialog = new Class({
     renderLayout: function () {
         this.parent();
 
-        new Element('a', {
-            title: t('Close'),
-            href: 'javascript:void(0)',
-            'class': 'jarves-SystemDialog-closer icon-cancel-8'
-        })
-            .addEvent('click', function(){
-                this.close();
-            }.bind(this))
-            .inject(this.main);
+        if (this.closerButton) {
+            this.closerButton.addClass('jarves-SystemDialog-closer');
+        }
 
         this.main.addClass('jarves-dialog-system');
     },

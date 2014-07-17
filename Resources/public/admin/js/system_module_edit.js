@@ -516,7 +516,7 @@ var jarves_system_module_edit = new Class({
                         dialog.close();
                     }
 
-                }.bind(this)}).put({'class': name.getValue(), module: this.mod});
+                }.bind(this)}).put({'class': name.getValue(), bundle: this.mod});
 
         }.bind(this)).inject(dialog.bottom);
 
@@ -2140,6 +2140,21 @@ var jarves_system_module_edit = new Class({
                 children: {
                     'desc': {
                         label: t('Description')
+                    },
+                    listEntryPoint: {
+                        label: t('Listing window entry point'),
+                        type: 'object',
+                        object: 'jarves/entryPoint'
+                    },
+                    editEntryPoint: {
+                        label: t('Edit window entry point'),
+                        type: 'object',
+                        object: 'jarves/entryPoint'
+                    },
+                    addEntryPoint: {
+                        label: t('Add window entry point'),
+                        type: 'object',
+                        object: 'jarves/entryPoint'
                     },
                     dataModel: {
                         type: 'select',

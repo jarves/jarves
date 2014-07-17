@@ -39,7 +39,7 @@ class RenderContentsExtension extends \Twig_Extension
 
     public function renderContents($contents, $view = '')
     {
-        return $this->getJarves()->getContentRender()->renderView($contents, $view);
+        return $this->getJarves()->getContentRender()->renderContents($contents, $view);
     }
 
 }

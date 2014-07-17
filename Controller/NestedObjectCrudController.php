@@ -13,8 +13,9 @@ abstract class NestedObjectCrudController extends ObjectCrudController
      *    description="Adds a new item (nested set)"
      * )
      *
-     * @Rest\QueryParam(name="targetPk", requirements=".*", description="The target object item's primaryKey as url encoded string. Only for nested sets.")
-     * @Rest\QueryParam(name="limit", requirements="[0-9]+", description="Limits the result")
+     * @Rest\RequestParam(name="_pk", array=true, strict=false, description="The target object item's primaryKey as url encoded string. Only for nested sets.")
+     * @Rest\RequestParam(name="_position", requirements=".*", strict=false, description="The position we place this new entry relative to _pk given position. `first` (child), `last` (child), `prev` (sibling), `next` (sibling).")
+     * @Rest\RequestParam(name="_targetObjectKey", requirements=".*", strict=false, description="The target object key. Only for nested sets.")
      *
      * @Rest\View()
      * @Rest\Post("/")
@@ -27,18 +28,41 @@ abstract class NestedObjectCrudController extends ObjectCrudController
     public function addItemAction(Request $request, ParamFetcher $paramFetcher)
     {
         $obj = $this->getObj();
-        $data = null;
 
-        return $obj->add($data, $paramFetcher->get('targetPk'));
+        return $obj->add($request, $paramFetcher->get('_pk'), $paramFetcher->get('_position'), $paramFetcher->get('_targetObjectKey'));
     }
 
     /**
      * @ApiDoc(
-     *    description="Delete a object root"
+     *    description="Adds multiple %object% items #todo-doc"
+     * )
+     *
+     * @Rest\RequestParam(name="_pk", array=true, strict=false, description="The target object item's primaryKey as url encoded string. Only for nested sets.")
+     * @Rest\RequestParam(name="_position", requirements=".*", strict=false, description="The position we place this new entry relative to _pk given position. `first` (child), `last` (child), `prev` (sibling), `next` (sibling).")
+     * @Rest\RequestParam(name="_targetObjectKey", requirements=".*", strict=false, description="The target object key. Only for nested sets.")
+     *
+     * @Rest\View()
+     * @Rest\Post("/:multiple")
+     *
+     * @param Request $request
+     *
+     * @return mixed
+     */
+    public function addMultipleItemAction(Request $request)
+    {
+        $obj = $this->getObj();
+
+        return $obj->addMultiple($request);
+    }
+
+
+    /**
+     * @ApiDoc(
+     *    description="Deletes a object root"
      * )
      *
      * @Rest\View()
-     * @Rest\Delete("/")
+     * @Rest\Delete("/:root")
      *
      * @return boolean
      */
@@ -178,9 +202,10 @@ abstract class NestedObjectCrudController extends ObjectCrudController
      *    description="Moves a item (nested set)"
      * )
      *
-     * @Rest\QueryParam(name="target", requirements=".+", description="The target PK. Same structure as pk.")
-     * @Rest\QueryParam(name="position", requirements="first|last|insert", default="first", description="The position")
-     * @Rest\QueryParam(name="overwrite", requirements="true|false", default=false, description="If the target should be replaced when exist")
+     * @Rest\RequestParam(name="target", requirements=".+", description="The target PK")
+     * @Rest\RequestParam(name="position", strict=false, requirements="prev|next|insert", default="first", description="The position")
+     * @Rest\RequestParam(name="targetObjectKey", strict=false, description="Target object key. Usually blank.")
+     * @Rest\RequestParam(name="overwrite", strict=false, requirements="true|false", default="false", description="If the target should be replaced when exist")
      *
      * @Rest\View()
      * @Rest\Post("/{pk}/:move")
@@ -193,11 +218,15 @@ abstract class NestedObjectCrudController extends ObjectCrudController
      *
      * @return boolean
      */
-    public function moveItemAction(Request $request, $target, $position = 'first', $targetObjectKey = '', $overwrite = false)
+    public function moveItemAction(Request $request, ParamFetcher $paramFetcher)
     {
         $obj = $this->getObj();
 
         $primaryKey = $this->extractPrimaryKey($request);
+        $target = $paramFetcher->get('target');
+        $position = $paramFetcher->get('position') ?: 'first';
+        $targetObjectKey = $paramFetcher->get('targetObjectKey');
+        $overwrite = $paramFetcher->get('overwrite');
 
         return $obj->moveItem(
             $primaryKey,

@@ -142,6 +142,15 @@ jarves.Loader = new Class({
         }
     },
 
+    destroyOverlay: function() {
+        if (this.transBg) {
+            this.transBg.destroy();
+        }
+        if (this.toElement()) {
+            this.toElement().setStyle('pointer-events', 'none');
+        }
+    },
+
     inject: function (pTarget, pWhere) {
         this.toElement().inject(pTarget, pWhere);
 

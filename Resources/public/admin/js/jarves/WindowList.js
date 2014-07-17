@@ -12,7 +12,7 @@ jarves.WindowList = new Class({
 
     loadAlreadyTriggeredBySearch: false,
 
-    initialize: function (pWindow, pOptions, pContainer) {
+    initialize: function (pWindow, pContainer, pOptions) {
         this.options = this.setOptions(pOptions);
         this.win = pWindow;
 
@@ -32,7 +32,7 @@ jarves.WindowList = new Class({
         this.sortDirection = 'asc';
 
         //this.oriWinCode = this.win.code;
-        this.oriWinEntryPoint = this.win.entryPoint;
+        this.oriWinEntryPoint = this.options.entryPoint;
 
         this.load();
         var _this = this;
@@ -45,6 +45,10 @@ jarves.WindowList = new Class({
         }
     },
 
+    getEntryPoint: function() {
+        return this.options.entryPoint || this.win.getEntryPoint();
+    },
+
     reload: function () {
         this.loadPage(this.currentPage);
     },
@@ -55,7 +59,7 @@ jarves.WindowList = new Class({
         this.container.set('html',
             '<div style="text-align: center; padding: 50px; color: silver">' + t('Loading definition ...') + '</div>');
 
-        new Request.JSON({url: _pathAdmin + this.win.getEntryPoint()+'/', noCache: true, onComplete: function (res) {
+        new Request.JSON({url: _pathAdmin + this.getEntryPoint()+'/', noCache: true, onComplete: function (res) {
             if (res.error) {
                 this.container.set('html', '<div style="text-align: center; padding: 50px; color: red">' +
                     tf('Failed. Error %s: %s', res.error, res.message) + '</div>');
@@ -266,7 +270,7 @@ jarves.WindowList = new Class({
 
         objectOptions.type = 'tree';
         objectOptions.object = this.classProperties.object;
-        objectOptions.entryPoint = this.win.getEntryPoint();
+        objectOptions.entryPoint = this.getEntryPoint();
         objectOptions.scopeChooser = false;
         objectOptions.noWrapper = true;
         objectOptions.selectObject = this.selected;
@@ -290,14 +294,14 @@ jarves.WindowList = new Class({
 
     addNestedRoot: function () {
         //open
-        jarves.entrypoint.open(jarves.entrypoint.getRelative(this.win.getEntryPoint(),
+        jarves.entrypoint.open(jarves.entrypoint.getRelative(this.getEntryPoint(),
             this.classProperties.nestedRootAddEntrypoint), {
             lang: (this.languageSelect) ? this.languageSelect.getValue() : false
         }, this);
     },
 
     openAddItem: function () {
-        jarves.wm.open(jarves.entrypoint.getRelative(this.win.getEntryPoint(), this.classProperties.addEntrypoint), {
+        jarves.wm.open(jarves.entrypoint.getRelative(this.getEntryPoint(), this.classProperties.addEntrypoint), {
             lang: (this.languageSelect) ? this.languageSelect.getValue() : false
         }, this.win.getId(), true);
     },
@@ -322,16 +326,16 @@ jarves.WindowList = new Class({
         var indexOffset = 0;
         if (this.classProperties.remove == true) {
             indexOffset = 1;
-            var input = new Element('input', {
+            this.columnCheckbox = new Element('input', {
                 value: 1,
                 type: 'checkbox'
             }).addEvent('click', function () {
-                    var checked = this.checked;
+                    var checked = this.columnCheckbox.checked;
                     this.checkboxes.each(function (checkbox) {
                         checkbox.checked = checked;
                     });
                 }.bind(this));
-            columns.push([input, 21]);
+            columns.push([this.columnCheckbox, 21]);
         }
 
         this.columns = {};
@@ -414,8 +418,12 @@ jarves.WindowList = new Class({
         }.bind(this));
     },
 
+    getSidebar: function() {
+        return this.options.sidebar || this.win.getSidebar();
+    },
+
     renderSideActionBar: function() {
-        var container = this.win.addSidebar();
+        var container = this.getSidebar();
 
         this.sideBarTitle = new Element('h2', {
             'class': 'light',
@@ -513,7 +521,7 @@ jarves.WindowList = new Class({
                     this.lastDeleteRq.cancel();
                 }
 
-                this.lastDeleteRq = new Request.JSON({url: _pathAdmin + this.win.getEntryPoint() + '/',
+                this.lastDeleteRq = new Request.JSON({url: _pathAdmin + this.getEntryPoint() + '/',
                     noCache: 1, onComplete: function (res) {
 
                     this.win.setLoading(false);
@@ -522,7 +530,7 @@ jarves.WindowList = new Class({
 
                 }.bind(this)}).post({
                     _method: 'delete',
-                    pk: pItems
+                    pks: pItems
                 });
             }.bind(this));
         }
@@ -560,7 +568,7 @@ jarves.WindowList = new Class({
             this.lastExportFrame.destroy();
         }
         this.lastExportForm = new Element('form', {
-            action: _pathAdmin + this.win.getEntryPoint() + '?cmd=exportItems&' + params.toQueryString(),
+            action: _pathAdmin + this.getEntryPoint() + '?cmd=exportItems&' + params.toQueryString(),
             method: 'post',
             target: 'myExportFrame' + this.win.id
         }).inject(document.hiddenElement);
@@ -591,7 +599,7 @@ jarves.WindowList = new Class({
             });
         }
 
-        this.lastRequest = new Request.JSON({url: _pathAdmin + this.win.getEntryPoint() + '/:count',
+        this.lastRequest = new Request.JSON({url: _pathAdmin + this.getEntryPoint() + '/:count',
             noCache: true,
             onComplete: function (res) {
                 if (!res || res.error) {
@@ -640,13 +648,14 @@ jarves.WindowList = new Class({
         req.offset = (this.classProperties.itemsPerPage * pPage) - this.classProperties.itemsPerPage;
         req.lang = (this.languageSelect) ? this.languageSelect.getValue() : null;
 
+        req.withAcl = true;
         req.orderBy = {};
         req.orderBy[this.sortField] = this.sortDirection;
         if (this.actionBarSearchInput) {
             req.q = this.actionBarSearchInput.getValue();
         }
 
-        this.lastLoadPageRequest = new Request.JSON({url: _pathAdmin + this.win.getEntryPoint() + '/',
+        this.lastLoadPageRequest = new Request.JSON({url: _pathAdmin + this.getEntryPoint() + '/',
             noCache: true,
             onComplete: function (res) {
                 this.currentPage = pPage;
@@ -708,7 +717,7 @@ jarves.WindowList = new Class({
     },
 
     openEditItem: function (pItem) {
-        jarves.entrypoint.open(jarves.entrypoint.getRelative(this.win.getEntryPoint(), this.classProperties.editEntrypoint), {
+        jarves.entrypoint.open(jarves.entrypoint.getRelative(this.getEntryPoint(), this.classProperties.editEntrypoint), {
             item: pItem
         }, this.win.getId(), true, this.win.getId());
     },

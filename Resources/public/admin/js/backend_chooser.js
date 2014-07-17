@@ -167,15 +167,15 @@ var jarves_backend_chooser = new Class({
 
     },
 
-    createObjectChooser: function (pObjectKey) {
-        pObjectKey = jarves.normalizeObjectKey(pObjectKey);
-        var objectDefinition = jarves.getObjectDefinition(pObjectKey);
+    createObjectChooser: function (objectKey) {
+        objectKey = jarves.normalizeObjectKey(objectKey);
+        var objectDefinition = jarves.getObjectDefinition(objectKey);
 
         var bundle = this.tapPane.addPane(objectDefinition.label || objectDefinition._key, objectDefinition.icon);
-        this.pane2ObjectId[bundle.id] = pObjectKey;
+        this.pane2ObjectId[bundle.id] = objectKey;
         bundle.pane.addClass('jarves-BackendChooser-pane');
 
-        var objectOptions = this.options.browserOptions[pObjectKey];
+        var objectOptions = this.options.browserOptions[objectKey];
 
         if (this.options.objects.length == 1 && !objectOptions) {
             objectOptions = this.options.browserOptions;
@@ -195,10 +195,10 @@ var jarves_backend_chooser = new Class({
             if (!chooserClass) {
                 this.win._alert(t("Can't find chooser class '%class%' in object '%object%'.")
                     .replace('%class%', objectDefinition.browserInterfaceClass)
-                    .replace('%object%', pObjectKey)
+                    .replace('%object%', objectKey)
                 );
             } else {
-                this.objectChooserInstance[pObjectKey] = new chooserClass(
+                this.objectChooserInstance[objectKey] = new chooserClass(
                     win.getContentContainer(),
                     objectOptions,
                     win
@@ -207,27 +207,27 @@ var jarves_backend_chooser = new Class({
         } else if (objectDefinition.nested) {
 
             objectOptions.type = 'tree';
-            objectOptions.object = pObjectKey;
+            objectOptions.object = objectKey;
             objectOptions.scopeChooser = true;
             objectOptions.noWrapper = true;
-            this.objectChooserInstance[pObjectKey] = new jarves.Field(objectOptions, win.getContentContainer());
+            this.objectChooserInstance[objectKey] = new jarves.Field(objectOptions, win.getContentContainer());
 
         } else {
-            this.objectChooserInstance[pObjectKey] = new jarves.ObjectTable(
+            this.objectChooserInstance[objectKey] = new jarves.ObjectTable(
                 win.getContentContainer(),
                 objectOptions,
                 win,
-                pObjectKey
+                objectKey
             );
         }
 
-        if (this.objectChooserInstance[pObjectKey] && this.objectChooserInstance[pObjectKey].addEvent) {
-            this.objectChooserInstance[pObjectKey].addEvent('select', function () {
-                this.deselectAll(pObjectKey);
+        if (this.objectChooserInstance[objectKey] && this.objectChooserInstance[objectKey].addEvent) {
+            this.objectChooserInstance[objectKey].addEvent('select', function () {
+                this.deselectAll(objectKey);
             }.bind(this));
 
-            this.objectChooserInstance[pObjectKey].addEvent('instantSelect', function () {
-                this.choose(pObjectKey);
+            this.objectChooserInstance[objectKey].addEvent('instantSelect', function () {
+                this.choose(objectKey);
             }.bind(this));
         }
     },

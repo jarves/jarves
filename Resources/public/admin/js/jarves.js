@@ -535,7 +535,7 @@ jarves.getObjectPkFromUrlId = function(objectKey, urlId) {
  * @param {String} objectKey
  * @param {Object} item
  *
- * @return {String}
+ * @return {String} url encoded string
  */
 jarves.getObjectUrlId = function(objectKey, item) {
     var pks = jarves.getObjectPrimaryList(objectKey);
@@ -548,7 +548,25 @@ jarves.getObjectUrlId = function(objectKey, item) {
         return values.join('/');
     }
 
+    if (!(pks[0] in item)) {
+        throw pks[0] + ' does not exist in item.';
+    }
+
     return jarves.urlEncode(item[pks[0]]);
+};
+
+/**
+ * Return the origin id of object primary keys. If the object has multiple pks, we return only the first.
+ *
+ * @param {String} objectKey
+ * @param {Object} item
+ *
+ * @return {String|Number}
+ */
+jarves.getObjectId = function(objectKey, item) {
+    var pks = jarves.getObjectPrimaryList(objectKey);
+
+    return item[pks[0]];
 };
 
 /**
@@ -653,7 +671,7 @@ jarves.getCroppedObjectKey = function(url) {
  *
  * @param {String} url
  *
- * @return {String}
+ * @return {String} encoded id
  */
 jarves.getObjectIdFromUrl = function(url) {
     var pks = jarves.getObjectPrimaryList(jarves.getCroppedObjectKey(url));
@@ -1328,11 +1346,11 @@ jarves.getObjectDefinition = function(objectKey) {
 
     objectKey = jarves.normalizeObjectKey(objectKey);
 
-    var module = ("" + objectKey.split('/')[0]).toLowerCase();
-    var name = objectKey.split('/')[1].toLowerCase();
+    var bundleName = ("" + objectKey.split('/')[0]).toLowerCase();
+    var name = objectKey.split('/')[1].lcfirst();
 
-    if (jarves.getConfig(module) && jarves.getConfig(module)['objects'][name]) {
-        var config = jarves.getConfig(module)['objects'][name];
+    if (jarves.getConfig(bundleName) && jarves.getConfig(bundleName)['objects'][name]) {
+        var config = jarves.getConfig(bundleName)['objects'][name];
         config._key = objectKey;
         return config;
     }

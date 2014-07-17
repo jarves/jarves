@@ -1637,6 +1637,8 @@ var jarves_system_module_editWindow = new Class({
         if (this.inApplyingProperties) {
             return;
         }
+
+        console.log('applyFieldProperties');
         this.inApplyingProperties = true;
 
         var tab;

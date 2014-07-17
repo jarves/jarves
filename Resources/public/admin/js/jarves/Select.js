@@ -418,6 +418,12 @@ jarves.Select = new Class({
         }
     },
 
+    reload: function() {
+        this.cachedObjectItems = {};
+        this.cache = {};
+        this.setValue(this.getValue());
+    },
+
     getObjectUrl: function() {
         var uri = _pathAdmin + 'object/' + jarves.normalizeObjectKey(this.options.object) +'/';
 
@@ -983,24 +989,24 @@ jarves.Select = new Class({
         this.chooser.empty();
     },
 
-    getLabel: function(pId, pCallback) {
+    getLabel: function(id, callback) {
 
         var data;
         if (this.items.length > 0) {
             //search for i
             for (var i = this.items.length - 1; i >= 0; i--) {
-                if (pId == this.items[i].id) {
+                if (id == this.items[i].id) {
                     data = this.items[i];
                     break;
                 }
             }
-            pCallback(data);
+            callback(data);
         } else if (this.options.object || this.options.store) {
             //maybe in objectcache?
-            if (this.cachedObjectItems[pId]) {
-                item = this.cachedObjectItems[pId];
-                pCallback({
-                    id: pId,
+            if (this.cachedObjectItems[id]) {
+                var item = this.cachedObjectItems[id];
+                callback({
+                    id: id,
                     label: item
                 });
             } else {
@@ -1009,42 +1015,19 @@ jarves.Select = new Class({
                     this.lastLabelRequest.cancel();
                 }
 
-//                if (this.options.store) {
-//
-//                    this.lastLabelRequest = new Request.JSON({
-//                        url: _pathAdmin + this.options.store + '/' + jarves.urlEncode(pId),
-//                        onComplete: function(response) {
-//
-//                            if (!response.error) {
-//
-//                                if (response.data === false) {
-//                                    return pCallback(false);
-//                                }
-//
-//                                pCallback({
-//                                    id: pId,
-//                                    label: response.data
-//                                });
-//                            }
-//                        }.bind(this)
-//                    }).get({
-//                            fields: this.objectFields.join(',')
-//                        });
-//
-//                } else
                 if (this.options.object) {
                     this.lastLabelRequest = new Request.JSON({
-                        url: _pathAdmin + 'object/' + jarves.normalizeObjectKey(this.options.object) + '/' + jarves.urlEncode(pId),
+                        url: _pathAdmin + 'object/' + jarves.normalizeObjectKey(this.options.object) + '/' + jarves.urlEncode(id),
                         onComplete: function(response) {
 
                             if (!response.error) {
 
                                 if (!response.data) {
-                                    return pCallback(false);
+                                    return callback(false);
                                 }
 
                                 var id = jarves.getObjectUrlId(this.options.object, response.data);
-                                pCallback({
+                                callback({
                                     id: id,
                                     label: response.data
                                 });
@@ -1058,18 +1041,22 @@ jarves.Select = new Class({
         }
     },
 
-    chooseItem: function(pValue, pInternal) {
-        this.setValue(pValue, pInternal);
+    chooseItem: function(value, internal) {
+        this.setValue(value, internal);
     },
 
-    setValue: function(pValue, pInternal) {
-        this.value = pValue;
+    setValue: function(value, internal) {
+        if ('object' === typeOf(value) && this.options.object) {
+            value = jarves.getObjectId(this.options.object, value);
+        }
+
+        this.value = value;
 
         if (typeOf(this.value) == 'null' || null === this.value) {
             if (!this.options.selectFirstOnNull) {
                 return this.title.set('text', '');
             } else {
-                return this.selectFirst(null, pInternal);
+                return this.selectFirst(null, internal);
             }
         }
 
@@ -1081,7 +1068,7 @@ jarves.Select = new Class({
             }
         }.bind(this));
 
-        if (pInternal) {
+        if (internal) {
             this.fireChange();
         }
 
@@ -1103,7 +1090,7 @@ jarves.Select = new Class({
         }
     },
 
-    close: function(pInternal) {
+    close: function(internal) {
         this.chooser.dispose();
         this.box.removeClass('jarves-Select-box-open');
         this.reset();

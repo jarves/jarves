@@ -599,6 +599,11 @@ class Bundle extends Model
     public function setEntryPoints(array $entryPoints = null)
     {
         $this->entryPoints = $entryPoints;
+        if ($this->entryPoints) {
+            foreach ($this->entryPoints as $entryPoint) {
+                $entryPoint->setBundle($this);
+            }
+        }
     }
 
     /**
@@ -689,7 +694,7 @@ class Bundle extends Model
         if (null !== $this->objects) {
             $objects = array();
             foreach ($this->objects as $object) {
-                $objects[strtolower($object->getId())] = $object->toArray();
+                $objects[lcfirst($object->getId())] = $object->toArray();
             }
 
             return $objects;

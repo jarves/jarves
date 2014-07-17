@@ -229,6 +229,32 @@ abstract class ObjectCrudController extends ObjectCrud
 
     /**
      * @ApiDoc(
+     *    description="Deletes multiple items at once"
+     * )
+     *
+     * @Rest\RequestParam(name="pks", requirements=".+", array=true, description="All primary keys as list")
+     *
+     * @Rest\View()
+     * @Rest\Delete("/")
+     *
+     * @param Request $request
+     *
+     * @return boolean
+     */
+    public function removeMultipleAction(Request $request)
+    {
+        $obj = $this->getObj();
+        $res = true;
+
+        foreach ((array)$request->get('pks') as $pk) {
+            $res &= $obj->remove($pk);
+        }
+
+        return $res;
+    }
+
+    /**
+     * @ApiDoc(
      *    description="Adds a new %object% item"
      * )
      *
@@ -244,16 +270,8 @@ abstract class ObjectCrudController extends ObjectCrud
     {
         $obj = $this->getObj();
 
-        $data = null;
-
-        return $obj->add($request, $data);
+        return $obj->add($request);
     }
-
-    /**
-     * Proxy method for REST POST to add().
-     *
-     * @return mixed
-     */
 
     /**
      * @ApiDoc(

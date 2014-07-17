@@ -3,7 +3,7 @@
     left: 20px;
     bottom: 25px;
     overflow: hidden;
-    width: 270px;
+    max-width: 50%px;
     z-index: 5000000;
 }
 

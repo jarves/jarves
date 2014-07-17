@@ -30,6 +30,8 @@ jarves.Dialog = new Class({
         autoClose: false,
         destroyOnClose: true,
 
+        withSmallCloseButton: false,
+
         animatedTransition: Fx.Transitions.Cubic.easeOut,
         animatedTransitionOut: Fx.Transitions.Cubic.easeIn,
         animatedDuration: 200
@@ -49,6 +51,10 @@ jarves.Dialog = new Class({
         this.lastFocusedElement = document.activeElement;
         this.container = instanceOf(parent, jarves.Window) ? parent.toElement() : parent;
 
+        if (instanceOf(parent, jarves.Window)) {
+            parent.toFront();
+        }
+
         this.setOptions(options);
         this.renderLayout();
 
@@ -67,7 +73,7 @@ jarves.Dialog = new Class({
         if (this.options.autoClose) {
             this.overlay.addEvent('click', function(e){
                 if (e.target === this.overlay) {
-                    this.closeAnimated();
+                    this.closeAnimated(true);
                 }
             }.bind(this));
 
@@ -91,7 +97,7 @@ jarves.Dialog = new Class({
 
     checkClose: function(e) {
         if (document.activeElement == document.body && 'esc' === e.key) {
-            this.closeAnimated();
+            this.closeAnimated(true);
             return false;
         }
     },
@@ -180,6 +186,18 @@ jarves.Dialog = new Class({
         if (this.options.autoDisplay) {
             this.center(true);
         }
+
+        if (this.options.withSmallCloseButton) {
+            this.closerButton = new Element('a', {
+                title: t('Close'),
+                href: 'javascript:void(0)',
+                'class': 'jarves-Dialog-closer icon-cancel-8'
+            })
+                .addEvent('click', function(){
+                    this.close(true);
+                }.bind(this))
+                .inject(this.main);
+        }
     },
 
     setStyle: function (p1, p2) {
@@ -227,7 +245,15 @@ jarves.Dialog = new Class({
         this.cancelNextClosing = true;
     },
 
+    /**
+     * Aborts the closing process during the preClose event
+     */
+    abortClosing: function() {
+        this.canClosed = false;
+    },
+
     close: function (internal, animated) {
+        this.canClosed = true;
         if (this.cancelNextClosing) {
             delete this.cancelNextClosing;
             return;
@@ -235,6 +261,7 @@ jarves.Dialog = new Class({
 
         if (internal) {
             this.main.fireEvent('preClose');
+            this.fireEvent('preClose');
         }
 
         if (!this.canClosed) {

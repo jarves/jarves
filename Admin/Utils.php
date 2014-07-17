@@ -73,6 +73,10 @@ class Utils
             $code = substr($code, 1);
         }
 
+        if (false === strpos($code, '/')) {
+            $path = '';
+        }
+
         $bundleName = $code;
         if (false !== (strpos($code, '/'))) {
             $bundleName = substr($code, 0, strpos($code, '/'));
@@ -90,6 +94,7 @@ class Utils
             $entryPoint->setChildren(
                 $config->getEntryPoints()
             );
+            $entryPoint->setBundle($config);
             return $entryPoint;
         }
 

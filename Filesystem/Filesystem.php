@@ -9,6 +9,7 @@ use Jarves\File\FileInfoInterface;
 use Jarves\Model\FileQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Map\TableMap;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 class Filesystem implements FilesystemInterface
 {
@@ -31,6 +32,7 @@ class Filesystem implements FilesystemInterface
     public function setAdapter(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
+        $this->adapter->loadConfig();
     }
 
     /**

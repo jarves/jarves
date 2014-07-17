@@ -85,8 +85,6 @@ class Local extends AbstractAdapter
      */
     public function setPermission($path)
     {
-        $path = $this->getFullPath($path);
-
         if (!file_exists($path)) {
             return false;
         }
@@ -577,6 +575,7 @@ class Local extends AbstractAdapter
 
     /**
      * {@inheritDoc}
+     * @todo
      */
     public function getPublicAccess($path)
     {
@@ -616,6 +615,7 @@ class Local extends AbstractAdapter
 
     /**
      * {@inheritDoc}
+     * @todo
      */
     public function setPublicAccess($path, $access = false)
     {

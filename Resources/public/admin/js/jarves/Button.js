@@ -4,57 +4,57 @@ jarves.Button = new Class({
 
     /**
      * @constructor
-     * @param {String|Array} pTitle A string or a array. With the array you can define a icon: ['title', '#icon-add']
-     * @param {String}       pOnClick
-     * @param {String}       pTooltip
+     * @param {String|Array} label A string or a array. With the array you can define a icon: ['title', '#icon-add']
+     * @param {String}       onClick
+     * @param {String}       tooltip
      */
-    initialize: function(pTitle, pOnClick, pTooltip) {
+    initialize: function(label, onClick, tooltip) {
         this.main = new Element('a', {
             'class': 'jarves-Button',
             href: 'javascript:void(0)',
-            title: (pTooltip) ? pTooltip : null
+            title: (tooltip) ? tooltip : null
         });
 
         this.mainLabel = new Element('span').inject(this.main);
 
         this.main.kaButton = this;
 
-        this.setText(pTitle);
+        this.setText(label);
 
-        if (pOnClick) {
-            this.main.addEvent('click', pOnClick);
+        if (onClick) {
+            this.main.addEvent('click', onClick);
         }
     },
 
-    setText: function(pText) {
+    setText: function(label) {
         if (this.lastIconClass) {
             this.main.removeClass(this.lastIconClass);
             delete this.lastIconClass;
         }
 
-        if (typeOf(pText) == 'element' && pText.inject) {
-            pText.inject(this.mainLabel);
-        } else if (typeOf(pText) == 'array') {
+        if (typeOf(label) == 'element' && label.inject) {
+            label.inject(this.mainLabel);
+        } else if (typeOf(label) == 'array') {
             this.mainLabel.empty();
-            this.main.set('title', pText[0]);
-            this.mainLabel.set('text', pText[0]);
+            this.main.set('title', label[0]);
+            this.mainLabel.set('text', label[0]);
 
-            if (typeOf(pText[1]) == 'string') {
-                if (pText[0] !== '') {
+            if (typeOf(label[1]) == 'string') {
+                if (label[0] !== '') {
                     this.main.addClass('jarves-Button-textAndIcon');
                 }
 
-                if (pText[1].substr(0, 1) == '#') {
-                    this.lastIconClass = pText[1].substr(1);
-                    this.main.addClass(pText[1].substr(1));
+                if (label[1].substr(0, 1) == '#') {
+                    this.lastIconClass = label[1].substr(1);
+                    this.main.addClass(label[1].substr(1));
                 } else {
                     new Element('img', {
-                        src: jarves.mediaPath(pText[1])
+                        src: jarves.mediaPath(label[1])
                     }).inject(this.mainLabel, 'top');
                 }
             }
         } else {
-            this.mainLabel.set('text', pText);
+            this.mainLabel.set('text', label);
         }
     },
 

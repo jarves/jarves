@@ -24,9 +24,31 @@ class ObjectEntryPoint extends Propel
             return array(
                  'path' => $pk['path'],
                 'type' => $entryPoint['type'],
-                'title' => $entryPoint['title'] ? $entryPoint['title'] . ' (/' . $pk['path'] . ')' : '/'.$pk['path']
+                'title' => $entryPoint->getLabel() ? $entryPoint->getLabel() . ' ('.$pk['path'].')' : $entryPoint->getPath()
             );
         }
+    }
+
+    protected function getChildrenFlattenList($path)
+    {
+        $adminUtils = new \Jarves\Admin\Utils($this->getJarves());
+
+        $entryPoint = $adminUtils->getEntryPoint($path);
+        var_dump($path, $entryPoint);
+        $children = [];
+
+        if ($entryPoint['children']) {
+            foreach ($entryPoint['children'] as $key => $entryPoint) {
+                $children = [
+                    'path' => $path . '/' . $key,
+                    'type' => $entryPoint['type'],
+                    'title' => $entryPoint['title'] ? $entryPoint['title'] . ' (' . $key . ')' : $key
+                ];
+
+            }
+        }
+
+        return $children;
     }
 
     /**
@@ -34,6 +56,26 @@ class ObjectEntryPoint extends Propel
      */
     public function getItems(Condition $condition = null, $options = null)
     {
+        $adminUtils = new \Jarves\Admin\Utils($this->getJarves());
+        $entryPoint = $adminUtils->getEntryPoint('JarvesPublicationBundle');
+        var_dump($entryPoint);
+        exit;
+
+        foreach ($this->getJarves()->getBundles() as $bundle) {
+            $item = array(
+                'path' => $bundle->getName(),
+                'title' => $bundle->getName()
+            );
+            $result[] = $item;
+
+            $children = $this->getChildrenFlattenList($item['path']);
+
+//            $entryPoint = $adminUtils->getEntryPoint($item['path'], true);
+//            foreach ($entryPoint['children'] as $key => $entryPoint) {
+
+        }
+
+        return $result;
     }
 
     /**
@@ -136,7 +178,7 @@ class ObjectEntryPoint extends Propel
             foreach ($this->getJarves()->getBundles() as $bundle) {
 
                 $item = array(
-                    'path' => strtolower($bundle->getName()),
+                    'path' => $bundle->getName(),
                     'title' => $bundle->getName()
                 );
 
@@ -150,16 +192,16 @@ class ObjectEntryPoint extends Propel
 
             $adminUtils = new \Jarves\Admin\Utils($this->getJarves());
             $entryPoint = $adminUtils->getEntryPoint($pk['path'], true);
-            if ($entryPoint && $entryPoint['children'] && count($entryPoint['children']) > 0) {
+            if ($entryPoint && $entryPoint->getChildren()) {
 
-                foreach ($entryPoint['children'] as $key => $entryPoint) {
+                foreach ($entryPoint->getChildren() as $entryPoint) {
                     $item = array(
-                        'path' => $pk['path'] . '/' . $key,
-                        'type' => $entryPoint['type'],
-                        'title' => $entryPoint['title'] ? $entryPoint['title'] . ' (' . $key . ')' : $key
+                        'path' => $pk['path'] . '/' . $entryPoint->getPath(),
+                        'type' => $entryPoint->getType(),
+                        'title' => $entryPoint->getLabel() ? $entryPoint->getLabel() : $entryPoint->getPath()
                     );
 
-                    $this->setChildren($pk['path'] . '/' . $key, $item, $depth);
+                    $this->setChildren($pk['path'] . '/' . $entryPoint->getPath(), $item, $depth);
 
                     $result[] = $item;
                 }

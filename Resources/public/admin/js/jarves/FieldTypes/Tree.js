@@ -165,7 +165,7 @@ jarves.FieldTypes.Tree = new Class({
                 typeOf(this.definition.treeMoveable) !== 'null' ? this.definition.treeMoveable : true;
         }
 
-        if (!this.options.scope) {
+        if (!this.options.scope && this.definition.nestedRootAsObject) {
             if (this.options.scopeChooser) {
                 var options = {
                     object: this.options.rootObject,
@@ -206,15 +206,15 @@ jarves.FieldTypes.Tree = new Class({
         return _pathAdmin + (this.options.entryPoint ? this.options.entryPoint : 'object/' + jarves.normalizeObjectKey(this.options.object) ) + '/';
     },
 
-    loadTree: function (pScope) {
+    loadTree: function (scope) {
         this.treesContainer.empty();
 
         this.trees = [];
 
-        this.addTree(pScope);
+        this.addTree(scope);
     },
 
-    addTree: function (pScope) {
+    addTree: function (scope) {
         var clazz = jarves.ObjectTree;
 
         if (this.options.treeInterface && this.options.treeInterface != 'default') {
@@ -228,7 +228,7 @@ jarves.FieldTypes.Tree = new Class({
         }
 
         var options = Object.clone(this.options);
-        options.scope = pScope;
+        options.scope = scope;
         options.objectKey = options.object;
         if (this.selectItem) {
             options.selectObject = this.selectItem;

@@ -105,7 +105,7 @@ jarves.wm = {
     loadWindow: function (pEntryPoint, pLink, pParentWindowId, pParams, pInline) {
         var instance = ++jarves.wm.instanceIdx;
 
-        if (pParentWindowId == -1) {
+        if (pParentWindowId == -1 || (pInline && !pParentWindowId)) {
             pParentWindowId = jarves.wm.lastWindow ? jarves.wm.lastWindow.id : false;
         }
 
@@ -118,6 +118,7 @@ jarves.wm = {
         jarves.wm.windows[instance].toFront();
         jarves.wm.updateWindowBar();
         jarves.wm.reloadHashtag();
+        return jarves.wm.windows[instance];
     },
 
     close: function (pWindow) {
@@ -198,7 +199,7 @@ jarves.wm = {
             })
             .addEvent('mouseup', function(e){
                 if(e.isMiddleClick()){
-                    win.close();
+                    win.close(true);
                     e.stop();
                 }
             })
@@ -215,7 +216,7 @@ jarves.wm = {
             new Element('a', {
                 'class': 'icon-cancel-8'
             }).addEvent('click', function(e){
-                win.close();
+                win.close(true);
                 e.stop();
             }).inject(el);
 

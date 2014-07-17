@@ -6,7 +6,7 @@ jarves.Helpsystem = new Class({
         this.boxes = [];
 
         this.container = new Element('div', {
-            'class': 'jarves-helpsystem-container'
+            'class': 'jarves-helpsystem-container jarves-admin'
         }).inject(this.desktop);
 
     },

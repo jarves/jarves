@@ -675,7 +675,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
                 }
 
                 if (!isset($field['label'])) {
-                    $field['label'] = '!!No title defined (either object or in objectWindow class!!';
+                    $field['label'] = $key;
                 }
             }
 
@@ -1213,6 +1213,8 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
         if (!$fields) {
             $fields = array();
+            $fields[] = $this->getObjectDefinition()->getLabelField();
+
             if ($rootField = $this->getObjectDefinition()->getNestedRootObjectLabelField()) {
                 $fields[] = $rootField;
             }
@@ -1246,13 +1248,12 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
         $options['order'] = $this->getOrder();
 
-        $options['fields'] = array_keys($this->getColumns() ? : array());
-        if (!$options['fields']) {
-            $options['fields'] = array();
+        if (is_array($options['fields'])) {
+            $options['fields'] = implode(',', $options['fields']);
         }
 
-        $options['fields'] += $this->getTreeFields();
-
+        $options['fields'] .= ',' . implode(',', array_keys($this->getColumns() ? : array()));
+        $options['fields'] .= ',' . implode(',', $this->getTreeFields());
 
         if ($this->getMultiLanguage()) {
 

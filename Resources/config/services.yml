@@ -97,12 +97,14 @@ services:
          class: %jarves.filesystem.adapter.local.class%
          arguments: ["/"]
          calls:
+             - [setJarves, ["@jarves"]]
              - [setRoot, ["%kernel.root_dir%/.."]]
 
      jarves.filesystem.adapter.cache:
          class: %jarves.filesystem.adapter.local.class%
          arguments: ["/"]
          calls:
+             - [setJarves, ["@jarves"]]
              - [setRoot, ["%kernel.cache_dir%"]]
 
      jarves.filesystem.local:

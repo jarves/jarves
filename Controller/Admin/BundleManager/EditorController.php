@@ -183,7 +183,6 @@ class EditorController extends ContainerAware
      * all framework window classes."
      * )
      *
-     *
      * @Rest\QueryParam(name="bundle", requirements=".*", strict=true, description="The bundle name")
      *
      * @Rest\Get("/admin/system/bundle/editor/windows")
@@ -917,9 +916,9 @@ class EditorController extends ContainerAware
      *  description="Creates a new CRUD object window class"
      * )
      *
-     * @Rest\QueryParam(name="class", requirements=".*", strict=true, description="The PHP class name")
-     * @Rest\QueryParam(name="bundle", requirements=".*", strict=true, description="The bundle name")
-     * @Rest\QueryParam(name="force", requirements=".*", default="false", description="Overwrites existing")
+     * @Rest\RequestParam(name="class", requirements=".*", strict=true, description="The PHP class name")
+     * @Rest\RequestParam(name="bundle", requirements=".*", strict=true, description="The bundle name")
+     * @Rest\RequestParam(name="force", requirements=".*", default="false", description="Overwrites existing")
      *
      * @Rest\Put("/admin/system/bundle/editor/window")
      *

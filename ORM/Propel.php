@@ -10,6 +10,7 @@ use Jarves\Exceptions\FileNotFoundException;
 use Jarves\Exceptions\ObjectNotFoundException;
 use Jarves\Objects;
 use Jarves\Propel\StandardEnglishPluralizer;
+use Jarves\Propel\WorkspaceManager;
 use Jarves\Tools;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -301,16 +302,30 @@ class Propel extends ORMAbstract
      * Since the core provide the pk as array('id' => 123) and not as array(123) we have to convert it for propel orm.
      *
      * @param  array $pk
+     * @param  string $objectKey
      *
      * @return mixed Propel PK
      */
-    public function getPropelPk($pk)
+    public function getPropelPk($pk, $objectKey = null)
     {
-        $pk = array_values($pk);
-        if (count($pk) == 1) {
-            $pk = $pk[0];
+        $definition = $this->getDefinition();
+        if ($objectKey) {
+            $definition = $this->getJarves()->getObjects()->getDefinition($objectKey);
         }
-        return $pk;
+
+        $result = [];
+
+        foreach ($definition->getPrimaryKeyNames() as $primaryKey) {
+            if (isset($pk[$primaryKey])) {
+                $result[] = $pk[$primaryKey];
+            }
+        }
+
+        if ($definition->getWorkspace()) {
+            $result[] = isset($pk['workspaceId']) ? $pk['workspaceId'] : WorkspaceManager::getCurrent();
+        }
+
+        return 1 === count($result) ? $result[0] : $result;
     }
 
     /**
@@ -823,13 +838,19 @@ class Propel extends ORMAbstract
             $query = $this->getQueryClass();
             if ($targetPk) {
                 $branch = $query->findPk($this->getPropelPk($targetPk));
-            } elseif ($scope !== null) {
+            } else {
                 $branch = $query->findRoot($scope);
                 $root = true;
                 if (!$branch) {
                     //no root, create one
                     $branch = new $clazz();
-                    $branch->setScopeValue($scope);
+                    if (method_exists($branch, 'setScopeValue')) {
+                        $branch->setScopeValue($scope);
+                    }
+                    $labelField = lcfirst($this->getDefinition()->getLabelField());
+                    $rootValues = $values;
+                    $rootValues[$labelField] = 'Root';
+                    $this->mapValues($branch, $rootValues);
                     $branch->makeRoot();
                     $branch->save();
                 }
@@ -843,7 +864,7 @@ class Propel extends ORMAbstract
                 $root = true;
             }
 
-            if (!$scope) {
+            if (!$scope && method_exists($branch, 'getScopeValue')) {
                 $scope = $branch->getScopeValue();
             }
 
@@ -868,7 +889,7 @@ class Propel extends ORMAbstract
                     break;
             }
 
-            if ($scope) {
+            if ($scope && method_exists($obj, 'setScopeValue')) {
                 $obj->setScopeValue($scope);
             }
         }
@@ -947,7 +968,7 @@ class Propel extends ORMAbstract
                             $pk = $self->getJarves()->getObjects()->getObjectPk($relation->getForeignObjectKey(), $foreignItem);
                             $item2 = null;
                             if ($pk) {
-                                $pk = $self->getPropelPk($pk);
+                                $pk = $self->getPropelPk($pk, $relation->getForeignObjectKey());
                                 $item2 = $foreignQuery->findPk($pk);
                             }
                             if (!$item2) {
@@ -1134,7 +1155,7 @@ class Propel extends ORMAbstract
 
         $selects[] = 'Lft';
         $selects[] = 'Rgt';
-        $selects[] = 'Title';
+//        $selects[] = 'Title';
         $query->select($selects);
 
         $query->orderByBranch();
@@ -1221,7 +1242,7 @@ class Propel extends ORMAbstract
 
         $selects[] = 'Lft';
         $selects[] = 'Rgt';
-        $selects[] = 'Title';
+//        $selects[] = 'Title';
         $query->select($selects);
 
         $this->mapOptions($query, $options);
@@ -1286,7 +1307,7 @@ class Propel extends ORMAbstract
 
         $selects[] = 'Lft';
         $selects[] = 'Rgt';
-        $selects[] = 'Title';
+//        $selects[] = 'Title';
         $query->select($selects);
 
         $this->mapOptions($query, $options);

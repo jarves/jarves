@@ -62,12 +62,14 @@ jarves.Editor = new Class({
 
     checkPlacer: function(e) {
         this.placerDimensions = [];
-        Array.each(this.container.getElements('.jarves-content-placer'), function(placer) {
-            this.placerDimensions.push({
-                dimension: placer.getElement('a.jarves-content-placer-place').getCoordinates(this.container.documentElement),
-                element: placer
-            });
-        }.bind(this));
+        if (this.container.documentElement) {
+            Array.each(this.container.getElements('.jarves-content-placer'), function(placer) {
+                this.placerDimensions.push({
+                    dimension: placer.getElement('a.jarves-content-placer-place').getCoordinates(this.container.documentElement),
+                    element: placer
+                });
+            }.bind(this));
+        }
 
         var range = 25;
         var posY = e.page.y;

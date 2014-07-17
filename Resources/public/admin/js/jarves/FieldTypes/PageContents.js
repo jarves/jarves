@@ -172,10 +172,10 @@ jarves.FieldTypes.PageContents = new Class({
     },
 
     hideTree: function() {
+        this.editableAreaContainer.setStyle('left', 0);
+
         if (this.treeContainer) {
-            this.editableAreaContainer.setStyle('left', 0);
-            this.treeContainer.destroy();
-            delete this.treeContainer;
+            this.treeContainer.setStyle('display', 'none');
         }
     },
 
@@ -184,9 +184,10 @@ jarves.FieldTypes.PageContents = new Class({
             this.treeContainer = new Element('div', {
                 'class': 'jarves-scrolling jarves-Field-content-treeContainer'
             }).inject(this.mainLayout.getCell(2, 1));
-
-            this.editableAreaContainer.setStyle('left', 300);
         }
+
+        this.editableAreaContainer.setStyle('left', 300);
+        this.treeContainer.setStyle('display');
 
         var domainId = this.domainSelection.getValue();
         if (domainId && this.lastLoadedTreeForDomainId !== domainId) {
@@ -338,8 +339,6 @@ jarves.FieldTypes.PageContents = new Class({
             return;
         }
 
-//        console.log('loadEditor', this.currentLayout, targetLayout, '/', this.currentNode, nodeId);
-
         var id = (Math.random() * 10 * (Math.random() * 10)).toString(36).slice(3);
 
         if (this.lastJarvesEditorLoader) {
@@ -353,7 +352,6 @@ jarves.FieldTypes.PageContents = new Class({
 
                 this.currentNode = this.getNodeId();
                 this.currentLayout = this.getLayout();
-//                console.log('jarvesEditorLoaded', this.currentLayout, this.currentNode);
 
                 if (!this.options.standalone) {
                     editor.deactivateLinks();
@@ -513,6 +511,10 @@ jarves.FieldTypes.PageContents = new Class({
         return _pathAdmin + 'object/jarves/node/' + this.editor.options.node.id;
     },
 
+    /**
+     *
+     * @param {jarves.Editor} editor
+     */
     setEditor: function(editor) {
         this.editor = editor;
     },

@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerAware;
  * Please note: All methods $path arguments are relative to your mountPath!
  *
  */
-abstract class AbstractAdapter extends ContainerAware implements AdapterInterface
+abstract class AbstractAdapter implements AdapterInterface
 {
     /**
      * Current name of the mount point. (in fact, the folder name in media/<folder>)
@@ -26,6 +26,11 @@ abstract class AbstractAdapter extends ContainerAware implements AdapterInterfac
      * @var array
      */
     protected $params = array();
+
+    /**
+     * @var Jarves
+     */
+    protected $jarves;
 
     /**
      * Constructor
@@ -47,7 +52,15 @@ abstract class AbstractAdapter extends ContainerAware implements AdapterInterfac
      */
     public function getJarves()
     {
-        return $this->container->get('jarves');
+        return $this->jarves;
+    }
+
+    /**
+     * @param Jarves $jarves
+     */
+    public function setJarves(Jarves $jarves)
+    {
+        $this->jarves = $jarves;
     }
 
     /**

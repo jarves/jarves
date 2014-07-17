@@ -6,11 +6,14 @@ jarves.WindowEdit = new Class({
 
     options: {
         saveLabel: '',
-        renderLanguageSelector: true
+        renderLanguageSelector: true,
+        entryPoint: ''
     },
 
     fieldToTabOIndex: {}, //index fieldkey to main-tabid
     winParams: {}, //copy of pWin.params in constructor
+
+    ready: false,
 
     initialize: function(win, container, options) {
         this.win = win;
@@ -18,11 +21,7 @@ jarves.WindowEdit = new Class({
 
         this.winParams = Object.clone(this.win.getParameter());
 
-        if (!this.winParams.item && this.winParams.values) {
-            this.winParams.item = this.winParams.values;
-        } //compatibility
-
-        if (!this.windowAdd && !this.winParams.item) {
+        if (!this.windowAdd && !this.getPrimaryKey()) {
             this.win.alert('No item given. A edit object window can not be called directly.', function() {
                 this.win.close();
             }.bind(this));
@@ -45,9 +44,20 @@ jarves.WindowEdit = new Class({
         this.win.addEvent('close', this.bCheckClose);
         this.win.addEvent('resize', this.bCheckTabFieldWidth);
 
-        if (this.win.getEntryPoint()) {
+        if (this.getEntryPoint()) {
             this.load();
         }
+    },
+
+    /**
+     * @return {Object}
+     */
+    getPrimaryKey: function() {
+        return this.options.primaryKey || this.winParams.item;
+    },
+
+    getObjectKey: function() {
+        return this.classProperties['object'];
     },
 
     getContentContainer: function() {
@@ -96,6 +106,7 @@ jarves.WindowEdit = new Class({
 
         this.container.empty();
 
+        this.fireEvent('destroy');
     },
 
     getModule: function() {
@@ -110,7 +121,7 @@ jarves.WindowEdit = new Class({
     },
 
     getEntryPoint: function() {
-        var restPoint = this.win.getEntryPoint();
+        var restPoint = this.options.entryPoint || this.win.getEntryPoint();
         if (restPoint.substr(restPoint.length - 1) == '/') {
             restPoint = restPoint.substr(0, restPoint.length - 1);
         }
@@ -132,16 +143,16 @@ jarves.WindowEdit = new Class({
         }.bind(this)}).post({_method: 'options'});
     },
 
-    generateItemParams: function(pVersion) {
+    generateItemParams: function(version) {
         var req = {};
 
-        if (pVersion) {
-            req.version = pVersion;
+        if (version) {
+            req.version = version;
         }
 
-        if (this.winParams && this.winParams.item) {
+        if (this.winParams && this.getPrimaryKey()) {
             this.classProperties.primary.each(function(prim) {
-                req[ prim ] = this.winParams.item[prim];
+                req[ prim ] = this.getPrimaryKey()[prim];
             }.bind(this));
         }
 
@@ -154,7 +165,7 @@ jarves.WindowEdit = new Class({
             return;
         }
 
-        var id = jarves.getObjectUrlId(this.classProperties['object'], this.winParams.item);
+        var id = jarves.getObjectUrlId(this.classProperties['object'], this.getPrimaryKey());
 
         if (this.lastRq) {
             this.lastRq.cancel();
@@ -180,6 +191,11 @@ jarves.WindowEdit = new Class({
         this.win.setLoading(false);
         this.fireEvent('load', pItem);
 
+        var first = this.fieldForm.getFirstField();
+        if (first) {
+            first.focus();
+        }
+
 //        this.ritem = this.retrieveData(true);
     },
 
@@ -200,7 +216,7 @@ jarves.WindowEdit = new Class({
         this.fieldForm.setValue(value, internal);
 
         if (this.getTitleValue()) {
-            this.win.setTitle(this.getTitleValue());
+//            this.win.setTitle(this.getTitleValue());
         }
 
         if (this.languageSelect && this.languageSelect.getValue() != value.lang) {
@@ -433,6 +449,12 @@ jarves.WindowEdit = new Class({
         if (this.winParams) {
             this.loadItem();
         }
+
+        this.ready = true;
+    },
+
+    isReady: function() {
+        return this.ready;
     },
 
     renderFields: function() {
@@ -460,7 +482,6 @@ jarves.WindowEdit = new Class({
             if (this.fieldForm.firstLevelTabBar) {
                 this.topTabGroup = this.fieldForm.firstLevelTabBar.buttonGroup;
             }
-
         }
 
         //generate index, fieldkey => main-tabid
@@ -533,8 +554,8 @@ jarves.WindowEdit = new Class({
                 this.languageSelect.add(id, lang.langtitle + ' (' + lang.title + ', ' + id + ')');
             }.bind(this));
 
-            if (this.winParams && this.winParams.item) {
-                this.languageSelect.setValue(this.winParams.item.lang);
+            if (this.winParams && this.getPrimaryKey()) {
+                this.languageSelect.setValue(this.getPrimaryKey().lang);
             } else if (this.language) {
                 this.languageSelect.setValue(this.language);
             }
@@ -586,33 +607,36 @@ jarves.WindowEdit = new Class({
         this.win.confirm(tf('Really delete %s?', this.getTitleValue()), function(answer) {
 
             this.win.setLoading(true, null, this.container.getCoordinates(this.win));
-            var itemPk = jarves.getObjectUrlId(this.classProperties['object'], this.winParams.item);
+            var itemPk = jarves.getObjectUrlId(this.classProperties['object'], this.getPrimaryKey());
 
             this.lastDeleteRq = new Request.JSON({url: _pathAdmin + this.getEntryPoint() + '/' + itemPk,
                 onComplete: function(pResponse) {
                     this.win.setLoading(false);
-                    this.fireEvent('remove', this.winParams.item);
+                    this.fireEvent('remove', this.getPrimaryKey());
                     jarves.getAdminInterface().objectChanged(this.classProperties['object']);
                     this.destroy();
-                    this.win.close();
                 }.bind(this)}).post({_method: 'delete'});
 
         }.bind(this));
     },
 
+    getSidebar: function() {
+        return this.options.sidebar || this.win.getSidebar();
+    },
+
     renderActionBar: function(container) {
-        var container = this.win.getSidebar();
+        container = this.getSidebar();
 
         this.actionGroup = new jarves.ButtonGroup(container);
         this.saveBtn = this.actionGroup.addButton(t('Save'), '#icon-checkmark-6', function() {
             this.save();
         }.bind(this));
 
-        if (this.win.isInline()) {
-            this.closeBtn = this.actionGroup.addButton(t('Close'), '#icon-cancel', function() {
-                this.checkClose();
-            }.bind(this));
-        }
+//        if (this.win.isInline()) {
+//            this.closeBtn = this.actionGroup.addButton(t('Close'), '#icon-cancel', function() {
+//                this.checkClose();
+//            }.bind(this));
+//        }
 
         this.saveBtn.setButtonStyle('blue')
 
@@ -639,7 +663,7 @@ jarves.WindowEdit = new Class({
         var dialog = this.win.newDialog();
 
         new jarves.ObjectVersionGraph(dialog.content, {
-            object: jarves.getObjectUrlId(this.classProperties['object'], this.winParams.item)
+            object: jarves.getObjectUrlId(this.classProperties['object'], this.getPrimaryKey())
         });
 
     },
@@ -842,8 +866,8 @@ jarves.WindowEdit = new Class({
 
 //        this.ritem = data;
 
-        if (this.winParams.item) {
-            req = Object.merge(this.winParams.item, data);
+        if (this.getPrimaryKey()) {
+            req = Object.merge(this.getPrimaryKey(), data);
         } else {
             req = data;
         }
@@ -918,7 +942,7 @@ jarves.WindowEdit = new Class({
     },
 
     doSave: function(andClose) {
-        var objectId = jarves.getObjectUrlId(this.classProperties['object'], this.winParams.item);
+        var objectId = jarves.getObjectUrlId(this.classProperties['object'], this.getPrimaryKey());
         var request = this.buildRequest(this.classProperties.usePatch);
         var method = this.classProperties.usePatch ? 'patch' : 'put';
 
@@ -941,9 +965,8 @@ jarves.WindowEdit = new Class({
                 this.saveBtn.setProgress(false);
 
                 if (typeOf(response.data) == 'object') {
-                    this.winParams.item = response.data; //our new primary keys
+                    this.options.primaryKey = response.data; //our new primary keys
                 }
-
 
                 if (this.classProperties.loadSettingsAfterSave == true) {
                     jarves.loadSettings();
@@ -960,10 +983,6 @@ jarves.WindowEdit = new Class({
 
                 if (this.classProperties.multiLanguage) {
                     this.itemLanguage = request.lang;
-                }
-
-                if (this.win.isInline()) {
-                    this.win.close();
                 }
             }.bind(this)}
         ).post(request);

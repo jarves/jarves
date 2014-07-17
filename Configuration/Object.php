@@ -276,6 +276,27 @@ class Object extends Model
     protected $limitDataSets;
 
     /**
+     * The path of the entry point that acts as a listing window.
+     *
+     * @var string|null
+     */
+    protected $listEntryPoint;
+
+    /**
+     * The path of the entry point that acts as a edit window.
+     *
+     * @var string|null
+     */
+    protected $editEntryPoint;
+
+    /**
+     * The path of the entry point that acts as a add window.
+     *
+     * @var string|null
+     */
+    protected $addEntryPoint;
+
+    /**
      * @var Field[]
      */
     protected $fields;
@@ -777,6 +798,20 @@ class Object extends Model
         }
 
         return $this->primaryKeys;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getPrimaryKeyNames()
+    {
+        $names = array();
+        foreach ($this->getPrimaryKeys() as $field) {
+            if ($field->isPrimaryKey()) {
+                $names[] = lcfirst($field->getId());
+            }
+        }
+        return $names;
     }
 
     /**
@@ -1331,5 +1366,53 @@ class Object extends Model
     public function isCrossRef()
     {
         return !!$this->crossRef;
+    }
+
+    /**
+     * @param null|string $addEntryPoint
+     */
+    public function setAddEntryPoint($addEntryPoint)
+    {
+        $this->addEntryPoint = $addEntryPoint;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getAddEntryPoint()
+    {
+        return $this->addEntryPoint;
+    }
+
+    /**
+     * @param null|string $editEntryPoint
+     */
+    public function setEditEntryPoint($editEntryPoint)
+    {
+        $this->editEntryPoint = $editEntryPoint;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getEditEntryPoint()
+    {
+        return $this->editEntryPoint;
+    }
+
+    /**
+     * @param null|string $listEntryPoint
+     */
+    public function setListEntryPoint($listEntryPoint)
+    {
+        $this->listEntryPoint = $listEntryPoint;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getListEntryPoint()
+    {
+        return $this->listEntryPoint;
     }
 }

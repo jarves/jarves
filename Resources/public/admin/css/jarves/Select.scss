@@ -151,7 +151,7 @@ a.jarves-Select-box-focus {
     max-height: 200px;
     max-width: 100%;
     overflow: auto;
-    background-color: #fefefe;
+    background-color: #f9f9f9;
 }
 
 .jarves-Select-borderline {
@@ -169,7 +169,7 @@ a.jarves-Select-box-focus {
     font-weight: bold;
 }
 
-a.jarves-select-chooser-item {
+.jarves-Select-chooser a.jarves-select-chooser-item {
     display: block;
     padding: 3px 23px;
     color: #222;
@@ -193,7 +193,7 @@ a.jarves-select-chooser-item {
 }
 
 .jarves-select-chooser-item:hover {
-    background-color: $mainColor;
+    background-color: #e5e5e5;
     color: white;
 }
 
@@ -204,11 +204,11 @@ a.jarves-Select-separator:link {
     cursor: default;
 }
 
-a.jarves-select-chooser-item-selected {
+.jarves-Select-chooser a.jarves-select-chooser-item-selected {
     padding-left: 6px;
 }
 
-a.jarves-select-chooser-item-selected:before {
+.jarves-Select-chooser a.jarves-select-chooser-item-selected:before {
     padding-right: 4px;
 }
 
@@ -224,4 +224,16 @@ a.jarves-select-chooser-item-selected:before {
     border: 1px solid #E7E7E7;
     opacity: 0.8;
     background-color: #FEFEFE;
+}
+
+.jarves-field-type-select-with-buttons a.jarves-Button,
+.jarves-field-type-select-with-buttons a.jarves-Button:link {
+    margin: 0;
+    padding: 0 4px;
+    margin-left: -1px;
+}
+
+.jarves-field-type-select-with-buttons a.jarves-Select-box,
+.jarves-field-type-select-with-buttons a.jarves-Select-box:link {
+    margin-right: 0;
 }

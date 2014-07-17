@@ -8,6 +8,7 @@ use Jarves\Exceptions\AccessDeniedException;
 use Jarves\Exceptions\BundleNotFoundException;
 use Jarves\Exceptions\InvalidArgumentException;
 use Jarves\Exceptions\ObjectNotFoundException;
+use Jarves\Propel\WorkspaceManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
@@ -390,12 +391,18 @@ class Objects
      */
     public function getObjectPk($objectKey, $item)
     {
-        $pks = $this->getPrimaryList($objectKey);
-        $result = array();
-        foreach ($pks as $pk) {
-            if (@$item[$pk] !== null) {
-                $result[$pk] = $item[$pk];
+        $definition = $this->getDefinition($objectKey);
+
+        $result = [];
+
+        foreach ($definition->getPrimaryKeyNames() as $primaryKey) {
+            if (isset($item[$primaryKey]) && null !== $item[$primaryKey]) {
+                $result[$primaryKey] = $item[$primaryKey];
             }
+        }
+
+        if ($result && $definition->getWorkspace()) {
+            $result['workspaceId'] = isset($item['workspaceId']) ? $item['workspaceId'] : WorkspaceManager::getCurrent();
         }
 
         return $result;

@@ -98,8 +98,6 @@ jarves.ObjectTree = new Class({
          */
         selectable: true,
 
-        rootObject: '',
-
         treeInterface: '',
 
         treeInterfaceClass: '',
@@ -130,6 +128,8 @@ jarves.ObjectTree = new Class({
     opens: {},
 
     objectDefinition: null,
+
+    lastRootItems: [],
 
     initialize: function(container, options, refs) {
         this.items = {};
@@ -372,6 +372,7 @@ jarves.ObjectTree = new Class({
             this.rootA.childrenContainer = this.paneObjects;
         }
 
+        this.lastRootItems = [];
         var scope = null;
 
         if (this.options.rootObject) {
@@ -384,7 +385,14 @@ jarves.ObjectTree = new Class({
         this.lastFirstLevelRq = new Request.JSON({url: this.getUrl() + ':branch',
             noCache: 1, onComplete: this.renderFirstLevel.bind(this)
         }).get({scope: scope});
+    },
 
+    isEmpty: function() {
+        if (this.rootA || this.lastRootItems.length) {
+            return false;
+        }
+
+        return true;
     },
 
     loadRoot: function() {
@@ -535,7 +543,14 @@ jarves.ObjectTree = new Class({
         this.activeLoadings--;
         this.checkDoneState();
 
-        this.fireEvent('childrenLoaded', [this.rootObject, this.rootA]);
+        var a = this.rootA;
+
+        if (!a) {
+            a = this.paneObjects.getParent();
+            a.childrenContainer = this.paneObjects;
+        }
+
+        this.fireEvent('childrenLoaded', [this.rootObject, a, this]);
 
     },
 
@@ -826,7 +841,7 @@ jarves.ObjectTree = new Class({
         }
 
         if (icon) {
-            var icon = jarves.mediaPath(icon);
+            icon = jarves.mediaPath(icon);
 
             pA.icon = new Element('span', {
                 'class': 'jarves-objectTree-item-masks'
@@ -860,7 +875,7 @@ jarves.ObjectTree = new Class({
             return;
         }
 
-        var icon = jarves.mediaPath(icon);
+        icon = jarves.mediaPath(icon);
 
         pA.icon = new Element('span', {
             'class': 'jarves-objectTree-item-masks'
@@ -882,7 +897,7 @@ jarves.ObjectTree = new Class({
             if (this.firstLoadDone == false) {
                 this.firstLoadDone = true;
 
-                this.fireEvent('ready');
+                this.fireEvent('ready', this);
             }
 
             this.main.setStyle('height');
@@ -1000,7 +1015,7 @@ jarves.ObjectTree = new Class({
                     this.addItem(childitem, pA);
                 }.bind(this));
 
-                this.fireEvent('childrenLoaded', [item, pA]);
+                this.fireEvent('childrenLoaded', [item, pA, this]);
 
                 this.activeLoadings--;
                 this.checkDoneState();
@@ -1222,9 +1237,9 @@ jarves.ObjectTree = new Class({
         if (pWithoutMoving != true) {
 
             var pos = {
-                'before': 'before',
-                'after': 'below',
-                'inside': 'first'
+                'before': 'prev',
+                'after': 'next',
+                'inside': 'into'
             };
 
             var target = this.dragNDropElement;
@@ -1252,7 +1267,10 @@ jarves.ObjectTree = new Class({
     },
 
     moveObject: function(pSourceId, pTargetId, pTargetObjectKey, pPosition, overwrite) {
-        new Request.JSON({url: this.getUrl() + ':move', onComplete: function(response) {
+        var urlId = jarves.getCroppedObjectId(pSourceId);
+        var targetId = jarves.getCroppedObjectId(pTargetId);
+
+        new Request.JSON({url: this.getUrl() + urlId + '/:move', onComplete: function(response) {
             //target item this.dragNDropElement
             if (response.data && response.data.targetExists) {
                 this.getWin().confirm(t('Target already exists. Overwrite?'), function(answer) {
@@ -1278,9 +1296,8 @@ jarves.ObjectTree = new Class({
 
             this.fireEvent('move', [pSourceId, pTargetId]);
 
-        }.bind(this)}).put({
-                source: pSourceId,
-                target: pTargetId,
+        }.bind(this)}).post({
+                target: targetId,
                 position: pPosition,
                 targetObjectKey: pTargetObjectKey,
                 overwrite: overwrite
@@ -1339,28 +1356,30 @@ jarves.ObjectTree = new Class({
 
     /**
      *
-     * @param {Array} pPk
+     * @param {Object|String} url
      */
-    select: function(pPk) {
+    select: function(url) {
         var id, objectKey = this.options.objectKey;
 
-        if ('object' === typeOf(pPk)) {
-            id = this.options.objectKey + '/' + jarves.getObjectUrlId(this.options.objectKey, pPk);
-        } else
-
-        if ('string' === typeOf(pPk) && this.options.rootObject) {
-            //it could be the root item/different objectKey
-            objectKey = jarves.getCroppedObjectKey(pPk) || this.options.objectKey;
-            id = objectKey + '/' + jarves.getCroppedObjectId(pPk);
-//            console.log('converted from object url: ', pPk, objectKey, id);
+        if ('object' === typeOf(url)) {
+            id = this.options.objectKey + '/' + jarves.getObjectUrlId(this.options.objectKey, url);
         } else {
-            if ('object' === typeOf(pPk)) {
-                id = jarves.getObjectUrlId(this.options.objectKey, pPk);
-            } else {
-                id = pPk;
-            }
-            id = this.options.objectKey + '/' + id;
+            id = url;
         }
+
+//        if ('string' === typeOf(pPk) && this.options.rootObject) {
+//            //it could be the root item/different objectKey
+//            objectKey = jarves.getCroppedObjectKey(pPk) || this.options.objectKey;
+//            id = objectKey + '/' + jarves.getCroppedObjectId(pPk);
+////            console.log('converted from object url: ', pPk, objectKey, id);
+//        } else {
+//            if ('object' === typeOf(pPk)) {
+//                id = jarves.getObjectUrlId(this.options.objectKey, pPk);
+//            } else {
+//                id = pPk;
+//            }
+//            id = this.options.objectKey + '/' + id;
+//        }
 
 //        console.log('select from', pPk, ' to ', id);
 

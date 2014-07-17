@@ -23,12 +23,11 @@ jarves.WindowAdd = new Class({
             this.resetBtn.hide();
         }
 
-        this.ritem = this.retrieveData(true);
-
         this.openAddItem();
+        this.fieldForm.resetPatch();
 
-        var first = this.getContentContainer().getElement('input[type=text]');
-        if (first && first.focus) {
+        var first = this.fieldForm.getFirstField();
+        if (first) {
             first.focus();
         }
     },
@@ -47,47 +46,46 @@ jarves.WindowAdd = new Class({
             //show dialog with
             this.createNewFirstDialog();
 
-            if (this.tabPane) {
-                this.tabPane.hide();
-            }
+
+            this.addItemLayout = new jarves.LayoutHorizontal(this.addDialogFieldContainer, {
+                columns: [null, this.classProperties.addMultipleFieldContainerWidth]
+            });
+            new jarves.LayoutSplitter(this.addItemLayout.getColumn(1), 'right');
 
             if (this.classProperties.addMultiple) {
+                if (this.tabPane) {
+                    this.tabPane.hide();
+                }
 
                 if (this.classProperties.nestedAddWithPositionSelection) {
-                    this.addItemMultiAddLayout = new jarves.LayoutHorizontal(this.addDialogFieldContainer, {
-                        columns: [null, this.classProperties.addMultipleFieldContainerWidth]
-                    });
 
-                    new jarves.LayoutSplitter(this.addItemMultiAddLayout.getColumn(2), 'left');
-
-                    this.addDialogLayoutPositionChooser = this.addNestedObjectPositionChooser(this.addItemMultiAddLayout.getColumn(1));
+                    this.addDialogLayoutPositionChooser = this.addNestedObjectPositionChooser(this.addItemLayout.getColumn(1));
 
                     this.addDialogFieldContainerNested = new Element('div', {
                         'style': 'position: absolute; left: 6px; top: 0; right: 0; bottom: 0; overflow: auto;'
-                    }).inject(this.addItemMultiAddLayout.getColumn(2));
+                    }).inject(this.addItemLayout.getColumn(2));
+
                     this.populateAddMultipleForm(this.addDialogFieldContainerNested);
                 } else {
                     this.populateAddMultipleForm(this.addDialogFieldContainer);
                 }
-
             } else {
+//                this.addDialogFieldContainer.setStyle('position', 'relative');
+                this.addDialogLayoutPositionChooser = this.addNestedObjectPositionChooser(this.addItemLayout.getColumn(1));
+                this.form.inject(this.addItemLayout.getColumn(2));
 
-                this.addDialogFieldContainer.setStyle('position', 'relative');
-                this.addDialogLayoutPositionChooser = this.addNestedObjectPositionChooser(this.addDialogFieldContainer);
-
+                this.addItemLayout.getColumn(1)
             }
 
             if (this.addDialogLayoutPositionChooser) {
 
                 this.addDialogLayoutPositionChooser.addEvent('positionChoose', function(dom, direction, pk, chooser, tree) {
-
                     this.addItemToAdd = {
                         position: direction == 'after' ? 'next' : 'first',
                         pk: pk,
                         objectKey: dom.objectKey,
                         tree: tree
                     };
-
                     this.checkAddItemForm();
                 }.bind(this));
 
@@ -167,14 +165,13 @@ jarves.WindowAdd = new Class({
                 }
                 this.fireEvent('addMultiple', args);
 
-                window.fireEvent('softReload', this.win.getEntryPoint());
+                window.fireEvent('softReload', this.getEntryPoint());
 
                 if (pClose) {
                     this.win.close();
                 }
 
             }.bind(this)}).post(request);
-
     },
 
     renderSelectPositionText: function() {
@@ -204,7 +201,6 @@ jarves.WindowAdd = new Class({
         }
 
         if (this.classProperties.addMultiple) {
-
             if (this.addMultipleFieldForm && !this.addMultipleFieldForm.isValid()) {
                 valid = false;
             }
@@ -216,7 +212,6 @@ jarves.WindowAdd = new Class({
     },
 
     populateAddMultipleForm: function(pContainer) {
-
         var fields = {};
 
         if (typeOf(this.classProperties.addMultipleFixedFields) == 'object' && Object.getLength(this.classProperties.addMultipleFixedFields) > 0) {
@@ -260,7 +255,6 @@ jarves.WindowAdd = new Class({
         this.addMultipleFieldForm = new jarves.FieldForm(pContainer, fields, {
             onChange: this.checkAddItemForm.bind(this)
         });
-
     },
 
     createNewFirstDialog: function() {
@@ -270,15 +264,15 @@ jarves.WindowAdd = new Class({
         }).inject(this.container);
 
         this.addDialogLayout = new jarves.LayoutVertical(this.addNestedAddPage, {
-            rows: [40, null],
+            rows: [null, 40],
             gridLayout: true
         });
 
-        this.addDialogFieldContainer = this.addDialogLayout.getContentRow(2);
+        this.addDialogFieldContainer = this.addDialogLayout.getContentRow(1);
 
         this.openAddItemPageBottom = new Element('div', {
             'class': 'kwindow-win-buttonBar'
-        }).inject(this.addDialogLayout.getContentRow(1));
+        }).inject(this.addDialogLayout.getContentRow(2));
 
     },
 
@@ -291,7 +285,8 @@ jarves.WindowAdd = new Class({
         objectOptions.scopeChooser = false;
         objectOptions.noWrapper = true;
         objectOptions.selectable = false;
-        objectOptions.moveable = this.classProperties.nestedMoveable;
+//        objectOptions.moveable = this.classProperties.nestedMoveable;
+        objectOptions.moveable = false;
 
         var lastSelected;
 
@@ -310,17 +305,19 @@ jarves.WindowAdd = new Class({
             var div;
 
             if (pDirection != 'into') {
-                if (pDom.childrenContainer.insertedAddChooserAfter) {
+                if (pDom.childrenContainer && pDom.childrenContainer.insertedAddChooserAfter) {
                     return;
                 }
+
                 div = new Element('div', {
                     styles: {
-                        paddingLeft: pDom.getStyle('padding-left').toInt() + 18
+                        paddingLeft: pDom && pDom.getStyle ? pDom.getStyle('padding-left').toInt() + 18 : 18
                     }
-                }).inject(pDom.childrenContainer, pDirection);
+                }).inject(pDom.childrenContainer, 'first' === pDirection ? null : pDirection);
+
                 pDom.childrenContainer.insertedAddChooserAfter = true;
             } else {
-                if (pDom.insertedAddChooser) {
+                if (pDom.insertedAddChooser || !pDom.span) {
                     return;
                 }
                 div = pDom.span;
@@ -335,18 +332,23 @@ jarves.WindowAdd = new Class({
             }).addEvent('click',function() {
                     choosePosition(this, pDom, pDirection, pItem, pTree);
                 }).inject(div);
-
-            new Element('span', {
+            var span = new Element('span', {
                 'class': 'jarves-objectTree-positionChooser-item-text',
                 text: pDirection == 'into' ? tc('addNestedObjectChoosePositionDialog', 'Into this!') : tc('addNestedObjectChoosePositionDialog', 'Add here!')
             }).inject(a);
 
+            if ('object' === typeOf(pDom) && 'into' === pDirection) {
+                //we have no entries, make this as default
+                choosePosition(a, pDom, pDirection, pItem, pTree);
+                span.setStyle('padding', '25px');
+                span.set('text', tc('addNestedObjectChoosePositionDialog', 'This is the first entry.'));
+            }
+
             return div;
-        }
+        };
 
         objectOptions.onChildrenLoaded = function(pItem, pDom, pTree) {
-
-            if (pDom.childrenContainer) {
+            if (pDom && pDom.childrenContainer) {
                 var children = pDom.childrenContainer.getChildren('.jarves-objectTree-item');
                 if (children.length > 0) {
                     pDom.childrenContainer.getChildren('.jarves-objectTree-item').each(function(item) {
@@ -356,9 +358,18 @@ jarves.WindowAdd = new Class({
                 }
             }
 
-            addChooser(pDom, 'into', pDom.objectEntry, pTree);
-
+            if (pDom) {
+                addChooser(pDom, 'into', pDom.objectEntry, pTree);
+            }
         }.bind(this);
+
+        objectOptions.onReady = function(tree) {
+            if (tree.isEmpty()) {
+                if (tree.addPlacerSet) return;
+                addChooser({span: tree.paneObjects}, 'into', null, tree);
+                tree.addPlacerSet = true;
+            }
+        };
 
         if (this.languageSelect) {
             objectOptions.scopeLanguage = this.languageSelect.getValue();
@@ -381,14 +392,14 @@ jarves.WindowAdd = new Class({
 
             if (_this.classProperties.edit) {
 
-                jarves.entrypoint.open(jarves.entrypoint.getRelative(_this.win.getEntryPoint(), _this.classProperties.editEntrypoint), {
+                jarves.entrypoint.open(jarves.entrypoint.getRelative(_this.getEntryPoint(), _this.classProperties.editEntrypoint), {
                     item: pItem.values
                 }, this);
 
             }
 
         } else if (this.classProperties.nestedRootEdit) {
-            var entryPoint = jarves.entrypoint.getRelative(this.win.getEntryPoint(), this.classProperties.nestedRootEditEntrypoint);
+            var entryPoint = jarves.entrypoint.getRelative(this.getEntryPoint(), this.classProperties.nestedRootEditEntrypoint);
             jarves.entrypoint.open(entryPoint);
         }
 
@@ -405,6 +416,12 @@ jarves.WindowAdd = new Class({
         }
 
         var request = this.buildRequest();
+
+        if (this.addItemToAdd) {
+            request._position = this.addItemToAdd.position;
+            request._pk = this.addItemToAdd.pk;
+            request._targetObjectKey = this.addItemToAdd.objectKey;
+        }
 
         if (typeOf(request) != 'null') {
 
@@ -432,16 +449,16 @@ jarves.WindowAdd = new Class({
                         jarves.loadSettings();
                     }
 
-                    this.fireEvent('add', [request, response]);
+                    var args = [request, response];
+                    if (this.addItemToAdd) {
+                        args.push(this.addItemToAdd.tree);
+                    }
+                    this.fireEvent('add', args);
 
                     jarves.getAdminInterface().objectChanged(this.classProperties['object']);
 
                     if ((!pClose || this.inline ) && this.classProperties.versioning == true) {
                         this.loadVersions();
-                    }
-
-                    if (this.win.isInline()) {
-                        this.win.close();
                     }
                 }.bind(this)}).post(request);
         }

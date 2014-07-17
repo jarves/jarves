@@ -44,6 +44,21 @@ class AdminController extends Controller
     }
 
     /**
+     * @Rest\Get("/test")
+     *
+     * @param ParamFetcher $paramFetcher
+     *
+     * @return array
+     */
+    public function getTest(ParamFetcher $paramFetcher)
+    {
+        $config = $this->getJarves()->getConfig('jarves')->getEntryPoint('nodes')->getBundle();
+        var_dump($config);
+        exit;
+    }
+
+
+    /**
      * @ApiDoc(
      *  section="Administration",
      *  description="Returns a layout template/view with placeholder for jarves.Editor."

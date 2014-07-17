@@ -187,7 +187,7 @@ jarves.WindowCombine = new Class({
 
                 this.removeCombineSelectedBtn.startTip(t('Removing ...'));
 
-                this.lastDeleteRq = new Request.JSON({url: _pathAdmin + this.win.getEntryPoint(),
+                this.lastDeleteRq = new Request.JSON({url: _pathAdmin + this.getEntryPoint(),
                     noCache: 1, onComplete: function(res) {
 
                         this.removeCombineSelectedBtn.stopTip(t('Removed.'));
@@ -1083,18 +1083,10 @@ jarves.WindowCombine = new Class({
             delete this.currentRootEdit;
         }
 
-        var win = {};
-        for (var i in this.win) {
-            win[i] = this.win[i];
-        }
-
-        win.entryPoint = jarves.entrypoint.getRelative(this.getEntryPoint(), this.classProperties.editEntrypoint);
-
-        win.getSidebar = function() {
-            return this.editAddSidebarContainer;
-        }.bind(this);
-
-        this.currentAdd = new jarves.WindowAdd(win, this.mainRight);
+        this.currentAdd = new jarves.WindowAdd(this.win, this.mainRight, {
+            entryPoint: jarves.entrypoint.getRelative(this.getEntryPoint(), this.classProperties.editEntrypoint),
+            sidebar: this.editAddSidebarContainer
+        });
         this.currentAdd.addEvent('add', this.addSaved.bind(this));
         this.currentAdd.addEvent('addMultiple', this.addSavedMultiple.bind(this));
         this.currentAdd.setLanguage(this.getLanguage());
@@ -1137,18 +1129,10 @@ jarves.WindowCombine = new Class({
             delete this.currentAdd;
         }
 
-        var win = {};
-        for (var i in this.win) {
-            win[i] = this.win[i];
-        }
-
-        win.entryPoint = jarves.entrypoint.getRelative(this.getEntryPoint(), this.classProperties.nestedRootAddEntrypoint);
-
-        win.getSidebar = function() {
-            return this.editAddSidebarContainer;
-        }.bind(this);
-
-        this.currentRootAdd = new jarves.WindowAdd(win, this.mainRight);
+        this.currentRootAdd = new jarves.WindowAdd(this.win, this.mainRight, {
+            entryPoint: jarves.entrypoint.getRelative(this.getEntryPoint(), this.classProperties.nestedRootAddEntrypoint),
+            sidebar: this.editAddSidebarContainer
+        });
         this.currentRootAdd.addEvent('add', this.addRootSaved.bind(this));
         this.currentRootAdd.addEvent('addMultiple', this.addRootSaved.bind(this));
 
@@ -1167,28 +1151,38 @@ jarves.WindowCombine = new Class({
         this.addSaved(request, response);
     },
 
-    addSaved: function(pRequest, pResponse) {
+    addSaved: function(request, response) {
         this.ignoreNextSoftLoad = true;
 
         if (this.currentAdd.classProperties.primary.length > 1) {
             return;
         }
 
+        this.currentAdd.destroy();
+
         this.lastLoadedItem = null;
         this._lastItems = null;
 
         this.win.setParameters({
-            selected: jarves.normalizeObjectKey(this.classProperties['object']) + '/' + jarves.getObjectUrlId(this.classProperties['object'], pResponse.data)
+            selected: jarves.normalizeObjectKey(this.classProperties['object']) + '/' + jarves.getObjectUrlId(this.classProperties['object'], response.data)
         });
 
-        this.needSelection = true;
         if (this.classProperties.asNested) {
-            if (pRequest._position == 'first') {
-                this.nestedField.getFieldObject().reloadBranch(pRequest._pk, pRequest._targetObjectKey);
+
+            this.setActiveItem(response.data, this.classProperties['object']);
+
+            if (request._pk) {
+                if (request._position == 'first') {
+                    this.nestedField.getFieldObject().reloadBranch(request._pk, request._targetObjectKey);
+                } else {
+                    this.nestedField.getFieldObject().reloadParentBranch(request._pk, request._targetObjectKey);
+                }
             } else {
-                this.nestedField.getFieldObject().reloadParentBranch(pRequest._pk, pRequest._targetObjectKey);
+                this.nestedField.getFieldObject().reload();
             }
+
         } else {
+            this.needSelection = true;
             return this.loadCount(function(count) {
                 this.loadAround(this.win.params.selected);
             }.bind(this));
@@ -1267,23 +1261,11 @@ jarves.WindowCombine = new Class({
                 this.addRootBtn.setPressed(false);
             }
 
-            var win = {};
-
-            for (var i in this.win) {
-                win[i] = this.win[i];
-            }
-
-            win.entryPoint = jarves.entrypoint.getRelative(this.win.entryPoint, _this.classProperties.editEntrypoint);
-            win.params = {item: pk};
-            win.getSidebar = function() {
-                return this.editAddSidebarContainer;
-            }.bind(this);
-
-            win.close = function() {
-
-            };
-
-            this.currentEdit = new jarves.WindowEdit(win, this.mainRight);
+            this.currentEdit = new jarves.WindowEdit(this.win, this.mainRight, {
+                entryPoint: jarves.entrypoint.getRelative(this.win.entryPoint, _this.classProperties.editEntrypoint),
+                sidebar: this.editAddSidebarContainer,
+                primaryKey: pk
+            });
 
             this.currentEdit.addEvent('save', this.saved.bind(this));
             this.currentEdit.addEvent('load', this.itemLoaded.bind(this));
@@ -1293,13 +1275,18 @@ jarves.WindowCombine = new Class({
             }.bind(this));
 
         } else {
+            if (!this.currentEdit.isReady()) {
+                console.log('WindowCombine::loadItem(): WindowEdit not yet ready, but already called');
+                return;
+            }
+
             hasUnsaved = this.currentEdit.hasUnsavedChanges();
 
             if (hasUnsaved) {
                 this.win.interruptClose = true;
                 this.win._confirm(t('There are unsaved data. Want to continue?'), function(pAccepted) {
                     if (pAccepted) {
-                        this.currentEdit.winParams = {item: pk};
+                        this.currentEdit.options.primaryKey = pk;
                         this.currentEdit.loadItem();
 
                         if (this.addBtn) {
@@ -1311,7 +1298,7 @@ jarves.WindowCombine = new Class({
                 }.bind(this));
                 return;
             } else {
-                this.currentEdit.winParams = {item: pk};
+                this.currentEdit.options.primaryKey = pk;
                 this.currentEdit.loadItem();
 
                 if (this.addBtn) {
@@ -1528,7 +1515,7 @@ jarves.WindowCombine = new Class({
     },
 
     getEntryPoint: function() {
-        return this.win.getEntryPoint();
+        return this.options.entryPoint || this.win.getEntryPoint();
     },
 
     loadAround: function(pPrimary) {

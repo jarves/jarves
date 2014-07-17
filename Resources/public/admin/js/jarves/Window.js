@@ -98,8 +98,15 @@ jarves.Window = new Class({
         jarves.wm.reloadHashtag();
     },
 
+    /**
+     *
+     * @returns {jarves.Window}
+     */
     getParent: function () {
-        return 'number' == typeOf(this.parent) ? jarves.wm.getWindow(this.parent) : this.parent;
+        if (instanceOf(this.parent, jarves.Window)) {
+            return this.parent;
+        }
+        return 'number' === typeOf(this.parent) ? jarves.wm.getWindow(this.parent) : this.parent;
     },
 
     isInFront: function () {
@@ -226,6 +233,7 @@ jarves.Window = new Class({
             if (this.loadingObj) {
 
                 this.loadingFx.cancel();
+                this.loadingObj.destroyOverlay();
 
                 this.loadingFx.addEvent('complete', function () {
 
@@ -515,8 +523,6 @@ jarves.Window = new Class({
                 this.getParent().toFront(true);
             }
 
-            jarves.wm.zIndex++;
-            this.border.setStyle('z-index', jarves.wm.zIndex);
             if (!this.isInline()) {
                 jarves.wm.zIndex++;
                 this.border.setStyle('z-index', jarves.wm.zIndex);
@@ -586,6 +592,7 @@ jarves.Window = new Class({
 
     _highlight: function () {
         [this.title, this.bottom].each(function (item) {
+            if (!item) return;
             item.set('tween', {duration: 50, onComplete: function () {
                 item.tween('opacity', 1);
             }});
@@ -724,7 +731,7 @@ jarves.Window = new Class({
             this.interruptClose = false;
             this.fireEvent('close');
             if (this.interruptClose == true) {
-                return;
+                return false;
             }
         }
 
@@ -958,19 +965,22 @@ jarves.Window = new Class({
     },
 
     renderEdit: function () {
-        this.edit = new jarves.WindowEdit(this);
+        this.edit = new jarves.WindowEdit(this, null, {entryPoint: this.getEntryPoint()});
+        this.edit.addEvent('destroy', function(){
+            this.close(true);
+        }.bind(this))
     },
 
     renderAdd: function () {
-        this.add = new jarves.WindowAdd(this);
+        this.add = new jarves.WindowAdd(this, null, {entryPoint: this.getEntryPoint()});
     },
 
     renderCombine: function () {
-        this.combine = new jarves.WindowCombine(this);
+        this.combine = new jarves.WindowCombine(this, null, {entryPoint: this.getEntryPoint()});
     },
 
     renderList: function () {
-        this.list = new jarves.WindowList(this, null, this.content);
+        this.list = new jarves.WindowList(this, null, {entryPoint: this.getEntryPoint()});
     },
 
     renderCustom: function () {
@@ -1059,18 +1069,25 @@ jarves.Window = new Class({
             this.dialogContainer = new jarves.Dialog(this.getParent(), {
                 absolute: true,
                 noBottom: true,
+                autoDisplay: true,
+                autoClose: true,
                 width: this.options.width || '75%',
                 height: this.options.height || '92%',
                 minWidth: this.options.minWidth,
-                minHeight: this.options.minHeight
+                minHeight: this.options.minHeight,
+                withSmallCloseButton: true
             });
             this.border.inject(this.dialogContainer.getContentContainer());
+            this.dialogContainer.addEvent('preClose', function() {
+                if (!this.close(true)) {
+                    this.dialogContainer.abortClosing();
+                }
+            }.bind(this));
         } else if (this.isInline()) {
             this.border.inject(this.getParent());
         } else {
             this.border.inject(jarves.adminInterface.desktopContainer);
         }
-
     },
 
     hideTitleGroups: function () {

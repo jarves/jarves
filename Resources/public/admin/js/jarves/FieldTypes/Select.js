@@ -50,6 +50,16 @@ jarves.FieldTypes.Select = new Class({
                 combobox: true,
                 type: 'objectKey',
                 desc: t('The key of the object')
+            },
+            withoutManageLink: {
+                label: t('Without manage link'),
+                type: 'checkbox',
+                desc: t('Disables the link that points to the manage-window')
+            },
+            withoutAddLink: {
+                label: t('Without add link'),
+                type: 'checkbox',
+                desc: t('Disables the link that points to the add-window')
             }
         }
     },
@@ -72,13 +82,47 @@ jarves.FieldTypes.Select = new Class({
             this.options.inputWidth -= 2;
         }
 
-        this.select = new jarves.Select(this.fieldInstance.fieldPanel, this.options);
+        this.select = new jarves.Select(this.getContainer(), this.options);
+
+        if (this.options.object && (!this.options.withoutManageLink || !this.options.withoutAddLink)) {
+            this.definition = jarves.getObjectDefinition(this.options.object);
+
+            if (!this.options.withoutManageLink && this.definition.listEntryPoint) {
+
+                this.manageLink = new jarves.Button(['', '#icon-pencil'], this.openManage.bind(this), t('Manage/Edit'))
+                    .inject(this.getContainer());
+            }
+
+            if (!this.options.withoutAddLink && this.definition.addEntryPoint) {
+                this.addLink = new jarves.Button(['', '#icon-plus-5'], this.openAdd.bind(this), t('Add new'))
+                    .inject(this.getContainer());
+            }
+
+            if (this.addLink || this.manageLink) {
+                this.getContainer().addClass('jarves-field-type-select-with-buttons');
+            }
+        }
 
         if (this.options.inputWidth && 'auto' !== this.options.inputWidth) {
             document.id(this.select).setStyle('width', this.options.inputWidth);
         }
 
         this.select.addEvent('change', this.fireChange);
+    },
+
+    openManage: function() {
+        var url = jarves.normalizeObjectKey(this.options.object) + '/' + jarves.urlEncode(this.select.getValue());
+        var win = jarves.wm.open(this.definition.editEntryPoint, {type: 'edit', selected: url}, null, true);
+        win.addEvent('close', function() {
+            this.select.reload();
+        }.bind(this));
+    },
+
+    openAdd: function() {
+        var win = jarves.wm.open(this.definition.addEntryPoint, {type: 'add'}, null, true);
+        win.addEvent('close', function() {
+            this.select.reload();
+        }.bind(this));
     },
 
     toElement: function() {

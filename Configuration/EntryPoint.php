@@ -6,7 +6,7 @@ class EntryPoint extends Model
 {
     protected $attributes = ['path', 'type', 'icon', 'multi', 'link', 'system'];
 
-    protected $_excludeFromExport = ['parentInstance', 'fullPath'];
+    protected $_excludeFromExport = ['parentInstance', 'fullPath', 'bundle'];
 
     /**
      * @var string
@@ -44,6 +44,11 @@ class EntryPoint extends Model
     protected $label;
 
     /**
+     * @var Bundle
+     */
+    protected $bundle;
+
+    /**
      * @var boolean
      */
     protected $multi = false;
@@ -62,6 +67,27 @@ class EntryPoint extends Model
      * @var string
      */
     protected $fullPath;
+
+    /**
+     * @param \Jarves\Configuration\Bundle $bundle
+     */
+    public function setBundle(Bundle $bundle = null)
+    {
+        $this->bundle = $bundle;
+        if ($this->children) {
+            foreach ($this->children as $child) {
+                $child->setBundle($bundle);
+            }
+        }
+    }
+
+    /**
+     * @return \Jarves\Configuration\Bundle
+     */
+    public function getBundle()
+    {
+        return $this->bundle;
+    }
 
     /**
      * @param EntryPoint[] $children
@@ -101,6 +127,7 @@ class EntryPoint extends Model
     public function setParentInstance(EntryPoint $parentInstance = null)
     {
         $this->parentInstance = $parentInstance;
+        $this->setBundle($parentInstance->getBundle());
     }
 
     public function getParentInstance()

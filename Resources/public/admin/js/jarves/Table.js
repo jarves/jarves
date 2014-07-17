@@ -58,7 +58,6 @@ jarves.Table = new Class({
             }.bind(this));
 
             this.main.addEvent('click:relay(th)', function (e, item) {
-                e.stop();
                 this.fireEvent('selectHead', item);
             }.bind(this));
 

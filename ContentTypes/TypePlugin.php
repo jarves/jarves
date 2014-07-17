@@ -5,6 +5,7 @@ namespace Jarves\ContentTypes;
 use Jarves\Model\Content;
 
 use Jarves\Exceptions\PluginException;
+use Jarves\Model\ContentInterface;
 use Jarves\PageResponse;
 use Jarves\PluginResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -69,7 +70,7 @@ class TypePlugin extends AbstractType
         ), null, $event->getException());
     }
 
-    public function setContent(Content $content)
+    public function setContent(ContentInterface $content)
     {
         parent::setContent($content);
         $this->plugin = json_decode($content->getContent(), 1);

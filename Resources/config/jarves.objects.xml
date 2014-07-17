@@ -238,7 +238,7 @@
           <field id="created" type="datetime"/>
         </fields>
       </object>
-      <object id="EntryPoint">
+      <object id="EntryPoint" crossRef="false">
         <label>EntryPoint</label>
         <class>Jarves\ORM\ObjectEntryPoint</class>
         <labelField>title</labelField>

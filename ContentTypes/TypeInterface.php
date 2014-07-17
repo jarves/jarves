@@ -2,7 +2,7 @@
 
 namespace Jarves\ContentTypes;
 
-use Jarves\Model\Content;
+use Jarves\Model\ContentInterface;
 
 interface TypeInterface
 {
@@ -11,7 +11,7 @@ interface TypeInterface
      */
     public function render();
 
-    public function setContent(Content $content);
+    public function setContent(ContentInterface $content);
 
     public function setParameters(array $parameters);
 

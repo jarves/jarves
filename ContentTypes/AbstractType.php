@@ -2,12 +2,12 @@
 
 namespace Jarves\ContentTypes;
 
-use Jarves\Model\Content;
+use Jarves\Model\ContentInterface;
 
 abstract class AbstractType implements TypeInterface
 {
     /**
-     * @var Content
+     * @var ContentInterface
      */
     private $content;
 
@@ -17,15 +17,15 @@ abstract class AbstractType implements TypeInterface
     private $parameters;
 
     /**
-     * @param Content $content
+     * @param ContentInterface $content
      */
-    public function setContent(Content $content)
+    public function setContent(ContentInterface $content)
     {
         $this->content = $content;
     }
 
     /**
-     * @return Content
+     * @return ContentInterface
      */
     public function getContent()
     {

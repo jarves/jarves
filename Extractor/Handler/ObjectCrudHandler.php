@@ -26,14 +26,14 @@ class ObjectCrudHandler implements HandlerInterface
         }
 
         if ($entryPointPath = $route->getDefault('_jarves_entry_point')) {
-//            $entryPoint = $this->jarves->
             $adminUtils = new \Jarves\Admin\Utils($this->jarves);
             $entryPoint = $adminUtils->getEntryPoint($entryPointPath);
             $annotation->setSection(
                 sprintf(
-                    'Entrypoint: %s %s',
-                    $entryPoint->getLabel() ? : $entryPoint->getPath(),
-                    $entryPoint->isFrameworkWindow() ? '(Framework Window) ' : ''
+                    '%s %s %s',
+                    $entryPoint->isFrameworkWindow() ? 'Framework Window: ' : '',
+                    $entryPoint->getBundle() ? ($entryPoint->getBundle()->getLabel() ?: $entryPoint->getBundle()->getBundleName()) . ', ': 'No Bundle, ',
+                    $entryPoint->getLabel() ?: $entryPoint->getPath()
                 )
             );
         } else {
@@ -41,9 +41,7 @@ class ObjectCrudHandler implements HandlerInterface
             $objectSection = $this->jarves->getObjects()->getDefinition($objectKey);
             $annotation->setSection(
                 sprintf(
-                    'Object %s -> %s (%s)',
-                    $objectSection->getBundle()->getBundleName(),
-                    $objectSection->getLabel() ? : $objectSection->getId(),
+                    'Object %s',
                     $objectKey
                 )
             );

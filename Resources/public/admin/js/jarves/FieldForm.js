@@ -557,6 +557,21 @@ jarves.FieldForm = new Class({
     },
 
     /**
+     * @returns {jarves.Field}
+     */
+    getFirstField: function() {
+        var result;
+
+        Object.each(this.fields, function (field, id) {
+            if (!result && field.type != 'tab') {
+                result = field;
+            }
+        });
+
+        return result;
+    },
+
+    /**
      * Invisible validation check. This does not show any information to the user,
      * if a field is invalid.
      *
@@ -749,8 +764,7 @@ jarves.FieldForm = new Class({
 
         this.value = Object.clone(this.getValue());
 
-        if (true !== internal) {
-            //todo, should be === ?
+        if (internal) {
             this.fireEvent('change', this.value);
             this.fireEvent('setValue', this.value);
         }
@@ -838,7 +852,6 @@ jarves.FieldForm = new Class({
 
             Object.each(res, function(v, k) {
                 if (!this.value || this.isDifferent(v, this.value[k])) {
-                    console.log(k, this.value ? this.value[k] : null, ' => ', v);
                     patchValue[k] = v;
                 }
             }.bind(this));
