@@ -603,8 +603,8 @@ class FileController extends Controller
      * This exists the process and sends a `content-type: image/png` http header.
      *
      * @Rest\QueryParam(name="path", requirements=".+", strict=true, description="The file path or its ID")
-     * @Rest\QueryParam(name="width", requirements="[0-9]+", default=50, description="The image width")
-     * @Rest\QueryParam(name="height", requirements="[0-9]*", default=50, description="The image height")
+     * @Rest\QueryParam(name="width", requirements="[0-9]+", description="The image width")
+     * @Rest\QueryParam(name="height", requirements="[0-9]*", description="The image height")
      *
      * @Rest\Get("/admin/file/preview")
      *
@@ -615,6 +615,11 @@ class FileController extends Controller
         $path = $paramFetcher->get('path');
         $width = $paramFetcher->get('width');
         $height = $paramFetcher->get('height');
+
+        if (!$width && !$height) {
+            $width = 50;
+            $height = 50;
+        }
 
         if (is_numeric($path)) {
             $path = $this->getJarves()->getWebFileSystem()->getPath($path);
@@ -637,7 +642,6 @@ class FileController extends Controller
         }
 
         $image = $this->getJarves()->getWebFileSystem()->getResizeMax($path, $width, $height);
-
 
         $expires = 3600; //1 h
         $response = new Response();

@@ -57,6 +57,9 @@ jarves.FieldTable = new Class({
         if (this.options.asFrameworkColumn || this.options.withWidth) {
             this.widthTd = new Element('th', {width: 80, text: 'Width'}).inject(this.headerTr);
         }
+        if (this.options.asModel) {
+            this.labelTd = new Element('th', {width: 150, text: 'Label'}).inject(this.headerTr);
+        }
         this.thType = new Element('th', {width: 150, text: 'Type'}).inject(this.headerTr);
         this.thProperties = new Element('th', {width: 150, text: 'Properties'}).inject(this.headerTr);
         this.thActions = new Element('th', {width: 80, text: 'Actions'}).inject(this.headerTr);

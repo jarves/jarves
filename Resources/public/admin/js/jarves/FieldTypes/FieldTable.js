@@ -100,7 +100,7 @@ jarves.FieldTypes.FieldTable = new Class({
     createLayout: function () {
         this.fieldTable = new jarves.FieldTable(this.fieldInstance.fieldPanel, this.win, this.options);
 
-        this.fieldTable.addEvent('change', this.fieldInstance.fireChange);
+        this.fieldTable.addEvent('change', this.fireChange);
     },
 
     setValue: function (pValue) {

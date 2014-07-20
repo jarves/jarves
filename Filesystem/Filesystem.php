@@ -362,7 +362,6 @@ class Filesystem implements FilesystemInterface
      */
     public function getResizeMax($path, $width, $height)
     {
-
         $content = $this->read($path);
         if (!$content) {
             return null;
@@ -370,13 +369,13 @@ class Filesystem implements FilesystemInterface
 
         $image = \PHPImageWorkshop\ImageWorkshop::initFromString($content);
 
-        $width2 = $image->getWidth();
-        $height2 = $image->getHeight();
+        $widthOriginal = $image->getWidth();
+        $heightOriginal = $image->getHeight();
 
         $newWidth = null;
         $newHeight = null;
 
-        if ($width2 > $height2) {
+        if ($widthOriginal > $heightOriginal) {
             $newWidth = $width;
         } else {
             $newHeight = $height;

@@ -57,7 +57,11 @@ class ObjectFile extends Propel
                 }
 
                 if (!is_numeric($value)) {
-                    $file = $this->getJarves()->getWebFileSystem()->getFile(Tools::urlDecode($value));
+                    try {
+                        $file = $this->getJarves()->getWebFileSystem()->getFile(Tools::urlDecode($value));
+                    } catch (FileNotFoundException $e) {
+                        $file = null;
+                    }
                     if ($file) {
                         $value = $file->getId();
                     } else {
@@ -147,7 +151,12 @@ class ObjectFile extends Propel
         if (!$path) {
             return null;
         }
-        $item = $this->getJarves()->getWebFileSystem()->getFile($path);
+        try {
+            $item = $this->getJarves()->getWebFileSystem()->getFile($path);
+        } catch (FileNotFoundException $e) {
+            return null;
+        }
+
         if ($item) {
             return $item->toArray();
         }
@@ -327,7 +336,11 @@ class ObjectFile extends Propel
             if ($depth > 0) {
                 $children = array();
                 if ($file['type'] == 'dir') {
-                    $children = self::getBranch(array('id' => $file['path']), $condition, $depth - 1);
+                    try {
+                        $children = self::getBranch(array('id' => $file['path']), $condition, $depth - 1);
+                    } catch (FileNotFoundException $e){
+                        $children = null;
+                    }
                 }
                 $file['_childrenCount'] = count($children);
                 if ($depth > 1 && $file['type'] == 'dir') {

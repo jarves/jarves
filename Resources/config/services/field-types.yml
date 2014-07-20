@@ -11,6 +11,7 @@ parameters:
      jarves.field.types.lang.class: Jarves\Admin\FieldTypes\TypeLang
      jarves.field.types.textarea.class: Jarves\Admin\FieldTypes\TypeTextarea
      jarves.field.types.file.class: Jarves\Admin\FieldTypes\TypeFile
+     jarves.field.types.image.class: Jarves\Admin\FieldTypes\TypeImage
      jarves.field.types.filelist.class: Jarves\Admin\FieldTypes\TypeFilelist
      jarves.field.types.layoutelement.class: Jarves\Admin\FieldTypes\TypeLayoutElement
      jarves.field.types.view.class: Jarves\Admin\FieldTypes\TypeView
@@ -94,6 +95,11 @@ services:
          class: %jarves.field.types.file.class%
          tags:
              - { name: jarves.field.type, alias: file }
+
+     jarves.field.types.image:
+         class: %jarves.field.types.image.class%
+         tags:
+             - { name: jarves.field.type, alias: image }
 
      jarves.field.types.filelist:
          class: %jarves.field.types.filelist.class%

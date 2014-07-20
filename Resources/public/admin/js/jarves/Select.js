@@ -784,7 +784,7 @@ jarves.Select = new Class({
                 for (i = 0; i < items.length; i++) {
                     var item = items[i];
                     if (item && !item.isSplit) {
-                        if (null === this.value) {
+                        if ('null' === typeOf(this.value)) {
                             this.chooseItem(item.id, internal);
                         }
                         this.fireEvent('firstItemLoaded', item.id);
@@ -1083,6 +1083,7 @@ jarves.Select = new Class({
     },
 
     toggle: function() {
+        this.toElement().focus();
         if (this.chooser.getParent()) {
             this.close(true);
         } else {

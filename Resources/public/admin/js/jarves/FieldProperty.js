@@ -264,12 +264,23 @@ jarves.FieldProperty = new Class({
             this.iKey = new jarves.Field({
                 type: 'text',
                 modifier: this.options.keyModifier,
-                noWrapper: true
+                noWrapper: true,
+                onChange: function(){
+                    if (this.labelField){
+                        var label = this.labelField.getValue() || '';
+
+                        if (!label || label.lcfirst() == this.oldKey) {
+                            this.labelField.setValue(this.iKey.getValue().ucfirst());
+                            this.oldKey = this.iKey.getValue();
+                        }
+                    }
+                }.bind(this)
             }, this.tdLabel);
 
             delete this.kaFields.key;
 
             this.iKey.setValue(this.key ? this.key : 'property_' + count);
+            this.oldKey = this.iKey.getValue();
 
             if (this.options.asFrameworkColumn || this.options.withWidth) {
                 this.tdWidth = new Element('td', {width: 80}).inject(this.main);
@@ -278,6 +289,15 @@ jarves.FieldProperty = new Class({
                 this.widthField = new jarves.Field(width, this.tdWidth);
 
                 this.widthField.setValue(this.definition && this.definition.width ? this.definition.width : '');
+            }
+
+            if (this.options.asModel) {
+                this.tdLabel = new Element('td', {width: 150}).inject(this.main);
+                var label = Object.clone(this.kaFields.label);
+                label.noWrapper = true;
+                this.labelField = new jarves.Field(label, this.tdLabel);
+
+                this.labelField.setValue(this.definition && this.definition.label ? this.definition.label : '');
             }
 
             this.tdType = new Element('td', {width: 150}).inject(this.main);
@@ -445,6 +465,10 @@ jarves.FieldProperty = new Class({
             this.fieldObject.getField('width').setValue(this.widthField.getValue(), true);
         }
 
+        if (this.options.asModel) {
+            this.fieldObject.getField('label').setValue(this.labelField.getValue(), true);
+        }
+
         new jarves.Button(t('Cancel'))
             .addEvent('click', function () {
                 this.dialog.closeAnimated();
@@ -460,6 +484,9 @@ jarves.FieldProperty = new Class({
                 this.typeField.setValue(this.definition.type);
                 if (this.options.asFrameworkColumn || this.options.withWidth) {
                     this.widthField.setValue(this.definition.width);
+                }
+                if (this.options.asModel) {
+                    this.labelField.setValue(this.definition.label);
                 }
 
                 this.fireChange();
@@ -504,13 +531,18 @@ jarves.FieldProperty = new Class({
 
         if (this.options.asTableItem) {
             key = this.iKey.getValue();
-            var type = this.typeField.getValue();
 
             if (!key) {
                 return;
             }
 
-            this.definition.type = type;
+            this.definition.type = this.typeField.getValue();
+            if (this.widthField) {
+                this.definition.width = this.widthField.getValue();
+            }
+            if (this.labelField) {
+                this.definition.label = this.labelField.getValue();
+            }
         } else {
             this.definition = this.fieldObject.getValue();
             key = this.definition.key;
@@ -629,10 +661,14 @@ jarves.FieldProperty = new Class({
 
         if (this.options.asTableItem) {
             this.iKey.setValue(key);
+            this.oldKey = key;
             this.typeField.setValue(this.definition.type);
 
             if (this.options.asFrameworkColumn || this.options.withWidth) {
                 this.widthField.setValue(this.definition.width);
+            }
+            if (this.options.asModel) {
+                this.labelField.setValue(this.definition.label);
             }
 
         } else {

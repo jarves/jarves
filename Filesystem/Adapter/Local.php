@@ -55,9 +55,6 @@ class Local extends AbstractAdapter
     public function __construct($mountPoint, $params = null)
     {
         parent::__construct($mountPoint, $params);
-        if ($this->getParam('root')) {
-            $this->setRoot($this->getParam('root'));
-        }
     }
 
     public function getFullPath($path)
@@ -74,6 +71,15 @@ class Local extends AbstractAdapter
 
         return $root . $path;
     }
+
+    public function setParams($params)
+    {
+        parent::setParams($params);
+        if ($this->getParam('root')) {
+            $this->setRoot($this->getParam('root'));
+        }
+    }
+
 
     /**
      * Sets file permissions on file/folder recursively.
@@ -472,7 +478,11 @@ class Local extends AbstractAdapter
      */
     public function hash($path)
     {
-        return md5_file($this->getRoot() . $path);
+        if (is_readable($this->getRoot() . $path)) {
+            return md5_file($this->getRoot() . $path);
+        }
+
+        return null;
     }
 
     /**

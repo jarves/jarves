@@ -1158,7 +1158,7 @@ jarves.Files = new Class({
         this.setAddressFakerAsFile(this.currentFile.type == 'file');
 
         if (this.sideTree) {
-            this.sideTree.setValue(this.currentFile.id);
+            this.sideTree.setValue('jarves/file/' + this.currentFile.id);
         }
 
         this.prepareRender();

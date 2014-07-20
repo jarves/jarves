@@ -190,6 +190,7 @@ var jarves_system_module_editWindow = new Class({
 
                 var currentTab = this.winTabPane.getSelected();
                 if (!currentTab) {
+                    this.win.alert(t('No tab added'));
                     return;
                 }
 
@@ -391,8 +392,8 @@ var jarves_system_module_editWindow = new Class({
                 label: t('Default order'),
                 type: 'array',
                 columns: [
-                    {label: t('Field'), width: '60%'},
-                    {label: t('Direction')}
+                    {label: t('Field')},
+                    {label: t('Direction'), width: '50px'}
                 ],
                 withOrder: true,
                 asHash: true,
@@ -408,7 +409,6 @@ var jarves_system_module_editWindow = new Class({
                         }
                     }
                 }
-
             },
 
             __search__: {
@@ -1156,7 +1156,7 @@ var jarves_system_module_editWindow = new Class({
 
     parseMethodDefintion: function (pCode) {
 
-        var res = pCode.match(/(public|private)\s*(static|)\s*function ([a-zA-Z0-9]*)\(([^\)]*)\)\s*{/);
+        var res = pCode.match(/(public|private)\s*(static|)\s*function ([a-zA-Z0-9]*)\(([^\)]*)\)\s*\{/);
 
         if (res) {
 

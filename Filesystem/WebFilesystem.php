@@ -54,7 +54,7 @@ class WebFilesystem extends Filesystem
      */
     public function getAdapter($path = null)
     {
-        $adapterClass = '\Jarves\Filesystem\Adapter\Local';
+        $adapterServiceId = 'jarves.filesystem.adapter.local';
 
         $params['root'] = realpath($this->getJarves()->getKernel()->getRootDir() . '/../web/');
 
@@ -92,7 +92,7 @@ class WebFilesystem extends Filesystem
             return $this->adapterInstances[$firstFolder];
         }
 
-        $adapter = $this->newAdapter($adapterClass, $firstFolder, $params);
+        $adapter = $this->newAdapter($adapterServiceId, $firstFolder, $params);
         $adapter->setMountPath($firstFolder);
 
         if ($adapter instanceof ContainerAwareInterface) {
@@ -105,14 +105,17 @@ class WebFilesystem extends Filesystem
     }
 
     /**
-     * @param string $class
+     * @param string $serviceId
      * @param string $mountPath
      * @param array $params
      * @return \Jarves\Filesystem\Adapter\AdapterInterface
      */
-    public function newAdapter($class, $mountPath, $params)
+    public function newAdapter($serviceId, $mountPath, $params)
     {
-        return new $class($mountPath, $params);
+        $service = $this->getJarves()->getContainer()->get($serviceId);
+        $service->setMountPath($mountPath);
+        $service->setParams($params);
+        return $service;
     }
 
     /**

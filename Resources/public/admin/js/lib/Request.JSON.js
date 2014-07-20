@@ -83,17 +83,17 @@ Request.JSON = new Class({
         throw 'Response Error %s'.replace('%s', this.options.url);
     },
 
-    checkError: function (result) {
-        if (true !== this.options.noErrorReporting && result && result.error) {
+    checkError: function (response) {
+        if (response && response.error) {
 
             if (typeOf(this.options.noErrorReporting) == 'array' &&
-                this.options.noErrorReporting.contains(result.error)) {
-                this.fireEvent('exception', result);
+                this.options.noErrorReporting.contains(response.error)) {
+                this.fireEvent('exception', response);
                 return false;
             }
 
             if (true === this.options.noErrorReporting) {
-                this.fireEvent('exception', result);
+                this.fireEvent('exception', response);
                 return false;
             }
 
@@ -106,7 +106,7 @@ Request.JSON = new Class({
                 return false;
             }
 
-            if ('AccessDeniedException' === result.error) {
+            if ('AccessDeniedException' === response.error) {
                 jarves.lastRequestBubble = jarves.adminInterface.getHelpSystem().newBubble(
                     t('Access denied'),
                     t('You started a secured action or requested a secured information.') +
@@ -119,8 +119,8 @@ Request.JSON = new Class({
                 jarves.lastRequestBubble = jarves.adminInterface.getHelpSystem().newBubble(
                     t('Request error'),
                     t('There has been a error occured during the last request. It looks like the server has currently some troubles. Please try it again.') +
-                        "<br/><br/>" + t('Error code: %s').replace('%s', result.error) +
-                        "<br/>" + t('Error message: %s').replace('%s', result.message) +
+                        "<br/><br/>" + t('Error code: %s').replace('%s', response.error) +
+                        "<br/>" + t('Error message: %s').replace('%s', response.message) +
                         "<br/>" + 'URI: %s'.replace('%s', this.options.url) +
                         '<br/><a class="jarves-Button" onclick="jarves.wm.open(\'admin/system/rest-logger\')">Details</a>',
                     15000

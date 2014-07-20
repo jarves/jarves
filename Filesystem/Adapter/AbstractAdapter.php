@@ -43,7 +43,7 @@ abstract class AbstractAdapter implements AdapterInterface
         $this->setMountPath($mountPath);
 
         if ($params) {
-            $this->params = $params;
+            $this->setParams($params);
         }
     }
 
@@ -84,6 +84,22 @@ abstract class AbstractAdapter implements AdapterInterface
     public function setParam($key, $value)
     {
         $this->params[$key] = $value;
+    }
+
+    /**
+     * @param array $params
+     */
+    public function setParams($params)
+    {
+        $this->params = $params;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParams()
+    {
+        return $this->params;
     }
 
     /**

@@ -110,12 +110,12 @@ services:
      jarves.filesystem.local:
          class: %jarves.filesystem.local.class%
          calls:
-            - [setAdapter, ["@jarves.filesystem.adapter.local"]]
+            - [setAdapter, ["@jarves.filesystem.adapter.local="]]
 
      jarves.filesystem.cache:
          class: %jarves.filesystem.cache.class%
          calls:
-            - [setAdapter, ["@jarves.filesystem.adapter.cache"]]
+            - [setAdapter, ["@jarves.filesystem.adapter.cache="]]
 
      jarves.filesystem.web:
          class: %jarves.filesystem.web.class%

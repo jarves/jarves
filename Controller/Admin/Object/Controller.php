@@ -114,7 +114,9 @@ class Controller extends JarvesController
                 $map = array();
                 foreach ($requestedIds as $id) {
                     $pk = $this->getObjects()->parsePk($objectKey, $id);
-                    $map[$this->getObjects()->getObjectUrlId($objectKey, $pk[0]) + ''] = $id;
+                    if ($pk) {
+                        $map[$this->getObjects()->getObjectUrlId($objectKey, $pk[0]) + ''] = $id;
+                    }
                 }
 
                 if (is_array($items)) {

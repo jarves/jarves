@@ -1996,6 +1996,35 @@ var jarves_system_module_edit = new Class({
         this.lr = new Request.JSON({
             url: _pathAdmin + 'admin/system/bundle/editor/model/build',
             noCache: 1,
+            noErrorReporting: true,
+            onException: function(response){
+                var dialog = new jarves.Dialog(this.win, {
+                    absolute: true,
+                    applyButtonLabel: 'OK',
+                    autoClose: true,
+                    withButtons: true,
+                    cancelButton: false
+                });
+                dialog.setStyle('width', '80%');
+                dialog.setStyle('height', '90%');
+
+                new Element('h1', {
+                    text: t('Error building the model')
+                }).inject(dialog.getContentContainer());
+
+                new Element('div', {
+                    text: response.message
+                }).inject(dialog.getContentContainer());
+
+
+                new Element('div', {
+                    style: 'padding: 15px; border: 1px solid silver; background-color: white; white-space:pre;',
+                    text: JSON.stringify(response, undefined, 2)
+                }).inject(dialog.getContentContainer());
+
+                dialog.show();
+
+            }.bind(this),
             onComplete: function(response) {
                 if (response.data) {
                     var atLeastOneFailed = false;
@@ -2800,7 +2829,7 @@ var jarves_system_module_edit = new Class({
                     'text': '',
                     style: 'color: gray',
                     width: 150
-                }).inject(item.tdType, 'before');
+                }).inject(item.iKey, 'after');
 
                 var updateUnderscore = function() {
                     var ucv = item.iKey.getValue().replace(/([^a-z0-9])/g, function($1) {
