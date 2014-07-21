@@ -2096,11 +2096,19 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
     }
 
     /**
-     * @return array
+     * @return \Jarves\Configuration\Field[]
      */
     public function getFields()
     {
         return $this->fields;
+    }
+
+    /**
+     * @return \Jarves\Configuration\Field[]
+     */
+    public function getInitializedFields()
+    {
+        return $this->_fields;
     }
 
     /**

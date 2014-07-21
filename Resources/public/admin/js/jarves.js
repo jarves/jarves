@@ -823,10 +823,11 @@ jarves.getObjectLabelByItem = function(objectKey, item, mode, overwriteDefinitio
 
     if (!template) {
         //we only have an label field, so return it
-        return mowla.fetch('{label}', {label: item[label]});
+        return item[label];
     }
 
-    return mowla.fetch(template, item);
+    template = twig({data: template});
+    return template.render(item);
 };
 
 /**

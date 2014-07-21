@@ -39,7 +39,7 @@ class UserCrudController extends WindowController
                 'type' => 'checkbox',
                 'align' => 'center'
             ),
-        'groupMembership.name' =>
+        'groups.name' =>
             array(
                 'label' => 'Group membership'
             )
@@ -52,7 +52,7 @@ class UserCrudController extends WindowController
             (<span>{firstName}</span>{if lastName} <span>{lastName}</span>{/if})
         {/if}
         {if email}<div class="sub">{email}</div>{/if}
-        <div class="sub">{if groupMembership}{groupMembership.name}{/if}</div>
+        <div class="sub">{if groups}{groups.name}{/if}</div>
     </div>';
 
     public $itemsPerPage = 20;
@@ -115,7 +115,7 @@ class UserCrudController extends WindowController
                     'label' => 'Active account',
                     'type' => 'checkbox'
                 ),
-                'groupMembership' => array(
+                'groups' => array(
                     'fieldWidth' => 'auto'
                 )
             )

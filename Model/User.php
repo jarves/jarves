@@ -38,7 +38,7 @@ class User extends BaseUser
             if (count($userGroups) > 0) {
                 $inGroups = [];
                 foreach ($userGroups as $group) {
-                    $inGroups[] = $group->getGroupMembershipId();
+                    $inGroups[] = $group->getGroupsId();
                 }
                 $this->cachedGroupIds = implode(', ', $inGroups);
             } else {

@@ -12,7 +12,7 @@ jarves.FieldTypes.Number = new Class({
         this.input.type = 'number';
 
         this.input.addEvent('keyup', function () {
-            this.value = this.value.replace(/[^0-9\.]/g, '');
+            this.value = this.value.replace(/[^0-9\-,\.]/g, '');
         });
 
     },

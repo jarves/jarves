@@ -1602,10 +1602,10 @@ jarves.WindowCombine = new Class({
         } else {
 
             if (this.classProperties.columns.title) {
-                layout += '<h2>{title}</h2>';
+                layout += '<h2>{{title}}</h2>';
                 titleAdded = true;
             } else if (this.classProperties.columns.name) {
-                layout += '<h2>{name}</h2>';
+                layout += '<h2>{{name}}</h2>';
                 nameAdded = true;
             }
 
@@ -1629,7 +1629,7 @@ jarves.WindowCombine = new Class({
                     layout += ', ';
                 }
 
-                layout += "<span>{" + id + "}</span>";
+                layout += "<span>{{" + id + "}}</span>";
                 c++;
 
             }.bind(this));
@@ -1637,17 +1637,15 @@ jarves.WindowCombine = new Class({
             layout += "</div>";
         }
 
+        var template = twig({data: layout});
+        var data = jarves.getObjectLabels(this.classProperties.columns, pItem, this.classProperties['object'], true);
+
         var item = new Element('div', {
-            html: layout,
+            html: template.render(data),
             'class': 'jarves-List-item' + (this.classProperties.edit ? ' editable' : '')
         });
         item._item = pItem;
         item._pk = pk;
-
-        //parse template
-        var data = jarves.getObjectLabels(this.classProperties.columns, pItem, this.classProperties['object'], true);
-
-        mowla.render(item, data);
 
         if (this.classProperties.remove == true) {
 

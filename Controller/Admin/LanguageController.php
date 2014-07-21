@@ -89,7 +89,7 @@ class LanguageController extends Controller
      *
      * @Rest\QueryParam(name="bundle", requirements=".+", strict=true, description="The bundle name")
      *
-     * @Rest\Get("/admin/system/bundle/editor/extract")
+     * @Rest\Get("/admin/system/bundle/editor/language/extract")
      *
      * @param ParamFetcher $paramFetcher
      *
@@ -113,7 +113,7 @@ class LanguageController extends Controller
      * @Rest\QueryParam(name="bundle", requirements=".+", strict=true, description="The bundle name")
      * @Rest\QueryParam(name="lang", requirements="[a-z]{2,3}", strict=true, description="The language code")
      *
-     * @Rest\Get("/admin/system/bundle/editor/overview")
+     * @Rest\Get("/admin/system/bundle/editor/language/overview")
      *
      * @param ParamFetcher $paramFetcher
      *

@@ -41,7 +41,12 @@ jarves.Select = new Class({
     loaderId: 0,
     backupedTitle: false,
 
-    labelTemplate: '{if kaSelectImage}' + '{var isVectorIcon = kaSelectImage.substr(0,1) == "#"} ' + '{if kaSelectImage && isVectorIcon}<span class="{kaSelectImage.substr(1)}">{/if}' + '{if kaSelectImage && !isVectorIcon}<img src="{kaSelectImage}" />{/if}' + '{/if}' + '{label}' + '{if kaSelectImage && isVectorIcon}</span>{/if}',
+    labelTemplate: ''
+    + '{% if jarvesSelectImage is defined %}'
+        + '{% if jarvesSelectImage|slice(0,1) == "#" %}<span class="{{ jarvesSelectImage|slice(1) }}">{% endif %}'
+        + '{% if jarvesSelectImage|slice(0,1) != "#" %}<img src="{{ jarvesSelectImage }}" />{% endif %}'
+    + '{% endif %}' + '{{ label }}'
+    + '{% if jarvesSelectImage is defined and jarvesSelectImage|slice(0,1) == "#" %}</span>{% endif %}',
 
     options: {
 
@@ -736,7 +741,7 @@ jarves.Select = new Class({
             oriData = {label: oriData};
         } else if (typeOf(oriData) == 'array') {
             //image
-            oriData = {label: oriData[0], kaSelectImage: oriData[1]};
+            oriData = {label: oriData[0], jarvesSelectImage: oriData[1]};
         }
 
         var template = this.labelTemplate;
@@ -758,15 +763,16 @@ jarves.Select = new Class({
             oriData.label = label.join(', ');
         }
 
-        if (!oriData.kaSelectImage) {
-            oriData.kaSelectImage = '';
+        if (!oriData.jarvesSelectImage) {
+            oriData.jarvesSelectImage = '';
         }
 
         if (typeOf(oriData.label) == 'null') {
             oriData.label = '';
         }
 
-        return mowla.fetch(template, oriData);
+        template = twig({data: template});
+        return template.render(oriData);
     },
 
     selectFirst: function(offset, internal) {
@@ -784,7 +790,7 @@ jarves.Select = new Class({
                 for (i = 0; i < items.length; i++) {
                     var item = items[i];
                     if (item && !item.isSplit) {
-                        if ('null' === typeOf(this.value)) {
+                        if ('null' === typeOf(this.value) && 'null' !== typeOf(item.id)) {
                             this.chooseItem(item.id, internal);
                         }
                         this.fireEvent('firstItemLoaded', item.id);
@@ -992,6 +998,11 @@ jarves.Select = new Class({
     getLabel: function(id, callback) {
 
         var data;
+
+        if ('null' === typeOf(id)) {
+            return null;
+        }
+
         if (this.items.length > 0) {
             //search for i
             for (var i = this.items.length - 1; i >= 0; i--) {

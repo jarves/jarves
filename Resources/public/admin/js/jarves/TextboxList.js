@@ -19,9 +19,9 @@ jarves.TextboxList = new Class({
 
     },
 
-    addValue: function (pItem) {
+    addValue: function (value) {
 
-        if (typeOf(pItem) == 'null') {
+        if (typeOf(value) == 'null') {
             return;
         }
 
@@ -29,7 +29,11 @@ jarves.TextboxList = new Class({
             'class': 'jarves-textboxList-item'
         }).inject(this.title);
 
-        this.getLabel(pItem, function (item) {
+        if ('object' === typeOf(value)) {
+            value = jarves.getObjectId(this.options.object, value);
+        }
+
+        this.getLabel(value, function (item) {
 
             if (typeOf(item) != 'null' && item !== false) {
                 span.set('html', this.renderLabel(item.label));
@@ -46,34 +50,34 @@ jarves.TextboxList = new Class({
             })
                 .addEvent('click', function (e) {
                     e.stopPropagation();
-                    this.value.erase(pItem);
+                    this.value.erase(value);
                     span.destroy();
                 }.bind(this))
                 .inject(span);
 
         }.bind(this));
 
-        this.value.push(pItem);
+        this.value.push(value);
 
     },
 
-    checkIfCurrentValue: function (pItem, pA) {
+    checkIfCurrentValue: function (item, domAnchor) {
 
-        if (this.value.contains(pItem.key)) {
-            pA.addClass('icon-checkmark-6');
-            pA.addClass('jarves-select-chooser-item-selected');
+        if (this.value.contains(item.key)) {
+            domAnchor.addClass('icon-checkmark-6');
+            domAnchor.addClass('jarves-select-chooser-item-selected');
         }
     },
 
-    chooseItem: function (pItem, pInternal) {
+    chooseItem: function (item, internal) {
 
-        if (this.value.contains(pItem.key)) {
+        if (this.value.contains(item.key)) {
             return false;
         }
 
-        this.addValue(pItem);
+        this.addValue(item);
 
-        if (pInternal) {
+        if (internal) {
             this.fireChange();
         }
     },
@@ -82,25 +86,25 @@ jarves.TextboxList = new Class({
         return this.value;
     },
 
-    setValue: function (pValue, pInternal) {
+    setValue: function (value, internal) {
 
         this.clear();
 
-        if (typeOf(pValue) == 'null') {
+        if (typeOf(value) == 'null') {
             return;
         }
 
-        if (typeOf(pValue) != 'array') {
-            pValue = [pValue];
+        if (typeOf(value) != 'array') {
+            value = [value];
         }
 
-        Array.each(pValue, function (item) {
+        Array.each(value, function (item) {
             this.addValue(item);
         }.bind(this));
 
-        this.value = pValue;
+        this.value = value;
 
-        if (pInternal) {
+        if (internal) {
             this.fireChange();
         }
     }

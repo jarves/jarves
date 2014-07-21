@@ -5,6 +5,7 @@ parameters:
      jarves.field.types.object.class: Jarves\Admin\FieldTypes\TypeObject
      jarves.field.types.datetime.class: Jarves\Admin\FieldTypes\TypeDatetime
      jarves.field.types.select.class: Jarves\Admin\FieldTypes\TypeSelect
+     jarves.field.types.textboxList.class: Jarves\Admin\FieldTypes\TypeTextboxList
      jarves.field.types.checkbox.class: Jarves\Admin\FieldTypes\TypeCheckbox
      jarves.field.types.page.class: Jarves\Admin\FieldTypes\TypePage
      jarves.field.types.layout.class: Jarves\Admin\FieldTypes\TypeLayout
@@ -60,6 +61,11 @@ services:
          class: %jarves.field.types.select.class%
          tags:
              - { name: jarves.field.type, alias: select }
+
+     jarves.field.types.textboxList:
+         class: %jarves.field.types.textboxList.class%
+         tags:
+             - { name: jarves.field.type, alias: textboxList }
 
      jarves.field.types.checkbox:
          class: %jarves.field.types.checkbox.class%

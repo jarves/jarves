@@ -326,7 +326,7 @@
           <field id="lastLogin" type="number"/>
           <field id="created" type="datetime"/>
           <field id="modified" type="datetime"/>
-          <field id="groupMembership" type="object">
+          <field id="groups" type="object">
             <label>Group membership</label>
             <object>jarves/group</object>
             <objectRelation>nToM</objectRelation>

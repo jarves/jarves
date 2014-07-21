@@ -4,6 +4,7 @@ namespace Jarves\Translation;
 
 use Jarves\Controller;
 use Jarves\Exceptions\FileNotWritableException;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Finder\Finder;
 
 class Utils extends Controller
@@ -242,19 +243,27 @@ class Utils extends Controller
                 if (isset($className[1]) && $className[1]){
                     preg_match('/\s*\t*namespace ([a-zA-Z0-9_\\\\]+)/', $classPlain, $namespace);
                     $className = (count($namespace) > 1 ? $namespace[1] . '\\' : '' ) . $className[1];
-                    $tempObj = new $className();
-                    if ($tempObj->columns) {
-                        self::extractFrameworkFields($tempObj->getColumns());
-                    }
-                    if ($tempObj->fields) {
-                        self::extractFrameworkFields($tempObj->getFields());
-                    }
-                    if ($tempObj->tabFields) {
-                        foreach ($tempObj->tabFields as $key => $fields) {
-                            $GLOBALS['moduleTempLangs'][$key] = $key;
-                            self::extractFrameworkFields($fields);
+                    $classReflection = new \ReflectionClass($className);
+                    if ($classReflection->isSubclassOf('Jarves\Admin\ObjectCrud')) {
+                        $tempObj = new $className();
+                        if ($tempObj instanceof ContainerAwareInterface) {
+                            $tempObj->setContainer($this->getJarves()->getContainer());
+                        }
+
+                        $tempObj->initialize();
+                        if ($tempObj->getColumns()) {
+                            self::extractFrameworkFields($tempObj->getColumns());
+                        }
+                        if ($tempObj->getInitializedFields()) {
+                            self::extractFrameworkFields($tempObj->getFields());
                         }
                     }
+//                    if ($tempObj->tabFields) {
+//                        foreach ($tempObj->tabFields as $key => $fields) {
+//                            $GLOBALS['moduleTempLangs'][$key] = $key;
+//                            self::extractFrameworkFields($fields);
+//                        }
+//                    }
                 }
             }
         }

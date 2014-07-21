@@ -29,16 +29,12 @@ jarves.FieldTypes.Select = new Class({
                 type: 'checkbox',
                 'default': true
             },
-            store: {
-                label: t('Store path'),
-                desc: t('&lt;extKey&gt;/&lt;EntryPath&gt;, Example: publication/stores/news.')
-            },
-            multi: {
-                label: t('Multiple selection'),
-                desc: t('This field returns then an array.'),
-                'default': false,
-                type: 'checkbox'
-            },
+//            multi: {
+//                label: t('Multiple selection'),
+//                desc: t('This field returns then an array.'),
+//                'default': false,
+//                type: 'checkbox'
+//            },
             combobox: {
                 label: t('Combobox'),
                 'default': false,

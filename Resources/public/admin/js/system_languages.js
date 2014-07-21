@@ -10,7 +10,7 @@ var jarves_system_languages = new Class({
         this.win.content.empty();
 
         this.info = new Element('div', {
-            style: 'position: absolute; left: 0px; right: 0px; top: 0px; height: 23px; padding: 4px; font-weight: bold; color: gray; text-align: center;',
+            style: 'padding: 4px; font-weight: bold; color: gray; text-align: center;',
             html: _('The native language is english. Do not translate the english language, unless you want to adjust some phrases.')
         }).inject(this.win.content);
 

@@ -416,14 +416,14 @@ jarves.WindowAdd = new Class({
         }
 
         var request = this.buildRequest();
-
-        if (this.addItemToAdd) {
-            request._position = this.addItemToAdd.position;
-            request._pk = this.addItemToAdd.pk;
-            request._targetObjectKey = this.addItemToAdd.objectKey;
-        }
-
         if (typeOf(request) != 'null') {
+
+            if (this.addItemToAdd) {
+                request._position = this.addItemToAdd.position;
+                request._pk = this.addItemToAdd.pk;
+                request._targetObjectKey = this.addItemToAdd.objectKey;
+            }
+
 
             this.saveBtn.startLoading(t('Adding ...'));
 
