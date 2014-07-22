@@ -20,7 +20,7 @@ class ObjectLanguage extends Propel
         $languages = explode(',', $languages);
 
         foreach ($languages as $lang) {
-            $condition->addAnd(['code', '=', $lang]);
+            $condition->addOr(['code', '=', $lang]);
         }
     }
 

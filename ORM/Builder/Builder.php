@@ -5,6 +5,7 @@ namespace Jarves\ORM\Builder;
 use Jarves\Configuration\Object;
 use Jarves\Jarves;
 use Jarves\Objects;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Builder
 {
@@ -119,12 +120,12 @@ class Builder
     /**
      * Calls build on each builder.
      */
-    public function build()
+    public function build(OutputInterface $output)
     {
         $this->bootBuildTime();
 
         foreach ($this->builder as $builder) {
-            $builder->build($this->objects);
+            $builder->build($this->objects, $output);
         }
     }
 

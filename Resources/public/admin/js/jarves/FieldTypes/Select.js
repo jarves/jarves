@@ -135,7 +135,6 @@ jarves.FieldTypes.Select = new Class({
 
     getValue: function () {
         var value = this.select.getValue();
-        console.log('select getValue', value);
         if (this.options.object && !this.options.objectIdAsUrlId) {
             value = jarves.getObjectPkFromUrlId(this.options.object, value);
         }

@@ -115,6 +115,29 @@ jarves.FieldAbstract = new Class({
     },
 
     /**
+     *
+     * @returns {jarves.FieldForm}
+     */
+    getForm: function() {
+        return this.fieldInstance.getFieldForm();
+    },
+
+    /**
+     * @returns {jarves.FieldContainer}
+     */
+    getFieldContainer: function() {
+        return this.fieldContainer || this.fieldInstance.getFieldForm()
+    },
+
+    /**
+     *
+     * @param {jarves.FieldContainer} fieldContainer
+     */
+    setFieldContainer: function(fieldContainer) {
+        this.fieldContainer = fieldContainer;
+    },
+
+    /**
      * Renders the UI with the new value.
      * Do not call this function in your code.
      *
@@ -185,7 +208,7 @@ jarves.FieldAbstract = new Class({
      * and call progressWatcher.done() if it's done or .cancel() or .error().
      * getValue() should then return your path value.
      *
-     * If image hasn't been uploaded and we call already getValue() (which can happen
+     * If a image hasn't been uploaded and we call already getValue() (which can happen
      * when we need a value of you to check if something has changed) you should
      * return nothing (if nothing is selected), the old path/value or if the user has selected
      * a new image (but is not saved through save() method), you should return the base64 (or anything else)

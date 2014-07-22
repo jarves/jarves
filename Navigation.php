@@ -71,7 +71,7 @@ class Navigation
         if (!$options['noCache'] && $themeProperties && $themeProperties->getByPath('core/cacheNavigations') !== 0) {
 
             $cache = $jarves->getDistributedCache($cacheKey);
-            if ($cache && is_array($cache) && $cache['html'] !== null && $cache['mtime'] == $mtime) {
+            if ($cache && isset($cache['html']) && $cache['html'] !== null && $cache['mtime'] == $mtime) {
                 return $cache['html'];
             }
         }

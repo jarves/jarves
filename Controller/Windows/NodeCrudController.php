@@ -18,6 +18,9 @@ class NodeCrudController extends WindowNestedController
                     'label' => 'Title',
                     'type' => 'text',
                     'required' => 'true',
+                    'options' => [
+                        'redirectSameValue' => 'urn:url'
+                    ]
                 ),
                 'alternativeTitle' => array(
                     'label' => 'Alternative title',
@@ -44,6 +47,9 @@ class NodeCrudController extends WindowNestedController
                     'required' => 'true',
                     'needValue' => [0, 1],
                     'againstField' => 'type',
+                    'options' => [
+                        'modifier' => 'url'
+                    ]
                 ),
                 'link' => array(
                     'label' => 'Link',
@@ -228,6 +234,17 @@ class NodeCrudController extends WindowNestedController
             'label' => 'Title',
             'type' => 'text',
             'required' => true,
+            'options' => [
+                'redirectSameValue' => 'urn:url'
+            ]
+        ),
+        'urn' => array(
+            'label' => 'URL part',
+            'type' => 'text',
+            'required' => true,
+            'options' => [
+                'modifier' => 'url'
+            ]
         ),
         'type' => array(
             'label' => 'Type',
@@ -241,12 +258,7 @@ class NodeCrudController extends WindowNestedController
             ),
             'type' => 'select',
             'width' => '50',
-        ),
-        'layout' => array(
-            'label' => 'Layout',
-            'type' => 'layout',
-            'width' => '50',
-        ),
+        )
     );
 
 
@@ -260,7 +272,7 @@ class NodeCrudController extends WindowNestedController
 
     public $workspace = true;
 
-    public $multiLanguage = true;
+    public $domainDepended = true;
 
     public $multiDomain = false;
 

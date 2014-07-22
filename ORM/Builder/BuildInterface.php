@@ -2,6 +2,7 @@
 
 namespace Jarves\ORM\Builder;
 
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 interface BuildInterface {
@@ -12,8 +13,9 @@ interface BuildInterface {
      * Check on each $objects entry if it's your data model (e.g $objects[0]->getDataModel == 'propel')
      *
      * @param \Jarves\Configuration\Object[] $objects
+     * @param OutputInterface $output
      */
-    public function build(array $objects);
+    public function build(array $objects, OutputInterface $output);
 
     /**
      * Returns true when a build is needed. This is fired on each JarvesBundle boot, so

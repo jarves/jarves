@@ -310,6 +310,9 @@ jarves.Field = new Class({
         this.fieldObject.setDisabled(disabled);
     },
 
+    /**
+     * @returns {jarves.FieldForm}
+     */
     getFieldForm: function() {
         return this.fieldForm;
     },
@@ -413,7 +416,6 @@ jarves.Field = new Class({
      */
     save: function(progressWatch) {
         if (!this.fieldObject) {
-            console.log('fast Done');
             return progressWatch.done();
         }
         this.fieldObject.save(progressWatch);
@@ -461,10 +463,7 @@ jarves.Field = new Class({
         if (internal) {
             this.fireChange();
         } else {
-            this.fireEvent('check-depends');
-            if (this.isVisible()) {
-                this.checkValid();
-            }
+            this.handleChanges(true);
         }
     },
 
@@ -473,17 +472,25 @@ jarves.Field = new Class({
 //    },
 
     /**
-     * A binded function, that fires 'change', 'check-depends' events and isOk() method.
+     * A bound function, that fires 'change', 'check-depends' events and isOk() method.
      *
      */
     fireChange: function() {
-        var value = this.getValue();
+        this.fireEvent('change', [this.getValue(), this, this.key]);
+        this.handleChanges();
+    },
 
-        this.fireEvent('change', [value, this, this.key]);
+    /**
+     * The actual additional logic that handles value changes.
+     * @param {Boolean} [withoutValidationCheck] disables the validation check if true
+     */
+    handleChanges: function(withoutValidationCheck) {
         this.fireEvent('check-depends');
-        this.checkValid();
+        if (!withoutValidationCheck) {
+            this.checkValid();
+        }
 
-        this.updateCookieStorage(value);
+        this.updateCookieStorage(this.getValue());
     },
 
     updateCookieStorage: function(pValue) {

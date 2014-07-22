@@ -366,6 +366,10 @@ jarves.FieldTypes.Array = new Class({
 
     },
 
+    removeRow: function(index) {
+        this.tbody.getChildren('tr')[index].destroy();
+    },
+
     addRow: function (pValue) {
         if (this.options.designMode) {
             return;
@@ -379,6 +383,7 @@ jarves.FieldTypes.Array = new Class({
         Object.each(this.options.fields, function (field, fieldKey) {
             var copy = Object.clone(field);
             copy.noWrapper = 1;
+            var nField;
 
             var td = new Element('td', {
                 'class': 'jarves-field',
@@ -388,19 +393,18 @@ jarves.FieldTypes.Array = new Class({
             if (copy.children) {
                 var parseFields = {};
                 parseFields[fieldKey] = copy;
-                var nField = new jarves.FieldForm(td, parseFields, {}, {win: this.win});
+                nField = new jarves.FieldForm(td, parseFields, {}, {win: this.win});
             } else {
-                var nField = new jarves.Field(copy, td, {win: this.win});
+                nField = new jarves.Field(copy, td, fieldKey, tr.fieldForm);
             }
 
             tr.fieldForm.attachField(fieldKey, nField, copy);
-
-            nField.addEvent('change', this.fireChange);
 
             tr.fields[fieldKey] = nField;
         }.bind(this));
 
         tr.fieldForm.setValue(pValue);
+        tr.fieldForm.addEvent('change', this.fireChange);
 
         var td;
         if (this.options.withOrder || !this.options.withoutRemove) {
@@ -416,6 +420,7 @@ jarves.FieldTypes.Array = new Class({
             }).addEvent('click',function () {
                 if (tr.getPrevious()) {
                     tr.inject(tr.getPrevious(), 'before');
+                    this.fireChange();
                 }
             }).inject(td);
 
@@ -426,6 +431,7 @@ jarves.FieldTypes.Array = new Class({
             }).addEvent('click',function () {
                 if (tr.getNext()) {
                     tr.inject(tr.getNext(), 'after');
+                    this.fireChange();
                 }
             }).inject(td);
 
@@ -437,8 +443,8 @@ jarves.FieldTypes.Array = new Class({
                 title: t('Remove'),
                 href: 'javascript: ;'
             }).addEvent('click', function () {
-                this.fireChange();
                 tr.destroy();
+                this.fireChange();
             }.bind(this)).inject(td);
         }
 

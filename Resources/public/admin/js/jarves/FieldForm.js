@@ -56,6 +56,7 @@ jarves.FieldForm = new Class({
             this.parseLevel(fieldDefinition, this.main);
         }
 
+        this.fireEvent('ready', this);
     },
 
     /**
@@ -304,6 +305,10 @@ jarves.FieldForm = new Class({
         this.checkForEmptyTabs();
     },
 
+    fireAttachField: function(key) {
+        this.fireEvent('attachField', [key, this]);
+    },
+
     attachField: function (id, obj, def) {
         var self = this;
         this.fields[id] = obj;
@@ -311,7 +316,8 @@ jarves.FieldForm = new Class({
 
         obj.addEvent('change', this.fireChange);
 
-        if (!instanceOf(obj, jarves.FieldForm)) {
+        if (instanceOf(obj, jarves.FieldForm)) {
+        } else {
             obj.setForm(this);
 
             if (obj.field.againstField) {
@@ -359,6 +365,8 @@ jarves.FieldForm = new Class({
                 }
             }
         }
+
+        this.fireAttachField(id);
     },
 
     /**

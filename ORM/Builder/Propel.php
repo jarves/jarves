@@ -17,6 +17,7 @@ use Jarves\Tools;
 use Propel\Generator\Model\Column;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Table;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
 class Propel implements BuildInterface
@@ -43,11 +44,14 @@ class Propel implements BuildInterface
 
     /**
      * @param \Jarves\Configuration\Object[] $objects
+     * @param OutputInterface $output
      */
-    public function build(array $objects)
+    public function build(array $objects, OutputInterface $output)
     {
         /** @var $jarves \Jarves\Jarves */
         $jarves = $this->kernel->getContainer()->get('jarves');
+
+        $output->writeln('===Propel Build===');
 
         foreach ($objects as $object) {
             if ('propel' === strtolower($object->getDataModel())) {
@@ -96,13 +100,14 @@ class Propel implements BuildInterface
             $files[$modelsFile] = $xml;
         }
 
-
         foreach ($files as $file => $xml) {
             file_put_contents($file, $xml);
         }
 
         $propelHelper = new PropelHelper($jarves);
-        $propelHelper->init();
+        $result = $propelHelper->init();
+
+        $output->writeln($result);
 
         foreach ($files as $file => $xml) {
             unlink($file);
@@ -358,6 +363,10 @@ class Propel implements BuildInterface
 
         $foreignKey['onDelete'] = $relation->getOnDelete();
         $foreignKey['onUpdate'] = $relation->getOnUpdate();
+
+        if (!$relation->getWithConstraint()) {
+            $foreignKey['skipSql'] = 'true';
+        }
 
         $references = $foreignKey->xpath("reference[not(@custom='true')]");
         foreach ($references as $i => $ref) {

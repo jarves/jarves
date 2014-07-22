@@ -75,6 +75,12 @@ jarves.FieldTypes.Object = new Class({
                 type: 'select',
                 'default': 'cascade',
                 items: ['cascade', 'setnull', 'restrict', 'none']
+            },
+            'objectRelationWithConstraint': {
+                label: t('With constraint'),
+                type: 'checkbox',
+                'default': 'true',
+                desc: t('If the storage backend should also create a constraint so its not possible to pass a invalid reference id.')
             }
         }
     },

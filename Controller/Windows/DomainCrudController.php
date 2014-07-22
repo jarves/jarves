@@ -105,8 +105,6 @@ class DomainCrudController extends \Jarves\Controller\WindowController {
 
     public $workspace = true;
 
-    public $multiLanguage = true;
-
     public $multiDomain = false;
 
 

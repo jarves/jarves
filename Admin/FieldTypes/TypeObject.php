@@ -239,6 +239,7 @@ class TypeObject extends AbstractType
         $relation->setName($field->getId());
         $relation->setType($field->getObjectRelation());
         $relation->setForeignObjectKey($field->getObject());
+        $relation->setWithConstraint($field->getObjectRelationWithConstraint());
 
         if ($refName = $field->getObjectRefRelationName()) {
             $relation->setRefName($refName);

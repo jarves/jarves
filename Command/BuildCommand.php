@@ -27,6 +27,6 @@ class BuildCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $modelBuilder = $this->getJarves()->getModelBuilder();
-        $modelBuilder->build();
+        $modelBuilder->build($output);
     }
 }

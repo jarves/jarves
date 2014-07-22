@@ -233,7 +233,7 @@ jarves.FieldTypes.PageContents = new Class({
         }.bind(this));
 
         if (this.getEditor()) {
-            this.treeField.setValue(this.getNodeId());
+            this.treeField.setValue('jarves/node/' + this.getNodeId());
         }
         this.lastLoadedTreeForDomainId = domainId;
     },
@@ -360,7 +360,7 @@ jarves.FieldTypes.PageContents = new Class({
                     this.reloadLayoutSelection(this.getTheme(), this.getLayout());
                 }
                 if (this.treeField) {
-                    this.treeField.setValue(this.getNodeId());
+                    this.treeField.setValue('jarves/node/' + this.getNodeId());
                 }
                 this.adjustAnchors();
             }

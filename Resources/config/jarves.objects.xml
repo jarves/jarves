@@ -86,7 +86,7 @@
         <treeInterface>custom</treeInterface>
         <treeRootObjectIconPath>#world</treeRootObjectIconPath>
         <treeRootObjectFixedIcon>true</treeRootObjectFixedIcon>
-        <treeRootFieldTemplate>{domain}</treeRootFieldTemplate>
+        <treeRootFieldTemplate>{{domain}}</treeRootFieldTemplate>
         <fields>
           <field id="id" type="number" primaryKey="true" autoIncrement="true">
             <label>ID</label>
@@ -148,7 +148,7 @@
         <label>Domain</label>
         <table>system_domain</table>
         <labelField>domain</labelField>
-        <labelTemplate>[{lang}] {domain}</labelTemplate>
+        <labelTemplate>[{{lang}}] {{domain}}</labelTemplate>
         <defaultSelection>domain, lang</defaultSelection>
         <multiLanguage>true</multiLanguage>
         <fields>
@@ -176,6 +176,7 @@
             <label>Startpage</label>
             <object>JarvesBundle:Node</object>
             <objectRelation>nTo1</objectRelation>
+            <objectRelationWithConstraint>false</objectRelationWithConstraint>
           </field>
           <field id="resourceCompression" type="checkbox">
             <label>Resource compression</label>
@@ -211,7 +212,7 @@
         <table>system_langs</table>
         <class>Jarves\ORM\ObjectLanguage</class>
         <labelField>title</labelField>
-        <labelTemplate>{title} ({langtitle}, {code})</labelTemplate>
+        <labelTemplate>{{title}} ({{langtitle}}, {{code}})</labelTemplate>
         <defaultSelection>title, langtitle, code</defaultSelection>
         <dataModel>custom</dataModel>
         <fields>

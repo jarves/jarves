@@ -46,13 +46,13 @@ class UserCrudController extends WindowController
     );
 
     public $itemLayout = '
-    <div title="#{id}">
-        <b>{username}</b>
-        {if firstName || lastName}
-            (<span>{firstName}</span>{if lastName} <span>{lastName}</span>{/if})
-        {/if}
-        {if email}<div class="sub">{email}</div>{/if}
-        <div class="sub">{if groups}{groups.name}{/if}</div>
+    <div title="#{{id}}">
+        <b>{{username}}</b>
+        {%if firstName or lastName%}
+            (<span>{{firstName}}</span>{% if lastName %} <span>{{lastName}}</span>{% endif %})
+        {%endif%}
+        {%if email%}<div class="sub">{{email}}</div>{%endif%}
+        <div class="sub">{%if groups%}{{groups.name}}{%endif%}</div>
     </div>';
 
     public $itemsPerPage = 20;

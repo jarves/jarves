@@ -641,7 +641,12 @@ class FileController extends Controller
             return $response;
         }
 
-        $image = $this->getJarves()->getWebFileSystem()->getResizeMax($path, $width, $height);
+        $image = null;
+        try {
+            $image = $this->getJarves()->getWebFileSystem()->getResizeMax($path, $width, $height);
+        } catch (\Exception $e) {
+            $image = $this->getJarves()->getWebFileSystem()->getResizeMax('bundles/jarves/images/broken-image.png', $width, $height);
+        }
 
         $expires = 3600; //1 h
         $response = new Response();

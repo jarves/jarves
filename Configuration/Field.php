@@ -106,6 +106,13 @@ class Field extends Model
     protected $objectRelationOnUpdate = 'cascade';
 
     /**
+     * If the storage backend should also create a constraint so its not possible to pass a invalid reference id.
+     *
+     * @var bool
+     */
+    protected $objectRelationWithConstraint = true;
+
+    /**
      * The key of the field this is representing. Primarily for types 'predefined'.
      *
      * @var string
@@ -1252,5 +1259,33 @@ class Field extends Model
     public function getMaxLength()
     {
         return $this->maxLength;
+    }
+
+    /**
+     * If the storage backend should also create a constraint so its not possible to pass a invalid reference id.
+     *
+     * @return boolean
+     */
+    public function isObjectRelationWithConstraint()
+    {
+        return $this->objectRelationWithConstraint;
+    }
+
+    /**
+     * If the storage backend should also create a constraint so its not possible to pass a invalid reference id.
+     *
+     * @return boolean
+     */
+    public function getObjectRelationWithConstraint()
+    {
+        return $this->objectRelationWithConstraint;
+    }
+
+    /**
+     * @param boolean $objectRelationWithConstraint
+     */
+    public function setObjectRelationWithConstraint($objectRelationWithConstraint)
+    {
+        $this->objectRelationWithConstraint = $this->bool($objectRelationWithConstraint);
     }
 }

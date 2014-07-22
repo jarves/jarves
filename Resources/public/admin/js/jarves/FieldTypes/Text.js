@@ -2,7 +2,7 @@ jarves.FieldTypes.Text = new Class({
 
     Extends: jarves.FieldAbstract,
 
-    Binds: ['replace', 'checkChange'],
+    Binds: ['replace', 'checkChange', 'setupRedirects'],
 
     Statics: {
         label: 'Text input',
@@ -12,10 +12,22 @@ jarves.FieldTypes.Text = new Class({
                 label: 'Value modifier',
                 type: 'text',
                 desc: 'A pipe separated list of modifiers. Exampple: trim|ucfirst|camelcase.' +
-                    'Possible: trim, lower, ucfirst, lcfirst, phpfunction, phpclass, underscore, camelcase, dash'
+                    'Possible: trim, lower, ucfirst, lcfirst, phpfunction, phpclass, underscore, camelcase, dash, url'
+            },
+            redirectSameValue: {
+                label: t('Redirect this value'),
+                desc: t('Redirect this value to another field with the same result as value. Example: fieldName:modifier1|modifier2,fieldName2:modifier3'),
+                type: 'text'
+            },
+            redirectValue: {
+                label: t('Redirect this value always'),
+                desc: t('Redirect this value always to another field (and overwrites it always). Example: fieldName:modifier1|modifier2,fieldName2:modifier3'),
+                type: 'text'
             }
         }
     },
+
+    boundRedirects: {},
 
     options: {
         maxLength: 255,
@@ -31,6 +43,8 @@ jarves.FieldTypes.Text = new Class({
          * @type {Array}
          */
         replace: null,
+        redirectSameValue: '',
+        redirectValue: '',
         modifiers: {
             'trim': function (v) {
                 return v.replace(/^\s+|\s+$/g, "");
@@ -64,6 +78,24 @@ jarves.FieldTypes.Text = new Class({
                 return v.replace(/([^a-zA-Z0-9]+)/g, function ($1) {
                     return "-" + $1.toLowerCase().replace(/[^a-z]/g, '');
                 });
+            },
+            'url': function(str) {
+                str = str.replace(/ß/g, 'ss');
+                str = str.replace(/^\s+|\s+$/g, ''); // trim
+                str = str.toLowerCase();
+
+                // remove accents, swap ñ for n, etc
+                var from = "ãàáäâẽèéëêìíïîõòóöôùúüûñç·/_,:;";
+                var to   = "aaaaaeeeeeiiiiooooouuuunc------";
+                for (var i=0, l=from.length ; i<l ; i++) {
+                    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+                }
+
+                str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+                    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+                    .replace(/-+/g, '-'); // collapse dashes
+
+                return str;
             }
         }
     },
@@ -113,16 +145,82 @@ jarves.FieldTypes.Text = new Class({
             }
         }
 
+        if (this.getFieldContainer()) {
+            this.getFieldContainer().addEvent('ready', this.setupRedirects);
+            this.getFieldContainer().addEvent('attachField', this.setupRedirects);
+            this.setupRedirects();
+        }
+
         this.input.addEvent('change', this.checkChange);
         this.input.addEvent('keyup', this.checkChange);
     },
+
+    setupRedirects: function() {
+        var redirects;
+
+        if (this.options.redirectValue) {
+            redirects = this.parseRedirects(this.options.redirectValue);
+            Object.each(redirects, function(modifiers, key) {
+                 if (!(key in this.boundRedirects)) {
+                     this.bindRedirect(key, modifiers);
+                 }
+            }.bind(this));
+        }
+
+        if (this.options.redirectSameValue) {
+            redirects = this.parseRedirects(this.options.redirectSameValue);
+            Object.each(redirects, function(modifiers, key) {
+                if (!(key in this.boundRedirects)) {
+                    this.bindRedirect(key, modifiers, true);
+                }
+            }.bind(this));
+        }
+    },
+
+    bindRedirect: function(key, modifier, onlySame) {
+        var field = this.getFieldContainer().getField(key);
+
+        var doRedirect = function() {
+            var result = this.applyModifier(this.getValue(), modifier);
+            var resultBefore = this.applyModifier(this.oldValue, modifier);
+            if (onlySame) {
+                if (field.getValue() && resultBefore != field.getValue()) {
+                    return;
+                }
+            }
+
+            if (field.getValue() != result) {
+                field.setValue(result, true);
+            }
+        }.bind(this);
+
+        if (field) {
+            this.boundRedirects[key] = true;
+            this.addEvent('change', doRedirect);
+            doRedirect();
+        }
+    },
+
+    /**
+     * @param {String} str
+     * @returns {Object}
+     */
+    parseRedirects: function(str) {
+        var redirects = {};
+        str.split(',').each(function(line) {
+            var splitted = line.split(':');
+            redirects[splitted[0]] = splitted[1];
+        });
+
+        return redirects;
+    },
+
 
     toElement: function () {
         return this.input;
     },
 
     checkChange: function () {
-
         if (this.duringCheck) {
             return;
         }
@@ -131,11 +229,9 @@ jarves.FieldTypes.Text = new Class({
             clearTimeout(this.lastCheckChangeTimeout);
         }
         this.lastCheckChangeTimeout = this._checkChange.delay(100, this);
-
     },
 
     _checkChange: function () {
-
         this.duringCheck = true;
         var range = null;
 
@@ -145,14 +241,7 @@ jarves.FieldTypes.Text = new Class({
         }
 
         if (typeOf(this.options.modifier) == 'string') {
-            var modifiers = this.options.modifier.toLowerCase().split('|');
-
-            Array.each(modifiers, function (modifier) {
-                if (this.options.modifiers[modifier]) {
-                    this.input.value = this.options.modifiers[modifier](this.input.value);
-                }
-            }.bind(this));
-
+            this.input.value = this.applyModifier(this.input.value, this.options.modifier);
         } else if (typeOf(this.options.modifier) == 'function') {
             this.input.value = this.options.modifier(this.input.value);
         }
@@ -166,19 +255,35 @@ jarves.FieldTypes.Text = new Class({
         }
 
         if (this.oldValue !== this.input.value) {
-            this.fieldInstance.fireChange();
+            this.fireChange();
             this.oldValue = this.input.value;
         }
 
         this.duringCheck = false;
     },
 
-    replace: function () {
+    /**
+     * @param {String} value
+     * @param {String} modifierString
+     * @returns {String}
+     */
+    applyModifier: function(value, modifierString) {
+        value = 'string' === typeOf(value) ? value : '';
+        var modifiers = modifierString.toLowerCase().split('|');
 
+        Array.each(modifiers, function (modifier) {
+            if (this.options.modifiers[modifier]) {
+                value = this.options.modifiers[modifier](value);
+            }
+        }.bind(this));
+
+        return value;
+    },
+
+    replace: function () {
         var regEx = new RegExp(this.options.replace[0], this.options.replace[1]);
         var oldValue = this.input.value;
         this.input.value = oldValue.replace(regEx, this.options.replace[2]);
-
     },
 
     setDisabled: function (pDisabled) {

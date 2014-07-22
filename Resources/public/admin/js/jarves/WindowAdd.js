@@ -151,6 +151,46 @@ jarves.WindowAdd = new Class({
             }.bind(this),
             onFailure: this.handleFailure.bind(this),
             onSuccess: function(response) {
+
+                var error_found = false;
+                var rows_to_destroy = [];
+                var errors = [];
+                Array.each(response.data, function(result, index) {
+                   if (result.error) {
+                       result.error.index = index;
+                       errors.push(result.error);
+                       error_found = true;
+                   } else {
+                       rows_to_destroy.push(index);
+                   }
+                });
+
+                Array.each(rows_to_destroy.reverse(), function(index) {
+                    this.addMultipleFieldForm.getField('_items').getFieldObject().removeRow(index);
+                }.bind(this));
+
+                if (error_found) {
+                    var div = new Element('div');
+                    new Element('h2', {text: t('There was a error in one of your values.')}).inject(div);
+                    new Element('div', {
+                        text: t('Valid values has been removed from the form. Please review the existing ones.')
+                    }).inject(div);
+
+                    Array.each(errors, function(error){
+                        new Element('h3', {
+                            text: '#'+error.index+': '+error.exception
+                        }).inject(div);
+                        new Element('div', {
+                            text: error.message,
+                            style: 'border-bottom: 1px solid #ddd; margin-bottom: 5px; padding-bottom: 5px;'
+                        }).inject(div);
+                    });
+                    this.win.alert(div);
+
+                    this.saveBtn.failedLoading(t('Failed'));
+                    return;
+                }
+
                 this.winParams.item = response.data[0]; //our new primary keys for the first item
 
                 this.saveBtn.doneLoading(t('Saved'));

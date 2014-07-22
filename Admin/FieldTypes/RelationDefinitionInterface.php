@@ -51,4 +51,9 @@ interface RelationDefinitionInterface
      * @return string cascade|setnull|restrict|none
      */
     public function getOnUpdate();
+
+    /**
+     * @return boolean
+     */
+    public function getWithConstraint();
 }

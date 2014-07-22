@@ -1484,7 +1484,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
     {
         $inserted = array();
 
-        $fixedFields = $this->getAddMultipleFixedFields();
+        $fixedFields = array_keys($this->getAddMultipleFixedFields());
 
         $fixedData = array();
 
@@ -1493,7 +1493,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
             $fixedData = $this->mapData($data, $fixedFields);
         }
 
-        $fields = $this->getAddMultipleFields();
+        $fields = array_keys($this->getAddMultipleFields());
 
         $position = $this->getRequest()->request->get('_position');
         $items = $this->getRequest()->request->get('_items');
@@ -1518,7 +1518,10 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
                     $this->getRequest()->request->get('_targetObjectKey')
                 );
             } catch (\Exception $e) {
-                $inserted[] = array('error' => $e);
+                $inserted[] = array('error' => [
+                    'exception' => get_class($e),
+                    'message' => $e->getMessage()
+                ]);
             }
 
         }
@@ -1807,7 +1810,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      * Iterates only through all defined fields in $fields.
      *
      * @param  array $data
-     * @param  \Jarves\Configuration\Field[] $fields The fields definition. If empty we use $this->fields.
+     * @param  string[] $fieldsToReturn Field name list to map, empty for all
      * @param  mixed $defaultData Default data. Is used if a field is not defined through _POST or _GET
      *
      * @return array

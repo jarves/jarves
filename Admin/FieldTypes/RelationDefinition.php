@@ -48,6 +48,13 @@ class RelationDefinition implements RelationDefinitionInterface {
     protected $onUpdate = 'cascade';
 
     /**
+     * If the storage backend should also create a constraint so its not possible to pass a invalid reference id
+     *
+     * @var bool
+     */
+    protected $withConstraint = true;
+
+    /**
      * @param RelationReferenceDefinitionInterface[] $references
      */
     public function setReferences($references)
@@ -159,4 +166,21 @@ class RelationDefinition implements RelationDefinitionInterface {
     {
         return $this->type;
     }
+
+    /**
+     * @return boolean
+     */
+    public function getWithConstraint()
+    {
+        return $this->withConstraint;
+    }
+
+    /**
+     * @param boolean $withConstraint
+     */
+    public function setWithConstraint($withConstraint)
+    {
+        $this->withConstraint = $withConstraint;
+    }
+
 }
