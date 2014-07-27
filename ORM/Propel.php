@@ -407,6 +407,7 @@ class Propel extends ORMAbstract
 
         $sql = $query->createSelectSql($params);
 
+        $conditionSql = '';
         if ($condition) {
             $condition2Params = $params;
             $conditionSql = $condition->toSql($condition2Params, $this->getObjectKey());
@@ -582,16 +583,16 @@ class Propel extends ORMAbstract
     /**
      * {@inheritDoc}
      */
-    public function getItems(Condition $condition = null, $options = null)
+    public function getItems(array $filter = null, Condition $condition = null, $options = null)
     {
         $this->init();
         $query = $this->getQueryClass();
-
         list($fields, $relations, $relationFields) = $this->getFields($options['fields']);
         $selects = array_keys($fields);
 
         $this->mapOptions($query, $options);
         $this->mapToOneRelationFields($query, $relations, $relationFields);
+        $this->mapFilter($query, $filter);
 
         if ($this->definition->isNested()) {
             $query->filterByLft(1, Criteria::GREATER_THAN);
@@ -622,21 +623,63 @@ class Propel extends ORMAbstract
     }
 
     /**
+     * @param mixed $query
+     * @param array $filter
+     */
+    public function mapFilter($query, $filter) {
+        foreach ((array)$filter as $key => $value) {
+
+            $field = $this->getDefinition()->getField($key);
+            if (!$field) {
+                continue;
+            }
+
+            $columns = $field->getFieldType()->getColumns();
+
+            if (1 < count($columns)) {
+                foreach ($columns as $idx => $column) {
+                    $filter = 'filterBy' . ucfirst($column->getName());
+
+                    if (method_exists($query, $filter)) {
+                        $namedIndex = ucfirst($column->getName());
+                        if (0 === strpos($namedIndex, $key)) {
+                            $namedIndex = substr($namedIndex, strlen($key));
+                        }
+                        $valueToSet = isset($value[$idx]) ? $value[$idx] : $value[$namedIndex];
+                        if ('integer' === $column->getPhpDataType()) {
+                            $valueToSet = (int)$valueToSet;
+                        }
+                        $query->$filter($valueToSet);
+                    }
+                }
+            } else {
+                $column = $columns[0];
+                $filter = 'filterBy' . ucfirst($column->getName());
+                $valueToSet = $value;
+                if ('integer' === $column->getPhpDataType()) {
+                    $valueToSet = (int)$valueToSet;
+                }
+                $query->$filter($valueToSet);
+            }
+        }
+    }
+
+    /**
      * Sets the filterBy<pk> by &$query from $pk.
      *
      * @param mixed $query
      * @param array $pk
      */
-    public function mapPk(&$query, $pk)
+    public function mapPk($query, $pk)
     {
         foreach ($this->primaryKeys as $key) {
             $filter = 'filterBy' . ucfirst($key);
             if (!isset($pk[$key])) {
                 throw new \Exception(sprintf('Primary key %s not found.', $key));
             }
-            $val = $pk[$key];
+            $value = $pk[$key];
             if (method_exists($query, $filter)) {
-                $query->$filter($val);
+                $query->$filter($value);
             }
         }
     }
@@ -846,13 +889,13 @@ class Propel extends ORMAbstract
                 if (!$branch) {
                     //no root, create one
                     $branch = new $clazz();
-                    if (method_exists($branch, 'setScopeValue')) {
-                        $branch->setScopeValue($scope);
-                    }
                     $labelField = lcfirst($this->getDefinition()->getLabelField());
                     $rootValues = $values;
                     $rootValues[$labelField] = 'Root';
                     $this->mapValues($branch, $rootValues);
+                    if (method_exists($branch, 'setScopeValue')) {
+                        $branch->setScopeValue($scope);
+                    }
                     $branch->makeRoot();
                     $branch->save();
                 }

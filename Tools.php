@@ -48,6 +48,44 @@ class Tools {
     }
 
     /**
+     * @param string $string a comma separated list of values
+     * @return array
+     */
+    public static function listToArray($string)
+    {
+        if (is_string($string)) {
+            $array = !$string ? [] : array_unique(
+                explode(',', trim(preg_replace('/[^a-zA-Z0-9_\.\-,\*]/', '', $string)))
+            );
+        } else if (is_array($string)) {
+            $array = $string;
+        } else {
+            return [];
+        }
+        return array_keys(array_flip($array));
+    }
+
+    /**
+     * @param array|string $array array or comma separated list
+     * @param array|string $blacklist array or comma separated list
+     * @return array
+     */
+    public static function filterArrayByBlacklist($array, $blacklist)
+    {
+        $array = static::listToArray($array);
+        $blacklist = static::listToArray($blacklist);
+        $blacklistIndexed = array_flip($blacklist);
+
+        foreach ($array as $idx => $item) {
+            if (isset($blacklistIndexed[$item])) {
+                unset($array[$idx]);
+            }
+        }
+
+        return $array;
+    }
+
+    /**
      * Returns a relative path from $path to $current.
      *
      * @param string $from

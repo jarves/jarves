@@ -120,6 +120,8 @@ abstract class ObjectCrudController extends ObjectCrud
      * @Rest\QueryParam(name="order", array=true, requirements=".+", description="Ordering. ?order[title]=asc")
      * @Rest\QueryParam(name="q", requirements=".+", description="Search query")
      * @Rest\QueryParam(name="withAcl", default=false, requirements=".+", description="With ACL information")
+     * @Rest\QueryParam(name="lang", requirements=".+", description="Language id to filter if multiLanguage")
+     * @Rest\QueryParam(name="domain", requirements=".+", description="Domain id to filter if domainDepended")
      *
      * @Rest\View()
      * @Rest\Get("/")
@@ -131,6 +133,9 @@ abstract class ObjectCrudController extends ObjectCrud
     public function getItemsAction(ParamFetcher $paramFetcher)
     {
         $obj = $this->getObj();
+
+        $obj->setLanguage($paramFetcher->get('lang'));
+        $obj->setDomain($paramFetcher->get('domain'));
 
         return $obj->getItems(
             $paramFetcher->get('filter'),
@@ -288,7 +293,6 @@ abstract class ObjectCrudController extends ObjectCrud
     public function addMultipleItemAction(Request $request)
     {
         $obj = $this->getObj();
-
         return $obj->addMultiple($request);
     }
 

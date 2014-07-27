@@ -45,6 +45,13 @@ jarves.FieldTypes.Tree = new Class({
         scopeLanguage: null,
 
         /**
+         * if the object behind the scope (RootAsObject) is domainDepended, we can filter by it.
+         *
+         * @var {Boolean}
+         */
+        scopeDomain: null,
+
+        /**
          * TODO, can be useful
          * @var [Boolean}
          */
@@ -192,7 +199,10 @@ jarves.FieldTypes.Tree = new Class({
                             this.addTree();
                         }
 
-                    }.bind(this)}).get();
+                    }.bind(this)}).get({
+                        domain: this.options.scopeDomain,
+                        lang: this.options.scopeLanguage
+                    });
             }
 
             this.treesContainer = new Element('div').inject(this.fieldInstance.fieldPanel);

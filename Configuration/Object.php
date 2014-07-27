@@ -117,12 +117,19 @@ class Object extends Model
     protected $domainDepended = false;
 
     /**
-     * Which field shall be used as default label for a default text input `field` instance in the user interface.
+     * Which field shall be used as default label for a default text input `field` instance in the user interface for example.
      * (jarves.Field instance)
      *
      * @var string
      */
-    protected $fieldLabel;
+    protected $singleItemLabelField;
+
+    /**
+     * Extra fields to select for single item.
+     *
+     * @var string|array
+     */
+    protected $singleItemSelection;
 
     /**
      * @var string
@@ -651,17 +658,33 @@ class Object extends Model
     /**
      * @param string $fieldLabel
      */
-    public function setFieldLabel($fieldLabel)
+    public function setSingleItemLabelField($fieldLabel)
     {
-        $this->fieldLabel = $fieldLabel;
+        $this->singleItemLabelField = $fieldLabel;
     }
 
     /**
      * @return string
      */
-    public function getFieldLabel()
+    public function getSingleItemLabelField()
     {
-        return $this->fieldLabel;
+        return $this->singleItemLabelField;
+    }
+
+    /**
+     * @return array|string
+     */
+    public function getSingleItemSelection()
+    {
+        return $this->singleItemSelection;
+    }
+
+    /**
+     * @param array|string $fieldFields
+     */
+    public function setSingleItemSelection($fieldFields)
+    {
+        $this->singleItemSelection = $fieldFields;
     }
 
     /**
@@ -867,6 +890,8 @@ class Object extends Model
     }
 
     /**
+     * Which field (the value of it) shall be used as default label for the object.
+     *
      * @return string
      */
     public function getLabelField()

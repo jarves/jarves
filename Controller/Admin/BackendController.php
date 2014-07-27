@@ -8,6 +8,7 @@ use Jarves\Jarves;
 use Jarves\Model\Base\GroupQuery;
 use Jarves\Model\LanguageQuery;
 use Jarves\Properties;
+use Jarves\Tools;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -211,7 +212,12 @@ class BackendController extends Controller
         }
 
         if ($loadKeys == false || in_array('langs', $loadKeys)) {
-            $tlangs = LanguageQuery::create()->filterByVisible(true)->find()->toArray(
+            $codes = Tools::listToArray($this->getJarves()->getSystemConfig()->getLanguages());
+            $query = LanguageQuery::create()->filterByCode($codes);
+
+            $query->orderBy('');
+
+            $tlang = $query->find()->toArray(
                 null,
                 null,
                 TableMap::TYPE_STUDLYPHPNAME

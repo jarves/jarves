@@ -519,7 +519,7 @@ jarves.Window = new Class({
                 });
             }
 
-            if (this.getParent()) {
+            if (this.getParent() && instanceOf(this.getParent(), jarves.Window)) {
                 this.getParent().toFront(true);
             }
 

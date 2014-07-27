@@ -243,16 +243,19 @@ abstract class NestedObjectCrudController extends ObjectCrudController
      *    description="Returns all roots items (nested set)"
      * )
      *
+     * @Rest\QueryParam(name="domain", requirements=".+", description="If the root object is domainDepended, filter by it")
+     * @Rest\QueryParam(name="lang", requirements=".+", description="If the root object is multiLanguage, filter by it")
+     *
      * @Rest\View()
      * @Rest\Get("/:roots")
      *
      * @return mixed
      */
-    public function getRootsAction()
+    public function getRootsAction(ParamFetcher $paramFetcher)
     {
         $obj = $this->getObj();
 
-        return $obj->getRoots();
+        return $obj->getRoots(null, $paramFetcher->get('lang'), $paramFetcher->get('domain'));
     }
 
     /**

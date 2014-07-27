@@ -50,7 +50,11 @@ jarves.WindowList = new Class({
     },
 
     reload: function () {
-        this.loadPage(this.currentPage);
+        if (this.classProperties.asNested) {
+            return this.renderLayoutNested(this.treeContainer);
+        } else {
+            this.loadPage(this.currentPage);
+        }
     },
 
     load: function () {
@@ -187,6 +191,7 @@ jarves.WindowList = new Class({
         this.renderTopActionBar();
         this.renderSideActionBar();
         this.renderMultilanguage();
+        this.renderDomainDepended();
 
         this.renderLayout();
         this.renderActionBar();
@@ -197,9 +202,19 @@ jarves.WindowList = new Class({
     },
 
     renderFinished: function () {
+        if (this.finishedFired) {
+            return;
+        }
+
         if (this.options.noInitLoad == true) {
             return;
         }
+
+        if (this.classProperties.domainDepended && !this.domainSelect.getValue()) {
+            return;
+        }
+
+        this.finishedFired = true;
 
         if (this.win.params && this.win.params.list && this.win.params.list.order) {
             Object.each(this.win.params.list.order, function(order, field) {
@@ -221,6 +236,7 @@ jarves.WindowList = new Class({
             }
         }
 
+        this.fireEvent('renderFinished');
     },
 
     renderLoader: function () {
@@ -230,26 +246,49 @@ jarves.WindowList = new Class({
     renderMultilanguage: function () {
 
         if (this.classProperties.multiLanguage && !this.languageSelect) {
-
             this.languageSelect = new jarves.Select(this.topActionBar);
             document.id(this.languageSelect).setStyle('width', 150);
 
-            this.languageSelect.addEvent('change', this.changeLanguage.bind(this));
+            this.languageSelect.addEvent('change', function() {
+                this.changeLanguage();
+                this.reloadFirst();
+            }.bind(this));
 
             var hasSessionLang = false;
             Object.each(jarves.settings.langs, function (lang, id) {
-
                 this.languageSelect.add(id, lang.langtitle + ' (' + lang.title + ', ' + id + ')');
                 if (id == window._session.lang) {
                     hasSessionLang = true;
                 }
-
             }.bind(this));
 
             if (hasSessionLang) {
                 this.languageSelect.setValue(window._session.lang);
             }
         }
+    },
+
+    renderDomainDepended: function() {
+        if (this.classProperties.domainDepended) {
+
+            this.domainSelect = new jarves.Select(this.topActionBar, {
+                object: 'jarves/domain',
+                onReady: function() {
+                    this.renderFinished();
+                }.bind(this)
+            });
+            document.id(this.domainSelect).setStyle('width', 150);
+
+            this.domainSelect.addEvent('change', this.reloadFirst.bind(this));
+        }
+    },
+
+    changeLanguage: function() {
+
+    },
+
+    reloadFirst: function() {
+        this.loadPage(1);
     },
 
     getLanguage: function() {
@@ -260,7 +299,12 @@ jarves.WindowList = new Class({
 
     renderLayout: function () {
         this.win.getTitleGroupContainer().setStyle('margin-bottom', 10);
-        this.renderLayoutTable();
+
+        if (this.classProperties.asNested) {
+            this.renderLayoutNested(this.container);
+        } else {
+            this.renderLayoutTable();
+        }
     },
 
     renderLayoutNested: function (pContainer) {
@@ -277,6 +321,10 @@ jarves.WindowList = new Class({
 
         if (this.languageSelect) {
             objectOptions.scopeLanguage = this.languageSelect.getValue();
+        }
+
+        if (this.domainSelect) {
+            objectOptions.scopeDomain = this.domainSelect.getValue();
         }
 
         this.nestedField = new jarves.Field(objectOptions);
@@ -369,14 +417,6 @@ jarves.WindowList = new Class({
             }
         }.bind(this));
         this.titleIconTd = this.table.getColumn(this.titleIconTdIndex);
-    },
-
-    changeLanguage: function () {
-        if (this.classProperties.asNested) {
-            //todo
-        } else {
-            this.loadPage(1);
-        }
     },
 
     renderActionBar: function () {
@@ -473,7 +513,7 @@ jarves.WindowList = new Class({
         }, this.actionBarSearchContainer);
 
         this.actionBarSearchInput.addEvent('change', function(){
-            this.loadPage(1);
+            this.onSearchInputChange();
         }.bind(this));
 
         /*
@@ -505,6 +545,10 @@ jarves.WindowList = new Class({
 
 
          }*/
+    },
+
+    onSearchInputChange: function() {
+        this.loadPage(1);
     },
 
     removeSelected: function (pItems) {
@@ -649,8 +693,8 @@ jarves.WindowList = new Class({
         req.lang = (this.languageSelect) ? this.languageSelect.getValue() : null;
 
         req.withAcl = true;
-        req.orderBy = {};
-        req.orderBy[this.sortField] = this.sortDirection;
+        req.order = {};
+        req.order[this.sortField] = this.sortDirection;
         if (this.actionBarSearchInput) {
             req.q = this.actionBarSearchInput.getValue();
         }

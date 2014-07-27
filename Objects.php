@@ -578,17 +578,17 @@ class Objects
      *
      * @static
      *
-     * @param string    $objectKey
-     * @param array|Condition $condition
-     * @param array     $options
+     * @param string $objectKey
+     * @param array  $filter
+     * @param array  $options
      *
      * @return array|bool
      */
-    public function getList($objectKey, $condition = null, $options = array())
+    public function getList($objectKey, $filter = null, $options = array())
     {
         $controller = $this->getController($objectKey, $options);
 
-        return $controller->getItems($condition);
+        return $controller->getItems($filter, null, null, null, @$options['fields']);
     }
 
     /**
@@ -618,7 +618,7 @@ class Objects
             } else {
                 $clazz = sprintf('\\Jarves\\ORM\\%s', ucfirst($definition->getDataModel()));
                 if (class_exists($clazz) || class_exists($clazz = $definition->getDataModel())) {
-                    $this->instances[$objectKey] = new $clazz($this->normalizeObjectKey($objectKey), $definition, $this->getJarves());
+                    $this->instances[$objectKey] = new $clazz(static::normalizeObjectKey($objectKey), $definition, $this->getJarves());
                 }
             }
         }
@@ -744,6 +744,7 @@ class Objects
     public function getController($objectKey, array $options = array())
     {
         $definition = $this->getDefinition($objectKey);
+
         if ($controllerId = $definition->getController()) {
             if (class_exists($controllerId)) {
                 $controller = new $controllerId();
@@ -768,8 +769,20 @@ class Objects
             $controller->setWithNewsFeed($options['newsFeed']);
         }
 
-        if (isset($options['fields'])) {
-            $controller->setExtraSelection($options['fields']);
+        if (isset($options['domain'])) {
+            $controller->setDomain($options['domain']);
+        }
+
+        if (isset($options['lang'])) {
+            $controller->setLanguage($options['lang']);
+        }
+
+        if ($definition->getMultiLanguage()) {
+            $controller->setMultiLanguage(true);
+        }
+
+        if ($definition->getDomainDepended()) {
+            $controller->setDomainDepended(true);
         }
 
         $controller->setObject($objectKey);

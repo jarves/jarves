@@ -235,7 +235,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      *
      * @var bool
      */
-    protected $allowCustomSelectFields = true;
+    protected $allowCustomFieldSelection = true;
 
     protected $nestedRootEdit = false;
     protected $nestedRootAdd = false;
@@ -290,12 +290,26 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
     protected $multiLanguage = false;
 
     /**
+     * The current language to filter if multiLanguage is enabled.
+     *
+     * @var string
+     */
+    protected $language;
+
+    /**
      * Defines whether the list windows should display the domain select box.
      * Note: Your table need a field 'domain_id' int. The windowList class filter by this.
      *
      * @var bool
      */
     protected $domainDepended = false;
+
+    /**
+     * The current domain id to filter if domainDepended is enabled.
+     *
+     * @var integer
+     */
+    protected $domain;
 
     /**
      * Defines whether the workspace slider should appears or not.
@@ -788,6 +802,11 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         }
     }
 
+    /**
+     * Get a list of field key for $this->_fields
+     *
+     * @return array
+     */
     public function getDefaultFieldList()
     {
         $fields = array();
@@ -799,12 +818,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
                     $fields[] = $key;
                 }
             }
-        } else {
-            $fields = explode(',', trim(str_replace(' ', '', $this->getObjectDefinition()->getDefaultSelection())));
-        }
-
-        if ($this->getMultiLanguage()) {
-            $fields[] = 'lang';
         }
 
         return $fields;
@@ -891,7 +904,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
             return null;
         }
 
-        $options['fields'] = $this->getSelection($fields, false);
+        $options['fields'] = $this->getItemSelection($fields);
         $options['permissionCheck'] = $this->getPermissionCheck();
 
         $item = $storageController->getItem($pk, $options);
@@ -951,8 +964,15 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      *
      * @return array
      */
-    public function getItems($filter = null, $limit = null, $offset = null, $query = '', $fields = null, $orderBy = [], $withAcl = false)
-    {
+    public function getItems(
+        $filter = null,
+        $limit = null,
+        $offset = null,
+        $query = '',
+        $fields = null,
+        $orderBy = [],
+        $withAcl = false
+    ) {
         $options = array();
 
         $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
@@ -967,27 +987,29 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         }
 
         $options['order'] = $orderBy ? : $this->getOrder();
-        $options['fields'] = $this->getSelection($fields);
-
-        if ($filter && $filterCondition = self::buildFilter($filter)) {
-            $condition->mergeAnd($filterCondition);
-        }
+        $options['fields'] = $this->getItemsSelection($fields);
 
         if ($limit = $this->getObjectDefinition()->getLimitDataSets()) {
             $condition->mergeAnd($limit);
         }
 
-        if ($this->getMultiLanguage()) {
-            //does the object have a lang field?
-            if ($this->objectDefinition->getField('lang')) {
-                //add language condition
-                $langCondition = new Condition(null, $this->getJarves());
-                $langCondition->addAnd(
-                    array('lang', '=', substr((string)$this->getRequest()->request->get('lang'), 0, 3))
-                );
-                $langCondition->addOr(array('lang', 'IS NULL'));
+        if ($this->getMultiLanguage() && $this->getLanguage()) {
+            if ($this->getObjectDefinition()->getNestedRootAsObject() && $rootObjectKey = $this->getObjectDefinition()->getNestedRootObject()) {
 
-                $condition->addAnd($langCondition);
+                $rootObjects = $this->getJarves()->getObjects()->getList($rootObjectKey, null, [
+                    'lang' => $this->getLanguage(),
+                    'fields' => 'id'
+                ]);
+                $langConditions = new Condition();
+                foreach ($rootObjects as $item) {
+                    $langConditions->addOr(['domain', '=', $item['id']]);
+                }
+                $condition->addAnd($langConditions);
+            } else {
+                //does the object have a lang field?
+                if ($this->objectDefinition->hasField('lang') && !isset($filter['lang'])) {
+                    $filter['lang'] = $this->getLanguage();
+                }
             }
         }
 
@@ -1001,7 +1023,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
             $condition->mergeAndBegin($aclCondition);
         }
 
-        $items = $storageController->getItems($condition, $options);
+        $items = $storageController->getItems($filter, $condition, $options);
 
         if ($withAcl && is_array($items)) {
             foreach ($items as &$item) {
@@ -1015,42 +1037,95 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
     }
 
     /**
-     * Returns the selection (field names)
+     * Returns the field list for single item selection.
      *
-     * @param array $fields
-     * @param bool $getColumns
+     * @param string|array $fields
      * @return array
      */
-    protected function getSelection($fields = '', $getColumns = true)
+    protected function getItemSelection($fields = null)
     {
-        $result = [];
-        if ($fields && $this->getAllowCustomSelectFields()) {
-            if (!is_array($fields)) {
-                if ('*' !== $fields) {
-                    $result = explode(',', trim(preg_replace('/[^a-zA-Z0-9_\.\-,\*]/', '', $fields)));
-                }
+        $fields = Tools::listToArray($fields);
+
+        if (!$fields) {
+            if ($this->fields) {
+                $fields = array_merge($fields, $this->getDefaultFieldList());
             }
         }
 
-        if (!$result && $getColumns) {
-            $result = array_keys($this->getColumns() ? : array());
+        if (!$fields) {
+            $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getDefaultSelection()));
         }
 
-        if (!$result) {
-            $result = $this->getDefaultFieldList();
+        $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getSingleItemLabelField()));
+        $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getSingleItemSelection()));
+
+        return $this->applyDefaultSelection($fields);
+    }
+
+
+    /**
+     * Returns the field list for items selection.
+     *
+     * @param string|array $fields
+     * @return array
+     */
+    protected function getItemsSelection($fields = null)
+    {
+        $fields = Tools::listToArray($fields);
+
+        if (!$fields && $this->getColumns()) {
+            $fields = array_keys($this->getColumns());
         }
 
-        if ($extraSelects = $this->getExtraSelection()) {
-            $result = $result ? array_merge($result, $extraSelects) : $extraSelects;
+        if (!$fields) {
+            $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getDefaultSelection()));
         }
 
-        return $result;
+        return $this->applyDefaultSelection($fields);
+    }
+
+    /**
+     * Returns the field list for branchItems selection.
+     *
+     * @param string|array $fields
+     * @return array
+     */
+    protected function getBranchItemsSelection($fields = null)
+    {
+        $fields = Tools::listToArray($fields);
+
+        if (!$fields) {
+            $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getDefaultSelection()));
+        }
+
+        $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getTreeLabel()));
+        $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getTreeFields()));
+        $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getTreeIcon()));
+
+        return $this->applyDefaultSelection($fields);
+    }
+
+    /**
+     * Adds labelField, extraSelection and filter by blacklistSelection
+     *
+     * @param array $fields
+     * @return array
+     */
+    protected function applyDefaultSelection($fields)
+    {
+        $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getLabelField()));
+        $fields = array_merge($fields, Tools::listToArray($this->getExtraSelection()));
+        if ($this->getMultiLanguage()) {
+            $fields[] = 'lang';
+        }
+
+        return Tools::filterArrayByBlacklist($fields, $this->getObjectDefinition()->getBlacklistSelection());
     }
 
     protected function getNestedSelection($fields)
     {
         if (is_string($fields)) {
-            $fields = explode(',', trim(preg_replace('/[^a-zA-Z0-9_\.\-,\*]/', '', $fields)));
+            $fields = Tools::listToArray($fields);
         }
 
         if ($extraSelects = $this->getExtraSelection()) {
@@ -1060,15 +1135,20 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         return $fields;
     }
 
+    /**
+     * @return array
+     */
     public function getExtraSelection()
     {
         if (is_string($this->extraSelection)) {
-            return explode(',', trim(preg_replace('/[^a-zA-Z0-9_\.\-,\*]/', '', $this->extraSelection)));
+            return Tools::listToArray($this->extraSelection);
         }
-
         return $this->extraSelection;
     }
 
+    /**
+     * @param array|string $selection
+     */
     public function setExtraSelection($selection)
     {
         $this->extraSelection = $selection;
@@ -1076,8 +1156,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
     protected function getQueryCondition($query, $fields)
     {
-        $fields = $this->getSelection($fields);
-
         $query = preg_replace('/(?<!\\\\)\\*/', '$1%', $query);
         $query = str_replace('\\*', '*', $query);
 
@@ -1142,7 +1220,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         $definition = $this->objectDefinition;
         $fields2 = array();
 
-        if ($fields && $this->getAllowCustomSelectFields()) {
+        if ($fields && $this->getAllowCustomFieldSelection()) {
             if (is_array($fields)) {
                 $fields2 = $fields;
             } else {
@@ -1161,7 +1239,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
                 ) : array();
             }
 
-            $fields2[] = $definition->getFieldLabel();
+            $fields2[] = $definition->getSingleItemLabelField();
 
             if ($definition->getTreeIcon()) {
                 $fields2[] = $definition->getTreeIcon();
@@ -1210,29 +1288,30 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         $options = array();
         $options['offset'] = $offset;
         $options['limit'] = $limit ? $limit : $this->defaultLimit;
+        $options['fields'] = $this->getBranchItemsSelection($fields);
+//
+//        if (!$fields) {
+//            $fields = array();
+//            $fields[] = $this->getObjectDefinition()->getLabelField();
+//
+//            if ($rootField = $this->getObjectDefinition()->getNestedRootObjectLabelField()) {
+//                $fields[] = $rootField;
+//            }
+//
+//            if ($extraFields = $this->getObjectDefinition()->getNestedRootObjectExtraFields()) {
+//                $extraFields = explode(',', trim(str_replace(' ', '', $extraFields)));
+//                foreach ($extraFields as $field) {
+//                    $fields[] = $field;
+//                }
+//            }
+//            $options['fields'] = implode(',', $fields);
+//        }
 
-        if (!$fields) {
-            $fields = array();
-            $fields[] = $this->getObjectDefinition()->getLabelField();
-
-            if ($rootField = $this->getObjectDefinition()->getNestedRootObjectLabelField()) {
-                $fields[] = $rootField;
-            }
-
-            if ($extraFields = $this->getObjectDefinition()->getNestedRootObjectExtraFields()) {
-                $extraFields = explode(',', trim(str_replace(' ', '', $extraFields)));
-                foreach ($extraFields as $field) {
-                    $fields[] = $field;
-                }
-            }
-            $options['fields'] = implode(',', $fields);
-        }
-
-        if ($filter) {
-            $conditionObject = $filter instanceof Condition ? $filter : self::buildFilter($filter);
-        } else {
-            $conditionObject = $this->getCondition();
-        }
+//        if ($filter) {
+//            $conditionObject = $filter instanceof Condition ? $filter : self::buildFilter($filter);
+//        } else {
+        $conditionObject = $this->getCondition();
+//        }
 
         if ($limit = $this->getObjectDefinition()->getLimitDataSets()) {
             $conditionObject->mergeAnd($limit);
@@ -1247,28 +1326,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         }
 
         $options['order'] = $this->getOrder();
-
-        if (is_array($options['fields'])) {
-            $options['fields'] = implode(',', $options['fields']);
-        }
-
-        $options['fields'] .= ',' . implode(',', array_keys($this->getColumns() ? : array()));
-        $options['fields'] .= ',' . implode(',', $this->getTreeFields());
-
-        if ($this->getMultiLanguage()) {
-
-            //does the object have a lang field?
-            if ($this->getObjectDefinition()->getField('lang')) {
-
-                //add language condition
-                $langCondition = array(
-                    array('lang', '=', (string)$this->getRequest()->request->get('lang')),
-                    'OR',
-                    array('lang', 'IS NULL'),
-                );
-                $conditionObject->mergeAnd($langCondition);
-            }
-        }
 
         $items = $storageController->getBranch($pk, $conditionObject, $depth, $scope, $options);
 
@@ -1348,7 +1405,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         }
 
         if ($query) {
-            if ($queryCondition = $this->getQueryCondition($query, $this->getSelection('', true))) {
+            if ($queryCondition = $this->getQueryCondition($query, $this->getItemsSelection())) {
                 $condition->mergeAnd($queryCondition);
             }
         }
@@ -1389,7 +1446,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         return $storageController->move($sourcePk, $targetPk, $position, $targetObjectKey);
     }
 
-    public function getRoots($condition = null)
+    public function getRoots($condition = null, $lang = null, $domain = 0)
     {
         $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
 
@@ -1400,15 +1457,32 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         $options['fields'] = $this->getNestedSelection($this->getObjectDefinition()->getNestedRootObjectLabelField());
 
         if ($this->getObjectDefinition()->getNestedRootAsObject()) {
-            return $this->getJarves()->getObjects()->getList($this->getObjectDefinition()->getNestedRootObject(), null, $options);
-        } else {
-            $conditionObject = $condition ?: new Condition(null, $this->getJarves());
+            $rootObjectKey = Objects::normalizeObjectKey($this->getObjectDefinition()->getNestedRootObject());
 
-            if ($this->getPermissionCheck() && $aclCondition = $this->getJarves()->getACL()->getListingCondition($this->getObject())) {
-                $conditionObject->mergeAndBegin($aclCondition);
+            $filter = [];
+            if ($domain) {
+                if ('jarves/domain' === $rootObjectKey) {
+                    $filter['id'] = $domain;
+                } else {
+                    $filter['domain'] = $domain;
+                }
             }
 
-            return $storageController->getRoots($conditionObject, $options);
+            if ($lang) {
+                $filter['lang'] = $lang;
+            }
+//            $rootCondition = new Condition();
+//            $rootCondition->addAnd(['id', '=', $domain]);
+
+            return $this->getJarves()->getObjects()->getList($rootObjectKey, $filter, $options);
+        } else {
+//            $conditionObject = $condition ?: new Condition(null, $this->getJarves());
+//
+//            if ($this->getPermissionCheck() && $aclCondition = $this->getJarves()->getACL()->getListingCondition($this->getObject())) {
+//                $conditionObject->mergeAndBegin($aclCondition);
+//            }
+
+            return $storageController->getRoots(null, $options);
         }
     }
 
@@ -2529,19 +2603,19 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
     }
 
     /**
-     * @param boolean $allowCustomSelectFields
+     * @param boolean $allowExtraFieldSelection
      */
-    public function setAllowCustomSelectFields($allowCustomSelectFields)
+    public function setAllowCustomFieldSelection($allowExtraFieldSelection)
     {
-        $this->allowCustomSelectFields = $allowCustomSelectFields;
+        $this->allowCustomFieldSelection = $allowExtraFieldSelection;
     }
 
     /**
      * @return boolean
      */
-    public function getAllowCustomSelectFields()
+    public function getAllowCustomFieldSelection()
     {
-        return $this->allowCustomSelectFields;
+        return $this->allowCustomFieldSelection;
     }
 
     /**
@@ -2590,6 +2664,42 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
     public function getStartCombine()
     {
         return $this->startCombine;
+    }
+
+    /**
+     * The current language to filter if multiLanguage is enabled.
+     *
+     * @return string
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
+     * @param string $language
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+    }
+
+    /**
+     * The current domain id to filter if domainDepended is enabled.
+     *
+     * @return int
+     */
+    public function getDomain()
+    {
+        return $this->domain;
+    }
+
+    /**
+     * @param int $domain
+     */
+    public function setDomain($domain)
+    {
+        $this->domain = (int)$domain;
     }
 
 }

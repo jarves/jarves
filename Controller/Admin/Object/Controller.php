@@ -78,7 +78,7 @@ class Controller extends JarvesController
         $returnKeyAsRequested = filter_var($paramFetcher->get('returnKeyAsRequested'), FILTER_VALIDATE_BOOLEAN);
 
         list($objectKey, $objectIds, ) = $this->getObjects()->parseUrl($url);
-        //check if we got an id
+        //check if we got a id
         if ($objectIds[0] === '') {
             throw new \Exception(sprintf('No id given in uri %s.', $url));
         }
@@ -88,8 +88,13 @@ class Controller extends JarvesController
             throw new ObjectNotFoundException(sprintf('Object %s can not be found.', $objectKey));
         }
 
-        $options['fields'] = $fields;
+        $options['extraFields'] = $fields;
         $options['permissionCheck'] = true;
+
+        $options['fields'][] = $definition->getLabelField();
+        if ($definition->getSingleItemLabelField()) {
+            $options['fields'][] = $definition->getSingleItemLabelField();
+        }
 
         $items = array();
         if (count($objectIds) == 1) {
@@ -154,159 +159,159 @@ class Controller extends JarvesController
         }
     }
 
-    /**
-     * @ApiDoc(
-     *  section="Object Browser",
-     *  description="General object items output for the object browser"
-     * )
-     *
-     * @Rest\QueryParam(name="returnHash", requirements=".+", description="If the result should be indexed by the pk")
-     *
-     * @Rest\QueryParam(name="limit", requirements="[0-9]+", description="Limits the result")
-     * @Rest\QueryParam(name="offset", requirements="[0-9]+", description="Offsets the result")
-     * @Rest\QueryParam(name="order", array=true, requirements=".+", description="Order the result")
-     * @Rest\QueryParam(name="filter", array=true, requirements=".+", description="Filter the result")
-     *
-     * @Rest\Get("/admin/object-browser/{objectKey}", requirements={"objectKey" = "[a-zA-Z0-9-_]+/[a-zA-Z0-9-_]+"})
-     *
-     * @param string $objectKey
-     * @param ParamFetcher $paramFetcher
-     *
-     * @return array
-     * @throws \Exception
-     * @throws ClassNotFoundException
-     * @throws ObjectNotFoundException
-     */
-    public function getBrowserItemsAction($objectKey, ParamFetcher $paramFetcher)
-    {
+//    /**
+//     * @ApiDoc(
+//     *  section="Object Browser",
+//     *  description="General object items output for the object browser"
+//     * )
+//     *
+//     * @Rest\QueryParam(name="returnHash", requirements=".+", description="If the result should be indexed by the pk")
+//     *
+//     * @Rest\QueryParam(name="limit", requirements="[0-9]+", description="Limits the result")
+//     * @Rest\QueryParam(name="offset", requirements="[0-9]+", description="Offsets the result")
+//     * @Rest\QueryParam(name="order", array=true, requirements=".+", description="Order the result")
+//     * @Rest\QueryParam(name="filter", array=true, requirements=".+", description="Filter the result")
+//     *
+//     * @Rest\Get("/admin/object-browser/{objectKey}", requirements={"objectKey" = "[a-zA-Z0-9-_]+/[a-zA-Z0-9-_]+"})
+//     *
+//     * @param string $objectKey
+//     * @param ParamFetcher $paramFetcher
+//     *
+//     * @return array
+//     * @throws \Exception
+//     * @throws ClassNotFoundException
+//     * @throws ObjectNotFoundException
+//     */
+//    public function getBrowserItemsAction($objectKey, ParamFetcher $paramFetcher)
+//    {
+//
+//        $returnHash = $paramFetcher->get('returnHash');
+//        $limit = $paramFetcher->get('limit');
+//        $offset = $paramFetcher->get('offset');
+//        $order = $paramFetcher->get('order');
+//        $filter = $paramFetcher->get('filter') ?: [];
+//
+//        $definition = $this->getObjects()->getDefinition($objectKey);
+//        if (!$definition) {
+//            throw new ObjectNotFoundException(sprintf('Object %s can not be found.', $objectKey));
+//        }
+//
+//        if (!$definition['browserColumns']) {
+//            throw new ObjectMisconfiguration(sprintf('Object %s does not have browser columns.', $objectKey));
+//        }
+//
+//        $fields2 = array_keys($definition['browserColumns']);
+//
+//        $options = array(
+//            'permissionCheck' => true,
+//            'fields' => $fields2,
+//            'limit' => $limit,
+//            'offset' => $offset,
+//            'order' => $order
+//        );
+//
+//        $condition = ObjectCrudController::buildFilter($filter);
+//
+//        if ($definition['browserDataModel'] == 'custom') {
+//
+//            $class = $definition['browserDataModelClass'];
+//            if (!class_exists($class)) {
+//                throw new ClassNotFoundException(sprintf('The class %s can not be found.', $class));
+//            }
+//
+//            /** @var $dataModel \Jarves\ORM\ORMAbstract */
+//            $dataModel = new $class($objectKey);
+//
+//            $items = $dataModel->getItems($condition, $options);
+//
+//        } else {
+//            $items = $this->getObjects()->getList($objectKey, $condition, $options);
+//        }
+//
+//        if ($returnHash) {
+//            $primaryKeys = $this->getObjects()->getPrimaries($objectKey);
+//
+//            $c = count($primaryKeys);
+//            $firstPK = key($primaryKeys);
+//
+//            $res = array();
+//            if (is_array($items)) {
+//                foreach ($items as &$item) {
+//
+//                    if ($c > 1) {
+//                        $keys = array();
+//                        foreach ($primaryKeys as $key => &$field) {
+//                            $keys[] = Tools::urlEncode($item[$key]);
+//                        }
+//                        $res[implode(',', $keys)] = $item;
+//                    } else {
+//                        $res[$item[$firstPK]] = $item;
+//                    }
+//                }
+//            }
+//
+//            return $res;
+//        } else {
+//            return $items;
+//        }
+//    }
 
-        $returnHash = $paramFetcher->get('returnHash');
-        $limit = $paramFetcher->get('limit');
-        $offset = $paramFetcher->get('offset');
-        $order = $paramFetcher->get('order');
-        $filter = $paramFetcher->get('filter') ?: [];
-
-        $definition = $this->getObjects()->getDefinition($objectKey);
-        if (!$definition) {
-            throw new ObjectNotFoundException(sprintf('Object %s can not be found.', $objectKey));
-        }
-
-        if (!$definition['browserColumns']) {
-            throw new ObjectMisconfiguration(sprintf('Object %s does not have browser columns.', $objectKey));
-        }
-
-        $fields2 = array_keys($definition['browserColumns']);
-
-        $options = array(
-            'permissionCheck' => true,
-            'fields' => $fields2,
-            'limit' => $limit,
-            'offset' => $offset,
-            'order' => $order
-        );
-
-        $condition = ObjectCrudController::buildFilter($filter);
-
-        if ($definition['browserDataModel'] == 'custom') {
-
-            $class = $definition['browserDataModelClass'];
-            if (!class_exists($class)) {
-                throw new ClassNotFoundException(sprintf('The class %s can not be found.', $class));
-            }
-
-            /** @var $dataModel \Jarves\ORM\ORMAbstract */
-            $dataModel = new $class($objectKey);
-
-            $items = $dataModel->getItems($condition, $options);
-
-        } else {
-            $items = $this->getObjects()->getList($objectKey, $condition, $options);
-        }
-
-        if ($returnHash) {
-            $primaryKeys = $this->getObjects()->getPrimaries($objectKey);
-
-            $c = count($primaryKeys);
-            $firstPK = key($primaryKeys);
-
-            $res = array();
-            if (is_array($items)) {
-                foreach ($items as &$item) {
-
-                    if ($c > 1) {
-                        $keys = array();
-                        foreach ($primaryKeys as $key => &$field) {
-                            $keys[] = Tools::urlEncode($item[$key]);
-                        }
-                        $res[implode(',', $keys)] = $item;
-                    } else {
-                        $res[$item[$firstPK]] = $item;
-                    }
-                }
-            }
-
-            return $res;
-        } else {
-            return $items;
-        }
-    }
-
-    /**
-     * @ApiDoc(
-     *  section="Object Browser",
-     *  description="General object items output for the object browser"
-     * )
-     *
-     * @Rest\QueryParam(name="filter", array=true, requirements=".+", description="Filter the result")
-     *
-     * @Rest\Get("/admin/object-browser-count/{objectKey}", requirements={"objectKey" = "[a-zA-Z0-9-_]+/[a-zA-Z0-9-_]+"})
-     *
-     * @param string $objectKey
-     * @param ParamFetcher $paramFetcher
-     *
-     * @return array
-     * @throws \Exception
-     * @throws ClassNotFoundException
-     * @throws ObjectNotFoundException
-     */
-    public function getBrowserItemsCountAction($objectKey, ParamFetcher $paramFetcher)
-    {
-        $filter = $paramFetcher->get('filter');
-
-        $definition = $this->getObjects()->getDefinition($objectKey);
-        if (!$definition) {
-            throw new ObjectNotFoundException(sprintf('Object %s can not be found.', $objectKey));
-        }
-
-        if (!$definition['browserColumns']) {
-            throw new ObjectMisconfiguration(sprintf('Object %s does not have browser columns.', $objectKey));
-        }
-
-//        $fields = array_keys($definition['browserColumns']);
-
-        $options = array(
-            'permissionCheck' => true
-        );
-
-        $condition = ObjectCrudController::buildFilter($filter);
-
-        if ($definition['browserDataModel'] == 'custom') {
-
-            $class = $definition['browserDataModelClass'];
-            if (!class_exists($class)) {
-                throw new ClassNotFoundException(sprintf('The class %s can not be found.', $class));
-            }
-
-            $dataModel = new $class($objectKey);
-
-            $count = $dataModel->getCount($condition, $options);
-
-        } else {
-
-            $count = $this->getObjects()->getCount($objectKey, $condition, $options);
-
-        }
-
-        return $count;
-    }
+//    /**
+//     * @ApiDoc(
+//     *  section="Object Browser",
+//     *  description="General object items output for the object browser"
+//     * )
+//     *
+//     * @Rest\QueryParam(name="filter", array=true, requirements=".+", description="Filter the result")
+//     *
+//     * @Rest\Get("/admin/object-browser-count/{objectKey}", requirements={"objectKey" = "[a-zA-Z0-9-_]+/[a-zA-Z0-9-_]+"})
+//     *
+//     * @param string $objectKey
+//     * @param ParamFetcher $paramFetcher
+//     *
+//     * @return array
+//     * @throws \Exception
+//     * @throws ClassNotFoundException
+//     * @throws ObjectNotFoundException
+//     */
+//    public function getBrowserItemsCountAction($objectKey, ParamFetcher $paramFetcher)
+//    {
+//        $filter = $paramFetcher->get('filter');
+//
+//        $definition = $this->getObjects()->getDefinition($objectKey);
+//        if (!$definition) {
+//            throw new ObjectNotFoundException(sprintf('Object %s can not be found.', $objectKey));
+//        }
+//
+//        if (!$definition['browserColumns']) {
+//            throw new ObjectMisconfiguration(sprintf('Object %s does not have browser columns.', $objectKey));
+//        }
+//
+////        $fields = array_keys($definition['browserColumns']);
+//
+//        $options = array(
+//            'permissionCheck' => true
+//        );
+//
+//        $condition = ObjectCrudController::buildFilter($filter);
+//
+//        if ($definition['browserDataModel'] == 'custom') {
+//
+//            $class = $definition['browserDataModelClass'];
+//            if (!class_exists($class)) {
+//                throw new ClassNotFoundException(sprintf('The class %s can not be found.', $class));
+//            }
+//
+//            $dataModel = new $class($objectKey);
+//
+//            $count = $dataModel->getCount($condition, $options);
+//
+//        } else {
+//
+//            $count = $this->getObjects()->getCount($objectKey, $condition, $options);
+//
+//        }
+//
+//        return $count;
+//    }
 }

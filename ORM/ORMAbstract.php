@@ -278,10 +278,11 @@ abstract class ORMAbstract
      *
      * @abstract
      *
-     * @param Condition $condition
+     * @param array $filter simple filter
+     * @param Condition $condition complex filter condition
      * @param array $options
      */
-    abstract public function getItems(Condition $condition = null, $options = null);
+    abstract public function getItems(array $filter = [], Condition $condition = null, $options = null);
 
     /**
      *

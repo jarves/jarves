@@ -272,7 +272,8 @@ class NodeCrudController extends WindowNestedController
 
     public $workspace = true;
 
-    public $domainDepended = true;
+//    public $domainDepended = true;
+    public $multiLanguage = true;
 
     public $multiDomain = false;
 

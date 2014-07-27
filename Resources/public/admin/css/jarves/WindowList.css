@@ -419,6 +419,10 @@ a.jarves-WindowList-search-button-active:link {
     padding-top: 7px;
 }
 
+.jarves-windowCombine-list-container .jarves-Table-body td {
+    vertical-align: middle;
+}
+
 a.jarves-windowCombine-left-toggler {
     position: absolute;
     display: block;

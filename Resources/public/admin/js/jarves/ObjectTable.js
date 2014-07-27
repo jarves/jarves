@@ -178,8 +178,8 @@ jarves.ObjectTable = new Class({
 
     getCount: function (pPage) {
 
-        this.lr = new Request.JSON({url: _pathAdmin + 'admin/object-browser-count/' +
-            jarves.normalizeObjectKey(this.objectKey), noCache: 1, onComplete: function (pRes) {
+        this.lr = new Request.JSON({url: jarves.getObjectApiUrl(this.objectKey) + '/:count',
+            noCache: 1, onComplete: function (pRes) {
 
             this.itemsCount = pRes.data;
             this._loadPage(pPage);
@@ -210,10 +210,9 @@ jarves.ObjectTable = new Class({
             limit: this.options.itemsPerPage,
             offset: offset,
             fields: fields.join(',')
-        }
+        };
 
-        this.lr = new Request.JSON({url: _pathAdmin + 'admin/object-browser/' +
-            jarves.normalizeObjectKey(this.objectKey), noCache: 1, onComplete: function (pRes) {
+        this.lr = new Request.JSON({url: jarves.getObjectApiUrl(this.objectKey), noCache: 1, onComplete: function (pRes) {
 
             this.renderResult(pRes.data);
             this.renderActions(pPage, Math.ceil(this.itemsCount / this.options.itemsPerPage), this.itemsCount);

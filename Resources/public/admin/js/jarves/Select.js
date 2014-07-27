@@ -223,11 +223,6 @@ jarves.Select = new Class({
 
         this.createLayout();
         this.mapEvents();
-        this.prepareOptions();
-
-        if (this.options.selectFirst) {
-            this.selectFirst(null, true);
-        }
 
         if (this.options.disabled)
             this.setEnabled(false);
@@ -236,7 +231,13 @@ jarves.Select = new Class({
             this.box.addClass('jarves-Select-transparent');
         }
 
-        this.fireEvent('ready');
+        this.prepareOptions();
+
+        if (this.options.selectFirst) {
+            this.selectFirst(null, true);
+        } else {
+            this.fireEvent('ready');
+        }
     },
 
     createLayout: function() {
@@ -795,6 +796,7 @@ jarves.Select = new Class({
                         }
                         this.fireEvent('firstItemLoaded', item.id);
                         this.fireEvent('selectFirst', item.id);
+                        this.fireEvent('ready');
                         return;
                     }
                 }

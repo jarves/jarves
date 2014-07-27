@@ -599,7 +599,6 @@ jarves.WindowCombine = new Class({
 
             var items = (this.classProperties.itemsPerPage) ? this.classProperties.itemsPerPage : 5;
             var newFrom = this.from - items;
-            var items = items;
 
             if (newFrom < 0) {
                 items += newFrom;
@@ -610,7 +609,6 @@ jarves.WindowCombine = new Class({
     },
 
     changeLanguage: function() {
-        this.reload();
         if (this.windowAdd && this.languageSelect) {
             this.windowAdd.setLanguage(this.languageSelect.getValue());
         }
@@ -631,6 +629,11 @@ jarves.WindowCombine = new Class({
 
     },
 
+    onSearchInputChange: function() {
+        this.setView('list');
+        this.parent();
+    },
+
     reload: function() {
         if (this.ignoreNextSoftLoad) {
             delete this.ignoreNextSoftLoad;
@@ -646,6 +649,11 @@ jarves.WindowCombine = new Class({
             this.parent();
             return this.loadItems(this.from, this.loadedCount);
         }
+    },
+
+    reloadFirst: function() {
+        this.parent();
+        this.reload();
     },
 
     loadItems: function(pFrom, pMax, pAndScrollToSelect) {
@@ -1139,7 +1147,7 @@ jarves.WindowCombine = new Class({
     },
 
     addRootSaved: function(request, response) {
-        this.changeLanguage();
+        this.reloadFirst();
     },
 
     addSavedMultiple: function(request, response) {

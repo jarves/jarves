@@ -770,6 +770,28 @@ jarves.getObjectLabel = function(uri, callback) {
     }).delay(50);
 };
 
+/**
+ * Returns the rest entry-point of our API for object access.
+ *
+ * Default is jarves/object/<bundleName>/<objectName>,
+ * but the object has the ability to define its own entry point.
+ *
+ * @param {String} objectKey
+ * @returns {String}
+ */
+jarves.getObjectApiUrl = function(objectKey) {
+    var definition = jarves.getObjectDefinition(objectKey);
+    if (!definition) {
+        throw 'Definition not found ' + objectKey;
+    }
+
+    if (definition.objectRestEntryPoint) {
+        return _pathAdmin + definition.objectRestEntryPoint;
+    }
+
+    return _pathAdmin + 'object/' + jarves.normalizeObjectKey(objectKey);
+};
+
 jarves.getObjectLabelQ = {};
 jarves.getObjectLabelBusy = {};
 jarves.getObjectLabelQTimer = {};
@@ -808,8 +830,8 @@ jarves.getObjectLabelByItem = function(objectKey, item, mode, overwriteDefinitio
         template = definition.fieldTemplate;
     }
 
-    if (mode == 'field' && definition.fieldLabel) {
-        label = definition.fieldLabel;
+    if (mode == 'field' && definition.singleItemLabelField) {
+        label = definition.singleItemLabelField;
     }
 
     /* tree */

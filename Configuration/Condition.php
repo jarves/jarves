@@ -185,19 +185,19 @@ class  Condition extends Model
         }
         $condition = $this->rules;
 
-        $tableName = null;
-        $def = null;
-
-        if ($objectKey) {
-            $def = $this->getJarves()->getObjects()->getDefinition($objectKey);
-            if ($def) {
-                $tableName = $this->getJarves()->getSystemConfig()->getDatabase()->getPrefix() . $def->getTable();
-            }
-        }
-
-        if (!$tableName) {
-            $tableName = $objectKey;
-        }
+//        $tableName = null;
+//        $def = null;
+//
+//        if ($objectKey) {
+//            $def = $this->getJarves()->getObjects()->getDefinition($objectKey);
+//            if ($def) {
+//                $tableName = $this->getJarves()->getSystemConfig()->getDatabase()->getPrefix() . $def->getTable();
+//            }
+//        }
+//
+//        if (!$tableName) {
+//            $tableName = $objectKey;
+//        }
 
         if (is_array($condition) && !is_numeric(key($condition))) {
             //array( 'bla' => 'hui' );
@@ -290,7 +290,8 @@ class  Condition extends Model
         if ($def) {
             $field = $def->getField($fieldName);
             if ($field) {
-                $columnName = $field->getColumnName();
+                $columns = $field->getFieldType()->getColumns();
+                $columnName = Tools::camelcase2Underscore($columns[0]->getName());
             }
         } else {
             $columnName = Tools::camelcase2Underscore($fieldName);

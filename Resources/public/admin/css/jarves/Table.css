@@ -92,13 +92,11 @@
 .jarves-Table tr.active:hover > td,
 .jarves-Table-body tr.active > td,
 .jarves-Table-body tr.active:hover > td {
-    background-color: #22638e;
-    color: white;
+    background-color: #EBEBEB;
 }
 
 .jarves-Table tr.active > td a,
 .jarves-Table-body tr.active a:link {
-    color: white;
 }
 
 .jarves-Table-hover tr:hover > td {
