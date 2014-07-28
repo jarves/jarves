@@ -741,8 +741,11 @@ class Objects
      * @param array $options
      * @return ObjectCrud
      */
-    public function getController($objectKey, array $options = array())
+    public function getController($objectKey, array $options = null)
     {
+        if (!$options) {
+            $options = [];
+        }
         $definition = $this->getDefinition($objectKey);
 
         if ($controllerId = $definition->getController()) {
@@ -1034,13 +1037,14 @@ class Objects
      *
      * @param  string $objectKey
      * @param  mixed  $pk
-     * @param  null   $options
+     * @param  array  $options
      *
      * @return mixed
      */
-    public function getParent($objectKey, $pk)
+    public function getParent($objectKey, $pk, $options = null)
     {
-        $controller = $this->getController($objectKey);
+        $controller = $this->getController($objectKey, $options);
+
         return $controller->getParent($pk);
     }
 

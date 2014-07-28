@@ -178,7 +178,7 @@ class  Condition extends Model
      *
      * @return string
      */
-    public function toSql(&$params, $objectKey, &$usedFieldNames = array())
+    public function toSql(&$params, $objectKey, array &$usedFieldNames = null)
     {
         if (!$this->rules) {
             return '';
@@ -208,7 +208,7 @@ class  Condition extends Model
             );
         }
 
-        if ($condition[0] && is_array($condition[0]) && !is_numeric(key($condition[0]))) {
+        if (isset($condition[0]) && is_array($condition[0]) && !is_numeric(key($condition[0]))) {
             //array( array('bla' => 'bla', ... );
             return static::create($this->primaryKeyToCondition($condition, $objectKey), $this->getJarves())->toSql(
                 $params,
@@ -226,7 +226,7 @@ class  Condition extends Model
             );
         }
 
-        return $this->conditionToSql($condition, $params, $objectKey, $pFieldNames);
+        return $this->conditionToSql($condition, $params, $objectKey, $usedFieldNames);
     }
 
     /**
@@ -297,11 +297,12 @@ class  Condition extends Model
             $columnName = Tools::camelcase2Underscore($fieldName);
         }
 
+        if (null !== $usedFieldNames) {
+            $usedFieldNames[] = $fieldName;
+        }
+
         if (!is_numeric($condition[0])) {
             $result = ($tableName ? Tools::dbQuote($tableName) . '.' : '') . Tools::dbQuote($columnName) . ' ';
-            if ($usedFieldNames !== null) {
-                $usedFieldNames[] = $condition[0];
-            }
         } else {
             $result = $condition[0];
         }
@@ -343,7 +344,7 @@ class  Condition extends Model
 
         $this->toSql($params, null, $fields);
 
-        return array_keys($fields);
+        return $fields;
     }
 
     /**

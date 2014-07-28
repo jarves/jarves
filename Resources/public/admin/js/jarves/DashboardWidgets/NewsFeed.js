@@ -5,14 +5,13 @@ jarves.DashboardWidgets.NewsFeed = new Class({
 
     firstLoad: true,
     loadedItems: false,
+    size: 'full',
 
     create: function () {
         this.header = new Element('h3', {
             text: jarves.tc('dashboardWidget.newsFeed', 'News Feed')
         })
             .inject(this.main);
-
-        this.main.addClass('jarves-Dashboard-widget-block');
 
         this.container = new Element('div', {
             style: ''
@@ -39,7 +38,6 @@ jarves.DashboardWidgets.NewsFeed = new Class({
                 }).inject(this.container);
             }
         }
-
 
         jarves.setStreamParam('newsFeed/lastTime', value.time);
     },

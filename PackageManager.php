@@ -441,7 +441,7 @@ class PackageManager extends ContainerAware {
             ->filterById($id)
             ->update(array('Id' => 1));
         $admin->setId(1);
-        $admin->addGroupMembership($groupAdmin);
+        $admin->addGroup($groupAdmin);
         $admin->save();
 
     }

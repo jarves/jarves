@@ -34,7 +34,7 @@ class AuthTestCase extends KernelAwareTestCase
             [
                 'username' => 'test',
                 'password' => 'test',
-                'groupMembership' => [$this->testGroupPk['id']]
+                'groups' => [$this->testGroupPk['id']]
             ]
         );
     }

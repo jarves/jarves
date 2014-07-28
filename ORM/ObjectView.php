@@ -24,7 +24,7 @@ class ObjectView extends Propel
     /**
      * {@inheritDoc}
      */
-    public function getItems(Condition $condition = null, $options = null)
+    public function getItems(array $filter = null, Condition $condition = null, $options = null)
     {
     }
 

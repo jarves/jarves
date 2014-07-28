@@ -4,7 +4,7 @@
             <asset>@JarvesBundle/admin/mootools-core-1.4.5-fixed-memory-leak.js</asset>
             <asset>@JarvesBundle/admin/mootools-more.js</asset>
             <assets>@JarvesBundle/admin/js/mootools-extras/*.js</assets>
-            <asset>@JarvesBundle/admin/js/lib/twig.min.js</asset>
+            <asset>@JarvesBundle/admin/js/lib/nunjucks.min.js</asset>
 
             <asset>@JarvesBundle/admin/js/jarves.js</asset>
             <asset>@JarvesBundle/admin/js/jarves/AdminInterface.js</asset>

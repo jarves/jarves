@@ -284,7 +284,7 @@ jarves.Slot = new Class({
         if (this.options.node.id) {
             this.lastRq = new Request.JSON({url: _pathAdmin + 'object/jarves/content', noCache: true,
                 onComplete: this.renderContents.bind(this)}).get({
-                    filter: {boxId: this.slotParams.id, nodeId: this.options.node.id},
+                    filter: {boxId: this.slotParams.id, node: this.options.node.id},
                     order: {sort: 'asc'}
                 });
         }

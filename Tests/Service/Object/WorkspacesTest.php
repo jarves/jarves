@@ -20,21 +20,26 @@ class WorkspacesTest extends KernelAwareTestCase
 
         WorkspaceManager::setCurrent(0);
         $this->getObjects()->add('JarvesPublicationBundle:News', array(
-            'title' => 'News 1 in workspace live'
+            'title' => 'News 1 in workspace live',
+            'lang' => 'en'
         ));
         $this->getObjects()->add('JarvesPublicationBundle:News', array(
-            'title' => 'News 2 in workspace live'
+            'title' => 'News 2 in workspace live',
+            'lang' => 'en'
         ));
 
         WorkspaceManager::setCurrent(1);
         $this->getObjects()->add('JarvesPublicationBundle:News', array(
-            'title' => 'News 1 in workspace one'
+            'title' => 'News 1 in workspace one',
+            'lang' => 'en'
         ));
         $this->getObjects()->add('JarvesPublicationBundle:News', array(
-            'title' => 'News 2 in workspace one'
+            'title' => 'News 2 in workspace one',
+            'lang' => 'en'
         ));
         $this->getObjects()->add('JarvesPublicationBundle:News', array(
-            'title' => 'News 3 in workspace one'
+            'title' => 'News 3 in workspace one',
+            'lang' => 'en'
         ));
 
         //anything inserted and selecting works correctly?
@@ -69,6 +74,7 @@ class WorkspacesTest extends KernelAwareTestCase
             $values = array(
                 'title' => 'News ' . $i,
                 'intro' => str_repeat('L', $i),
+                'lang' => 'en',
                 'newsDate' => strtotime('+' . rand(1, 30) . ' day'. '+' . rand(1, 24) . ' hours')
             );
             $pk = $this->getObjects()->add('JarvesPublicationBundle:News', $values);
@@ -83,14 +89,16 @@ class WorkspacesTest extends KernelAwareTestCase
         $this->assertEquals('News 11', $item['title']);
 
         $this->getObjects()->update('JarvesPublicationBundle:News', $id11, array(
-            'title' => 'New News 11'
+            'title' => 'New News 11',
+            'lang' => 'en'
         ));
 
         $item = $this->getObjects()->get('JarvesPublicationBundle:News', $id11);
         $this->assertEquals('New News 11', $item['title']);
 
         $this->getObjects()->update('JarvesPublicationBundle:News', $id11, array(
-            'title' => 'New News 11 - 2'
+            'title' => 'New News 11 - 2',
+            'lang' => 'en'
         ));
 
         //check version counter - we have 2 updates, so we have 2 versions.

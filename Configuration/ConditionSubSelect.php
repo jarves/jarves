@@ -80,7 +80,7 @@ class ConditionSubSelect extends Condition
         return 1 === count($row) ? current($row) : $row;
     }
 
-    public function toSql(&$params, $objectKey, &$usedFieldNames = array())
+    public function toSql(&$params, $objectKey, array &$usedFieldNames = null)
     {
         $tableName = $this->tableNameSelect;
         if ($objectKey) {
@@ -91,12 +91,14 @@ class ConditionSubSelect extends Condition
         }
 
         if (is_array($this->select)) {
-            foreach ($this->select as $select) {
-                $usedFieldNames[] = $select;
+            if (null !== $usedFieldNames) {
+                $usedFieldNames = array_merge($usedFieldNames, array_keys($this->select));
             }
             $selected = implode(', ', $this->select);
         } else {
-            $usedFieldNames[] = $this->select;
+            if (null !== $usedFieldNames) {
+                $usedFieldNames[] = $this->select;
+            }
             $selected = $tableName.'.'.$this->select;
         }
 

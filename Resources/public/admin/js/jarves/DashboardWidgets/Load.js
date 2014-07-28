@@ -2,13 +2,13 @@ jarves.DashboardWidgets.Load = new Class({
     Extends: jarves.DashboardWidgets.Base,
 
     streamPath: 'JarvesBundle/load',
+    size: 2,
 
     create: function () {
         this.header = new Element('h3', {
             text: jarves.tc('dashboardWidget.load', 'Load')
         })
             .inject(this.main);
-        this.toElement().addClass('jarves-Dashboard-widget-grid-2');
 
         this.load = new Element('div', {
             style: 'padding: 5px; text-align: center',

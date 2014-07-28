@@ -5,6 +5,7 @@ namespace Jarves\ORM\Builder;
 use Jarves\Configuration\Object;
 use Jarves\Jarves;
 use Jarves\Objects;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Builder
@@ -119,13 +120,23 @@ class Builder
 
     /**
      * Calls build on each builder.
+     *
+     * @return string
      */
-    public function build(OutputInterface $output)
+    public function build(OutputInterface $output = null)
     {
         $this->bootBuildTime();
 
+        if (!$output) {
+            $output = new BufferedOutput();
+        }
+
         foreach ($this->builder as $builder) {
             $builder->build($this->objects, $output);
+        }
+
+        if ($output instanceof BufferedOutput) {
+            return $output->fetch();
         }
     }
 

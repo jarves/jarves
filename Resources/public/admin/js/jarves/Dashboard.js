@@ -21,26 +21,15 @@ jarves.Dashboard = new Class({
             'class': 'jarves-Dashboard'
         }).inject(this.container);
 
-        this.mainLayout = new jarves.Layout(this.main, {
-            layout: [
-                {columns: ['40%', 11, '60%']}
-            ],
-            fixed: false
-        });
-
         this.main.setStyle('opacity', 0);
-
-        this.leftSide = this.mainLayout.getCell(1, 1);
-        this.middle = this.mainLayout.getCell(1, 2);
-        this.rightSide = this.mainLayout.getCell(1, 3);
 
         this.loadWidgets();
         this.fireEvent('load');
     },
 
     loadWidgets: function () {
-        this.leftSide.empty();
-        this.rightSide.empty();
+
+        this.main.empty();
 
         [
             'jarves.DashboardWidgets.LiveVisitor',
@@ -52,14 +41,14 @@ jarves.Dashboard = new Class({
             'jarves.DashboardWidgets.Apc'
         ].each(function (clazz) {
             clazz = jarves.getClass(clazz);
-            this.widgets.push(new clazz(this.leftSide));
+            this.widgets.push(new clazz(this.main));
         }.bind(this));
 
         [
             'jarves.DashboardWidgets.NewsFeed'
         ].each(function (clazz) {
             clazz = jarves.getClass(clazz);
-            this.widgets.push(new clazz(this.rightSide));
+            this.widgets.push(new clazz(this.main));
         }.bind(this));
 
 

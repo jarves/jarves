@@ -16,8 +16,9 @@ input.text {
 
     display: inline-block;
 
-    border: 1px solid #d3d3d3;
-    background-color: white;
+    border: 1px solid #E7E7E7;
+    background-color: #FCFCFC;
+
     min-width: 20px;
     height: 30px;
 
@@ -27,6 +28,11 @@ input.text {
     @include box-sizing(border-box);
     @include transition(all 0.2s ease-out);
     border-radius: 2px;
+}
+.jarves-Input-text:hover,
+input.text:hover {
+    background-color: white;
+    border: 1px solid #d3d3d3;
 }
 
 textarea.jarves-Input-text {
@@ -57,6 +63,8 @@ textarea.jarves-Input-text {
 input.text:focus {
     outline: 0;
     border-color: #B9D2E2;
+    background-color: white;
+    border: 1px solid #d3d3d3;
     -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);

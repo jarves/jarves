@@ -13,39 +13,39 @@ class CreateTest extends KernelAwareTestCase
 
     public function testObject()
     {
-        $this->getObjects()->clear('Test\\Test');
+        $this->getObjects()->clear('test/test');
 
         //check empty
-        $count = $this->getObjects()->getCount('Test\\Test');
+        $count = $this->getObjects()->getCount('test/test');
         $this->assertEquals(0, $count);
 
         //new object
         $values = array('name' => 'Hallo "\'Peter, ✔');
-        $pk = $this->getObjects()->add('Test\\Test', $values);
+        $pk = $this->getObjects()->add('test/test', $values);
 
         //check if inserted correctly
         $this->assertArrayHasKey('id', $pk);
         $this->assertGreaterThan(0, $pk['id']);
 
         //get through single value pk and check result
-        $item = $this->getObjects()->get('Test\\Test', $pk['id']);
+        $item = $this->getObjects()->get('test/test', $pk['id']);
         $this->assertGreaterThan(0, $item['id']);
         $this->assertEquals($values['name'], $item['name']);
 
         //get through array pk and check result
-        $item = $this->getObjects()->get('Test\\Test', $pk);
+        $item = $this->getObjects()->get('test/test', $pk);
         $this->assertGreaterThan(0, $item['id']);
         $this->assertEquals($values['name'], $item['name']);
 
         //check count
-        $count = $this->getObjects()->getCount('Test\\Test');
+        $count = $this->getObjects()->getCount('test/test');
         $this->assertGreaterThan(0, $count);
 
         //remove
-        $this->getObjects()->remove('Test\\Test', $pk);
+        $this->getObjects()->remove('test/test', $pk);
 
         //check empty
-        $count = $this->getObjects()->getCount('Test\\Test');
+        $count = $this->getObjects()->getCount('test/test');
         $this->assertEquals(0, $count);
     }
 
@@ -55,7 +55,8 @@ class CreateTest extends KernelAwareTestCase
         $values = array(
             'title' => 'News item',
             'intro' => 'Lorem ipsum',
-            'newsDate' => strtotime($date)
+            'newsDate' => strtotime($date),
+            'lang' => 'en'
         );
         $pk = $this->getObjects()->add('JarvesPublicationBundle:News', $values);
 
@@ -64,6 +65,7 @@ class CreateTest extends KernelAwareTestCase
         $this->assertEquals($values['title'], $item['title']);
         $this->assertEquals($values['intro'], $item['intro']);
         $this->assertEquals($values['newsDate'], $item['newsDate']);
+        $this->assertEquals($values['lang'], $item['lang']);
 
         $this->assertTrue($this->getObjects()->remove('JarvesPublicationBundle:News', $pk));
 

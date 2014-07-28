@@ -905,7 +905,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         }
 
         $options['fields'] = $this->getItemSelection($fields);
-        $options['permissionCheck'] = $this->getPermissionCheck();
 
         $item = $storageController->getItem($pk, $options);
 
@@ -988,6 +987,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
         $options['order'] = $orderBy ? : $this->getOrder();
         $options['fields'] = $this->getItemsSelection($fields);
+        $options['permissionCheck'] = $this->getPermissionCheck();
 
         if ($limit = $this->getObjectDefinition()->getLimitDataSets()) {
             $condition->mergeAnd($limit);
@@ -1413,12 +1413,21 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         return $storageController->getCount($condition);
     }
 
-    public function getParent($pk)
+    public function getParent($pk, $fields = null)
     {
         $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
         $pk = $storageController->normalizePrimaryKey($pk);
 
-        return $storageController->getParent($pk);
+        $options['fields'] = $this->getItemSelection($fields);
+        $options['permissionCheck'] = $this->getPermissionCheck();
+
+        if ($this->getPermissionCheck() && !$this->getJarves()->getACL()->checkViewExact($this->getObject(), $pk)) {
+            return null;
+        }
+
+        $item = $storageController->getParent($pk, $options);
+
+        return $item;
     }
 
     public function getParents($pk)

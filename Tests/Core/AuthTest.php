@@ -31,9 +31,6 @@ class AuthTest extends AuthTestCase
         $this->assertEquals(32, strlen($response['data']['token']));
     }
 
-    /**
-     * @group test
-     */
     public function testNewValidUserLogin()
     {
         $this->acls[] = $acl = new Acl();

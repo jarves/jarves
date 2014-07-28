@@ -215,9 +215,7 @@ class BackendController extends Controller
             $codes = Tools::listToArray($this->getJarves()->getSystemConfig()->getLanguages());
             $query = LanguageQuery::create()->filterByCode($codes);
 
-            $query->orderBy('');
-
-            $tlang = $query->find()->toArray(
+            $tlangs = $query->find()->toArray(
                 null,
                 null,
                 TableMap::TYPE_STUDLYPHPNAME

@@ -16,6 +16,21 @@ jarves.Files = new Class({
     downloadableExtensions: ['pdf', 'zip', 'rar'],
     __ext: ['.css', '.tpl', '.js', '.html', '.htm'],
 
+    extensionToIcon: {
+        pdf: 'icon-file-pdf',
+        zip: 'icon-file-zip',
+        doc: 'icon-file-word',
+        xls: 'icon-file-excel',
+        ppt: 'icon-file-powerpoint',
+        css: 'icon-file-css',
+        xml: 'icon-file-xml',
+        html: 'icon-file-xml',
+        twig: 'icon-file-xml',
+        smarty: 'icon-file-xml',
+        image: 'icon-picture',
+        dir: 'icon-folder-4'
+    },
+
     systemFolders: ['/', '/bundles', '/cache'],
 
     options: {
@@ -2544,22 +2559,23 @@ jarves.Files = new Class({
         this.files2View.each(function(file) {
 
             var bg = '';
-            if (file.type != 'dir' && this.__images.contains(file.path.substr(file.path.lastIndexOf('.')).toLowerCase())) { //is image
-                bg = 'image'
+            var iconClass = 'icon-paper';
+
+            var fileExtension = file.path.substr(file.path.lastIndexOf('.')).toLowerCase();
+
+
+            if (file.type != 'dir' && this.__images.contains(fileExtension)) { //is image
+                fileExtension = 'image'
             } else if (file.type == 'dir') {
-                bg = 'dir'
-            } else if (this.__ext.contains(file.path.substr(file.path.lastIndexOf('.')))) {
-                bg = file.path.substr(file.path.lastIndexOf('.') + 1);
-            } else {
-                bg = 'tpl';
+                fileExtension = 'dir'
             }
 
-            if (file.path == '/trash') {
-                bg = 'dir_bin';
+            if (this.extensionToIcon[fileExtension]) {
+                iconClass = this.extensionToIcon[fileExtension];
             }
 
-            var image = new Element('img', {
-                src: _path + 'bundles/jarves/admin/images/ext/' + bg + '-mini.png'
+            var image = new Element('span', {
+                'class': iconClass
             });
 
             var size = jarves.bytesToSize(file.size);

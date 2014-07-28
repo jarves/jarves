@@ -20,7 +20,7 @@ jarves.DashboardWidgets.Space = new Class({
 
     update: function (value) {
         if (0 === this.gauges.length) {
-            this.toElement().addClass('jarves-Dashboard-widget-grid-' + value.length);
+            this.getBorder().addClass('jarves-Dashboard-widget-grid-' + value.length);
 
             Array.each(value, function (space, id) {
                 this.gauges.push(

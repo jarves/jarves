@@ -41,11 +41,12 @@ table tr:first-child > .jarves-field-inputTd {
 }
 
 .jarves-field-tdtitle {
-    padding-top: 4px;
+    padding-top: 10px;
     padding-left: 5px;
     padding-right: 5px;
     color: #333;
     line-height: 28px;
+    text-align: right;
 }
 .jarves-field-main-small {
     width: 210px;
@@ -63,7 +64,7 @@ h2.jarves-field-headline {
 }
 
 .jarves-field-tdtitle div.desc {
-    color: #999;
+    color: #c0c0c0;
     padding-top: 3px;
     padding-bottom: 3px;
 }
@@ -393,4 +394,9 @@ iframe.jarves-Field-info {
     height: 99%;
     margin: 0;
     padding: 0;
+}
+
+.jarves-field-type-tree {
+    display: inline-block;
+    min-width: 100%;
 }

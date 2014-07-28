@@ -4,9 +4,7 @@
       <object id="Test">
         <table>test_test</table>
         <labelField>name</labelField>
-        <nested>false</nested>
         <dataModel>propel</dataModel>
-        <multiLanguage>true</multiLanguage>
         <browserColumns>
           <field id="name">
             <type>text</type>
@@ -21,9 +19,6 @@
           </field>
           <field id="description">
             <type>text</type>
-          </field>
-          <field id="lang">
-            <type>lang</type>
           </field>
         </fields>
         <label>name</label>

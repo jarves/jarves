@@ -12,13 +12,19 @@ jarves.DashboardWidgets.Base = new Class({
 
     streamPath: null,
 
+    size: 1,
+
     initialize: function (container, options) {
         this.container = container;
         this.setOptions(options);
 
-        this.main = new Element('div', {
-            'class': 'jarves-Dashboard-widget'
+        this.border = new Element('div', {
+            'class': 'jarves-Dashboard-widget jarves-Dashboard-widget-grid-' + this.size
         }).inject(this.container);
+
+        this.main = new Element('div', {
+            'class': 'jarves-Dashboard-widget-content'
+        }).inject(this.border);
 
         this.create();
 
@@ -28,6 +34,10 @@ jarves.DashboardWidgets.Base = new Class({
 
     toElement: function () {
         return this.main;
+    },
+
+    getBorder: function() {
+        return this.border;
     },
 
     destroy: function () {

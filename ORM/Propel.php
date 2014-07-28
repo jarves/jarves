@@ -1342,6 +1342,7 @@ class Propel extends ORMAbstract
     public function getParent($pk, $options = null)
     {
         $query = $this->getQueryClass();
+
         $item = $query->findPK($this->getPropelPk($pk));
         if (!$item) {
             return null;
@@ -1352,7 +1353,6 @@ class Propel extends ORMAbstract
 
         $selects[] = 'Lft';
         $selects[] = 'Rgt';
-//        $selects[] = 'Title';
         $query->select($selects);
 
         $this->mapOptions($query, $options);
@@ -1367,8 +1367,19 @@ class Propel extends ORMAbstract
         $clazz = $this->getPhpName();
 
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-        $item = $this->populateRow($clazz, $row, $selects, $relations, $relationFields, $options['permissionCheck']);
 
+        if (!$row) {
+            return null;
+        }
+
+        $item = $this->populateRow(
+            $clazz,
+            $row,
+            $selects,
+            $relations,
+            $relationFields,
+            $options['permissionCheck']
+        );
         return $item;
 
     }

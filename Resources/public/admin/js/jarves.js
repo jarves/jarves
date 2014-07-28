@@ -31,6 +31,24 @@ window.logger = function(){
     }
 };
 
+jarves.template = new nunjucks.Environment();
+
+jarves.template.addFilter('substr', function(str, start, len) {
+    return str.substr(start, len);
+});
+
+jarves.getCompiledTemplate = function(src, env, path, eagerCompile) {
+    return new nunjucks.Template(src, jarves.getTemplate(), path, eagerCompile)
+};
+
+/**
+ *
+ * @returns {nunjucks.Environment}
+ */
+jarves.getTemplate = function() {
+    return jarves.template;
+};
+
 /**
  * Opens the frontend in a new tab.
  */
@@ -848,9 +866,11 @@ jarves.getObjectLabelByItem = function(objectKey, item, mode, overwriteDefinitio
         return item[label];
     }
 
-    template = twig({data: template});
+    template = jarves.getObjectLabelByItemTemplates[template] || nunjucks.compile(template);
     return template.render(item);
 };
+
+jarves.getObjectLabelByItemTemplates = {};
 
 /**
  * Returns all labels for a object item.

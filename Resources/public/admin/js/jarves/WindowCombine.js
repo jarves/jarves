@@ -12,6 +12,8 @@ jarves.WindowCombine = new Class({
 
     combineCheckboxes: [],
 
+    compiledTemplates: {},
+
     renderLayout: function() {
         this.win.content.addClass('jarves-WindowList-combine-content');
 
@@ -1645,7 +1647,7 @@ jarves.WindowCombine = new Class({
             layout += "</div>";
         }
 
-        var template = twig({data: layout});
+        var template = this.compiledTemplates[layout] || (this.compiledTemplates = jarves.getCompiledTemplate(layout));
         var data = jarves.getObjectLabels(this.classProperties.columns, pItem, this.classProperties['object'], true);
 
         var item = new Element('div', {

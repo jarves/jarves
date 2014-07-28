@@ -2,6 +2,8 @@
 
 .jarves-objectTree {
     position: relative;
+    display: inline-block;
+    min-width: 100%;
 }
 
 .jarves-objectTree-root {
@@ -13,10 +15,15 @@
 
 .jarves-objectTree-objects {
     display: none;
+    min-width: 100%;
+}
+
+.jarves-objectTree-objects-show {
+    display: inline-block;
 }
 
 .jarves-objectTree-top-dummy {
-    height: 30px;
+    height: 25px;
 }
 
 .jarves-objectTree-pages {
@@ -51,12 +58,14 @@
 .jarves-objectTree-item,
 .jarves-objectTree-drag-box {
     position: relative;
-    display: block;
-    line-height: 30px;
-    height: 30px;
+    line-height: 25px;
+    height: 25px;
     color: #444;
     cursor: default;
     white-space: nowrap;
+    display: inline-block;
+    min-width: 100%;
+    box-sizing: border-box;
 }
 
 .jarves-objectTree-item-hover,
@@ -79,6 +88,11 @@
 .jarves-objectTree-item-children {
     display: none;
     position: relative;
+    min-width: 100%;
+}
+
+.jarves-objectTree-item-children-show {
+    display: inline-block;
 }
 
 .jarves-objectTree-item-masks {
@@ -93,7 +107,7 @@
 }
 
 .jarves-objectTree-item-masks:before {
-    font-size: 16px;
+    font-size: 14px;
     /* color: #22638E; */
 }
 

@@ -471,7 +471,9 @@ abstract class ORMAbstract
      */
     public function getParent($pk, $options = null)
     {
-        throw new \Exception(sprintf('getParent is not implemented.'));
+        if ($parentId = $this->getParentId($pk)) {
+            return $this->getItem($pk, $options);
+        }
     }
 
     /**
@@ -481,6 +483,7 @@ abstract class ORMAbstract
      * Each entry has to have also '_objectKey' as value.
      *
      * @param array $pk
+     *
      * @return array
      *
      */

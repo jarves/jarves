@@ -245,7 +245,7 @@ jarves.ObjectTree = new Class({
             this.container.addEvent('scroll', this.setRootPosition.bind(this));
         }
 
-        this.paneObjects.setStyle('display', 'block');
+        this.paneObjects.addClass('jarves-objectTree-objects-show')
 
         this.paneRoot = new Element('div', {
             'class': 'jarves-objectTree-root'
@@ -917,7 +917,7 @@ jarves.ObjectTree = new Class({
     },
 
     toggleChildren: function(pA) {
-        if (pA.childrenContainer.getStyle('display') != 'block') {
+        if (!pA.childrenContainer.hasClass('jarves-objectTree-item-children-show')) {
             this.openChildren(pA);
         } else {
             this.closeChildren(pA);
@@ -927,7 +927,7 @@ jarves.ObjectTree = new Class({
     closeChildren: function(pA) {
         var item = pA.objectEntry;
 
-        pA.childrenContainer.setStyle('display', '');
+        pA.childrenContainer.removeClass('jarves-objectTree-item-children-show');
         pA.toggler.set('html', '&#xe0c3;');
         this.opens[ pA.pk ] = false;
         this.setRootPosition();
@@ -942,9 +942,7 @@ jarves.ObjectTree = new Class({
 
         pA.toggler.set('html', '&#xe0c4;');
         if (true === pA.childrenLoaded) {
-            pA.childrenContainer.setStyles({
-                'display': 'block'
-            });
+            pA.childrenContainer.addClass('jarves-objectTree-item-children-show');
             this.opens[ pA.pk ] = true;
             this.saveOpens();
         } else {
@@ -997,7 +995,7 @@ jarves.ObjectTree = new Class({
 
                 if (pAndOpen) {
                     pA.toggler.set('html', '&#xe0c4;');
-                    pA.childrenContainer.setStyle('display', 'block');
+                    pA.childrenContainer.addClass('jarves-objectTree-item-children-show');
                     this.opens[ pA.pk ] = true;
                     this.saveOpens();
                 }

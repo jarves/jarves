@@ -740,9 +740,11 @@ class ACL
                 if (!$match && $acl['sub']) {
                     // we need to check if a parent matches this $acl as we have sub=true
                     $parentItem = $this->getObjects()->get($objectKey, $currentObjectPk);
+                    $parentCondition = Condition::create($acl['constraint_code']);
+                    $parentOptions['fields'] = $parentCondition->extractFields();
 
-                    while ($parentItem = $this->getObjects()->getParent($objectKey, $this->getObjects()->getObjectPk($objectKey, $parentItem))) {
-                        if ($acl['constraint_type'] == 2 && $this->getObjects()->satisfy($parentItem, $acl['constraint_code'])) {
+                    while ($parentItem = $this->getObjects()->getParent($objectKey, $this->getObjects()->getObjectPk($objectKey, $parentItem), $parentOptions)) {
+                        if ($acl['constraint_type'] == 2 && $parentCondition->satisfy($parentItem)) {
                             $match = true;
                             break;
                         } else if ($acl['constraint_type'] == 1 && $acl['constraint_code'] == $this->getObjects()->getObjectUrlId($objectKey, $parentItem)) {

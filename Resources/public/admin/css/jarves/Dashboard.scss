@@ -2,84 +2,111 @@
 @import "../variables";
 
 .jarves-Dashboard-active {
-  /* background-color: #22638E; */
+    /* background-color: #22638E; */
 }
 
 .jarves-Dashboard {
-  padding: 5px;
+    padding: 5px;
 }
 
 $width = 255px;
+$height = 215px;
 $margin = 10px;
 
 .jarves-Dashboard-widget {
-  background-color: #f7f7f7;
-  margin: $margin;
-  display: block;
-  float: left;
-  width: $width;
-  height: 215px;
-  color: #444;
-  border: 1px solid #e7e7e7;
+    display: block;
+    float: left;
+    width: 100%;
+    height: $height;
+    color: #444;
+    overflow: hidden;
+}
 
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
+.jarves-Dashboard-widget-content {
+    border: 1px solid #e7e7e7;
+    background-color: #f7f7f7;
 
-  border-radius: 4px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    border-radius: 4px;
+    margin: $margin;
+    height: $height - $margin;
 }
 
 .jarves-Dashboard-widget h3 {
-  margin: 0;
-  padding: 5px;
-  font-size: 13px;
+    margin: 0;
+    padding: 5px;
+    font-size: 13px;
 
-  -moz-border-radius-topleft: 5px;
-  -moz-border-radius-topright: 5px;
-  border-top-right-radius: 5px;
-  border-top-left-radius: 5px;
-  -webkit-border-top-right-radius: 5px;
-  -webkit-border-top-left-radius: 5px;
-}
-@for $i from 2 through 10 {
-.jarves-Dashboard-widget-grid-#{$i} {
-  width: ($width*$i)+((2*$margin));
-}
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -webkit-border-top-left-radius: 5px;
 }
 
+$containerPadding = 900-775; //actual window width - container width of our container
 
-.jarves-Dashboard-widget-block {
-  width: 100%;
-  height: auto;
+@for $i from $width through 3500 {
+    @if $i % strip-unit($width) == 0 {
+        $mediaWidth = $i + $containerPadding;
+        @media all and (min-width: #{$mediaWidth}px) {
+            @for $j from 1 through $i / $width {
+                .jarves-Dashboard-widget-grid-#{$j} {
+                    width: percentage($width*$j / $i);
+                }
+            }
+        }
+    }
+}
+
+
+//@for $i from 1 through 10 {
+//.jarves-Dashboard-widget-grid-#{$i} {
+//  width: ($width*$i)+((2*$margin));
+//}
+//}
+
+.jarves-Dashboard-widget-grid-full {
+    width: 100%;
+    height: auto;
+    float: none;
+}
+
+.jarves-Dashboard-widget-grid-full .jarves-Dashboard-widget-content {
+    height: auto;
 }
 
 .jarves-Dashboard-newsFeed-item {
-  color: gray;
-  padding: 9px 15px;
-  border-bottom: 1px solid #eee;
-  clear: both;
-  @include animation(kaDashboardNewsItemFadeIn 0.4s);
+    color: gray;
+    padding: 9px 15px;
+    border-bottom: 1px solid #eee;
+    clear: both;
+    @include animation(kaDashboardNewsItemFadeIn 0.4s);
 }
 
 @include keyframes(kaDashboardNewsItemFadeIn) {
-  from {
-    opacity: 0.4;
-    background-color: #FCFBD4;
-  }
-  to {
-    opacity: 1;
-    background-color: transparent;
-  }
+    from {
+        opacity: 0.4;
+        background-color: #FCFBD4;
+    }
+    to {
+        opacity: 1;
+        background-color: transparent;
+    }
 }
 
 .jarves-Dashboard-newsFeed-item:last-child {
-  border-bottom: 0;
+    border-bottom: 0;
 }
 
 .jarves-Dashboard-newsFeed-item-user,
 .jarves-Dashboard-newsFeed-item-object-label,
 .jarves-Dashboard-newsFeed-item-label {
-  color: $mainColor;
+    color: $mainColor;
 }
 
 .jarves-Dashboard-newsFeed-item-label,
@@ -93,28 +120,28 @@ $margin = 10px;
 }
 
 .jarves-Dashboard-newsFeed-item-date {
-  float: right;
-  color: #b4b4b4;
+    float: right;
+    color: #b4b4b4;
 }
 
 .jarves-Dashboard-newsFeed-item-verb {
-  margin: 0 4px;
+    margin: 0 4px;
 }
 
 .jarves-Dashboard-newsFeed-item-object-label {
-  margin-right: 4px;
+    margin-right: 4px;
 }
 
 .jarves-Dashboard-newsFeed-item-message {
-  padding: 10px;
-  padding-left: 25px;
+    padding: 10px;
+    padding-left: 25px;
 }
 
 .diff-html-removed {
-  color: #AC8E8E;
+    color: #AC8E8E;
 }
 
 .diff-html-added {
-  color: #50A050;
-  text-decoration: none;
+    color: #50A050;
+    text-decoration: none;
 }

@@ -42,11 +42,11 @@ jarves.Select = new Class({
     backupedTitle: false,
 
     labelTemplate: ''
-    + '{% if jarvesSelectImage is defined %}'
-        + '{% if jarvesSelectImage|slice(0,1) == "#" %}<span class="{{ jarvesSelectImage|slice(1) }}">{% endif %}'
-        + '{% if jarvesSelectImage|slice(0,1) != "#" %}<img src="{{ jarvesSelectImage }}" />{% endif %}'
+    + '{% if jarvesSelectImage %}'
+        + '{% if jarvesSelectImage[0] == "#" %}<span class="{{ jarvesSelectImage|substr(1) }}">{% endif %}'
+        + '{% if jarvesSelectImage[0] != "#" %}<img src="{{ jarvesSelectImage }}" />{% endif %}'
     + '{% endif %}' + '{{ label }}'
-    + '{% if jarvesSelectImage is defined and jarvesSelectImage|slice(0,1) == "#" %}</span>{% endif %}',
+    + '{% if jarvesSelectImage and jarvesSelectImage[0] == "#" %}</span>{% endif %}',
 
     options: {
 
@@ -772,8 +772,10 @@ jarves.Select = new Class({
             oriData.label = '';
         }
 
-        template = twig({data: template});
-        return template.render(oriData);
+        if (!this.compiledTemplate) {
+            this.compiledTemplate = jarves.getCompiledTemplate(template);
+        }
+        return this.compiledTemplate.render(oriData);
     },
 
     selectFirst: function(offset, internal) {

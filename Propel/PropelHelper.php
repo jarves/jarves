@@ -133,10 +133,6 @@ class PropelHelper
         $content .= $this->generateClasses();
         $content .= $this->updateSchema();
 
-//        self::cleanup();
-
-        $content .= "\n\n<b style='color: green'>Done.</b>";
-
         return $content;
     }
 
