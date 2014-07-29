@@ -277,7 +277,7 @@ class ContentRender
      */
     public function renderContent($content, $parameters = array())
     {
-        $type = $content->getType();
+        $type = $content->getType() ?: 'text';
         $title = sprintf('Content %d [%s]', $content->getId(), $type);
         $this->stopwatch->start($title, 'Jarves');
 
