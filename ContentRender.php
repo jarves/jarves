@@ -275,7 +275,7 @@ class ContentRender
      * @return string
      * @throws ContentTypes\TypeNotFoundException
      */
-    public function renderContent(ContentInterface $content, $parameters = array())
+    public function renderContent($content, $parameters = array())
     {
         $type = $content->getType();
         $title = sprintf('Content %d [%s]', $content->getId(), $type);
