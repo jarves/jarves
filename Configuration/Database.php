@@ -42,6 +42,24 @@ class Database extends Model
     }
 
     /**
+     * @return Connection[]
+     */
+    public function getSlaveConnections()
+    {
+        $result = [];
+
+        if (null !== $this->connections) {
+            foreach ($this->connections as $connection) {
+                if ($connection->isSlave()) {
+                    $result[] = $connection;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * @param Connection[] $connections
      */
     public function setConnections(array $connections = null)

@@ -67,6 +67,37 @@ class Connection extends Model
      */
     protected $slave = false;
 
+    public function getDsn($withLogin = false)
+    {
+        $type = strtolower($this->getType());
+        $dsn = $type;
+
+        if ('sqlite' === $dsn) {
+            $file = $this->getServer();
+            if (substr($file, 0, 1) != '/') {
+                $file = realpath($file);
+            }
+            $dsn .= ':' . $file;
+        } else {
+            $dsn .= ':host=' . $this->getServer();
+            if ($this->getPort()) {
+                $dsn .= ';port=' . $this->getPort();
+            }
+            $dsn .= ';dbname=' . $this->getName();
+        }
+
+        if ('sqlite' !== $type && $withLogin) {
+            if ($this->getUsername()) {
+                $dsn .= ';user=' . $this->getUsername();
+            }
+            if ($this->getPassword()) {
+                $dsn .= ';password=' . urlencode($this->getPassword());
+            }
+        }
+
+        return $dsn;
+    }
+
     /**
      * @param boolean $persistent
      */

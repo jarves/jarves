@@ -124,7 +124,7 @@ class PropelHelper
      */
     public function fullGenerator()
     {
-        $this->writeXmlConfig();
+        $this->writeConfig();
         $this->writeBuildProperties();
         $this->collectSchemas();
 
@@ -145,7 +145,7 @@ class PropelHelper
         $tmp = $this->getJarves()->getKernel()->getCacheDir() . '/';
 
         if (!file_exists($tmp . 'propel')) {
-            self::writeXmlConfig();
+            self::writeConfig();
             self::writeBuildProperties();
             self::collectSchemas();
         }
@@ -231,73 +231,55 @@ class PropelHelper
         return $result;
 
     }
-
-    public function getDsn(Connection $connection)
-    {
-        $type = strtolower($connection->getType());
-        $dsn = $type;
-
-        if ('sqlite' === $dsn) {
-            $file = $connection->getServer();
-            if (substr($file, 0, 1) != '/') {
-                $file = realpath($file);
-            }
-            $dsn .= ':' . $file;
-        } else {
-            $dsn .= ':host=' . $connection->getServer();
-            $dsn .= ';dbname=' . $connection->getName();
-        }
-
-        return $dsn;
-    }
-
     /**
      * @param Connection $connection
+     * @param Connection[] $slaves
      *
      * @return string
      */
-    public function getConnectionXml(Connection $connection)
+    public function getConnectionYml(Connection $connection, $slaves)
     {
-        $dsn = $this->getDsn($connection);
+        $dsn = $connection->getDsn();
 
-        $user = htmlspecialchars($connection->getUsername(), ENT_XML1);
-        $password = htmlspecialchars($connection->getPassword(), ENT_XML1);
-        $dsn = htmlspecialchars($dsn, ENT_XML1);
-
+        $user = var_export($connection->getUsername(), true);
+        $password = var_export($connection->getPassword(), true);
+        $dsn = var_export($dsn, true);
+        $adapter = strtolower($connection->getType());
         $persistent = $connection->getPersistent() ? 'true' : 'false';
 
-        $xml = "
-    <connection>
-        <dsn>$dsn</dsn>
-        <user>$user</user>
-        <password>$password</password>
+        foreach ($slaves as $slave) {
+            $slaves .= '
+          - dsn: ' . $slave->getDsn(true);
 
-        <options>
-            <option id=\"ATTR_PERSISTENT\">$persistent</option>
-        </options>";
+        }
 
-//        if ('mysql' === $type) {
-//            $xml .= '
-//        <attributes>
-//            <option id="ATTR_EMULATE_PREPARES">true</option>
-//        </attributes>
-//            ';
-//        }
+        $slaves = '';
 
-        $xml .= '
-        <settings>
-            <setting id="charset">utf8</setting>
-        </settings>
-    </connection>';
+        $yml = <<<EOF
+default:
+        adapter: $adapter
+        classname: \Propel\Runtime\Connection\PropelPDO
+        dsn: $dsn
+        user: $user
+        password: $password
+        options:
+          ATTR_PERSISTENT: $persistent
+        attributes:
+          ATTR_EMULATE_PREPARES: true
+        settings:
+          charset: utf8
+        slaves:
+          $slaves
+EOF;
 
-        return $xml;
+        return $yml;
     }
 
     /**
      * @return bool
      * @throws \Exception
      */
-    public function writeXmlConfig()
+    public function writeConfig()
     {
         $fs = $this->getJarves()->getCacheFileSystem();
         $path = $this->getJarves()->getKernel()->getCacheDir();
@@ -309,41 +291,32 @@ class PropelHelper
         }
 
         $config = $this->getJarves()->getSystemConfig();
-        $adapter = $config->getDatabase()->getMainConnection()->getType();
 
-        $xml = '<?xml version="1.0"?>
-<config>
-    <propel>
-        <datasources default="default">
-            <datasource id="default">
-                <adapter>' . $adapter . '</adapter>
-                ';
+        $connections = self::getConnectionYml($config->getDatabase()->getMainConnection(), $config->getDatabase()->getSlaveConnections());
 
-        foreach ($config->getDatabase()->getConnections() as $connection) {
-            if (!$connection->isSlave()) {
-                $xml .= self::getConnectionXml($connection) . "\n";
-            }
-        }
+        $yml = <<<EOF
+propel:
+  general:
+    project: jarves
 
-        $slaves = '';
-        foreach ($config->getDatabase()->getConnections() as $connection) {
-            if ($connection->isSlave()) {
-                $slaves .= self::getConnectionXml($connection) . "\n";
-            }
-        }
+  database:
+    connections:
+      $connections
+  generator:
+    defaultConnection: default
+    connections:
+      - default
+    objectModel:
+      disableIdentifierQuoting: true
 
-        if ($slaves) {
-            $xml .= "<slaves>$slaves</slaves>";
-        }
+  runtime:
+    defaultConnection: default
+    connections:
+      - default
 
-        $xml .= '
-            </datasource>
-        </datasources>
-    </propel>
-</config>';
+EOF;
 
-        $fs->write('propel/runtime-conf.xml', $xml);
-        $fs->write('propel/buildtime-conf.xml', $xml);
+        $fs->write('propel/propel.yml', $yml);
 
         return true;
     }
@@ -382,7 +355,7 @@ class PropelHelper
     public function getManagerConfig(Connection $connection)
     {
         $config = [];
-        $config['dsn'] = $this->getDsn($connection);
+        $config['dsn'] = $connection->getDsn();
         $config['user'] = (string)$connection->getUsername();
         $config['password'] = (string)$connection->getPassword();
 
@@ -508,8 +481,8 @@ class PropelHelper
     {
         $tmp = $this->getJarves()->getKernel()->getCacheDir() . '/';
 
-        if (!file_exists($tmp . 'propel/runtime-conf.xml')) {
-            self::writeXmlConfig();
+        if (!file_exists($tmp . 'propel/propel.yml')) {
+            self::writeConfig();
             self::writeBuildProperties();
             self::collectSchemas();
         }
