@@ -194,7 +194,7 @@ class Field extends Model
      *
      * @var bool
      */
-    protected $tableItem = false;
+    protected $tableItem;
 
     /**
      * If this fields is disabled or not.
