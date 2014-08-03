@@ -104,31 +104,31 @@ jarves.AdminInterface = new Class({
         return this.appContainerAnimation;
     },
 
-    openDashboard: function() {
-        if (this.checkLastSystemDialog('dashboard')) return;
-        this.lastSystemDialog = new jarves.SystemDialog(this.getDialogContainer(), {
-            autoClose: true
-        });
-
-        this.btnOpenDashboard.addClass('jarves-main-menu-active');
-        this.lastSystemDialog.addEvent('close', function(){
-            this.btnOpenDashboard.removeClass('jarves-main-menu-active');
-        }.bind(this));
-
-        new Element('h1', {
-            text: t('Dashboard')
-        }).inject(this.lastSystemDialog.getContentContainer());
-
-        this.lastSystemDialog.center();
-
-        var dashboardInstance = new jarves.Dashboard(this.lastSystemDialog.getContentContainer());
-
-        this.lastSystemDialog.addEvent('closed', function() {
-            dashboardInstance.destroy();
-            this.clearLastSystemDialog();
-        }.bind(this));
-
-    },
+//    openDashboard: function() {
+//        if (this.checkLastSystemDialog('dashboard')) return;
+//        this.lastSystemDialog = new jarves.SystemDialog(this.getDialogContainer(), {
+//            autoClose: true
+//        });
+//
+//        this.btnOpenDashboard.addClass('jarves-main-menu-active');
+//        this.lastSystemDialog.addEvent('close', function(){
+//            this.btnOpenDashboard.removeClass('jarves-main-menu-active');
+//        }.bind(this));
+//
+//        new Element('h1', {
+//            text: t('Dashboard')
+//        }).inject(this.lastSystemDialog.getContentContainer());
+//
+//        this.lastSystemDialog.center();
+//
+//        var dashboardInstance = new jarves.Dashboard(this.lastSystemDialog.getContentContainer());
+//
+//        this.lastSystemDialog.addEvent('closed', function() {
+//            dashboardInstance.destroy();
+//            this.clearLastSystemDialog();
+//        }.bind(this));
+//
+//    },
 
     getDialogContainer: function(){
         if (!this.dialogContainer) {
@@ -157,114 +157,50 @@ jarves.AdminInterface = new Class({
         delete this.lastSystemDialogId;
     },
 
-    openApps: function() {
-        if (this.checkLastSystemDialog('apps')) return;
-
-        this.lastSystemDialog = new jarves.SystemDialog(this.getDialogContainer(), {
-            autoClose: true
-        });
-
-
-        this.mainMenuStartButton.addClass('jarves-main-menu-active');
-        this.lastSystemDialog.addEvent('close', function(){
-            this.mainMenuStartButton.removeClass('jarves-main-menu-active');
-        }.bind(this));
-
-        var lastBundleName;
-        var currentContainer;
-
-        var addLink = function(item, parentContainer) {
-            if (item.system) {
-                return;
-            }
-
-            var currentBundleName = item.fullPath.split('/')[0];
-
-            if (lastBundleName) {
-                if (lastBundleName != currentBundleName) {
-                    currentContainer = new Element('div', {
-                        'class': 'jarves-menu-dialog-cat'
-                    }).inject(parentContainer);
-
-                    if (jarves.getConfig(currentBundleName)) {
-                        new Element('h2', {
-                            'class': 'light',
-                            text: jarves.getConfig(currentBundleName).label || jarves.getConfig(currentBundleName).name
-                        }).inject(currentContainer);
-                    }
-                }
-            } else {
-                currentContainer = new Element('div', {
-                    'class': 'jarves-menu-dialog-cat'
-                }).inject(parentContainer);
-                new Element('h1', {
-                    text: 'Apps'
-                }).inject(currentContainer, 'before');
-            }
-
-            lastBundleName = currentBundleName;
-
-            var a = new Element('a', {
-                'class': 'jarves-menu-dialog-link',
-                text: item.label
-            })
-                .addEvent('click', function(){
-                    this.lastSystemDialog.close();
-                    jarves.wm.open(item.fullPath);
-                }.bind(this))
-                .inject(currentContainer);
-
-            if (item.icon) {
-                var icon = new Element('span').inject(a, 'top');
-                if ('#' === item.icon.substr(0, 1)) {
-                    icon.addClass(item.icon.substr(1));
-                } else {
-                    new Element('img', {
-                        src: jarves.mediaPath(item.icon)
-                    }).inject(icon);
-                }
-            }
-
-        }.bind(this);
-
-        Object.each(this.menuItems, function(item, path) {
-            addLink(item, this.lastSystemDialog.getContentContainer());
-        }.bind(this));
-
-        this.lastSystemDialog.addEvent('closed', function() {
-            this.clearLastSystemDialog();
-        }.bind(this));
-
-        this.lastSystemDialog.center();
-    },
+//    openApps: function() {
+//        if (this.checkLastSystemDialog('apps')) return;
+//
+//        this.lastSystemDialog = new jarves.SystemDialog(this.getDialogContainer(), {
+//            autoClose: true
+//        });
+//
+//
+//        this.mainMenuStartButton.addClass('jarves-main-menu-active');
+//        this.lastSystemDialog.addEvent('close', function(){
+//            this.mainMenuStartButton.removeClass('jarves-main-menu-active');
+//        }.bind(this));
+//
+//
+//        this.lastSystemDialog.center();
+//    },
 
     getMenuItems: function() {
         return this.menuItems;
     },
 
-    openSettings: function() {
-        if (this.checkLastSystemDialog('settings')) return;
-        this.lastSystemDialog = new jarves.SystemDialog(this.getDialogContainer(), {
-            autoClose: true
-        });
-
-        this.btnOpenSystem.addClass('jarves-main-menu-active');
-        this.lastSystemDialog.addEvent('close', function(){
-            this.btnOpenSystem.removeClass('jarves-main-menu-active');
-        }.bind(this));
-
-        var system = new jarves.System(this.lastSystemDialog.getContentContainer(), this.getMenuItems());
-
-        system.addEvent('click', function(){
-            this.lastSystemDialog.close();
-        }.bind(this));
-
-        this.lastSystemDialog.addEvent('closed', function() {
-            this.clearLastSystemDialog();
-        }.bind(this));
-
-        this.lastSystemDialog.center(true);
-    },
+//    openSettings: function() {
+//        if (this.checkLastSystemDialog('settings')) return;
+//        this.lastSystemDialog = new jarves.SystemDialog(this.getDialogContainer(), {
+//            autoClose: true
+//        });
+//
+//        this.btnOpenSystem.addClass('jarves-main-menu-active');
+//        this.lastSystemDialog.addEvent('close', function(){
+//            this.btnOpenSystem.removeClass('jarves-main-menu-active');
+//        }.bind(this));
+//
+//        var system = new jarves.System(this.lastSystemDialog.getContentContainer(), this.getMenuItems());
+//
+//        system.addEvent('click', function(){
+//            this.lastSystemDialog.close();
+//        }.bind(this));
+//
+//        this.lastSystemDialog.addEvent('closed', function() {
+//            this.clearLastSystemDialog();
+//        }.bind(this));
+//
+//        this.lastSystemDialog.center(true);
+//    },
 
     createLayout: function() {
         this.border = new Element('div', {
@@ -272,122 +208,48 @@ jarves.AdminInterface = new Class({
         }).inject(document.body);
 
         this.mainMenuTop = new Element('div', {
-            'class': 'jarves-main-menu-top'
+            'class': 'jarves-main-menu-left'
         }).inject(this.border);
 
-        this.mainMenu = new Element('div', {
-            'class': 'jarves-main-menu'
-        }).inject(this.mainMenuTop);
-
-        this.btnOpenDashboard = new Element('a',{
-            'class': 'icon-stats-up',
-            text: tc('mainMenu', 'Dashboard')
-        })
-            .addEvent('click', this.openDashboard)
-            .inject(this.mainMenu);
-
-        this.mainMenuStartButton = new Element('a',{
-            'class': 'jarves-main-menu-start',
-            text: tc('mainMenu', 'Apps')
-        })
-            .addEvent('click', this.openApps)
-            .inject(this.mainMenu);
-
-        new Element('img', {
-            'class': 'jarves-main-menu-start',
-            src: _path + 'bundles/jarves/admin/images/jarves-icon.png'
-        })
-            .inject(this.mainMenuStartButton, 'top');
-
-        this.btnOpenSystem = new Element('a',{
-            'class': 'icon-cog-2',
-            text: tc('mainMenu', 'System')
-        })
-            .addEvent('click', this.openSettings)
-            .inject(this.mainMenu);
-
         this.mainMenuTopLogo = new Element('img', {
-            'class': 'jarves-main-menu-top-logo',
+            'class': 'jarves-main-menu-left-logo',
             src: _path + 'bundles/jarves/admin/images/logo.png'
         }).inject(this.mainMenuTop);
 
-//        this.mainMenuTopNavigation = new Element('div', {
-//            'class': 'jarves-main-menu-top-navigation'
-//        }).inject(this.mainMenuTop);
-//
         this.mainMenuUser = new Element('div', {
             'class': 'jarves-main-menu-user'
         }).inject(this.mainMenuTop);
-//
-//        this.mainMenuRight = new Element('div', {
-//            'class': 'jarves-main-menu-additional'
-//        }).inject(this.mainMenuTop);
-//
-//        this.mainLinks = new Element('div', {
-//            'class': 'jarves-mainLinks jarves-scrolling'
-//        }).inject(this.mainMenu);
 
-//        this.mainLinksSplitter = new jarves.LayoutSplitter(this.mainMenu, 'right');
+        this.mainMenuContainer = new Element('div', {
+            'class': 'jarves-main-menu'
+        }).inject(this.mainMenuTop);
 //
-//        document.id(this.mainLinksSplitter).addClass('jarves-mainLinks-splitter');
-
-//        this.mainLinksSplitter = new Element('div', {
-//            'class': 'jarves-mainLinks-splitter'
-//        }).inject(this.mainMenu);
-
-//        this.mainLinksSplitterText = new Element('div', {
-//            html: '&bullet; &bullet; &bullet;'
-//        }).inject(this.mainLinksSplitter);
-//
-//        this.mainLinkSplitterArrow = new Element('a', {
-//            'class': 'icon-arrow-left-5'
-//        }).inject(this.mainLinksSplitter);
-//
-//        this.mainLinkSplitterArrow.addEvent('click', this.toggleMainLinks);
-//
-//        this.mainMenuIconBar = new Element('div', {
-//            'class': 'jarves-iconbar-item'
-//        }).inject(this.mainMenuRight);
-//
-//        this.openFrontendBtn = new Element('a', {
-//            'class': 'icon-eye',
-//            title: t('Open Frontend'),
-//            href: 'javascript: ;'
+//        this.btnOpenDashboard = new Element('a',{
+//            'class': 'icon-stats-up',
+//            text: tc('mainMenu', 'Dashboard')
 //        })
-//            .addEvent('click', function() {
-//                jarves.openFrontend();
-//            })
-//            .inject(this.mainMenuIconBar);
+//            .addEvent('click', this.openDashboard)
+//            .inject(this.mainMenu);
 //
-//        this.openSearchIndexBtn = new Element('a', {
-//            'class': 'icon-search-8',
-//            title: t('Search engine index'),
-//            href: 'javascript: ;'
+//        this.mainMenuStartButton = new Element('a',{
+//            'class': 'jarves-main-menu-start',
+//            text: tc('mainMenu', 'Apps')
 //        })
-//            .addEvent('click', function() {
-//                jarves.openSearchContext();
-//            })
-//            .inject(this.mainMenuIconBar);
+//            .addEvent('click', this.openApps)
+//            .inject(this.mainMenu);
 //
-//        this.clearCacheBtn = new Element('a', {
-//            'class': 'icon-trashcan-6',
-//            title: t('Clear cache'),
-//            href: 'javascript: ;'
+//        new Element('img', {
+//            'class': 'jarves-main-menu-start',
+//            src: _path + 'bundles/jarves/admin/images/jarves-icon.png'
 //        })
-//            .addEvent('click', function() {
-//                this.clearCache();
-//            }.bind(this))
-//            .inject(this.mainMenuIconBar);
+//            .inject(this.mainMenuStartButton, 'top');
 //
-//        this.openHelpBtn = new Element('a', {
-//            'class': 'icon-info-5',
-//            title: t('Help'),
-//            href: 'javascript: ;'
+//        this.btnOpenSystem = new Element('a',{
+//            'class': 'icon-cog-2',
+//            text: tc('mainMenu', 'System')
 //        })
-//            .addEvent('click', function() {
-//                jarves.clearCache();
-//            })
-//            .inject(this.mainMenuIconBar);
+//            .addEvent('click', this.openSettings)
+//            .inject(this.mainMenu);
 
         this.appContainer = new Element('div', {
             'class': 'jarves-app-container'
@@ -397,22 +259,22 @@ jarves.AdminInterface = new Class({
             'class': 'jarves-main-menu-wm-tabs'
         }).inject(this.appContainer)
 
-        if (this.options.frontPage) {
-            this.desktopContainer = this.border;
-
-            var y;
-            window.addEvent('scroll', function() {
-                if ((y = window.getScroll().y) > 0) {
-                    this.mainMenu.setStyle('top', y);
-                } else {
-                    this.mainMenu.setStyle('top', 0);
-                }
-            }.bind(this));
-        } else {
+//        if (this.options.frontPage) {
+//            this.desktopContainer = this.border;
+//
+//            var y;
+//            window.addEvent('scroll', function() {
+//                if ((y = window.getScroll().y) > 0) {
+//                    this.mainMenu.setStyle('top', y);
+//                } else {
+//                    this.mainMenu.setStyle('top', 0);
+//                }
+//            }.bind(this));
+//        } else {
             this.desktopContainer = new Element('div', {
                 'class': 'jarves-desktop jarves-admin jarves-scrolling'
             }).inject(this.appContainer);
-        }
+//        }
 
         //this.setupMainLinksDragger();
     },
@@ -448,6 +310,7 @@ jarves.AdminInterface = new Class({
             return;
         }
         this.createLayout();
+        this.renderMenu();
 
         this.border.setStyles({'display': 'block'});
         this.mainMenuUser.empty();
@@ -480,6 +343,7 @@ jarves.AdminInterface = new Class({
                 jarves.wm.open('users/users/editMe', {values: {id: window._userId}});
             })
             .inject(this.mainMenuUser);
+
 
         this.logoutButton = new jarves.Button(t('Logout'))
             .addEvent('click', function() {
@@ -546,9 +410,6 @@ jarves.AdminInterface = new Class({
             }
         };
 
-        window.addEvent('mouseup', function() {
-            this.destroyLinkContext();
-        }.bind(this));
 
         //        window.addEvent('stream', function (res) {
         //            document.id('serverTime').set('html', res.time);
@@ -565,9 +426,9 @@ jarves.AdminInterface = new Class({
 
         jarves.wm.handleHashtag();
 
-        if (!window.location.hash) {
-            this.openDashboard();
-        }
+//        if (!window.location.hash) {
+//            this.openDashboard();
+//        }
         jarves.wm.updateWindowBar();
     },
 
@@ -577,24 +438,6 @@ jarves.AdminInterface = new Class({
      */
     getHelpSystem: function() {
         return this.helpsystem;
-    },
-
-    toggleMainbar: function() {
-        if (this.border.getStyle('top').toInt() != 0) {
-            this.border.tween('top', 0);
-            document.id('arrowUp').setStyle('background-color', 'transparent');
-            document.id('arrowUp').morph({
-                'top': 0,
-                left: 0
-            });
-        } else {
-            this.border.tween('top', -76);
-            document.id('arrowUp').setStyle('background-color', '#399BC7');
-            document.id('arrowUp').morph({
-                'top': 61,
-                left: 32
-            });
-        }
     },
 
     doMiniSearch: function() {
@@ -1156,62 +999,6 @@ jarves.AdminInterface = new Class({
         //});
     },
 
-    toggleModuleMenuIn: function(pOnlyStay) {
-        if (this.lastModuleMenuOutTimer) {
-            clearTimeout(this.lastModuleMenuOutTimer);
-        }
-
-        if (this.ModuleMenuOutOpen == true) {
-            return;
-        }
-
-        if (pOnlyStay == true) {
-            return;
-        }
-
-        this.ModuleMenuOutOpen = false;
-        this._moduleMenu.set('tween', {transition: Fx.Transitions.Quart.easeOut, onComplete: function() {
-            this.ModuleMenuOutOpen = true;
-        }});
-        this._moduleMenu.tween('left', 0);
-        this.moduleToggler.store('active', true);
-        this.moduleItems.setStyle('right', 0);
-        //this.moduleItemsScroller.setStyle('left', 188);
-        //this.moduleItemsScrollerContainer.setStyle('right', 0);
-    },
-
-    toggleModuleMenuOut: function(pForce) {
-
-        //if( !this.ModuleMenuOutOpen && pForce != true )
-        //	return;
-
-        if (this.lastModuleMenuOutTimer) {
-            clearTimeout(this.lastModuleMenuOutTimer);
-        }
-
-        this.ModuleMenuOutOpen = false;
-
-        this.lastModuleMenuOutTimer = (function() {
-            this._moduleMenu.set('tween', {transition: Fx.Transitions.Quart.easeOut, onComplete: function() {
-                this.ModuleMenuOutOpen = false;
-            }});
-            this._moduleMenu.tween('left', (this._moduleMenu.getSize().x - 33) * -1);
-            this.moduleToggler.store('active', false);
-            this.moduleItems.setStyle('right', 40);
-            //this.moduleItemsScrollerContainer.setStyle('right', 50);
-            this.destroyLinkContext();
-        }).delay(300, this);
-
-    },
-
-    toggleModuleMenu: function() {
-        if (this.moduleToggler.retrieve('active') != true) {
-            this.toggleModuleMenuIn();
-        } else {
-            this.toggleModuleMenuOut();
-        }
-    },
-
     loadMenu: function(cb) {
         if (this.lastLoadMenuReq) {
             this.lastLoadMenuReq.cancel();
@@ -1220,6 +1007,7 @@ jarves.AdminInterface = new Class({
         this.lastLoadMenuReq =
             new Request.JSON({url: _pathAdmin + 'admin/backend/menus', noCache: true, onComplete: function(res) {
                 this.menuItems = res.data;
+                this.renderMenu();
                 if (cb) {
                     cb(res.data);
                 }
@@ -1227,25 +1015,10 @@ jarves.AdminInterface = new Class({
     },
 
     renderMenu: function() {
-        return;
+        if (!this.mainMenuContainer) return;
 
-        this.mainLinks.empty();
-
-        if (this.additionalMainMenu) {
-            this.additionalMainMenu.destroy();
-            this.additionalMainMenuContainer.destroy();
-            delete this.additionalMainMenu;
-        }
-
-        this.removedMainMenuItems = [];
-        delete this.mainMenuItems;
-
-        Object.each(this.menuItems, function(item, path) {
-            this.addAdminLink(item, path);
-        }.bind(this));
-
-        jarves.wm.handleHashtag();
-        jarves.wm.updateWindowBar();
+        this.mainMenuContainer.empty();
+        this.mainMenu = new jarves.MainMenu(this.mainMenuContainer, this.getMenuItems());
     },
 
     showDashboard: function(show) {
@@ -1264,503 +1037,6 @@ jarves.AdminInterface = new Class({
             this.dashboardVisible = show;
         }
 
-    },
-
-    makeMenu: function(pToggler, pMenu, pCalPosition, pOffset) {
-
-        pMenu.setStyle('display', 'none');
-
-        var showMenu = function() {
-            pMenu.setStyle('display', 'block');
-            pMenu.store('this.makeMenu.canHide', false);
-
-            if (pCalPosition) {
-                var pos = pToggler.getPosition(this.border);
-                if (pOffset) {
-                    if (pOffset.x) {
-                        pos.x += pOffset.x;
-                    }
-                    if (pOffset.y) {
-                        pos.y += pOffset.y;
-                    }
-                }
-                pMenu.setStyles({
-                    'left': pos.x,
-                    'top': pos.y
-                });
-            }
-        };
-
-        var _hideMenu = function() {
-            if (pMenu.retrieve('this.makeMenu.canHide') != true) {
-                return;
-            }
-            pMenu.setStyle('display', 'none');
-        };
-
-        var hideMenu = function() {
-            pMenu.store('this.makeMenu.canHide', true);
-            _hideMenu.delay(250);
-        };
-
-        pToggler.addEvent('mouseover', showMenu);
-        pToggler.addEvent('mouseout', hideMenu);
-        pMenu.addEvent('mouseover', showMenu);
-        pMenu.addEvent('mouseout', hideMenu);
-
-        //this.additionalMainMenu, this.additionalMainMenuContainer, true, {y: 80});
-    },
-
-//    addAdminHeadline: function(pExtKey) {
-//        var config = jarves.getConfig(pExtKey);
-//        if (config) {
-//
-//            new Element('div', {
-//                'class': 'jarves-main-menu-splitter'
-//            }).inject(this.mainLinks);
-//
-//            new Element('h2', {
-//                'class': 'jarves-main-menu-headline',
-//                text: config.title,
-//                title: config.desc ? config.desc : ''
-//            }).inject(this.mainLinks);
-//        }
-//    },
-
-    addTempLink: function(pWin) {
-        var entryPoint = pWin.getEntryPointDefinition();
-
-        var mlink = new Element('a', {
-            text: entryPoint.label + ' » ' + pWin.getTitle(),
-            'class': 'jarves-main-menu-item'
-        }).inject(this.mainTempLinks);
-
-        var entryPoint = pWin.getEntryPointDefinition();
-
-        if (entryPoint.icon) {
-            mlink.addClass('jarves-main-menu-item-hasIcon');
-            if (entryPoint.icon.substr(0, 1) == '#') {
-                mlink.addClass(entryPoint.icon.substr(1));
-            } else {
-                mlink.addClass('jarves-main-menu-item-hasImageAsIcon');
-                new Element('img', {
-                    src: _path + entryPoint.icon
-                }).inject(mlink, 'top');
-            }
-        } else {
-            mlink.addClass('jarves-main-menu-item-hasNoIcon');
-        }
-
-        mlink.activeWindowInformationContainer = new Element('div', {
-            'class': 'jarves-main-menu-item-window-information-container'
-        }).inject(mlink);
-
-        return mlink;
-    },
-
-    addAdminLink: function(entryPoint, path) {
-        if (entryPoint.system) {
-            return;
-        }
-
-        var link = new Element('a', {
-            'class': 'jarves-main-menu-item'
-        });
-        new Element('span', {
-            text: entryPoint.label
-        }).inject(link);
-        var module = entryPoint.fullPath.split('/')[0];
-
-        if ('admin/dashboard' === path) {
-            this.dashboardLink = link;
-        }
-
-        if (this.lastAddedAdminLinkModule && this.lastAddedAdminLinkModule != module) {
-            var splitter = new Element('div', {
-                'class': 'jarves-main-menu-splitter'
-            }).inject(this.mainLinks);
-            if (jarves.getConfig(module)) {
-                new Element('h2', {
-                    'class': 'jarves-main-menu-title',
-                    text: jarves.getConfig(module).label || jarves.getConfig(module).name
-                }).inject(this.mainLinks);
-            }
-        }
-
-        this.lastAddedAdminLinkModule = module;
-
-        link.activeWindowInformationContainer = new Element('div', {
-            'class': 'jarves-main-menu-item-window-information-container'
-        }).inject(link);
-
-        if (entryPoint.icon) {
-            link.addClass('jarves-main-menu-item-hasIcon');
-            if (entryPoint.icon.substr(0, 1) == '#') {
-                link.addClass(entryPoint.icon.substr(1));
-            } else {
-                link.addClass('jarves-main-menu-item-hasImageAsIcon');
-                new Element('img', {
-                    src: _path + entryPoint.icon
-                }).inject(link, 'top');
-            }
-        } else {
-            link.addClass('jarves-main-menu-item-hasNoIcon');
-        }
-
-        link.activeWindowInformationContainer = new Element('div', {
-            'class': 'jarves-main-menu-item-window-information-container'
-        }).inject(link);
-
-        this._links[path] = {
-            level: 'main',
-            object: link,
-            link: entryPoint,
-            path: path,
-            title: entryPoint.title
-        };
-
-        if (1 == entryPoint.level) {
-            if ('admin' === module && 0 !== entryPoint.fullPath.indexOf('admin/system')) {
-                link.inject(this.mainMenuTopNavigation);
-            } else {
-                link.inject(this.mainLinks);
-
-                link.subMenu = new Element('div', {
-                    'class': 'jarves-menu-item-children'
-                }).inject(this.mainLinks);
-            }
-        } else {
-            var parentCode = path.substr(0, path.lastIndexOf('/'));
-            var parent = this._links[parentCode];
-            if (parent) {
-                parent = parent.object;
-                link.inject(parent.subMenu);
-
-                if (!parent.hasClass('jarves-menu-item-hasChilds')) {
-                    parent.addClass('jarves-menu-item-hasChilds');
-
-                    var childOpener = new Element('a', {
-                        'class': 'jarves-menu-item-childopener'
-                    }).inject(parent);
-
-                    new Element('img', {
-                        src: _path + 'bundles/jarves/admin/images/jarves-mainmenu-item-tree_minus.png'
-                    }).inject(childOpener);
-
-                    childOpener.addEvent('click', function(e) {
-                        e.stop();
-                        if ('block' !== parent.subMenu.getStyle('display')) {
-                            parent.subMenu.setStyle('display', 'block');
-                        } else {
-                            parent.subMenu.setStyle('display', 'none');
-                        }
-                    });
-                }
-            }
-        }
-        link.store('entryPoint', entryPoint);
-        this.linkClick(link);
-    },
-
-    getMenuItem: function(pEntryPoint) {
-        return this._links[pEntryPoint];
-    },
-
-    destroyLinkContext: function() {
-
-        if (this._lastLinkContextDiv) {
-            this._lastLinkContextDiv.destroy();
-            this._lastLinkContextDiv = null;
-        }
-
-    },
-
-    linkClick: function(link) {
-        var entryPoint = link.retrieve('entryPoint');
-
-        if (['iframe', 'list', 'combine', 'custom', 'add', 'edit'].indexOf(entryPoint.type) != -1) {
-
-            var item = this._links[entryPoint.fullPath];
-            var link = item.object;
-
-            link.addEvent('click', function(e) {
-                this.destroyLinkContext();
-
-                if (e.rightClick) {
-                    return;
-                }
-                e.stopPropagation();
-                e.stop();
-
-                var windows = [];
-                Object.each(jarves.wm.windows, function(pwindow) {
-                    if (!pwindow) {
-                        return;
-                    }
-                    if (pwindow.code == entryPoint.code && pwindow.module == entryPoint.module) {
-                        windows.include(pwindow);
-                    }
-                }.bind(this));
-
-                if (windows.length == 0) {
-                    //none exists, just open
-                    jarves.wm.open(entryPoint.fullPath);
-                } else if (windows.length == 1) {
-                    //only one is open, bring it to front
-                    windows[0].toFront();
-                } else if (windows.length > 1) {
-                    //open contextmenu
-                    e.stopPropagation();
-                    e.stop();
-                    this._openLinkContext(link);
-                }
-
-                delete windows;
-            }.bind(this));
-
-            link.addEvent('mouseup', function(e) {
-
-                if (e.rightClick) {
-                    e.stopPropagation();
-                    this._openLinkContext(link);
-                }
-            }.bind(this));
-        }
-    },
-
-    _openLinkContext: function(pLink) {
-
-        if (this._lastLinkContextDiv) {
-            this._lastLinkContextDiv.destroy();
-            this._lastLinkContextDiv = null;
-        }
-
-        var pos = {x: 0, y: 0};
-        var corner = false;
-
-        var parent = pLink.object.getParent('.jarves-module-menu');
-        if (!parent) {
-            parent = document.body;
-        }
-        var div = new Element('div', {
-            'class': 'jarves-linkcontext-main jarves-linkcontext-sub'
-        }).inject(parent);
-
-        corner = new Element('div', {
-            'class': 'jarves-tooltip-corner-top',
-            style: 'height: 15px; width: 30px;'
-        }).inject(div);
-
-        pos = pLink.object.getPosition(pLink.object.getParent('.jarves-module-menu'));
-        var size = pLink.object.getSize();
-
-        div.setStyle('left', pos.x);
-        div.setStyle('top', pos.y + size.y);
-        if (pLink.level == 'main') {
-
-            corner.setStyle('bottom', 'auto');
-            corner.setStyle('top', -8);
-        }
-
-        this._lastLinkContextDiv = div;
-
-        var windows = [];
-        Object.each(jarves.wm.windows, function(pwindow) {
-            if (!pwindow) {
-                return;
-            }
-            if (pwindow.code == pLink.code && pwindow.module == pLink.module) {
-                windows.include(pwindow);
-            }
-        }.bind(this));
-
-        var opener = new Element('a', {
-            text: _('Open new %s').replace('%s', "'" + pLink.title + "'"),
-            'class': 'jarves-linkcontext-opener'
-        }).addEvent('click',
-            function() {
-                jarves.wm.openWindow(pLink.module + '/' + pLink.code);
-                this._lastLinkContextDiv.destroy();
-            }).inject(div);
-
-        if (windows.length == 0) {
-            opener.addClass('jarves-linkcontext-last');
-        }
-
-        var lastItem = false;
-        windows.each(function(window) {
-            lastItem = new Element('a', {
-                text: '#' + window.id + ' ' + window.getTitle()
-            }).addEvent('click',
-                function() {
-                    window.toFront();
-                    this._lastLinkContextDiv.destroy();
-                }).inject(div);
-        });
-
-        if (pLink.level == 'sub') {
-            var bsize = div.getSize();
-            var wsize = window.getSize();
-            var mtop = div.getPosition(document.body).y;
-
-            if (mtop + bsize.y > wsize.y) {
-                mtop = pos.y - bsize.y;
-                div.setStyle('top', mtop);
-                corner.set('class', 'jarves-tooltip-corner');
-                corner.setStyle('bottom', '-15px');
-            } else {
-                corner.setStyle('top', '-7px');
-            }
-            if (lastItem) {
-                lastItem.addClass('jarves-linkcontext-last');
-            }
-        }
-
-        delete windows;
-
-    },
-
-    startSearchCrawlerInfo: function(pHtml) {
-        this.stopSearchCrawlerInfo();
-
-        this.startSearchCrawlerInfoMenu = new Element('div', {
-            'class': 'jarves-updates-menu',
-            style: 'left: 170px; width: 177px;'
-        }).inject(this.border);
-
-        this.startSearchCrawlerInfoMenuHtml = new Element('div', {
-            html: pHtml
-        }).inject(this.startSearchCrawlerInfoMenu);
-
-        this.startSearchCrawlerProgressLine = new Element('div', {
-            style: 'position: absolute; bottom: 1px; left: 4px; width: 0px; height: 1px; background-color: #444;'
-        }).inject(this.startSearchCrawlerInfoMenu);
-
-        this.startSearchCrawlerInfoMenu.tween('top', 48);
-    },
-
-    setSearchCrawlerInfo: function(pHtml) {
-        this.startSearchCrawlerInfoMenuHtml.set('html', pHtml);
-    },
-
-    stopSearchCrawlerInfo: function(pOutroText) {
-        if (!this.startSearchCrawlerInfoMenu) {
-            return;
-        }
-
-        var doOut = function() {
-            this.startSearchCrawlerInfoMenu.tween('top', 17);
-        }.bind(this);
-
-        if (pOutroText) {
-            this.startSearchCrawlerInfoMenuHtml.set('html', pOutroText);
-            doOut.delay(2000);
-        } else {
-            doOut.call();
-        }
-
-    },
-
-    setSearchCrawlerProgress: function(pPos) {
-        var maxLength = 177 - 8;
-        var pos = maxLength * pPos / 100;
-        this.startSearchCrawlerProgressLine.set('tween', {duration: 100});
-        this.startSearchCrawlerProgressLine.tween('width', pos);
-    },
-
-    stopSearchCrawlerProgres: function() {
-        this.startSearchCrawlerProgressLine.set('tween', {duration: 10});
-        this.startSearchCrawlerProgressLine.tween('width', 0);
-    },
-
-    openSearchContextClose: function() {
-        if (this.openSearchContextLast) {
-            this.openSearchContextLast.destroy();
-        }
-
-    },
-
-    openSearchContext: function() {
-        var button = this.openSearchIndexBtn;
-
-        this.openSearchContextClose();
-
-        this.openSearchContextLast = new Element('div', {
-            'class': 'jarves-searchcontext'
-        }).inject(this.border);
-
-        var pos = button.getPosition(this.border);
-        var size = this.border.getSize();
-        var right = size.x - pos.x;
-
-        this.openSearchContextLast.setStyle('right', right - 30);
-
-        new Element('img', {
-            'class': 'jarves-searchcontext-arrow',
-            src: _path + 'bundles/jarves/admin/images/jarves-tooltip-corner-top.png'
-        }).inject(this.openSearchContextLast);
-
-        this.openSearchContextContent = new Element('div', {
-            'class': 'jarves-searchcontext-content'
-        }).inject(this.openSearchContextLast);
-
-        this.openSearchContextBottom = new Element('div', {
-            'class': 'jarves-searchcontext-bottom'
-        }).inject(this.openSearchContextLast);
-
-        new jarves.Button(t('Indexed pages')).addEvent('click',
-            function() {
-                jarves.wm.open('jarvesbundle/system/searchIndexerList');
-            }).inject(this.openSearchContextBottom);
-
-        this.openSearchContextClearIndex = new jarves.Button(_('Clear index')).addEvent('click',
-            function() {
-                this.openSearchContextClearIndex.startTip(_('Clearing index ...'));
-
-                new Request.JSON({url: _pathAdmin +
-                    'admin/backend/searchIndexer/clearIndex', noCache: 1, onComplete: function(pRes) {
-                    this.openSearchContextClearIndex.stopTip(_('Done'));
-                }.bind(this)}).post();
-            }).inject(this.openSearchContextBottom);
-
-        new Element('a', {
-            style: 'position: absolute; right: 5px; top: 3px; text-decoration: none; font-size: 13px;',
-            text: 'x',
-            title: _('Close'),
-            href: 'javascript: ;'
-        }).addEvent('click', this.openSearchContextClose).inject(this.openSearchContextLast);
-
-        this.openSearchContextLoad();
-    },
-
-    openSearchContextLoad: function() {
-        this.openSearchContextContent.set('html',
-            '<br /><br /><div style="text-align: center; color: gray;">' + _('Loading ...') + '</div>');
-
-        //todo
-        this.openSearchContextTable = new jarves.Table([
-            [_('Domain'), 190],
-            [_('Indexed pages')]
-        ]);
-
-        new Request.JSON({url: _pathAdmin + 'admin/backend/searchIndexer/getIndexedPages4AllDomains',
-            noCache: 1,
-            onComplete: function(pRes) {
-
-                this.openSearchContextContent.empty();
-
-                this.openSearchContextTable.inject(this.openSearchContextContent);
-
-                if (pRes) {
-                    pRes.each(function(domain) {
-                        this.openSearchContextTable.addRow(
-                            [domain.domain + '<span style="color:gray"> (' + domain.lang + ')</span>',
-                                domain.indexedcount]);
-                    });
-                }
-
-            }
-        }.bind(this)).post();
     },
 
     displayNewUpdates: function(pModules) {
@@ -1791,30 +1067,30 @@ jarves.AdminInterface = new Class({
         this.newUpdatesMenu.tween('top', 48);
     },
 
-    buildClipboardMenu: function() {
-        this.clipboardMenu = new Element('div', {
-            'class': 'jarves-clipboard-menu'
-        }).inject(this.mainMenu, 'before');
-    },
+//    buildClipboardMenu: function() {
+//        this.clipboardMenu = new Element('div', {
+//            'class': 'jarves-clipboard-menu'
+//        }).inject(this.mainMenu, 'before');
+//    },
 
-    buildUploadMenu: function() {
-        this.uploadMenu = new Element('div', {
-            'class': 'jarves-upload-menu',
-            styles: {
-                height: 22
-            }
-        }).addEvent('mouseover',
-            function() {
-                this.tween('height', this.scrollHeight);
-            }).addEvent('mouseout',
-            function() {
-                this.tween('height', 22);
-            }).inject(this.mainMenu, 'before');
-
-        this.uploadMenuInfo = new Element('div', {
-            'class': 'jarves-upload-menu-info'
-        }).inject(this.uploadMenu);
-    },
+//    buildUploadMenu: function() {
+//        this.uploadMenu = new Element('div', {
+//            'class': 'jarves-upload-menu',
+//            styles: {
+//                height: 22
+//            }
+//        }).addEvent('mouseover',
+//            function() {
+//                this.tween('height', this.scrollHeight);
+//            }).addEvent('mouseout',
+//            function() {
+//                this.tween('height', 22);
+//            }).inject(this.mainMenu, 'before');
+//
+//        this.uploadMenuInfo = new Element('div', {
+//            'class': 'jarves-upload-menu-info'
+//        }).inject(this.uploadMenu);
+//    },
 
     check4Updates: function() {
         if (window._session.userId == 0) {

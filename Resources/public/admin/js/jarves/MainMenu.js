@@ -1,19 +1,15 @@
-jarves.System = new Class({
+jarves.MainMenu = new Class({
     Implements: [Events],
 
     items: {},
 
-    initialize: function(pContainer, pMenuItems) {
-        this.container = pContainer;
-        this.menuItems = pMenuItems;
+    initialize: function(container, validMenuItems) {
+        this.container = container;
+        this.menuItems = validMenuItems;
         this.createLayout();
     },
 
     createLayout: function() {
-        new Element('h1', {
-            text: t('System')
-        }).inject(this.container);
-
         this.addSection('JarvesBundle');
         Object.each(jarves.settings.configs, function(config, key) {
             if ('JarvesBundle' !== key) {
@@ -28,30 +24,31 @@ jarves.System = new Class({
         var container, subContainer;
 
         if (config.entryPoints) {
-            var systemEntryPoints = this.collectSystemEntryPoints(config.entryPoints);
+            var systemEntryPoints = this.collectEntryPoints(config.entryPoints);
             if (0 < Object.getLength(systemEntryPoints)) {
 
                 container = new Element('div', {
-                    'class': 'jarves-system-cat'
+                    'class': 'jarves-mainMenu-cat'
                 }).inject(this.container);
+
 
 //                if ('JarvesBundle' !== bundleName) {
                     new Element('h2', {
-                        'class': 'light',
                         text: config.label || config.name
                     }).inject(container);
 //                }
+                this.prepareCat(container, bundleName);
 
                 Object.each(systemEntryPoints, function(entryPoint) {
                     if (!entryPoint.type) {
                         subContainer = new Element('div', {
-                            'class': 'jarves-system-cat'
+                            'class': 'jarves-mainMenu-cat'
                         }).inject(this.container);
 
                         new Element('h2', {
-                            'class': 'light',
                             text: entryPoint.label
                         }).inject(subContainer);
+                        this.prepareCat(subContainer);
 
                         Object.each(entryPoint.children, function(subEntryPoint) {
                             this.addLink(bundleName, subEntryPoint, subContainer);
@@ -65,6 +62,30 @@ jarves.System = new Class({
         }
     },
 
+    prepareCat: function(cat, bundleName) {
+
+        var toggle = new Element('a', {
+            'class': 'jarves-mainMenu-cat-toggle icon-arrow-down-3',
+            title: t('Hide')
+        }).inject(cat);
+
+        cat.getElement('h2').addEvent('click', function() {
+            if (cat.hasClass('jarves-mainMenu-cat-hidden')) {
+                //show it
+                cat.removeClass('jarves-mainMenu-cat-hidden');
+                toggle.addClass('icon-arrow-down-3');
+                toggle.removeClass('icon-arrow-left-3');
+                toggle.set('title', t('Hide'));
+            } else {
+                cat.addClass('jarves-mainMenu-cat-hidden');
+                toggle.removeClass('icon-arrow-down-3');
+                toggle.addClass('icon-arrow-left-3');
+                toggle.set('title', t('Show'));
+            }
+        });
+
+    },
+
     addLink: function(bundleName, entryPoint, container) {
         var fullPath = bundleName + '/' + entryPoint.fullPath;
         if (this.items[fullPath]) {
@@ -76,7 +97,7 @@ jarves.System = new Class({
         }
 
         var item = new Element('a', {
-            'class': 'jarves-system-settings-link',
+            'class': 'jarves-mainMenu-link ' + (entryPoint.icon && entryPoint.icon.indexOf('#') === 0 ?  entryPoint.icon.substr(1) : ''),
             text: entryPoint.label
         })
             .addEvent('click', function() {
@@ -86,33 +107,29 @@ jarves.System = new Class({
             .inject(container);
 
         if (entryPoint.icon) {
-            var span = new Element('span', {
-                'class': entryPoint.icon.indexOf('#') === 0 ?  entryPoint.icon.substr(1) : null
-            }).inject(item, 'top');
-
             if (-1 === entryPoint.icon.indexOf('#')) {
                 new Element('img', {
                     src: jarves.mediaPath(entryPoint.icon)
-                }).inject(span);
+                }).inject(item, top);
             }
         }
 
         this.items[fullPath] = item;
     },
 
-    collectSystemEntryPoints: function(entryPoints) {
+    collectEntryPoints: function(entryPoints) {
         var result = {};
 
         Object.each(entryPoints, function(entryPoint, key) {
             if (entryPoint.children) {
-                result = Object.merge(result, this.collectSystemEntryPoints(entryPoint.children));
+                result = Object.merge(result, this.collectEntryPoints(entryPoint.children));
             }
 
             if (!entryPoint.link) return;
 
-            if (entryPoint.system) {
+//            if (entryPoint.system) {
                 result[key] = entryPoint;
-            }
+//            }
 
         }, this);
 

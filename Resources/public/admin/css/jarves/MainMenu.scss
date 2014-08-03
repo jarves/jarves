@@ -1,0 +1,63 @@
+@import "../base";
+
+a.jarves-mainMenu-link {
+    display: block;
+    padding: 5px;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    color: #f9f9f9;
+    padding-left: 15px;
+    @include transition (all 0.5s);
+}
+
+a.jarves-mainMenu-link:before {
+    margin-right: 10px;
+    font-weight: 300;
+    font-size: 11px;
+}
+
+.jarves-mainMenu-link > span {
+    display: inline-block;
+    padding-bottom: 7px;
+}
+
+.jarves-mainMenu-cat {
+    margin-top: 10px;
+    position: relative;
+    border-top: 1px solid darken($mainColor, 3%);
+}
+
+
+.jarves-mainMenu-cat h2 {
+    margin: 0;
+    padding: 7px 0;
+    padding-top: 9px;
+}
+
+.jarves-mainMenu-cat h2:hover {
+    background-color: darken($mainColor, 3%);
+}
+
+.jarves-mainMenu-cat-hidden a.jarves-mainMenu-link {
+    display: none;
+}
+
+.jarves-mainMenu-cat h2 {
+    font-size: 12px;
+    color: white;
+}
+
+a.jarves-mainMenu-link:hover {
+    color: white;
+    background-color: darken($mainColor, 5%);
+}
+
+a.jarves-mainMenu-cat-toggle {
+    color: #596C85;
+    display: inline-block;
+    font-size: 11px;
+    position: absolute;
+    right: 8px;
+    top: 10px;
+}

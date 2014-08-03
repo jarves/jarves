@@ -1,10 +1,12 @@
+@import "../base";
+
 .jarves-tabGroup,
 .jarves-tabGroup-small {
     position: relative;
     white-space: nowrap;
-    background-color: #E4E4E4;
     padding-bottom: 0;
     overflow: hidden;
+    text-align: center;
 }
 
 .jarves-tabGroup:first-child,
@@ -19,11 +21,21 @@
     padding: 0 10px;
     min-width: 20px;
     cursor: default;
-    line-height: 42px;
-    height: 42px;
-    font-size: 15px;
-    border-right: 1px solid #c9c9c9;
-    background-color: #E4E4E4;
+
+    line-height: 30px;
+    height: 30px;
+    font-size: 13px;
+
+    border-bottom: 1px solid #D8D8D8;
+    border-right: 1px solid #D1D1D1;
+    border-top: 1px solid #E2E2E2;
+    background-color: #f9f9f9;
+}
+
+.jarves-admin .jarves-tabGroup-small a.jarves-tabGroup-item {
+    line-height: 25px;
+    height: 25px;
+    font-size: 12px;
 }
 
 .jarves-tabGroup-item-with-image:before {
@@ -38,13 +50,24 @@
     height: 12px;
 }
 
+.jarves-admin a.jarves-tabGroup-item-first {
+     border-top-left-radius: 5px;
+     border-bottom-left-radius: 5px;
+     border-left: 1px solid #DFDFDF;
+ }
+
+.jarves-admin a.jarves-tabGroup-item-last {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+ }
+
 .jarves-admin a.jarves-tabGroup-item:hover {
-    color: #222;
-    background-color: #f1f1f1;
+    background-color: #fafafa;
+    color: #111;
 }
 
 .jarves-admin a.jarves-tabGroup-item-active,
 .jarves-admin a.jarves-tabGroup-item-active:hover  {
     position: relative;
-    background-color: #f9f9f9;
+    background-color: #E4E4E4;
 }

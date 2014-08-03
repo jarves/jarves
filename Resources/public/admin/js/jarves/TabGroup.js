@@ -3,10 +3,10 @@ jarves.TabGroup = new Class({
 
     'className': 'jarves-tabGroup',
 
-    initialize: function (pParent) {
+    initialize: function (container) {
         this.box = new Element('div', {
             'class': this.className
-        }).inject(pParent);
+        }).inject(container);
 
         this.addEvent('addButton', this.checkButtons.bind(this));
     },
@@ -35,7 +35,7 @@ jarves.TabGroup = new Class({
         this.box.setStyle('display', 'inline');
     },
 
-    rerender: function (pFirst) {
+    rerender: function (first) {
 
         var items = this.box.getElements('a');
 
@@ -65,104 +65,109 @@ jarves.TabGroup = new Class({
 
     },
 
-    addButton: function (pTitle, pIcon, pOnClick) {
+    addButton: function (title, onClick, icon) {
 
         var button = new Element('a', {
             'class': 'jarves-tabGroup-item',
-            title: pTitle,
-            text: pTitle
+            title: title,
+            text: title
         }).inject(this.box);
 
-        if (typeOf(pIcon) == 'string' && pIcon) {
-            if (pIcon.substr(0, 1) == '#') {
-                button.addClass(pIcon.substr(1));
+        if ('function' === typeOf(icon)) {
+            var oldOnClick = onClick;
+            onClick = icon;
+            icon = oldOnClick;
+        }
+
+        if ('string' === typeOf(icon) && icon) {
+            if (icon.substr(0, 1) == '#') {
+                button.addClass(icon.substr(1));
             } else {
                 new Element('img', {
-                    src: jarves.mediaPath(pIcon),
+                    src: jarves.mediaPath(icon),
                     height: 14
                 }).inject(button, 'top');
             }
             button.addClass('jarves-tabGroup-item-with-image');
         }
 
-        this.setMethods(button, pOnClick);
+        this.setMethods(button, onClick);
         this.fireEvent('addButton');
 
         return button;
-
     },
 
-    setPressed: function (pPressed) {
+    setPressed: function (isPressed) {
 
         this.box.getChildren().each(function (button) {
-            button.setPressed(pPressed);
+            button.setPressed(isPressed);
         });
 
     },
 
-    setMethods: function (pButton, pOnClick) {
-        if (pOnClick) {
-            pButton.addEvent('click', pOnClick);
+    setMethods: function (buttonElement, onClick) {
+        if (onClick) {
+            buttonElement.addEvent('click', onClick);
         }
 
-        pButton.hide = function () {
-            if (pButton.isHidden()) return;
-            pButton.store('visible', false);
-            pButton.setStyle('display', 'none');
+        buttonElement.hide = function () {
+            if (buttonElement.isHidden()) return;
+            buttonElement.store('visible', false);
+            buttonElement.setStyle('display', 'none');
             this.rerender();
 
-            if (pButton.tabPane && pButton.isPressed()) {
+            if (buttonElement.tabPane && buttonElement.isPressed()) {
                 var items = this.box.getChildren('a');
-                var index = items.indexOf(pButton);
+                var index = items.indexOf(buttonElement);
                 if (items[index + 1]) {
-                    pButton.tabPane.to(index + 1);
+                    buttonElement.tabPane.to(index + 1);
                 }
                 if (items[index - 1]) {
-                    pButton.tabPane.to(index - 1);
+                    buttonElement.tabPane.to(index - 1);
                 }
             }
         }.bind(this);
 
-        pButton.show = function () {
-            if (!pButton.isHidden()) return;
-            pButton.store('visible', true);
-            pButton.setStyle('display');
+        buttonElement.show = function () {
+            if (!buttonElement.isHidden()) return;
+            buttonElement.store('visible', true);
+            buttonElement.setStyle('display');
             this.rerender();
         }.bind(this);
 
-        pButton.isHidden = function () {
-            return pButton.getStyle('display') == 'none';
+        buttonElement.isHidden = function () {
+            return buttonElement.getStyle('display') == 'none';
         };
 
-        pButton.startTip = function (pText) {
+        buttonElement.startTip = function (pText) {
             if (!this.toolTip) {
-                this.toolTip = new jarves.Tooltip(pButton, pText);
+                this.toolTip = new jarves.Tooltip(buttonElement, pText);
             }
             this.toolTip.setText(pText);
             this.toolTip.show();
         }
 
-        pButton.stopTip = function (pText) {
+        buttonElement.stopTip = function (pText) {
             if (this.toolTip) {
                 this.toolTip.stop(pText);
             }
         }
 
-        pButton.setPressed = function (pPressed) {
+        buttonElement.setPressed = function (pPressed) {
             if (pPressed) {
-                pButton.addClass('jarves-tabGroup-item-active');
-                pButton.fireEvent('show');
+                buttonElement.addClass('jarves-tabGroup-item-active');
+                buttonElement.fireEvent('show');
             } else {
-                pButton.removeClass('jarves-tabGroup-item-active');
-                pButton.fireEvent('hide');
+                buttonElement.removeClass('jarves-tabGroup-item-active');
+                buttonElement.fireEvent('hide');
             }
         }
 
-        pButton.isPressed = function () {
-            return pButton.hasClass('jarves-tabGroup-item-active');
+        buttonElement.isPressed = function () {
+            return buttonElement.hasClass('jarves-tabGroup-item-active');
         }
 
-        pButton.store('visible', true);
+        buttonElement.store('visible', true);
         this.rerender(true);
     }
 });

@@ -24,16 +24,15 @@
 .jarves-tabPane-full > .kwindow-win-tabPane-pane > .jarves-tabPane-pane,
 .jarves-tabPane-full {
     position: absolute;
-    left: 0px;
-    right: 0px;
-    top: 0px;
-    bottom: 0px;
-    margin: 0px;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: 0;
 }
 
-.jarves-tabPane-full > .jarves-tabGroup-small {
-    position: relative;
-    top: 0px;
+.jarves-tabGroup {
+    padding-top: 5px;
 }
 
 .jarves-tabPane-full > .kwindow-win-tabPane-pane > .jarves-tabPane-pane {

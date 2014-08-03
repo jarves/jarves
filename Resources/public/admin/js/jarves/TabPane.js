@@ -13,7 +13,7 @@ jarves.TabPane = new Class({
             this.buttonGroup = pUseThisAsWindowHeader.addSmallTabGroup();
             this.box.addClass('jarves-tabPane-tabsInWindowHeader');
         } else {
-            this.buttonGroup = new jarves.SmallTabGroup(this.box);
+            this.buttonGroup = new jarves.TabGroup(this.box);
         }
 
         this.paneBox = new Element('div', {'class': 'kwindow-win-tabPane-pane'}).inject(this.box);

@@ -47,8 +47,10 @@ jarves.WindowCombine = new Class({
 
         this.mainLeft.set('tween', {duration: 100});
 
-        this.mainRight = this.contentLayout.getCell(1, 3);
-        this.mainRight.addClass('jarves-WindowList-combine-right');
+
+        this.mainRight = new Element('div', {
+            'class': 'jarves-WindowList-combine-right'
+        }).inject(this.contentLayout.getCell(1, 3), 'top');
 
         this.combineLeftToggler = new Element('a', {
             'class': 'icon-arrow-left-5 jarves-windowCombine-left-toggler'
@@ -60,8 +62,8 @@ jarves.WindowCombine = new Class({
             this.displayCombineLeft(!this.isCombineLeftVisible());
         }.bind(this));
 
-        this.contentLayout.getCell(1, 2).destroy();
-        this.contentLayout.getTd(1, 2);
+        this.contentLayout.getCell(1, 2).addClass('jarves-windowCombine-splitter');
+//        this.contentLayout.getTd(1, 2);
 
         if (this.classProperties.asNested) {
             this.treeContainer = new Element('div', {

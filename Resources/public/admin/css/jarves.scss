@@ -1,3 +1,5 @@
+@import "base";
+
 html, body {
     margin: 0;
     padding: 0;
@@ -68,13 +70,12 @@ $base-font-size: 13px;
         overflow: hidden;
     }
 
-    a[class^="icon-"],
-    a[class*=" icon-"]{
-        color: #444;
-        text-decoration: none;
-        line-height: 28px;
-        padding: 0 2px;
-    }
+//    a[class^="icon-"],
+//    a[class*=" icon-"]{
+//        text-decoration: none;
+//        line-height: 28px;
+//        padding: 0 2px;
+//    }
 
     td {
         vertical-align: top;
@@ -240,8 +241,8 @@ $base-font-size: 13px;
 
 .jarves-app-container {
     position: absolute;
-    left: 0;
-    top: 61px;
+    left: 200px;
+    top: 0;
     right: 0;
     bottom: 0;
 
@@ -358,30 +359,26 @@ a.jarves-wm-tab:hover {
 
 .jarves-main-menu {
     position: absolute;
+    top: 120px;
+    left: 0;
+    bottom: 50px;
+    right: 0;
+    text-align: center;
+    overflow: hidden;
+}
+
+.jarves-main-menu-left {
+    position: absolute;
     top: 0;
     left: 0;
     bottom: 0;
-    right: 0;
-    overflow: hidden;
+    width: 200px;
     text-align: center;
-}
-
-.jarves-main-menu-top {
-    height: 60px;
-    line-height: 60px;
-    color: white;
-    background-color: #22638e;
-    border-bottom: 1px solid black;
-    position: relative;
+    background-color: $mainColor;
+    overflow: auto;
 }
 .jarves-main-menu-user {
-    color: white;
-    padding: 0 15px;
-    height: 60px;
-    float: right;
-    border-left: 1px solid #39739a;
-    line-height: 18px;
-    position: relative;
+    text-align: right;
 }
 
 .jarves-main-menu-user > h2 {
@@ -524,35 +521,6 @@ a.jarves-menu-dialog-link:hover {
     margin: 14px;
 }
 
-.jarves-admin {
-
-    .jarves-main-menu a {
-        position: relative;
-        top: 2px;
-        cursor: pointer;
-        display: inline-block;
-        padding: 6px 11px;
-        border-top-right-radius: 4px;
-        border-top-left-radius: 4px;
-        background-color: #175074;
-        color: white;
-        line-height: 14px;
-    }
-
-    .jarves-main-menu a.jarves-main-menu-active,
-    .jarves-main-menu a.jarves-main-menu-active:hover {
-        background-color: #173244;
-    }
-
-    .jarves-main-menu a:before {
-        padding-right: 5px;
-    }
-
-    .jarves-main-menu a:hover {
-        background-color: #47799B;
-    }
-}
-
 a.jarves-main-menu-start {
     width: 40px;
 }
@@ -561,12 +529,8 @@ img.jarves-main-menu-start {
     width: 30px;
 }
 
-.jarves-main-menu-top-logo {
-    height: 28px;
-    margin-left: 15px;
-    position: relative;
-    top: 15px;
-    vertical-align: top;
+.jarves-main-menu-left-logo {
+    margin: 25px auto;
 }
 
 .jarves-search-query-icon {
