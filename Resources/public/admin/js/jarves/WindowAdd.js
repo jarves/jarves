@@ -311,7 +311,7 @@ jarves.WindowAdd = new Class({
         this.addDialogFieldContainer = this.addDialogLayout.getContentRow(1);
 
         this.openAddItemPageBottom = new Element('div', {
-            'class': 'kwindow-win-buttonBar'
+            'class': 'jarves-Window-win-buttonBar'
         }).inject(this.addDialogLayout.getContentRow(2));
 
     },

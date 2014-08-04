@@ -26,14 +26,14 @@ jarves.WindowCombine = new Class({
         }).inject(this.win.content);
 
         //this.combineContainer.setStyle('opacity', 0);
-        this.win.getTitleGroupContainer().setStyle('margin-bottom', 10);
+//        this.win.getTitleGroupContainer().setStyle('margin-bottom', 10);
 
         this.renderLayoutTable();
 
         this.contentLayout = new jarves.Layout(this.combineContainer, {
             layout: [
                 {
-                    columns: [300, 15, null]
+                    columns: [200, 40, null]
                 }
             ],
             splitter: [
@@ -52,17 +52,18 @@ jarves.WindowCombine = new Class({
             'class': 'jarves-WindowList-combine-right'
         }).inject(this.contentLayout.getCell(1, 3), 'top');
 
+        this.displayCombineLeft(true);
+
+        this.contentLayout.getCell(1, 2).addClass('jarves-windowCombine-splitter');
+        document.id(this.contentLayout.getSplitter(1, 1, 'right')).inject(this.contentLayout.getCell(1, 2));
+
         this.combineLeftToggler = new Element('a', {
             'class': 'icon-arrow-left-5 jarves-windowCombine-left-toggler'
-        }).inject(this.contentLayout.getCell(1, 1));
-
-        this.displayCombineLeft(true);
+        }).inject(this.contentLayout.getCell(1, 2));
 
         this.combineLeftToggler.addEvent('click', function() {
             this.displayCombineLeft(!this.isCombineLeftVisible());
         }.bind(this));
-
-        this.contentLayout.getCell(1, 2).addClass('jarves-windowCombine-splitter');
 //        this.contentLayout.getTd(1, 2);
 
         if (this.classProperties.asNested) {
@@ -107,7 +108,7 @@ jarves.WindowCombine = new Class({
             this.itemsMaxSpan = new Element('span', {text: '0'}).inject(this.itemCount);
 
             this.mainLeftDeleter = new Element('div', {
-                'class': 'kwindow-win-buttonBar jarves-windowCombine-list-actions'
+                'class': 'jarves-windowCombine-list-actions'
             }).inject(this.mainLeft);
 
             new jarves.Button(t('Select all')).addEvent('click', function() {

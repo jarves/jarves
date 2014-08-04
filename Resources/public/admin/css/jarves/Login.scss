@@ -1,28 +1,36 @@
+@import "../base";
+
 .jarves-login-middle {
     margin: auto;
     width: 325px;
     margin-top: 200px;
     text-align: center;
     position: relative;
-    background-color: #f0f0f0;
-    border: 5px solid #f0f0f0;
 }
 
-.jarves-login-middle .jarves-Select-box,
-.jarves-login-middle .jarves-Select-box:link,
-.jarves-login-middle .jarves-Button,
-.jarves-login-middle .jarves-Button:link,
 .jarves-login-middle .jarves-Input-text {
     margin: 10px 0;
     display: block;
-    line-height: 40px;
-    height: 40px;
+    line-height: 30px;
+    height: 30px;
+}
+.jarves-login-middle .jarves-Button,
+.jarves-login-middle .jarves-Button:link {
+    float: right;
+    margin: 0;
+    position: relative;
+    top: 1px;
 }
 
 .jarves-login-middle .jarves-Select-box,
 .jarves-login-middle .jarves-Select-box:link {
     line-height: 30px;
     height: 30px;
+    width: auto;
+    float: left;
+    margin: 0;
+    position: relative;
+    top: 1px;
 }
 
 .jarves-login-barrierTape {
@@ -58,7 +66,7 @@
 }
 
 .jarves-login-logo {
-    height: 28px;
+    width: 55px;
 }
 
 .jarves-login {
@@ -67,7 +75,7 @@
     right: 0px;
     top: 0px;
     bottom: 0px;
-    background-color: #22638E;
+    background-color: $mainColor;
     text-align: center;
     z-index: 200101;
     overflow: hidden;
@@ -80,16 +88,9 @@
 }
 
 .jarves-login-middle-top {
-    background-color: #22638E;
-    height: 60px;
-    line-height: 60px;
-    text-align: left;
-}
-
-.jarves-login-middle-top img {
-    position: relative;
-    top: 7px;
-    margin-left: 18px;
+    height: 80px;
+    line-height: 0px;
+    text-align: center;
 }
 
 .jarves-ai-loader-con {
@@ -117,6 +118,7 @@
 .jarves-login-middle-form {
     position: relative;
     margin: 15px;
+    @include line-bottom;
 }
 
 .jarves-login-desktopMode {
@@ -137,15 +139,17 @@
 .jarves-login-loader-bottom,
 .jarves-login-loader-top {
     position: absolute;
-    left: 0;
-    width: 100%;
+    left: -15px;
+    right: -15px;
+    width: 350px;
     height: 0;
     overflow: hidden;
-    background-color: #f5f5f5;
+    background-color: $mainColor;
+    z-index: 5;
 }
 
 .jarves-login-loader-top {
-    top: 0px;
+    top: 20px;
 }
 
 .jarves-login-loader-bottom {
@@ -182,7 +186,10 @@
 
 .jarves-login-middle .loginMessage {
     line-height: 16px;
-    margin: 5px 15px;
+    position: absolute;
+    bottom: -60px;
+    left: 0;
+    right: 0;
 }
 
 .jarves-login-middle-form .loginLangSelection {

@@ -37,6 +37,10 @@ jarves.template.addFilter('substr', function(str, start, len) {
     return str.substr(start, len);
 });
 
+jarves.template.addFilter('strlen', function(str) {
+    return str.length;
+});
+
 jarves.getCompiledTemplate = function(src, env, path, eagerCompile) {
     return new nunjucks.Template(src, jarves.getTemplate(), path, eagerCompile)
 };

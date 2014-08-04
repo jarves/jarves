@@ -11,7 +11,6 @@ var jarves_system_module = new Class({
      */
     initialize: function (win) {
         this.win = win;
-        document.id(win.getMainLayout()).addClass('jarves-border');
 
         this.tabGroup = this.win.addTabGroup();
 
@@ -40,10 +39,10 @@ var jarves_system_module = new Class({
 
         /* installed */
         this.installedPane = new Element('div', {
-            'class': 'jarves-kwindow-content-withBottomBar'
+            'class': 'jarves-jarves-Window-content-withBottomBar'
         }).inject(this.panes['installed']);
         this.installedActionBar = new Element('div', {
-            'class': 'kwindow-win-buttonBar jarves-ActionBar'
+            'class': 'jarves-Window-win-buttonBar jarves-ActionBar'
         }).inject(this.panes['installed']);
 
         new Element('h2', {
@@ -338,7 +337,7 @@ var jarves_system_module = new Class({
         this.panes['local'].empty();
 
         this.localePane = new Element('div', {
-            'class': 'jarves-kwindow-content-withBottomBar'
+            'class': 'jarves-jarves-Window-content-withBottomBar'
         }).inject(this.panes['local']);
         var p = this.localePane;
 
@@ -490,7 +489,7 @@ var jarves_system_module = new Class({
                 [_('Activated'), 50, 'html'],
                 [_('Version'), 50],
                 [_('Status'), 130],
-                [_('Action'), 350]
+                [_('Action'), 150]
             ], {absolute: false, valign: 'middle'}).inject(tableMyDiv);
         }
 
@@ -506,7 +505,7 @@ var jarves_system_module = new Class({
             [_('Activated'), 50, 'html'],
             [_('Version'), 50],
             [_('Status'), 130],
-            [_('Action'), 350]
+            [_('Action'), 150]
         ], {absolute: false, valign: 'middle'}).inject(tableLocalDiv);
 
         new Element('h2', {
@@ -521,7 +520,7 @@ var jarves_system_module = new Class({
             [_('Activated'), 50, 'html'],
             [_('Version'), 50],
             [_('Status'), 130],
-            [_('Action'), 350]
+            [_('Action'), 150]
         ], {absolute: false, valign: 'middle'}).inject(tableLocalDiv);
 
         var lang = jarves.settings['user']['adminLanguage'];
@@ -681,7 +680,7 @@ var jarves_system_module = new Class({
         }.bind(this)).inject(this.searchPane);
 
         this.mainPane = new Element('div', {
-            'style': 'position: absolute; top: 46px; left: 0px; right: 0px; bottom: 0px; background-color: #f4f4f4; padding: 5px; overflow: auto;',
+            'style': 'position: absolute; top: 46px; left: 0px; right: 0px; bottom: 0px; padding: 5px; overflow: auto;',
             text: 'TODO'
         }).inject(this.panes['install']);
 

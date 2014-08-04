@@ -1,6 +1,8 @@
+@import "../base";
+
 .jarves-helpsystem-container {
     position: absolute;
-    left: 20px;
+    right: 25px;
     bottom: 25px;
     max-width: 50%;
     z-index: 5000000;
@@ -21,18 +23,13 @@ a.jarves-helpsystem-bubble-closer:hover {
 }
 
 .jarves-helpsystem-bubble {
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    background-color: #dadada;
+    background-color: lighten($mainColor, 8%);
     padding: 10px 10px;
     font-size: 11px;
     margin-top: 5px;
     line-height: 20px;
     position: relative;
-    border-left: 5px solid #265F85;
-    color: #444;
-    box-shadow: 0px 0px 20px #DDD;
+    border: 1px solid #0B3C5E;
 }
 
 .jarves-helpsystem-bubble h3 {

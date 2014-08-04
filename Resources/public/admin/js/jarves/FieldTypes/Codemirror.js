@@ -64,7 +64,7 @@ jarves.FieldTypes.Codemirror = new Class({
             this.editor.refresh();
         }.bind(this);
 
-        var windowInstance = this.fieldInstance.fieldPanel.getParent('.kwindow-border');
+        var windowInstance = this.fieldInstance.fieldPanel.getParent('.jarves-Window-border');
         if (this.win) {
             this.win.addEvent('resize', refresh);
         } else if (windowInstance) {

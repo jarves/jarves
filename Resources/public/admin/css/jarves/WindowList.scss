@@ -1,3 +1,5 @@
+@import "../base";
+
 .jarves-WindowList-main > table,
 .jarves-WindowList-head > table {
     table-layout: fixed;
@@ -73,12 +75,18 @@
     transition:all 0.3s;
 }
 
+.jarves-windowCombine-splitter {
+    @include line-top;
+    top: -1px;
+    border-top: 1px solid $mainColor;
+}
+
 .jarves-windowCombine-combine-container {
     position: absolute;
     left: 0;
     right: 0;
     top: 0;
-    bottom: 0;
+    bottom: 40px;
     -webkit-transform:translate(150px, 0px);
     -moz-transform:translate(150px, 0px);
     -ms-transform:translate(150px, 0px);
@@ -118,7 +126,6 @@
     bottom: -11px;
     right: 0;
     overflow: hidden;
-    background-color: white;
 }
 
 .jarves-WindowList-combine-item-remove {
@@ -157,20 +164,20 @@
     left: 0;
     top: 0;
     bottom: 0;
-    border: 1px solid #ebebeb;
-    border-radius: 3px;
 }
 
 .jarves-WindowList-combine-content {
     background: transparent;
     border: 0;
+    overflow: visible;
 }
 
 .jarves-WindowList-combine-left-itemcount {
     position: absolute;
-    right: 6px;
-    top: 14px;
-    color: #999;
+    right: 0;
+    top: 5px;
+    color: #A8A8A8;
+    font-size: 11px;
 }
 
 .jarves-windowCombine-title {
@@ -186,7 +193,6 @@
     top: 0px;
     bottom: 0px;
     width: 30px;
-    border-right: 1px solid #ccc;
     text-align: center;
     cursor: pointer;
     line-height: 30px;
@@ -234,8 +240,12 @@
 
 .jarves-WindowList-combine-left-top .jarves-Select-box,
 .jarves-WindowList-combine-left-top .jarves-Select-box:link {
-    margin-left: 10px;
     line-height: 22px;
+    margin: 0;
+}
+
+.jarves-WindowList-combine-left-top .jarves-Select-box .jarves-Select-box-title {
+    padding-left: 0;
 }
 
 .jarves-WindowList-combine-userfilter a img,
@@ -252,32 +262,28 @@
 
 .jarves-WindowList-combine-right,
 .jarves-WindowList-combine-left {
+    @include line-bottom;
     position: absolute;
     left: 0;
     right: 0;
     top: 0;
     bottom: 0;
+    background-color: #021216;
 }
 
 .jarves-WindowList-combine-left {
-    border: 1px solid #ebebeb;
     border-radius: 2px;
     border-right: 0;
-    top: 30px;
-    bottom: 30px;
-    background-color: #fcfcfc;
+    top: 0px;
+    bottom: 0px;
 }
 
-.jarves-WindowList-combine-right + .jarves-Splitter-main {
-    left: -12px;
-    width: 1px;
+.jarves-windowCombine-splitter .jarves-Splitter-main {
+    left: 14px;
+    width: 15px;
     border: 0;
-    top: 60px;
-    bottom: 60px;
-    border-top: 12px solid rgba(0, 0, 0, 0);
-    border-bottom: 12px solid rgba(0, 0, 0, 0);
-    border-right: 12px solid #f1f1f1;
-    border-radius: 80px 2px 2px 80px;
+    top: 0;
+    bottom: 0;
 }
 
 .jarves-WindowList-actionBarNavigation {
@@ -291,9 +297,7 @@
 
 .jarves-Table-windowList {
     bottom: 46px;
-    border: 1px solid #E4E4E4;
     overflow: hidden;
-    border-radius: 3px;
 }
 
 .jarves-Table-windowList .jarves-Table-body {
@@ -332,8 +336,8 @@ a.jarves-WindowList-search-button:link {
     height: 30px;
     line-height: 30px;
     color: white;
-    border-left: 1px solid gray;
-    border-right: 1px solid gray;
+//    border-left: 1px solid gray;
+//    border-right: 1px solid gray;
     cursor: pointer;
     outline: 0;
     text-decoration: none;
@@ -368,15 +372,14 @@ a.jarves-WindowList-search-button-active:link {
 
 .jarves-WindowList-combine-left-top {
     position: relative;
-    height: 33px;
-    color: #444;
-    padding: 11px;
+    height: 27px;
+    color: #888;
     padding-left: 0;
+    @include line-bottom;
 }
 
-.jarves-WindowList-combine-items + .jarves-Splitter-main {
-    top: 35px;
-    border-top: 1px solid #E2E2E2;
+.jarves-WindowList-combine-left + .jarves-Splitter-main {
+    border: 0;
 }
 
 .jarves-windowCombine-title-groups {
@@ -437,7 +440,7 @@ a.jarves-WindowList-search-button-active:link {
 a.jarves-windowCombine-left-toggler {
     position: absolute;
     display: block;
-    right: -17px;
+    left: 5px;
     width: 14px;
     bottom: 0;
     padding-left: 0;
@@ -448,7 +451,7 @@ a.jarves-windowCombine-left-toggler:hover {
 }
 
 .jarves-WindowList-combine-sidebarContainer {
-    border-bottom: 1px solid gray;
+    @include line-bottom-left;
 }
 
 .jarves-WindowList-searchContainer {

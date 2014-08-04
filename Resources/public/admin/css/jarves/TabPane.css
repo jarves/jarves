@@ -1,13 +1,11 @@
-.kwindow-win-tabPane-pane {
-    border: 1px solid #c9c9c9;
-    border-top: 0;
+.jarves-Window-win-tabPane-pane {
 }
 
-.kwindow-win-tabPane .kwindow-win-tabWrapperLast {
+.jarves-Window-win-tabPane .jarves-Window-win-tabWrapperLast {
     border-right: 0px;
 }
 
-.kwindow-win-tabPane .kwindow-win-tabGroup {
+.jarves-Window-win-tabPane .jarves-Window-win-tabGroup {
     border-left: 1px solid #aaa;
     border-right: 1px solid #aaa;
     border-top: 1px solid #888;
@@ -17,11 +15,10 @@
     display: none;
     position: relative;
     padding: 10px;
-    background-color: #f9f9f9;
 }
 
-.jarves-tabPane-full > .kwindow-win-tabPane-pane,
-.jarves-tabPane-full > .kwindow-win-tabPane-pane > .jarves-tabPane-pane,
+.jarves-tabPane-full > .jarves-Window-win-tabPane-pane,
+.jarves-tabPane-full > .jarves-Window-win-tabPane-pane > .jarves-tabPane-pane,
 .jarves-tabPane-full {
     position: absolute;
     left: 0;
@@ -31,25 +28,21 @@
     margin: 0;
 }
 
-.jarves-tabGroup {
-    padding-top: 5px;
-}
-
-.jarves-tabPane-full > .kwindow-win-tabPane-pane > .jarves-tabPane-pane {
+.jarves-tabPane-full > .jarves-Window-win-tabPane-pane > .jarves-tabPane-pane {
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 }
 
-.jarves-tabPane-full > .kwindow-win-tabPane-pane {
+.jarves-tabPane-full > .jarves-Window-win-tabPane-pane {
     position: absolute;
     left: 0px;
     right: 0px;
     bottom: 0px;
-    top: 42px;
+    top: 26px;
     padding: 0;
 }
 
-.jarves-tabPane-tabsInWindowHeader > .kwindow-win-tabPane-pane {
+.jarves-tabPane-tabsInWindowHeader > .jarves-Window-win-tabPane-pane {
     top: 0px;
     margin: 0px;
     -moz-border-radius: 0px;

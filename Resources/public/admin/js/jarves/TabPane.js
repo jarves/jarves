@@ -5,18 +5,18 @@ jarves.TabPane = new Class({
 
     initialize: function (pParent, pFull, pUseThisAsWindowHeader) {
         this.box = new Element('div', {
-            'class': 'kwindow-win-tabPane' + (pFull ? ' jarves-tabPane-full' : '')
+            'class': 'jarves-Window-win-tabPane' + (pFull ? ' jarves-tabPane-full' : '')
         }).inject(pParent);
 
         if (pUseThisAsWindowHeader) {
             pUseThisAsWindowHeader.setContentStick(true);
-            this.buttonGroup = pUseThisAsWindowHeader.addSmallTabGroup();
+            this.buttonGroup = pUseThisAsWindowHeader.addTabGroup();
             this.box.addClass('jarves-tabPane-tabsInWindowHeader');
         } else {
             this.buttonGroup = new jarves.TabGroup(this.box);
         }
 
-        this.paneBox = new Element('div', {'class': 'kwindow-win-tabPane-pane'}).inject(this.box);
+        this.paneBox = new Element('div', {'class': 'jarves-Window-win-tabPane-pane'}).inject(this.box);
 
         this.panes = [];
         this.buttons = [];

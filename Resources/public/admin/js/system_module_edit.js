@@ -2658,9 +2658,9 @@ var jarves_system_module_edit = new Class({
 
         new jarves.Button(t('Settings')).addEvent('click', this.openObjectSettings.bind(this, tr)).inject(actions);
 
-        if (pDefinition) {
-            new jarves.Button(t('Window wizard')).addEvent('click', this.openObjectWizard.bind(this, pKey, pDefinition)).inject(actions);
-        }
+//        if (pDefinition) {
+//            new jarves.Button(t('Window wizard')).addEvent('click', this.openObjectWizard.bind(this, pKey, pDefinition)).inject(actions);
+//        }
 
         new Element('a', {
             style: "cursor: pointer; font-family: 'icomoon'; padding: 0px 2px;",

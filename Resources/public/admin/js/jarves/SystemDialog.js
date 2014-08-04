@@ -38,9 +38,9 @@ jarves.SystemDialog = new Class({
         }
 
         this.main.setStyles({
-            left: 0,
+            left: -100,
             minWidth: null,
-            top: -100,
+            top: 0,
             bottom: 0
         });
 
@@ -51,11 +51,11 @@ jarves.SystemDialog = new Class({
                 var styles = {
                     opacity: 1
                 };
-                styles[Modernizr.prefixed('transform')] = 'translate(0px, 100px)';
+                styles[Modernizr.prefixed('transform')] = 'translate(100px, 0px)';
                 this.main.setStyles(styles);
             } else {
                 this.main.morph({
-                    'top': 0
+                    'left': 0
                 });
             }
         }.bind(this, 50));

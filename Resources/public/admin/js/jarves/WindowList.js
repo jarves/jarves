@@ -24,7 +24,7 @@ jarves.WindowList = new Class({
 
         this.container.empty();
 
-        this.container.setStyle('overflow', 'hidden');
+//        this.container.setStyle('overflow', 'hidden');
         this.page = 1;
         this.checkboxes = [];
 
@@ -247,7 +247,7 @@ jarves.WindowList = new Class({
 
         if (this.classProperties.multiLanguage && !this.languageSelect) {
             this.languageSelect = new jarves.Select(this.topActionBar);
-            document.id(this.languageSelect).setStyle('width', 150);
+//            document.id(this.languageSelect).setStyle('width', 150);
 
             this.languageSelect.addEvent('change', function() {
                 this.changeLanguage();
@@ -277,7 +277,7 @@ jarves.WindowList = new Class({
                     this.renderFinished();
                 }.bind(this)
             });
-            document.id(this.domainSelect).setStyle('width', 150);
+//            document.id(this.domainSelect).setStyle('width', 150);
 
             this.domainSelect.addEvent('change', this.reloadFirst.bind(this));
         }
@@ -465,8 +465,8 @@ jarves.WindowList = new Class({
     renderSideActionBar: function() {
         var container = this.getSidebar();
 
-        this.sideBarTitle = new Element('h2', {
-            'class': 'light',
+        this.sideBarTitle = new Element('div', {
+            'class': 'jarves-Window-sidebar-title',
             text: t('Actions')
         }).inject(container);
 
@@ -503,7 +503,7 @@ jarves.WindowList = new Class({
             'class': 'jarves-WindowList-searchContainer'
         }).inject(this.topActionBar);
 
-        this.topActionBar.setStyle('min-height', 30);
+//        this.topActionBar.setStyle('min-height', 30);
 
         this.actionBarSearchInput = new jarves.Field({
             noWrapper: true,

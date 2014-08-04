@@ -1,8 +1,9 @@
+@import "../base";
+
 .jarves-Table,
 .jarves-Table-head,
 .jarves-Table-body {
     width: 100%;
-    background-color: #f4f4f4;
 }
 
 .jarves-Table-valign-center td,
@@ -22,9 +23,6 @@
 }
 
 .jarves-Table {
-    border: 1px solid #dcdcdc;
-    border-top: 0;
-    border-bottom: 0;
 }
 
 .jarves-Table-absolute {
@@ -48,7 +46,7 @@
 .jarves-Table-head th,
 .jarves-Table > tbody > tr > td,
 .jarves-Table-body td {
-    border-bottom: 1px solid #E9E9E9;
+    border-bottom: 1px solid lighten($mainColor, 5%);
 }
 
 .jarves-Table > thead > tr > th,
@@ -92,7 +90,7 @@
 .jarves-Table tr.active:hover > td,
 .jarves-Table-body tr.active > td,
 .jarves-Table-body tr.active:hover > td {
-    background-color: #EBEBEB;
+    background-color: lighten($mainColor, 12%);
 }
 
 .jarves-Table tr.active > td a,
@@ -100,5 +98,5 @@
 }
 
 .jarves-Table-hover tr:hover > td {
-    background-color: rgba(238, 238, 238, 0.8);
+    background-color: lighten($mainColor, 3%);
 }

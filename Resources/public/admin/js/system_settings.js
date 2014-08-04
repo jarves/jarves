@@ -319,10 +319,11 @@ var jarves_system_settings = new Class({
         });
 
         this.actionBarContainer = new Element('div', {
-            style: 'text-align: right; padding: 5px 0;'
+            style: 'text-align: right; '
         }).inject(this.win.getTitleGroupContainer());
 
         this.actionBar = new jarves.ButtonGroup(this.actionBarContainer);
+        document.id(this.actionBar).setStyle('float', 'right');
         this.resetBtn = this.actionBar.addButton(t('Reset'), '#icon-escape');
         this.saveBtn = this.actionBar.addButton(t('Save'), '#icon-checkmark-6');
         this.saveBtn.setButtonStyle('blue');

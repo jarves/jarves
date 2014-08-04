@@ -1,3 +1,5 @@
+@import "../base";
+
 .jarves-List {
     position: absolute;
     left: 0;
@@ -9,17 +11,18 @@
 }
 
 .jarves-List-split {
-    padding: 6px;
-    border-bottom: 1px solid #E2E2E2;
-    background-color: #F5F5F5;
-    color: gray;
+    padding: 3px 6px;
+    border-bottom: 1px solid lighten($mainColor, 10%);
+    background-color: lighten($mainColor, 3%);
+    color: #eee;
+    font-size: 11px;
+    text-transform: uppercase;
 }
 
 .jarves-List-item {
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid lighten($mainColor, 10%);
     cursor: pointer;
     padding: 6px;
-    color: #333;
     position: relative;
 
     -moz-transition-duration: .3s;
@@ -32,22 +35,22 @@
 .jarves-List-item h2 {
     padding: 0px;
     margin: 1px 0px 4px 0px;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 16px;
     font-weight: normal;
 }
 
 .jarves-List-item .sub {
-    color: #aaa;
+    color: #ccc;
 }
 
 .jarves-List-item:hover {
-    background-color: #f4f4f4;
+    background-color: lighten($mainColor, 2%);
 }
 
 .jarves-List-item.active,
 .jarves-List-item.active:hover {
-    background-color: #e4e4e4;
+    background-color: lighten($mainColor, 4%);
 }
 
 .jarves-List-loader:hover {

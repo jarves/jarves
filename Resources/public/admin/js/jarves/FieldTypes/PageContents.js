@@ -70,7 +70,7 @@ jarves.FieldTypes.PageContents = new Class({
             this.mainLayout.getCell(1, 1).addClass('jarves-Field-content-actionBar');
         }
 
-        this.win.setTitle(t('Home'));
+        this.getWin().setTitle(t('Home'));
 
         this.editableAreaContainer = new Element('div', {
             style: 'position: absolute; left: 0px; right: 0px; top: 0px; bottom: 0px;'

@@ -50,12 +50,12 @@ a.jarves-buttonGroup-item:link {
 }
 
 a.jarves-buttonGroup-item:first-child {
-    border-left: 1px solid #ddd;
-    @include border-left-radius(2px);
+//    border-left: 1px solid #ddd;
+//    @include border-left-radius(2px);
 }
 
 a.jarves-buttonGroup-item:last-child {
-    @include border-right-radius(2px);
+//    @include border-right-radius(2px);
 }
 
 a.jarves-buttonGroup-item-only-icon:before {

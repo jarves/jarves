@@ -1,5 +1,4 @@
-@import "../bourbon/bourbon";
-@import "../variables";
+@import "../base";
 
 .jarves-editor {
     margin-right: 180px;
@@ -56,14 +55,13 @@
     text-align: center;
     float: left;
     cursor: pointer;
-    background-color: #F5F5F5;
 //    outline: 1px solid #ddd;
 
     @include transition(all 0.2s ease-in-out);
 }
 
 .jarves-editor-content-item:hover {
-    background-color: #e5e5e5;
+    background-color: lighten($mainColor, 5%);
 }
 
 .jarves-editor-content-item:before {
@@ -80,12 +78,12 @@
     max-width: 80%;
     max-height: 90%;
     overflow: auto;
-    border-top: 3px solid $mainColor;
-    border-bottom: 3px solid $mainColor;
-    background-color: #F5F5F5;
+    border-top: 2px solid lighten($mainColor, 15%);
+    border-bottom: 2px solid lighten($mainColor, 15%);
+    background-color: $mainColor;
     padding: 2px 15px;
     padding-top: 0;
-    box-shadow: 0 0 2px #808080;
+    box-shadow: 0 0 5px lighten($mainColor, 8%);
     visibility: hidden;
 }
 

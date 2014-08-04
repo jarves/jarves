@@ -25,8 +25,8 @@ class GroupCrudController extends WindowController
         'description'
     );
 
-    public $itemLayout = '{name}
-<div style="color: silver">{if description.length > 20}{description.substr(0,20)}...{else}{description}{/if}</div>';
+    public $itemLayout = '{{name}}
+<div style="color: silver">{{description|truncate(20)}}</div>';
 
     public $itemsPerPage = 10;
 

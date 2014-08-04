@@ -29,7 +29,7 @@ jarves.Tooltip = new Class({
 
     start: function () {
 
-        var tparent = this.target.getParent('div.kwindow-border');
+        var tparent = this.target.getParent('div.jarves-Window-border');
 
         if (!tparent) {
             if (this.target.get('class').contains('jarves-Button')) {

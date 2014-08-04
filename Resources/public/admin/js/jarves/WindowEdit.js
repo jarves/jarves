@@ -473,7 +473,7 @@ jarves.WindowEdit = new Class({
 
             this.fieldForm = new jarves.FieldForm(this.form, this.classProperties.fields, {
                 firstLevelTabPane: this.tabPane,
-                allTableItems: true,
+//                allTableItems: true,
                 tableItemLabelWidth: '35%'
             }, {win: this.win});
 

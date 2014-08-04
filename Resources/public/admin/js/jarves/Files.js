@@ -264,9 +264,9 @@ jarves.Files = new Class({
         actionsContainer.setStyle('white-space', 'nowrap');
         var sidebar = this.win.getSidebar();
 
-        new Element('h2', {
+        new Element('div', {
             text: 'Actions',
-            'class': 'light'
+            'class': 'jarves-Window-sidebar-title'
         }).inject(sidebar);
 
         var boxAction = new jarves.ButtonGroup(sidebar);
@@ -338,6 +338,8 @@ jarves.Files = new Class({
             noWrapper: true
         }, searchContainer);
 
+        this.search.toElement().addClass('jarves-Files-search-input');
+
         this.search.getFieldObject().input.addEvent('keyup', function(e) {
             if (e.key == 'enter') {
                 this.startSearch();
@@ -353,8 +355,7 @@ jarves.Files = new Class({
         }.bind(this));
 
         new Element('span', {
-            'class': 'icon-search',
-            style: 'position: absolute; right: 9px; top: 7px; color: gray;'
+            'class': 'icon-search jarves-Files-search-input-icon'
         }).inject(searchContainer);
 
         this.mainLayout = new jarves.Layout(this.wrapper, {
@@ -2382,7 +2383,7 @@ jarves.Files = new Class({
                 this.lastPreviewImage = new Element('img', {
                     src: image,
                     style: 'position: relative;'
-                }).inject(this.previewDiv, 'top');
+                }).inject(this.previewDivMover, 'top');
 
                 [20, 50, 75, 100, 125, 150, 175, 200, 250].each(function(delayMs) {
                     (function() {
@@ -2694,8 +2695,6 @@ jarves.Files = new Class({
 
     __buildItem: function(pFile) {
 
-        var fileIcon;
-
         var base = new Element('div', {
             'class': (pFile.path == '/trash' ? '' : 'jarves-Files-droppables ') + 'jarves-Files-item',
             title: pFile.object_id + '=' + pFile.name,
@@ -2706,13 +2705,9 @@ jarves.Files = new Class({
         var fileIcon = null;
 
         if (pFile.path.lastIndexOf('.') && this.__images.contains(pFile.path.substr(pFile.path.lastIndexOf('.')).toLowerCase())) {
-
             fileIcon = pFile;
-
         } else {
-
             fileIconClass = this.getIcon(pFile);
-
         }
 
         base.imageContainer = new Element('div', {
@@ -2918,7 +2913,7 @@ jarves.Files = new Class({
 
             searchPaneCloser = new Element('div', {
                 style: 'position: absolute; top: 3px; right: 3px; font-weight: bold;',
-                'class': 'kwindow-win-titleBarIcon kwindow-win-titleBarIcon-close'
+                'class': 'jarves-Window-win-titleBarIcon jarves-Window-win-titleBarIcon-close'
             }).addEvent('click', function() {
                     this.closeSearch();
                 }.bind(this)).inject(this.searchPane);

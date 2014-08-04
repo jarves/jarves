@@ -1,75 +1,79 @@
 @import "../base";
 
-.jarves-Checkbox:link {
-    height: 30px;
-    width: 60px;
-    -moz-border-radius: 25px;
-    -webkit-border-radius: 25px;
-    border-radius: 25px;
-    position: relative;
-    cursor: default;
-    display: inline-block;
-    line-height: 28px;
-}
+.jarves-admin {
+    .jarves-Checkbox:link {
+        height: 25px;
+        width: 50px;
+        -moz-border-radius: 15px;
+        -webkit-border-radius: 15px;
+        border-radius: 15px;
+        position: relative;
+        cursor: default;
+        display: inline-block;
+        line-height: 28px;
+    }
 
-.jarves-Checkbox:focus {
-    outline: 0;
+    .jarves-Checkbox:focus {
+        outline: 0;
 
-    border-color: rgba(47, 140, 189, 0.9);
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
-    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
-    box-shadow: 0 0 0 3px rgba(47, 140, 189, 0.2);
+        border-color: rgba(47, 140, 189, 0.9);
+        -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+        -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+        box-shadow: 0 0 0 3px rgba(47, 140, 189, 0.2);
 
-    -moz-transition-duration: .1s;
-    -webkit-transition-duration: .1s;
-    -o-transition-duration: .1s;
-    -ms-transition-duration: .1s;
-    transition-duration: .1s;
-}
+        -moz-transition-duration: .1s;
+        -webkit-transition-duration: .1s;
+        -o-transition-duration: .1s;
+        -ms-transition-duration: .1s;
+        transition-duration: .1s;
+    }
 
-.jarves-Checkbox-text-off {
-    font-weight: bold;
-    color: #fbfbfb;
-    position: absolute;
-    right: 11px;
-    font-size: 15px;
-    top: 0px;
-}
+    .jarves-Checkbox-text-off {
+        font-weight: bold;
+        color: #fbfbfb;
+        position: absolute;
+        right: 11px;
+        font-size: 12px;
+        top: 0px;
+    }
 
-.jarves-Checkbox-text-on {
-    font-weight: bold;
-    color: white;
-    position: absolute;
-    left: 17px;
-    font-size: 15px;
-    top: 0px;
-}
+    .jarves-Checkbox-text-on {
+        font-weight: bold;
+        color: white;
+        position: absolute;
+        left: 17px;
+        font-size: 12px;
+        top: -1px;
+    }
 
-.jarves-Checkbox-off {
-    background-color: #e1e1e1;
-}
+    a.jarves-Checkbox-off,
+    a.jarves-Checkbox-off:hover {
+        background-color: lighten($mainColor, 4%);
+    }
 
-.jarves-Checkbox-on {
-    background-color: $mainColor;
-}
+    a.jarves-Checkbox-on,
+    a.jarves-Checkbox-on:hover {
+        background-color: lighten($mainColor, 9%);
+    }
 
-.jarves-Checkbox-knob {
-    background-color: #FDFDFD;
+    .jarves-Checkbox-knob {
+        background-color: #29475E;
 
-    -moz-border-radius: 28px;
-    -webkit-border-radius: 28px;
-    border-radius: 24px;
+        -moz-border-radius: 15px;
+        -webkit-border-radius: 15px;
+        border-radius: 15px;
 
-    @include transition(all 0.2s ease-out);
+        @include transition(all 0.2s ease-out);
 
-    width: 28px;
-    height: 28px;
-    position: relative;
-    left: 1px;
-    top: 1px;
-}
+        width: 23px;
+        height: 23px;
+        position: relative;
+        left: 1px;
+        top: 1px;
+    }
 
-.jarves-Checkbox-on .jarves-Checkbox-knob {
-    left: 31px;
+    .jarves-Checkbox-on .jarves-Checkbox-knob {
+        left: 27px;
+    }
 }

@@ -26,10 +26,11 @@ jarves.ui.Speedmeter = new Class({
             value: 0,
             min: 0,
             max: 100,
-            titleFontColor: '#666',
+            titleFontColor: '#bbb',
+            valueFontColor: '#bbb',
             showInnerShadow: false,
             title: "Title",
-            levelColors: ["#22638E"]
+            levelColors: ["#114754"]
         }, this.options));
     },
 

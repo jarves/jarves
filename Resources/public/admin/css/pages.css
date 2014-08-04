@@ -1,4 +1,4 @@
-.kwindow-border > .jarves-pages-main-layout {
+.jarves-Window-border > .jarves-pages-main-layout {
     left: 0;
     right: 0;
     top: 15px;
@@ -9,6 +9,6 @@
     margin: 0 15px;
 }
 
-.jarves-pages-main-layout + .kwindow-win-title {
+.jarves-pages-main-layout + .jarves-Window-win-title {
     display: none;
 }

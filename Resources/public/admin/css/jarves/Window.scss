@@ -1,6 +1,6 @@
 @import "../base";
 
-.kwindow-border {
+.jarves-Window-border {
     position: absolute;
     left: 0;
     right: 0;
@@ -8,29 +8,33 @@
     bottom: 0;
     overflow: hidden;
     min-height: 250px;
-    background-color: #fafafa;
+//    background-color: #fafafa;
 }
 
-.kwindow-border > .jarves-Layout-main-fixed {
-    bottom: 35px;
-    left: 25px;
+.jarves-Window-border > .jarves-Layout-main-fixed {
+    bottom: 0;
+    left: 0;
     right: 25px;
-    top: 25px;
+    top: 49px;
 }
 
-.jarves-frontpage-backend .kwindow-border {
+.jarves-dialog-content .jarves-Window-border > .jarves-Layout-main-fixed {
+    left: 25px;
+}
+
+.jarves-frontpage-backend .jarves-Window-border {
     left: 221px;
 }
 
-.jarves-window-extend-head .kwindow-win-content {
+.jarves-window-extend-head .jarves-Window-win-content {
     top: 62px;
 }
 
-.kwindow-border-inline {
+.jarves-Window-border-inline {
     position: relative;
 }
 
-.kwindow-win-inline {
+.jarves-Window-win-inline {
     overflow: auto;
     position: absolute;
     width: 100%;
@@ -39,11 +43,11 @@
     top: 0px;
 }
 
-.kwindow-win-title,
-.kwindow-win-title-inaktive {
+.jarves-Window-win-title,
+.jarves-Window-win-title-inaktive {
     position: absolute;
-    bottom: 5px;
-    left: 25px;
+    top: 0;
+    left: 0;
     min-height: 22px;
     line-height: 20px;
     vertical-align: middle;
@@ -53,31 +57,37 @@
     cursor: default;
 }
 
-.jarves-kwindow-inFront {
+.jarves-jarves-Window-inFront {
     color: #111;
 }
 
-.kwindow-win-buttonBar,
+.jarves-Window-win-buttonBar,
 .window-bottom-bar {
+    @include line-top;
     position: absolute;
-    height: 30px;
-    line-height: 30px;
+    height: 25px;
+    line-height: 25px;
 
     text-align: right;
-    padding: 5px 15px;
-    bottom: 0;
+    padding: 0px 15px;
+    bottom: 14px;
     left: 0;
-    border-top: 1px solid #e2e2e2;
     right: 0;
 }
 
 /* make line-height working even if there are only block-inline events. */
-.kwindow-win-buttonBar::before {
+.jarves-Window-win-buttonBar::before {
     content: "\a0";
 }
 
+.jarves-Window-win-titleGroups {
+//    @include line-top-left;
+    margin-bottom: 1px;
+    height: 30px;
+}
+
 /*
-.kwindow-win-titleGroups {
+.jarves-Window-win-titleGroups {
     display: block;
     padding: 10px;
     margin: 0 15px;
@@ -87,32 +97,35 @@
 }
 */
 
-.kwindow-win-titleGroups > .jarves-tabGroup:first-child {
+.jarves-Window-win-titleGroups > .jarves-tabGroup:first-child {
     margin-left: 0;
 }
 
-.kwindow-win-title-inaktive {
+.jarves-Window-win-title-inaktive {
     color: #555;
 }
 
-.kwindow-win-content {
+.jarves-Window-win-content-container {
+    @include line-top;
+}
+
+.jarves-Window-win-content {
     position: absolute;
     left: 0;
     right: 0;
     top: 0;
     bottom: 0;
-    background-color: #f9f9f9;
     overflow: auto;
 }
 
 
-.kwindow-win-content-stick {
+.jarves-Window-win-content-stick {
     top: 0;
     border-top: 0;
 }
 
 
-.kwindow-win-content-with-bottom {
+.jarves-Window-win-content-with-bottom {
     bottom: 45px;
 }
 
@@ -138,32 +151,15 @@
 }
 
 
-.kwindow-win-inline .kwindow-win-content {
+.jarves-Window-win-inline .jarves-Window-win-content {
     top: 0px;
 }
 
-.kwindow-win-bottom {
-    position: absolute;
-    left: 0px;
-    right: 0px;
-    display: none;
-    height: 18px;
-    bottom: 0px;
-    /*background-color: #d4d0c8;*/
-    background-image: url(../../images/win-bottom-resize.png);
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    border-top: 1px solid #777;
-    padding-left: 6px;
-    color: #444;
-    line-height: 18px;
-}
-
-.kwindow-win-bottom-maximized {
+.jarves-Window-win-bottom-maximized {
     background-image: none;
 }
 
-.kwindow-iframe {
+.jarves-Window-iframe {
     width: 100%;
     height: 100%;
     border: 0px;
@@ -171,17 +167,17 @@
     margin: 0px;
 }
 
-.kwindow-win-titleBar {
+.jarves-Window-win-titleBar {
     position: absolute;
     top: 10px;
     right: 10px;
 }
 
-.jarves-window-extend-head .kwindow-win-titleBar {
+.jarves-window-extend-head .jarves-Window-win-titleBar {
     top: 4px;
 }
 
-.kwindow-win-titleBarIcon {
+.jarves-Window-win-titleBarIcon {
     margin-left: 2px;
     width: 24px;
     height: 16px;
@@ -193,28 +189,28 @@
     padding: 1px 0;
 }
 
-.kwindow-win-titleBarIcon:hover {
+.jarves-Window-win-titleBarIcon:hover {
     color: #333;
 }
 
-.kwindow-win-titleBarIcon:active {
+.jarves-Window-win-titleBarIcon:active {
     color: #444;
 }
 
-.jarves-kwindow-titlepath {
+.jarves-jarves-Window-titlepath {
     display: block;
     line-height: 25px;
-    font-size: 12px;
+    font-size: 10px;
     font-weight: normal;
     color: #aaa;
 }
 
-.jarves-kwindow-titlepath img {
+.jarves-jarves-Window-titlepath img {
     margin: 0 8px;
     width: 4px;
 }
 
-.jarves-kwindow-prompt {
+.jarves-jarves-Window-prompt {
     position: absolute;
     left: 20px;
     top: 20px;
@@ -223,16 +219,16 @@
     box-shadow: 0px 8px 15px #666;
 }
 
-.jarves-kwindow-prompt input.text {
+.jarves-jarves-Window-prompt input.text {
     width: 220px;
 }
 
-.jarves-kwindow-prompt-text {
+.jarves-jarves-Window-prompt-text {
     padding: 5px;
     padding-bottom: 40px;
 }
 
-.jarves-kwindow-prompt-text-abs {
+.jarves-jarves-Window-prompt-text-abs {
     position: absolute;
     top: 0px;
     padding-top: 5px;
@@ -245,7 +241,7 @@
     padding-bottom: 5px;
 }
 
-.jarves-kwindow-prompt-bottom {
+.jarves-jarves-Window-prompt-bottom {
     position: absolute;
     text-align: right;
     left: 0px;
@@ -254,7 +250,7 @@
     height: 25px;
 }
 
-.kwindow-win-content h3,
+.jarves-Window-win-content h3,
 h3.jarves-headline {
     margin: 0px;
     cursor: default;
@@ -267,7 +263,7 @@ h3.jarves-headline {
     padding: 0px 3px;
 }
 
-.jarves-kwindow-content-withBottomBar {
+.jarves-jarves-Window-content-withBottomBar {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -276,7 +272,7 @@ h3.jarves-headline {
     overflow: auto;
 }
 
-.jarves-kwindow-loader-content {
+.jarves-jarves-Window-loader-content {
     width: 200px;
     margin: auto;
     height: 30px;
@@ -292,23 +288,23 @@ h3.jarves-headline {
     color: white;
 
     position: relative;
-    background-color: #22638E;
+    background-color: lighten($mainColor, 15%);
 }
 
-.jarves-kwindow-sizer {
+.jarves-jarves-Window-sizer {
     position: absolute;
     background-color: white;
 }
 
-.jarves-kwindow-sizer-ne,
-.jarves-kwindow-sizer-se,
-.jarves-kwindow-sizer-nw,
-.jarves-kwindow-sizer-sw {
+.jarves-jarves-Window-sizer-ne,
+.jarves-jarves-Window-sizer-se,
+.jarves-jarves-Window-sizer-nw,
+.jarves-jarves-Window-sizer-sw {
     width: 8px;
     height: 8px;
 }
 
-.jarves-kwindow-sizer-n {
+.jarves-jarves-Window-sizer-n {
     cursor: n-resize;
     right: 2px;
     left: 2px;
@@ -316,13 +312,13 @@ h3.jarves-headline {
     height: 6px;
 }
 
-.jarves-kwindow-sizer-ne {
+.jarves-jarves-Window-sizer-ne {
     cursor: ne-resize;
     top: -4px;
     right: -4px;
 }
 
-.jarves-kwindow-sizer-e {
+.jarves-jarves-Window-sizer-e {
     cursor: e-resize;
     right: -4px;
     bottom: 2px;
@@ -330,13 +326,13 @@ h3.jarves-headline {
     width: 6px;
 }
 
-.jarves-kwindow-sizer-se {
+.jarves-jarves-Window-sizer-se {
     cursor: se-resize;
     right: -4px;
     bottom: -4px;
 }
 
-.jarves-kwindow-sizer-s {
+.jarves-jarves-Window-sizer-s {
     cursor: s-resize;
     right: 2px;
     left: 2px;
@@ -344,13 +340,13 @@ h3.jarves-headline {
     height: 6px;
 }
 
-.jarves-kwindow-sizer-sw {
+.jarves-jarves-Window-sizer-sw {
     cursor: sw-resize;
     left: -4px;
     bottom: -4px;
 }
 
-.jarves-kwindow-sizer-w {
+.jarves-jarves-Window-sizer-w {
     cursor: w-resize;
     left: -4px;
     bottom: 2px;
@@ -358,20 +354,29 @@ h3.jarves-headline {
     width: 6px;
 }
 
-.jarves-kwindow-sizer-nw {
+.jarves-jarves-Window-sizer-nw {
     cursor: nw-resize;
     left: -4px;
     top: -4px;
 }
 
 .jarves-Window-sidebar {
+    @include line-bottom-left;
     position: absolute;
     right: 0;
-    top: 25px;
-    bottom: 35px;
+    top: 80px;
+    bottom: 40px;
     width: 150px;
-    background-color: #5c5c5c;
-    @include border-left-radius(3px);
+    color: #ddd;
+}
+
+.jarves-Window-sidebar-title {
+    @include line-top-left;
+    text-align: center;
+    padding-top: 4px;
+    padding-bottom: 5px;
+    font-size: 12px;
+    text-transform: uppercase;
 }
 
 .jarves-Window-sidebar-container {
@@ -381,6 +386,7 @@ h3.jarves-headline {
     bottom: 0;
     right: 0;
     overflow: auto;
+    background-color: #021216;
 }
 
 
@@ -391,8 +397,8 @@ h3.jarves-headline {
 
 .jarves-Window-sidebar a.jarves-Button {
     display: block;
-    background-image: none;
-    background-color: transparent;
+//    background-image: none;
+//    background-color: transparent;
     box-shadow: none;
     color: white;
     border: 0;
@@ -419,23 +425,23 @@ h3.jarves-headline {
 .jarves-Window-sidebar a.jarves-Button-deactivate:hover {
     cursor: default;
     color: #808080;
-    background-color: rgba(0, 0, 0, 0);
+//    background-color: rgba(0, 0, 0, 0);
 }
 
 .jarves-Window-sidebar a.jarves-Select-box,
 .jarves-Window-sidebar a.jarves-Select-box:link {
-    background-image: none;
-    background-color: transparent;
+//    background-image: none;
+//    background-color: transparent;
     padding: 0 15px;
     color: white;
     width: 100% !important;
-    border: 1px solid #9C9C9C;
+//    border: 1px solid #9C9C9C;
 }
 
 .jarves-Window-sidebar .jarves-Select-arrow {
-    background-image: none;
-    background-color: transparent;
-    border-left: 1px solid #9f9f9f;
+//    background-image: none;
+//    background-color: transparent;
+//    border-left: 1px solid #9f9f9f;
 }
 
 .jarves-Window-sidebar .jarves-Select-arrow:before {
@@ -451,17 +457,17 @@ h3.jarves-headline {
     margin: 0;
     display: block;
     white-space: pre;
-    border-top: 1px solid gray;
+    @include line-top-left;
 }
 
 .jarves-Window-sidebar .jarves-ButtonGroup:first-child {
-    border-top: 0;
+//    border-top: 0;
 }
 
-.jarves-Window-sidebar a.jarves-Button:hover {
-    background-image: none;
-    background-color: #6e6e6e;
-}
+//.jarves-Window-sidebar a.jarves-Button:hover {
+//    background-image: none;
+//    background-color: #6e6e6e;
+//}
 
 .jarves-Window-sidebar a.jarves-Button-deactivate:hover {
     cursor: default;
@@ -469,7 +475,7 @@ h3.jarves-headline {
     background-color: transparent;
 }
 
-.jarves-Window-sidebar-container-small h2 {
+.jarves-Window-sidebar-container-small .jarves-Window-sidebar-title {
     display: none;
 }
 
@@ -479,5 +485,5 @@ h3.jarves-headline {
 
 
 .jarves-Window-sidebar-delimiter {
-    border-top: 1px solid #808080;
+    @include line-top-left;
 }

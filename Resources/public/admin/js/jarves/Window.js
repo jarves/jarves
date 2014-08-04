@@ -16,15 +16,15 @@ jarves.Window = new Class({
 
     },
 
-    initialize: function (pEntryPoint, pOptions, pInstanceId, pParameter, pInline, pParent) {
-        this.params = pParameter || {};
-        this.setOptions(pOptions);
+    initialize: function (entryPointPath, options, instanceId, parameter, isInline, parentWindowId) {
+        this.params = parameter || {};
+        this.setOptions(options);
         this.originParams = Object.clone(this.params);
         
-        this.id = pInstanceId;
-        this.entryPoint = pEntryPoint;
-        this.inline = pInline;
-        this.parent = pParent;
+        this.id = instanceId;
+        this.entryPoint = entryPointPath;
+        this.inline = isInline;
+        this.parent = parentWindowId;
 
         if (this.inline) {
             if (typeOf(this.parent) == 'number' && jarves.wm.getWindow(this.parent)) {
@@ -37,7 +37,7 @@ jarves.Window = new Class({
 
         this.createWin();
 
-        if (pEntryPoint) {
+        if (entryPointPath) {
             this.loadContent();
             this.addHotkey('esc', !this.isInline(), false, function (e) {
                 (function () {
@@ -199,7 +199,7 @@ jarves.Window = new Class({
             });
 
             var div = new Element('div', {
-                'class': 'jarves-kwindow-loader-content gradient',
+                'class': 'jarves-jarves-Window-loader-content gradient',
                 html: "<br/>" + pText
             }).inject(this.loadingObj.td);
 
@@ -429,26 +429,26 @@ jarves.Window = new Class({
     /**
      * Creates a new dialog over the current window.
      *
-     * @param  {mixed} pText A string (non html) or an element, that will be injected in the content area.
-     * @param  {Boolean} pAbsoluteContent If we position this absolute or inline.
+     * @param  {*} text A string (non html) or an element, that will be injected in the content area.
+     * @param  {Boolean} absoluteContent If we position this absolute or inline.
      *
      * @return {jarves.Dialog}
      */
-    newDialog: function (pText, pAbsoluteContent) {
+    newDialog: function (text, absoluteContent) {
         return new jarves.Dialog(this, {
-            content: pText,
+            content: text,
             autoDisplay: true,
-            absolute: pAbsoluteContent
+            absolute: absoluteContent
         });
     },
 
-    parseTitle: function (pHtml) {
-        pHtml = pHtml.replace('<img', ' » <img');
-        pHtml = pHtml.stripTags();
-        if (pHtml.indexOf('»') !== -1) {
-            pHtml = pHtml.substr(3);
+    parseTitle: function (html) {
+        html = html.replace('<img', ' » <img');
+        html = html.stripTags();
+        if (html.indexOf('»') !== -1) {
+            html = html.substr(3);
         }
-        return pHtml;
+        return html;
     },
 
     getTitle: function () {
@@ -465,26 +465,23 @@ jarves.Window = new Class({
         return '';
     },
 
-    setTitle: function (pTitle) {
+    setTitle: function (title) {
         this.clearTitle();
 
         if (!this.titleTextPath) {
-            this.titleTextPath = new Element('img', {
-                src: _path + 'bundles/jarves/admin/images/jarves-kwindow-title-path.png'
-            }).inject(this.titleAdditional);
-
             this.titleText = new Element('span', {
-                text: pTitle
+                text: title,
+                'class': 'icon-arrow-right-5 icon-arrow-19'
             }).inject(this.titleAdditional);
         } else {
-            this.titleText.set('text', pTitle);
+            this.titleText.set('text', title);
         }
         jarves.wm.updateWindowBar();
 
     },
 
     toBack: function () {
-        this.title.removeClass('jarves-kwindow-inFront');
+        this.title.removeClass('jarves-jarves-Window-inFront');
 
         if (!this.isInline() && (!this.children || !this.children.isInline())) {
             this.border.setStyle('display', 'none');
@@ -498,21 +495,18 @@ jarves.Window = new Class({
         jarves.wm.updateWindowBar();
     },
 
-    addTitle: function (pText) {
-        new Element('img', {
-            src: _path + 'bundles/jarves/admin/images/jarves-kwindow-title-path.png'
-        }).inject(this.titleAdditional);
-
+    addTitle: function (text) {
         new Element('span', {
-            text: pText
+            text: text,
+            'class': 'icon-arrow-right-5 icon-arrow-19'
         }).inject(this.titleAdditional);
 
         jarves.wm.updateWindowBar();
     },
 
-    toFront: function (pOnlyZIndex) {
+    toFront: function (onlyZIndex) {
         if (this.active) {
-            this.title.addClass('jarves-kwindow-inFront');
+            this.title.addClass('jarves-jarves-Window-inFront');
             if (this.border.getStyle('display') != 'block') {
                 this.border.setStyles({
                     'display': 'block'
@@ -528,7 +522,7 @@ jarves.Window = new Class({
                 this.border.setStyle('z-index', jarves.wm.zIndex);
             }
 
-            if (pOnlyZIndex) {
+            if (onlyZIndex) {
                 return true;
             }
 
@@ -663,16 +657,16 @@ jarves.Window = new Class({
             this.maximizer.removeClass('icon-shrink-3');
             this.maximizer.addClass('icon-expand-4');
             this.maximized = false;
-            this.border.removeClass('kwindow-border-maximized');
+            this.border.removeClass('jarves-Window-border-maximized');
 
             Object.each(this.sizer, function (sizer) {
                 sizer.setStyle('display', 'block');
             });
 
-            this.bottom.set('class', 'kwindow-win-bottom');
+            this.bottom.set('class', 'jarves-Window-win-bottom');
         } else {
             //this.borderDragger.detach();
-            this.border.addClass('kwindow-border-maximized');
+            this.border.addClass('jarves-Window-border-maximized');
 
             this.oldDimension = this.border.getCoordinates(this.border.getParent());
             this.border.setStyles({
@@ -689,7 +683,7 @@ jarves.Window = new Class({
                 sizer.setStyle('display', 'none');
             });
 
-            this.bottom.set('class', 'kwindow-win-bottom-maximized');
+            this.bottom.set('class', 'jarves-Window-win-bottom-maximized');
         }
 
         this.onResizeComplete();
@@ -700,7 +694,7 @@ jarves.Window = new Class({
 
         //search for dialogs
         if (this.border) {
-            var dialogs = this.border.getChildren('.jarves-kwindow-prompt');
+            var dialogs = this.border.getChildren('.jarves-jarves-Window-prompt');
             if (!dialogs || !dialogs.length) {
                 dialogs = this.border.getChildren('.jarves-dialog-overlay');
             }
@@ -743,7 +737,7 @@ jarves.Window = new Class({
             if (this.getEntryPoint() == 'users/users/edit/') {
                 jarves.loadSettings();
             }
-            this.border.getElements('a.kwindow-win-buttonWrapper').each(function (button) {
+            this.border.getElements('a.jarves-Window-win-buttonWrapper').each(function (button) {
                 if (button.toolTip && button.toolTip.main) {
                     button.toolTip.main.destroy();
                 }
@@ -850,40 +844,33 @@ jarves.Window = new Class({
             }
         }
 
-        var title = jarves.getConfig( this.getModule() )['label'] ||
-            jarves.getConfig( this.getModule() )['name'];
+        var title = jarves.getConfig( this.getModule() )['label'] || jarves.getConfig( this.getModule() )['name'];
 
-        if (title != 'Jarves cms') {
-            new Element('span', {
-                text: title
-            }).inject(this.titleTextContainer);
-        }
+        new Element('span', {
+            text: title
+        }).inject(this.titleTextContainer);
 
         var path = Array.clone(this.entryPointDefinition._path);
         path.pop();
         Array.each(path, function (label) {
-
-            new Element('img', {
-                src: _path + 'bundles/jarves/admin/images/jarves-kwindow-title-path.png'
-            }).inject(this.titleTextContainer);
-
-            new Element('span', {
-                text: t(label)
-            }).inject(this.titleTextContainer);
-
+            this.addTitle(label);
         }.bind(this));
+//
+//            new Element('img', {
+//                src: _path + 'bundles/jarves/admin/images/jarves-jarves-Window-title-path.png'
+//            }).inject(this.titleTextContainer);
+//
+//            new Element('span', {
+//                text: t(label)
+//            }).inject(this.titleTextContainer);
+//
+//        }.bind(this));
 
         if (!this.inline && !this.isPopup()) {
             this.createResizer();
         }
 
-        new Element('img', {
-            src: _path + 'bundles/jarves/admin/images/jarves-kwindow-title-path.png'
-        }).inject(this.titleTextContainer);
-
-        new Element('span', {
-            text: t(this.entryPointDefinition.label)
-        }).inject(this.titleTextContainer);
+        this.addTitle(this.entryPointDefinition.label);
 
         this.content.empty();
         new Element('div', {
@@ -894,7 +881,7 @@ jarves.Window = new Class({
         if (this.entryPointDefinition.type == 'iframe') {
             this.content.empty();
             this.iframe = new IFrame('iframe_kwindow_' + this.id, {
-                'class': 'kwindow-iframe',
+                'class': 'jarves-Window-iframe',
                 frameborder: 0
             }).addEvent('load', function () {
                     this.iframe.contentWindow.win = this;
@@ -929,7 +916,7 @@ jarves.Window = new Class({
 
         if (this.entryPointDefinition.print === true) {
             this.printer = new Element('img', {
-                'class': 'kwindow-win-printer',
+                'class': 'jarves-Window-win-printer',
                 src: _path + 'bundles/jarves/admin/images/icons/printer.png'
             }).inject(this.border);
             this.printer.addEvent('click', this.print.bind(this));
@@ -1036,12 +1023,13 @@ jarves.Window = new Class({
 
     createWin: function () {
         this.border = new Element('div', {
-            'class': 'jarves-admin kwindow-border'
+            'class': 'jarves-admin jarves-Window-border'
         });
 
         this.border.windowInstance = this;
 
         this.win = this.border;
+        this.title = new Element('div', {'class': 'jarves-Window-win-title'}).inject(this.win);
 
         this.mainLayout = new jarves.Layout(this.win, {
             layout: [
@@ -1052,17 +1040,17 @@ jarves.Window = new Class({
 
         this.mainLayout.getCell(1, 1).setStyle('height', 'auto');
 
-        this.title = new Element('div', {'class': 'kwindow-win-title'}).inject(this.win);
 
-        this.titlePath = new Element('span', {'class': 'jarves-kwindow-titlepath'}).inject(this.title);
-        this.titleTextContainer = new Element('span', {'class': 'jarves-kwindow-titlepath-main'}).inject(this.titlePath);
+        this.titlePath = new Element('span', {'class': 'jarves-jarves-Window-titlepath'}).inject(this.title);
+        this.titleTextContainer = new Element('span', {'class': 'jarves-jarves-Window-titlepath-main'}).inject(this.titlePath);
 
-        this.titleAdditional = new Element('span', {'class': 'jarves-kwindow-titlepath-additional'}).inject(this.titlePath);
+        this.titleAdditional = new Element('span', {'class': 'jarves-jarves-Window-titlepath-additional'}).inject(this.titlePath);
 
         this.titleGroups =
-            new Element('div', {'class': 'kwindow-win-titleGroups'}).inject(this.mainLayout.getCell(1, 1));
+            new Element('div', {'class': 'jarves-Window-win-titleGroups'}).inject(this.mainLayout.getCell(1, 1));
 
-        this.content = new Element('div', {'class': 'kwindow-win-content'}).inject(this.mainLayout.getCell(2, 1));
+        this.mainLayout.getCell(2, 1).addClass('jarves-Window-win-content-container');
+        this.content = new Element('div', {'class': 'jarves-Window-win-content'}).inject(this.mainLayout.getCell(2, 1));
         this.inFront = true;
 
         if (this.isInline() && instanceOf(this.getParent(), jarves.Window)) {
@@ -1149,7 +1137,7 @@ jarves.Window = new Class({
             this.sidebarSplitter = new jarves.LayoutSplitter(this.sidebar, 'left');
 
             this.sidebarSplitter.addEvent('resize', function() {
-                document.id(this.mainLayout).setStyle('right', this.sidebar.getStyle('width').toInt() + 20);
+                document.id(this.mainLayout).setStyle('right', this.sidebar.getStyle('width').toInt() + 40);
                 var width = this.sidebarContainer.getSize().x;
                 if (width < 50) {
                     this.sidebarContainer.addClass('jarves-Window-sidebar-container-small');
@@ -1163,7 +1151,7 @@ jarves.Window = new Class({
                 this.fireEvent('resizeSidebar', width);
             }.bind(this));
 
-            this.setSidebarWidth(200);
+            this.setSidebarWidth(150);
 
             if (Modernizr.touch) {
                 Hammer(this.sidebarContainer).on('touch', function(event) {
@@ -1217,7 +1205,7 @@ jarves.Window = new Class({
 
     setSidebarWidth: function(width) {
         document.id(this.sidebar).setStyle('width', width);
-        document.id(this.mainLayout).setStyle('right', width + 20);
+        document.id(this.mainLayout).setStyle('right', width + 40);
     },
 
     /**
@@ -1253,7 +1241,7 @@ jarves.Window = new Class({
             return button;
         }.bind(this);
 
-        this.content.addClass('kwindow-win-content-with-bottom');
+        this.content.addClass('jarves-Window-win-content-with-bottom');
         return this.bottomBar;
     },
 
@@ -1269,7 +1257,7 @@ jarves.Window = new Class({
 
     createOverlay: function () {
         var overlay = new Element('div', {
-            'class': 'jarves-kwindow-overlay',
+            'class': 'jarves-jarves-Window-overlay',
             styles: {
                 opacity: 0.5,
                 position: 'absolute',
@@ -1297,7 +1285,7 @@ jarves.Window = new Class({
 
         ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'].each(function (item) {
             this.sizer[item] = new Element('div', {
-                'class': 'jarves-kwindow-sizer jarves-kwindow-sizer-' + item
+                'class': 'jarves-jarves-Window-sizer jarves-jarves-Window-sizer-' + item
             }).inject(this.border);
         }.bind(this));
 
@@ -1386,9 +1374,9 @@ jarves.Window = new Class({
 
     setContentStick: function(stick) {
         if (stick) {
-            this.content.addClass('kwindow-win-content-stick');
+            this.content.addClass('jarves-Window-win-content-stick');
         } else {
-            this.content.removeClass('kwindow-win-content-stick');
+            this.content.removeClass('jarves-Window-win-content-stick');
         }
     }
 

@@ -1134,7 +1134,7 @@ jarves.Select = new Class({
             return;
         }
 
-        if (this.box.getParent('.kwindow-win-titleGroups')) {
+        if (this.box.getParent('.jarves-Window-win-titleGroups')) {
             this.chooser.addClass('jarves-Select-darker');
         } else {
             this.chooser.removeClass('jarves-Select-darker');

@@ -4,13 +4,11 @@ a.jarves-Button,
 a.jarves-Button:link {
     white-space: nowrap;
     padding: 0px 10px;
-
     position: relative;
     cursor: default;
-    color: #444;
+    color: #eee;
     line-height: 28px;
     height: 30px;
-    font-weight: normal;
     text-align: center;
     margin: 0 4px;
 
@@ -19,10 +17,12 @@ a.jarves-Button:link {
     vertical-align: top;
 
     display: inline-block;
-    border: 1px solid #ddd;
+
+//    background-color: lighten($mainColor, 2%);
 
     @include box-sizing(border-box);
-    @include button();
+    -webkit-appearance: none;
+    border-radius: 0;
 }
 
 a.jarves-button-icon,
@@ -40,15 +40,20 @@ a.jarves-Button > span {
     position: relative;
 }
 
-.jarves-ActionBar a.jarves-Button,
-.jarves-ActionBar a.jarves-Button:link,
-.jarves-windowEdit-action-bar a.jarves-Button,
-.jarves-windowEdit-action-bar a.jarves-Button:link,
-.kwindow-win-titleGroups a.jarves-Button,
-.kwindow-win-titleGroups a.jarves-Button:link {
-    line-height: 28px;
-    height: 30px;
+a.jarves-Button:hover {
+    color: white;
+//    background-color: lighten($mainColor, 8%);
 }
+
+//.jarves-ActionBar a.jarves-Button,
+//.jarves-ActionBar a.jarves-Button:link,
+//.jarves-windowEdit-action-bar a.jarves-Button,
+//.jarves-windowEdit-action-bar a.jarves-Button:link,
+//.jarves-Window-win-titleGroups a.jarves-Button,
+//.jarves-Window-win-titleGroups a.jarves-Button:link {
+//    line-height: 28px;
+//    height: 30px;
+//}
 
 a.jarves-Button:last-child {
     margin-right: 0;
@@ -68,28 +73,25 @@ a.jarves-Button-textAndIcon:before {
     padding-right: 5px;
 }
 
-a.jarves-Button:hover {
-    background-color: #fafafa;
-    color: #111;
-}
+//a.jarves-Button:focus {
+//    border: 1px solid #3E9BCB;
+//    outline: 0;
+//    border-color: rgba(47, 140, 189, 0.9);
+//    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+//    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+//    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+//    box-shadow: 0 0 0 3px rgba(47, 140, 189, 0.2);
+//    color: black;
+//}
 
-a.jarves-Button:focus {
-    border: 1px solid #3E9BCB;
-    outline: 0;
-    border-color: rgba(47, 140, 189, 0.9);
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
-    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
-    box-shadow: 0 0 0 3px rgba(47, 140, 189, 0.2);
-    color: black;
-}
 
 a.jarves-Button:active,
 a.jarves-Button-pressed,
 a.jarves-Button-pressed:link,
 a.jarves-Button-pressed:hover,
 a.jarves-Button-pressed:active {
-    @include button-pressed();
+    color: #f5f5f5;
+    background-color: lighten($mainColor, 15%);
 }
 
 div.button-list {
@@ -111,32 +113,32 @@ a.jarves-Button img {
     left: -3px;
 }
 
-a.jarves-Button-red, a.jarves-Button-red:link {
-    color: white;
-    background-color: #b23935;
-}
-
-a.jarves-Button-red:hover {
-    color: #eee;
-}
-
-a.jarves-Button-red:active {
-    background-color: #af1715;
-}
-
-a.jarves-Button-blue,
-a.jarves-Button-blue:link {
-    @include button-primary();
-}
-
-a.jarves-Button-blue:hover {
-    color: #eee;
-    background-color: #205A81;
-}
-
-a.jarves-Button-blue:active {
-    background-color: #154A66;
-}
+//a.jarves-Button-red, a.jarves-Button-red:link {
+//    color: white;
+//    background-color: #b23935;
+//}
+//
+//a.jarves-Button-red:hover {
+//    color: #eee;
+//}
+//
+//a.jarves-Button-red:active {
+//    background-color: #af1715;
+//}
+//
+//a.jarves-Button-blue,
+//a.jarves-Button-blue:link {
+//    @include button-primary();
+//}
+//
+//a.jarves-Button-blue:hover {
+//    color: #eee;
+//    background-color: #205A81;
+//}
+//
+//a.jarves-Button-blue:active {
+//    background-color: #154A66;
+//}
 
 a.jarves-Button-deactivate,
 a.jarves-Button-deactivate:link,
@@ -146,10 +148,10 @@ a.jarves-Button-deactivate:hover {
     color: gray;
     background-color: transparent;
 }
-
-a.jarves-Button-loading:before {
-    content: url(../../images/loading.gif?v1);
-}
+//
+//a.jarves-Button-loading:before {
+//    content: url(../../images/loading.gif?v1);
+//}
 
 .jarves-Button-progress {
     position: absolute;

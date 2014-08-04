@@ -17,7 +17,7 @@ jarves.Base = new Class({
      * @returns {jarves.Window}
      */
     getWin: function() {
-        var win = this.toElement().getParent('.kwindow-border');
+        var win = this.toElement().getParent('.jarves-Window-border');
         if (win) {
             return win.windowInstance;
         }
@@ -112,7 +112,7 @@ jarves.Base = new Class({
             return this.win;
         }
 
-        var win = this.toElement().getParent('.kwindow-border');
+        var win = this.toElement().getParent('.jarves-Window-border');
         if (!win) {
             return null;
         }

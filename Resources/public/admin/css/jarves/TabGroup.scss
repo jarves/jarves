@@ -2,11 +2,35 @@
 
 .jarves-tabGroup,
 .jarves-tabGroup-small {
+    @include line-bottom;
     position: relative;
     white-space: nowrap;
-    padding-bottom: 0;
-    overflow: hidden;
-    text-align: center;
+    text-align: left;
+    padding: 1px 0;
+}
+
+.jarves-admin .jarves-Window-win-titleGroups {
+    .jarves-tabGroup, .jarves-tabGroup-small {
+        border-bottom: 0;
+        height: 30px;
+        display: inline-block;
+    }
+    a.jarves-tabGroup-item {
+        line-height: 29px;
+        height: 29px;
+    }
+}
+
+
+.jarves-admin a.jarves-tabGroup-item {
+    text-decoration: none;
+    display: inline-block;
+    padding: 0 10px;
+    min-width: 20px;
+    cursor: default;
+
+    line-height: 24px;
+    height: 24px;
 }
 
 .jarves-tabGroup:first-child,
@@ -16,20 +40,15 @@
 
 .jarves-admin a.jarves-tabGroup-item {
     text-decoration: none;
-    color: #424242;
     display: inline-block;
     padding: 0 10px;
     min-width: 20px;
     cursor: default;
 
-    line-height: 30px;
-    height: 30px;
-    font-size: 13px;
-
-    border-bottom: 1px solid #D8D8D8;
-    border-right: 1px solid #D1D1D1;
-    border-top: 1px solid #E2E2E2;
-    background-color: #f9f9f9;
+    line-height: 24px;
+    height: 24px;
+    font-size: 12px;
+    background-color: lighten($mainColor, 3%);
 }
 
 .jarves-admin .jarves-tabGroup-small a.jarves-tabGroup-item {
@@ -51,23 +70,19 @@
 }
 
 .jarves-admin a.jarves-tabGroup-item-first {
-     border-top-left-radius: 5px;
-     border-bottom-left-radius: 5px;
-     border-left: 1px solid #DFDFDF;
  }
 
 .jarves-admin a.jarves-tabGroup-item-last {
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
  }
 
 .jarves-admin a.jarves-tabGroup-item:hover {
-    background-color: #fafafa;
-    color: #111;
+    background-color: lighten($mainColor, 3%);
+    color: #eee;
 }
 
 .jarves-admin a.jarves-tabGroup-item-active,
 .jarves-admin a.jarves-tabGroup-item-active:hover  {
     position: relative;
-    background-color: #E4E4E4;
+    color: white;
+    background-color: lighten($mainColor, 15%);
 }

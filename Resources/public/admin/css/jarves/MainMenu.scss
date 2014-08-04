@@ -9,6 +9,7 @@ a.jarves-mainMenu-link {
     color: #f9f9f9;
     padding-left: 15px;
     @include transition (all 0.5s);
+    font-weight: 300;
 }
 
 a.jarves-mainMenu-link:before {
@@ -23,24 +24,27 @@ a.jarves-mainMenu-link:before {
 }
 
 .jarves-mainMenu-cat {
-    margin-top: 10px;
+    margin-bottom: 10px;
     position: relative;
-    border-top: 1px solid darken($mainColor, 3%);
+    @include line-top-right;
 }
-
 
 .jarves-mainMenu-cat h2 {
     margin: 0;
     padding: 7px 0;
-    padding-top: 9px;
+    padding-top: 5px;
 }
 
 .jarves-mainMenu-cat h2:hover {
-    background-color: darken($mainColor, 3%);
+    background-color: lighten($mainColor, 3%);
 }
 
 .jarves-mainMenu-cat-hidden a.jarves-mainMenu-link {
     display: none;
+}
+
+.jarves-mainMenu-cat-hidden {
+    margin-bottom: 0;
 }
 
 .jarves-mainMenu-cat h2 {
@@ -50,14 +54,15 @@ a.jarves-mainMenu-link:before {
 
 a.jarves-mainMenu-link:hover {
     color: white;
-    background-color: darken($mainColor, 5%);
+    background-color: lighten($mainColor, 5%);
 }
 
-a.jarves-mainMenu-cat-toggle {
+.jarves-mainMenu-cat-toggle {
     color: #596C85;
     display: inline-block;
-    font-size: 11px;
+    font-size: 10px;
     position: absolute;
-    right: 8px;
-    top: 10px;
+    right: 2px;
+    top: 8px;
+    pointer-events: none;
 }

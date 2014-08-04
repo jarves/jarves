@@ -28,7 +28,7 @@ jarves.DatePicker = new Class({
             this.input = pInput;
         }
 
-        var kwindow = this.input.getParent('.kwindow-border');
+        var kwindow = this.input.getParent('.jarves-Window-border');
         if (kwindow) {
             kwindow.windowInstance.addEvent('close', function() {
                 if (this.chooser) {

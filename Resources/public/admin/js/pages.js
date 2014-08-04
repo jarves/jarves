@@ -11,10 +11,7 @@ var jarves_pages = new Class({
     },
 
     createLayout: function () {
-        this.win.content.setStyle('border', 0);
-        this.win.content.setStyle('top', 0);
         this.win.content.setStyle('overflow', 'hidden');
-        this.win.content.setStyle('background-color', 'transparent');
         document.id(this.win.getMainLayout()).addClass('jarves-pages-main-layout');
 
         new jarves.Field({

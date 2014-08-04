@@ -1,14 +1,14 @@
-.kwindow-win-imageTabWrapper {
+.jarves-Window-win-imageTabWrapper {
     width: 75px;
     height: 100px;
 }
 
-.jarves-imageGroup .kwindow-win-tabWrapper {
+.jarves-imageGroup .jarves-Window-win-tabWrapper {
     background-color: #eaeaea;
     padding: 18px 7px 2px;
 }
 
-.jarves-imageGroup .kwindow-win-imageTabWrapper:hover {
+.jarves-imageGroup .jarves-Window-win-imageTabWrapper:hover {
     background-color: #ddd;
 }
 
@@ -16,11 +16,11 @@
     background-color: #d7d7d7;
 }
 
-.jarves-imageGroup .kwindow-win-tabWrapperFirst {
+.jarves-imageGroup .jarves-Window-win-tabWrapperFirst {
     -moz-border-radius-bottomleft: 4px;
 }
 
-.jarves-imageGroup .kwindow-win-tabWrapperLast {
+.jarves-imageGroup .jarves-Window-win-tabWrapperLast {
     -moz-border-radius-bottomright: 4px;
 }
 

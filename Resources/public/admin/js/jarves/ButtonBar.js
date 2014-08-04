@@ -2,7 +2,7 @@ jarves.ButtonBar = new Class({
     initialize: function (pParent) {
         this.buttons = [];
         this.box = new Element('div', {
-            'class': 'kwindow-win-buttonBar'
+            'class': 'jarves-Window-win-buttonBar'
         }).inject(pParent);
     },
 

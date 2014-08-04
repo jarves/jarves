@@ -35,7 +35,7 @@ jarves.field_multiUpload = new Class({
         this.uploadBtnId = 'uploadBtn_' + Math.ceil(Math.random() * 100) + '_' + Math.ceil(Math.random() * 100);
         this.uploadBtn = new Element('div', {
             'title': this.options.buttontitle,
-            'class': 'kwindow-win-buttonWrapper multiUpload-uploadBtnDiv',
+            'class': 'jarves-Window-win-buttonWrapper multiUpload-uploadBtnDiv',
             'style': 'background : transparent url(' + _path +
                 'bundles/admin/images/admin-files-uploadFile.png) center center no-repeat;cursor:pointer;' }).inject(this.parentField.main);
 

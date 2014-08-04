@@ -3,7 +3,6 @@
 html, body {
     margin: 0;
     padding: 0;
-
 }
 
 $base-font-size: 13px;
@@ -13,12 +12,13 @@ $base-font-size: 13px;
     font-size: $base-font-size;
     margin: 0px;
     padding: 0px;
-    color:#444;
+    color: white;
     line-height: normal;
     text-align: left;
     -webkit-font-smoothing: antialiased;
     text-rendering: geometricPrecision;
     font-smooth: never;
+    font-weight: 300;
 }
 
 .jarves-admin {
@@ -47,7 +47,7 @@ $base-font-size: 13px;
 
     h2 {
         font-size: 26px;
-        color: #666;
+        color: #969696;
         margin: 5px 0;
         padding: 0;
     }
@@ -92,11 +92,16 @@ $base-font-size: 13px;
 
     a,
     a:link {
-        color: gray;
+        color: $mainLinkColor;
+        display: inline-block;
+        padding: 1px 3px;
+        text-decoration: none;
     }
 
     a:hover {
-        color: #333;
+        color: darken($mainLinkColor, 60%);
+        cursor: pointer;
+        background-color: lighten($mainColor, 15%);
     }
 
     a img,
@@ -135,8 +140,8 @@ $base-font-size: 13px;
     overflow: auto;
     position: relative;
     -webkit-overflow-scrolling: touch;
-    -webkit-backface-visibility: hidden;
-    -webkit-perspective: 1000;
+//    -webkit-backface-visibility: hidden;
+//    -webkit-perspective: 1000;
 }
 
 .jarves-description {
@@ -237,13 +242,14 @@ $base-font-size: 13px;
     right: 0;
     overflow: hidden;
     bottom: 0;
+    background-color: $mainColor;
 }
 
 .jarves-app-container {
     position: absolute;
-    left: 200px;
+    left: 265px;
     top: 0;
-    right: 0;
+    right: 15px;
     bottom: 0;
 
     -webkit-transition:all 0.2s ease-out;
@@ -255,28 +261,42 @@ $base-font-size: 13px;
 .jarves-main-dialog-container > .jarves-dialog-overlay > .jarves-dialog {
     box-shadow: none;
     position: relative;
-    padding: 0 50px;
     max-width: 100%;
     max-height: 100%;
     min-height: 100%;
+    border-bottom: 0;
+    padding: 0;
+    &:after {
+        display: none;
+    }
+    &:before {
+        display: none;
+    }
+}
+
+
+.jarves-main-dialog-container > .jarves-dialog-overlay > .jarves-dialog > .jarves-dialog-content {
+    padding: 0;
 }
 
 .jarves-desktop {
+    @include line-top-left;
     position: absolute;
-    top: 31px;
+    top: 46px;
     left: 0;
     right: 0;
     bottom: 0;
-    overflow: auto;
+    overflow: visible;
 }
 
 .jarves-main-dialog-container {
+    @include line-top;
     position: absolute;
-    left: 0;
-    top: 60px;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.8);
+    left: 265px;
+    top: 13px;
+    right: 15px;
+    bottom: 13px;
+    background: $mainColor;
     display: none;
     z-index:3000;
 
@@ -284,7 +304,20 @@ $base-font-size: 13px;
     -moz-transition: all 0.2s ease-out;
     -o-transition: all 0.2s ease-out;
     transition: all 0.2s ease-out;
-    border-top: 5px solid #173244;
+}
+
+.jarves-main-dialog-container h1:first-child {
+    font-size: 12px;
+    padding: 5px 0;
+    margin: 0;
+    @include line-bottom;
+    color: white;
+    line-height: 15px;
+}
+.jarves-main-dialog-container .jarves-dialog-overlay {
+    position: absolute;
+    overflow: auto;
+    padding: 0;
 }
 
 .jarves-main-dialog-container-visible {
@@ -292,13 +325,14 @@ $base-font-size: 13px;
 }
 
 .jarves-main-menu-wm-tabs {
+    @include line-top-left();
+
     position: absolute;
     left: 0;
-    top: 0;
+    top: 13px;
     height: 30px;
     right: 0;
-    background-color: #ddd;
-    border-bottom: 1px solid silver;
+    padding: 1px 0;
 }
 
 .jarves-wm-tab {
@@ -307,10 +341,9 @@ $base-font-size: 13px;
     height: 30px;
     padding: 0 15px;
     padding-right: 25px;
-    background-color: #d3d3d3;
-    border-right: 1px solid #c5c5c5;
+    background-color: lighten($mainColor, 5%);
     cursor: default;
-    color: #666;
+    color: #eee;
     position: relative;
 }
 
@@ -319,22 +352,14 @@ $base-font-size: 13px;
     .jarves-wm-tab > a:link {
         position: absolute;
         right: 3px;
-        top: 8px;
+        top: 7px;
         display: block;
         height: 12px;
         padding: 2px;
         line-height: 13px;
         text-decoration: none;
+        color: #D5D5D5;
     }
-
-    .jarves-wm-tab > a:hover {
-        -moz-border-radius: 3px;
-        -webkit-border-radius: 3px;
-        border-radius: 3px;
-        background-color: silver;
-        color: white;
-    }
-
 
     .jarves-wm-tab > a:active {
         background-color: gray;
@@ -343,53 +368,92 @@ $base-font-size: 13px;
 
 .jarves-wm-tab:before {
     padding-right: 10px;
-    color: #444;
 }
 
-a.jarves-wm-tab:hover {
-    background-color: #c8c8c8;
+.jarves-wm-tab:hover {
+    background-color: lighten($mainColor, 3%);
 }
 
 .jarves-wm-tab-active,
 .jarves-wm-tab-active:hover {
-    background-color: #fafafa;
-    height: 31px;
-    color: #333;
+    background-color: lighten($mainColor, 15%);
+    color: white;
 }
 
 .jarves-main-menu {
     position: absolute;
-    top: 120px;
+    top: 210px;
     left: 0;
     bottom: 50px;
     right: 0;
     text-align: center;
-    overflow: hidden;
+}
+
+.jarves-main-menu-bottom {
+    @include line-top-right;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 40px;
+    text-align: right;
+}
+
+.jarves-main-menu-bottom-collapse {
+    text-transform: uppercase;
+}
+
+.jarves-main-menu-bottom-collapse span {
+    position: relative;
+    top: 1px;
+    margin-left: 2px;
 }
 
 .jarves-main-menu-left {
     position: absolute;
     top: 0;
-    left: 0;
+    left: 15px;
     bottom: 0;
-    width: 200px;
+    width: 215px;
     text-align: center;
     background-color: $mainColor;
     overflow: auto;
 }
+
+.jarves-main-menu-actions,
 .jarves-main-menu-user {
     text-align: right;
+    @include line-top-right;
 }
 
-.jarves-main-menu-user > h2 {
+.jarves-main-menu-actions {
+    padding: 7px 0;
+}
+
+input.jarves-main-menu-actions-search-input {
+    margin-bottom: 2px;
+}
+
+.jarves-main-menu-actions-links {
+    text-transform: uppercase;
+}
+
+.jarves-main-menu-actions-links a {
+    display: inline-block;
+    margin-left: 7px;
+    font-size: 10px;
+}
+
+.jarves-main-menu-user-name {
     margin: 0;
-    padding: 0;
+    padding: 3px 0;
     color: white;
     display: inline-block;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: normal;
+    text-transform: uppercase;
     line-height: 20px;
-    padding-top: 12px;
+    font-weight: 300;
 }
 
 .jarves-main-menu-user .username {
@@ -531,6 +595,12 @@ img.jarves-main-menu-start {
 
 .jarves-main-menu-left-logo {
     margin: 25px auto;
+    width: 55px;
+}
+
+.jarves-main-menu-logo-container {
+    margin-top: 13px;
+    @include line-top-right(13px);
 }
 
 .jarves-search-query-icon {
@@ -691,30 +761,6 @@ a.jarves-create-search-index-icon.red {
     padding-top: 3px;
 }
 
-.jarves-pages-tree-elementPropertyToolbarToggler {
-    position: absolute;
-    left: 0px;
-    right: 0px;
-    top: -6px;
-    height: 6px;
-    background-image: url(../images/jarves-admin-possibleContenItems-toggler.png);
-}
-
-.jarves-pages-tree-elementPropertyToolbar .jarves-field-main-small {
-    width: 190px;
-    padding: 0px 2px;
-}
-
-.jarves-pages-tree-elementPropertyToolbar .jarves-field-main-small .jarves-field-field {
-    margin-left: 9px;
-    margin-top: 2px;
-    margin-bottom: 3px;
-}
-
-.jarves-pages-tree-elementPropertyToolbar select {
-    margin: 1px;
-}
-
 .jarves-searchcontext {
     position: absolute;
     top: 60px;
@@ -784,7 +830,7 @@ a.jarves-create-search-index-icon.red {
 * for a white background
 *
 */
-.jarves-main-menu-light .kwindow-win-buttonGroup {
+.jarves-main-menu-light .jarves-Window-win-buttonGroup {
     border-bottom: 1px solid #999; /*#888;*/
     border-right: 1px solid #999; /*#777;*/
     border-left: 1px solid #999; /*#777;*/

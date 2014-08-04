@@ -64,7 +64,7 @@ jarves.MainMenu = new Class({
 
     prepareCat: function(cat, bundleName) {
 
-        var toggle = new Element('a', {
+        var toggle = new Element('span', {
             'class': 'jarves-mainMenu-cat-toggle icon-arrow-down-3',
             title: t('Hide')
         }).inject(cat);

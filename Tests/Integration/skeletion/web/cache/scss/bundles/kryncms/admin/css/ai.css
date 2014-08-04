@@ -702,7 +702,7 @@ a.jarves-create-search-index-icon.red {
  * * for a white background
  * *
  */
-.jarves-main-menu-light .kwindow-win-buttonGroup {
+.jarves-main-menu-light .jarves-Window-win-buttonGroup {
   border-bottom: 1px solid #999999;
     /*
    * #888;

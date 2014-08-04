@@ -102,15 +102,15 @@ a.jarves-backendChoosers-search-button-active:link {
     cursor: pointer;
 }
 
-.jarves-BackendChooser-pane > .kwindow-border > .jarves-Layout-main-fixed {
+.jarves-BackendChooser-pane > .jarves-Window-border > .jarves-Layout-main-fixed {
     bottom: 0;
     left: 0;
     right: 0;
     top: 0;
 }
 
-.jarves-BackendChooser-pane > .kwindow-border {
-    background-color: #F9F9F9;
+.jarves-BackendChooser-pane > .jarves-Window-border {
+    left: 15px;
 }
 
 .jarves-BackendChooser-pane .jarves-Files-wrapper {

@@ -1,4 +1,4 @@
-@import "../bourbon/bourbon";
+@import "../base";
 
 .jarves-objectTree {
     position: relative;
@@ -60,7 +60,6 @@
     position: relative;
     line-height: 25px;
     height: 25px;
-    color: #444;
     cursor: default;
     white-space: nowrap;
     display: inline-block;
@@ -71,8 +70,7 @@
 .jarves-objectTree-item-hover,
 .jarves-objectTree-item-hover:link,
 .jarves-objectTree-item-selectable:hover {
-    background-color: #e5e5e5;
-    color: #444;
+    background-color: lighten($mainColor, 2%);
 }
 
 .jarves-objectTree-item-over {
@@ -113,7 +111,7 @@
 
 .jarves-objectTree-item-selected,
 .jarves-objectTree-item-selected:hover {
-    background-color: #22638E;
+    background-color: lighten($mainColor, 4%);
     color: white;
 }
 
@@ -177,7 +175,6 @@
     line-height: 13px;
     padding: 1px 5px 1px 8px;
     cursor: pointer;
-    color: #444;
 }
 
 .jarves-objectTree-context a:hover {

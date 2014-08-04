@@ -1,29 +1,98 @@
 @import "bourbon";
 @import "variables";
+//
+//@mixin button() {
+////    @include linear-gradient(lighten($buttonColor, 20%), $buttonColor);
+//    border-radius: 2px;
+//    color: #444;
+////    &:hover {
+////        @include linear-gradient($buttonColor, darken($buttonColor, 2%));
+////    }
+//}
+//
+//@mixin button-pressed() {
+//    @include button();
+////    @include linear-gradient(#e7e7e7, darken($buttonColor, 6%));
+////    &:hover {
+////        @include linear-gradient(#e7e7e7, darken($buttonColor, 6%));
+////    }
+//}
+//
+//@mixin button-primary() {
+//    @include button();
+////    @include linear-gradient(lighten($buttonColorPrimary, 1%), $buttonColorPrimary);
+////    color: white;
+////    border: 1px solid darken($buttonColorPrimary, 6%);
+////    &:hover {
+////        @include linear-gradient(darken($buttonColorPrimary, 2%), darken($buttonColorPrimary, 3%));
+////    }
+//}
 
-@mixin button() {
-    @include linear-gradient(lighten($buttonColor, 20%), $buttonColor);
-    border-radius: 2px;
-    color: #444;
-    &:hover {
-        @include linear-gradient($buttonColor, darken($buttonColor, 2%));
+@mixin dot-right {
+    position: relative;
+    &:after {
+        position: absolute;
+        right: 0;
+        top: -1px;
+        width: 1px;
+        height: 1px;
+        content: '';
+        background-color: lighten($mainColor, 50%);
     }
 }
 
-@mixin button-pressed() {
-    @include button();
-    @include linear-gradient(#e7e7e7, darken($buttonColor, 6%));
-    &:hover {
-        @include linear-gradient(#e7e7e7, darken($buttonColor, 6%));
+@mixin dot-left() {
+    position: relative;
+    &:before {
+        position: absolute;
+        left: 0;
+        top: -1px;
+        width: 1px;
+        height: 1px;
+        content: '';
+        background-color: lighten($mainColor, 50%);
     }
 }
 
-@mixin button-primary() {
-    @include button();
-    @include linear-gradient(lighten($buttonColorPrimary, 1%), $buttonColorPrimary);
-    color: white;
-    border: 1px solid darken($buttonColorPrimary, 6%);
-    &:hover {
-        @include linear-gradient(darken($buttonColorPrimary, 2%), darken($buttonColorPrimary, 3%));
+@mixin dot-left-bottom() {
+    @include dot-left;
+    &:before {
+        bottom: -1px;
+        top: auto;
     }
+}
+
+@mixin dot-right-bottom() {
+    @include dot-right;
+    &:after {
+        bottom: -1px;
+        top: auto;
+    }
+}
+
+@mixin line-top-right {
+    border-top: 1px solid lighten($mainColor, 15%);
+    @include dot-right();
+}
+
+@mixin line-top-left {
+    border-top: 1px solid lighten($mainColor, 15%);
+    @include dot-left();
+}
+
+@mixin line-top {
+    border-top: 1px solid lighten($mainColor, 15%);
+    @include dot-right();
+    @include dot-left();
+}
+
+@mixin line-bottom-left {
+    border-bottom: 1px solid lighten($mainColor, 15%);
+    @include dot-left-bottom();
+}
+
+@mixin line-bottom {
+    border-bottom: 1px solid lighten($mainColor, 15%);
+    @include dot-left-bottom();
+    @include dot-right-bottom();
 }

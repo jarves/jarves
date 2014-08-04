@@ -268,8 +268,8 @@ jarves.ObjectTree = new Class({
             this.loadFirstLevel();
         }
 
-        if (container && container.getParent('.kwindow-border')) {
-            container.getParent('.kwindow-border').windowInstance.addEvent('close', this.clean.bind(this));
+        if (container && container.getParent('.jarves-Window-border')) {
+            container.getParent('.jarves-Window-border').windowInstance.addEvent('close', this.clean.bind(this));
         }
 
         window.addEvent('mouseup', this.destroyContext.bind(this));
@@ -1050,7 +1050,7 @@ jarves.ObjectTree = new Class({
          }
          }*/
 
-        var kwin = pA.getParent('.kwindow-border');
+        var kwin = pA.getParent('.jarves-Window-border');
 
         if (this.lastClone) {
             this.lastClone.destroy();

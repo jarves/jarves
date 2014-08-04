@@ -41,7 +41,7 @@ class UserCrudController extends WindowController
             ),
         'groups.name' =>
             array(
-                'label' => 'Group membership'
+                'label' => 'Groups'
             )
     );
 

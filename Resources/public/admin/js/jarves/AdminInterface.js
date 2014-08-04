@@ -104,31 +104,31 @@ jarves.AdminInterface = new Class({
         return this.appContainerAnimation;
     },
 
-//    openDashboard: function() {
-//        if (this.checkLastSystemDialog('dashboard')) return;
-//        this.lastSystemDialog = new jarves.SystemDialog(this.getDialogContainer(), {
-//            autoClose: true
-//        });
-//
-//        this.btnOpenDashboard.addClass('jarves-main-menu-active');
-//        this.lastSystemDialog.addEvent('close', function(){
-//            this.btnOpenDashboard.removeClass('jarves-main-menu-active');
-//        }.bind(this));
-//
-//        new Element('h1', {
-//            text: t('Dashboard')
-//        }).inject(this.lastSystemDialog.getContentContainer());
-//
-//        this.lastSystemDialog.center();
-//
-//        var dashboardInstance = new jarves.Dashboard(this.lastSystemDialog.getContentContainer());
-//
-//        this.lastSystemDialog.addEvent('closed', function() {
-//            dashboardInstance.destroy();
-//            this.clearLastSystemDialog();
-//        }.bind(this));
-//
-//    },
+    openDashboard: function() {
+        if (this.checkLastSystemDialog('dashboard')) return;
+        this.lastSystemDialog = new jarves.SystemDialog(this.getDialogContainer(), {
+            autoClose: true
+        });
+
+        this.btnOpenDashboard.addClass('jarves-main-menu-active');
+        this.lastSystemDialog.addEvent('close', function(){
+            this.btnOpenDashboard.removeClass('jarves-main-menu-active');
+        }.bind(this));
+
+        new Element('h1', {
+            text: t('Dashboard')
+        }).inject(this.lastSystemDialog.getContentContainer());
+
+        this.lastSystemDialog.center();
+
+        var dashboardInstance = new jarves.Dashboard(this.lastSystemDialog.getContentContainer());
+
+        this.lastSystemDialog.addEvent('closed', function() {
+            dashboardInstance.destroy();
+            this.clearLastSystemDialog();
+        }.bind(this));
+
+    },
 
     getDialogContainer: function(){
         if (!this.dialogContainer) {
@@ -211,45 +211,73 @@ jarves.AdminInterface = new Class({
             'class': 'jarves-main-menu-left'
         }).inject(this.border);
 
+
+        this.mainMenuTopLogoContainer = new Element('div', {
+            'class': 'jarves-main-menu-logo-container'
+        }).inject(this.mainMenuTop);
+
         this.mainMenuTopLogo = new Element('img', {
             'class': 'jarves-main-menu-left-logo',
             src: _path + 'bundles/jarves/admin/images/logo.png'
-        }).inject(this.mainMenuTop);
+        }).inject(this.mainMenuTopLogoContainer);
 
+
+        // user
         this.mainMenuUser = new Element('div', {
             'class': 'jarves-main-menu-user'
         }).inject(this.mainMenuTop);
 
-        this.mainMenuContainer = new Element('div', {
-            'class': 'jarves-main-menu'
+        this.mainMenuUserName = new Element('div', {
+            'class': 'jarves-main-menu-user-name'
+        }).inject(this.mainMenuUser);
+
+
+
+        // actions
+        this.mainMenuActions = new Element('div', {
+            'class': 'jarves-main-menu-actions'
         }).inject(this.mainMenuTop);
-//
-//        this.btnOpenDashboard = new Element('a',{
-//            'class': 'icon-stats-up',
-//            text: tc('mainMenu', 'Dashboard')
-//        })
-//            .addEvent('click', this.openDashboard)
-//            .inject(this.mainMenu);
-//
-//        this.mainMenuStartButton = new Element('a',{
-//            'class': 'jarves-main-menu-start',
-//            text: tc('mainMenu', 'Apps')
-//        })
-//            .addEvent('click', this.openApps)
-//            .inject(this.mainMenu);
-//
-//        new Element('img', {
-//            'class': 'jarves-main-menu-start',
-//            src: _path + 'bundles/jarves/admin/images/jarves-icon.png'
-//        })
-//            .inject(this.mainMenuStartButton, 'top');
-//
-//        this.btnOpenSystem = new Element('a',{
-//            'class': 'icon-cog-2',
-//            text: tc('mainMenu', 'System')
-//        })
-//            .addEvent('click', this.openSettings)
-//            .inject(this.mainMenu);
+
+        this.mainMenuSearchInput = new Element('input', {
+            'class': 'jarves-Input-text jarves-main-menu-actions-search-input'
+        }).inject(this.mainMenuActions);
+
+        this.mainMenuActionsLinks = new Element('div', {
+            'class': 'jarves-main-menu-actions-links'
+        }).inject(this.mainMenuActions);
+
+        this.mainMenuActionsSearchBtn = new Element('a', {
+            text: 'Search'
+        }).inject(this.mainMenuActionsLinks);
+
+        this.mainMenuActionsCacheBtn = new Element('a', {
+            text: 'Wipe Cache'
+        }).inject(this.mainMenuActionsLinks);
+
+        this.mainMenuActionsLogoutBtn = new Element('a', {
+            text: 'Logout'
+        })
+            .addEvent('click', function(){this.logout()}.bind(this))
+            .inject(this.mainMenuActionsLinks);
+
+
+        // actual menu
+        this.mainMenuContainer = new Element('div', {
+            'class': 'jarves-main-menu jarves-scrolling'
+        }).inject(this.mainMenuTop);
+
+        this.mainMenuBottom = new Element('div', {
+            'class': 'jarves-main-menu-bottom'
+        }).inject(this.mainMenuTop);
+
+        this.mainMenuBottomCollapse = new Element('a', {
+            'class': 'jarves-main-menu-bottom-collapse',
+            text: t('Collapse')
+        }).inject(this.mainMenuBottom);
+
+        new Element('span', {
+            'class': 'icon-arrow-left-5'
+        }).inject(this.mainMenuBottomCollapse);
 
         this.appContainer = new Element('div', {
             'class': 'jarves-app-container'
@@ -257,7 +285,7 @@ jarves.AdminInterface = new Class({
 
         this.wmTabContainer = new Element('div', {
             'class': 'jarves-main-menu-wm-tabs'
-        }).inject(this.appContainer)
+        }).inject(this.appContainer);
 
 //        if (this.options.frontPage) {
 //            this.desktopContainer = this.border;
@@ -272,7 +300,7 @@ jarves.AdminInterface = new Class({
 //            }.bind(this));
 //        } else {
             this.desktopContainer = new Element('div', {
-                'class': 'jarves-desktop jarves-admin jarves-scrolling'
+                'class': 'jarves-desktop jarves-admin'
             }).inject(this.appContainer);
 //        }
 
@@ -313,43 +341,39 @@ jarves.AdminInterface = new Class({
         this.renderMenu();
 
         this.border.setStyles({'display': 'block'});
-        this.mainMenuUser.empty();
+        this.mainMenuUserName.set('text', tf('Welcome, %s %s', window._session.firstName, window._session.lastName));
 
-        new Element('h2', {
-            text: tf('%s %s', window._session.firstName, window._session.lastName)
-        }).inject(this.mainMenuUser);
+//        var profilePictureUrl;
+//        if (window._session.imagePath) {
+//            profilePictureUrl = _path + window._session.imagePath.substr(1);
+//        } else if (window._session.emailMd5) {
+//            profilePictureUrl = 'https://secure.gravatar.com/avatar/' + window._session.emailMd5;
+//        }
+//
+//        if (profilePictureUrl) {
+//            new Element('img', {
+//                'class': 'profile-image',
+//                src: profilePictureUrl
+//            }).inject(this.mainMenuUser);
+//        }
+//
+//        new Element('br').inject(this.mainMenuUser);
 
-        var profilePictureUrl;
-        if (window._session.imagePath) {
-            profilePictureUrl = _path + window._session.imagePath.substr(1);
-        } else if (window._session.emailMd5) {
-            profilePictureUrl = 'https://secure.gravatar.com/avatar/' + window._session.emailMd5;
-        }
+//        new Element('span', {
+//            text: window._session.username,
+//            'class': 'username'
+//        })
+//            .addEvent('click', function() {
+//                jarves.wm.open('users/users/editMe', {values: {id: window._userId}});
+//            })
+//            .inject(this.mainMenuUser);
 
-        if (profilePictureUrl) {
-            new Element('img', {
-                'class': 'profile-image',
-                src: profilePictureUrl
-            }).inject(this.mainMenuUser);
-        }
-
-        new Element('br').inject(this.mainMenuUser);
-
-        new Element('span', {
-            text: window._session.username,
-            'class': 'username'
-        })
-            .addEvent('click', function() {
-                jarves.wm.open('users/users/editMe', {values: {id: window._userId}});
-            })
-            .inject(this.mainMenuUser);
-
-
-        this.logoutButton = new jarves.Button(t('Logout'))
-            .addEvent('click', function() {
-                this.logout();
-            }.bind(this))
-            .inject(this.mainMenuUser);
+//
+//        this.logoutButton = new jarves.Button(t('Logout'))
+//            .addEvent('click', function() {
+//                this.logout();
+//            }.bind(this))
+//            .inject(this.mainMenuUser);
 
         if (!this.helpsystem) {
             this.helpsystem = new jarves.Helpsystem(document.body);
@@ -426,9 +450,9 @@ jarves.AdminInterface = new Class({
 
         jarves.wm.handleHashtag();
 
-//        if (!window.location.hash) {
+        if (!window.location.hash) {
 //            this.openDashboard();
-//        }
+        }
         jarves.wm.updateWindowBar();
     },
 
@@ -740,11 +764,18 @@ jarves.AdminInterface = new Class({
             document.activeElement.blur();
         }).delay(10, this);
         this.blockLoginForm();
+
         this.loginMessage.set('html', t('Check Login. Please wait ...'));
         if (this.loginFailedClearer) {
             clearTimeout(this.loginFailedClearer);
         }
-        new Request.JSON({url: _pathAdmin + 'admin/login', noCache: 1, onComplete: function(res) {
+
+        new Request.JSON({url: _pathAdmin + 'admin/login', noCache: 1,
+            onException: function(){
+                this.loginFailed();
+                this.unblockLoginForm();
+            }.bind(this),
+            onComplete: function(res) {
             if (res.data) {
                 this.loginSuccess(res.data);
             } else {
@@ -796,7 +827,6 @@ jarves.AdminInterface = new Class({
                 this.unblockLoginForm();
                 this.loginPw.focus();
 
-                this.middle.setStyle('border', '5px solid #ffffff');
                 this.middle.setStyle('height');
             }.bind(this));
 
@@ -841,17 +871,17 @@ jarves.AdminInterface = new Class({
 
     blockLoginForm: function(pAlready) {
         if (pAlready) {
-            this.loaderTop.setStyles({'height': 91, 'border-bottom': '1px solid #ffffff'});
-            this.loaderBottom.setStyles({'height': 92, 'border-top': '1px solid #ffffff'});
+            this.loaderTop.setStyles({'height': 91, 'border-bottom': '1px solid #aaaaaa'});
+            this.loaderBottom.setStyles({'height': 92, 'border-top': '1px solid #aaaaaa'});
         } else {
-            this.loaderTop.morph({'height': 91, 'border-bottom': '1px solid #ffffff'});
-            this.loaderBottom.morph({'height': 92, 'border-top': '1px solid #ffffff'});
+            this.loaderTop.morph({'height': 91, 'border-bottom': '1px solid #aaaaaa'});
+            this.loaderBottom.morph({'height': 92, 'border-top': '1px solid #aaaaaa'});
         }
     },
 
     unblockLoginForm: function() {
-        this.loaderTop.morph({'height': 0, 'border-bottom': '0px solid #ffffff'});
-        this.loaderBottom.morph({'height': 0, 'border-top': '0px solid #ffffff'});
+        this.loaderTop.morph({'height': 0, 'border-bottom': '0px solid #ddddd'});
+        this.loaderBottom.morph({'height': 0, 'border-top': '0px solid #ddddd'});
         (function(){
             this.loginPw.focus();
         }.bind(this)).delay(200);
@@ -1018,6 +1048,12 @@ jarves.AdminInterface = new Class({
         if (!this.mainMenuContainer) return;
 
         this.mainMenuContainer.empty();
+
+        this.btnOpenDashboard = new Element('a', {
+            text: 'Dashboard',
+            'class': 'jarves-mainMenu-link icon-stats-up'
+        }).addEvent('click', this.openDashboard.bind(this)).inject(this.mainMenuContainer);
+
         this.mainMenu = new jarves.MainMenu(this.mainMenuContainer, this.getMenuItems());
     },
 

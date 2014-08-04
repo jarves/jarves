@@ -22,19 +22,17 @@ a.jarves-Select-box:link {
     display: inline-block;
     line-height: 28px;
 
-    color: #333;
-
     vertical-align: top;
     min-width: 40px;
     margin: 0 4px;
-    border: 1px solid #ddd;
+
+    color: #eee;
 
     text-align: left;
 
     max-width: 100%;
 
     @include box-sizing(border-box);
-    @include button();
 }
 
 .jarves-Select-box:first-child {
@@ -53,10 +51,6 @@ a.jarves-Select-box:link {
 
 .jarves-ButtonGroup > .jarves-Select-box:first-child {
     border-left: 1px solid #ececec;
-}
-
-.jarves-Select-arrow {
-    background-color: #fefefe;
 }
 
 a.jarves-Select-box:focus {
@@ -84,7 +78,7 @@ a.jarves-Select-box:hover,
 a.jarves-Select-box-open,
 a.jarves-Select-box-open:link,
 a.jarves-Select-box-open:hover {
-    background-color: #f4f4f4;
+//    background-color: lighten($mainColor, 3%);
 }
 
 a.jarves-Select-transparent,
@@ -93,7 +87,6 @@ a.jarves-Select-transparent:link,
 a.jarves-Select-transparent:active,
 a.jarves-Select-transparent .jarves-Select-box:active > .jarves-Select-arrow,
 a.jarves-Select-transparent .jarves-Select-box-focus > .jarves-Select-arrow {
-    background-color: transparent;
     background: transparent;
     border: 0;
     box-shadow: none;
@@ -101,12 +94,12 @@ a.jarves-Select-transparent .jarves-Select-box-focus > .jarves-Select-arrow {
 }
 
 a.jarves-Select-box-focus {
-    border: 1px solid #3E9BCB;
+//    border: 1px solid #3E9BCB;
 }
 
 .jarves-Select-box-title {
     padding-left: 5px;
-    padding-right: 25px;
+    padding-right: 18px;
     display: inline-block;
     white-space: nowrap;
 }
@@ -121,12 +114,11 @@ a.jarves-Select-box-focus {
 
 .jarves-Select-arrow {
     position: absolute;
-    padding-top: 1px;
+    padding-top: 3px;
     padding-right: 5px;
     top: 0;
     right: 0;
     bottom: 0px;
-    border-left: 1px solid #DDD;
     width: 14px;
 }
 
@@ -142,7 +134,7 @@ a.jarves-Select-box-focus {
 
 .jarves-Select-chooser {
     margin: 0px auto;
-    border: 1px solid #e6e6e6;
+//    border: 1px solid #e6e6e6;
 
     border-top: 0px;
 
@@ -152,7 +144,7 @@ a.jarves-Select-box-focus {
     max-height: 200px;
     max-width: 100%;
     overflow: auto;
-    background-color: #f9f9f9;
+    background-color: lighten($mainColor, 3%);
 }
 
 .jarves-Select-borderline {
@@ -160,11 +152,10 @@ a.jarves-Select-box-focus {
     left: 0px;
     top: 0px;
     height: 1px;
-    border-top: 1px solid #e6e6e6;
+//    border-top: 1px solid #e6e6e6;
 }
 
 .jarves-Select-chooser div.group {
-    color: #999;
     text-align: left;
     padding: 5px 10px;
     font-weight: bold;
@@ -173,10 +164,10 @@ a.jarves-Select-box-focus {
 .jarves-Select-chooser a.jarves-select-chooser-item {
     display: block;
     padding: 3px 23px;
-    color: #222;
     text-decoration: none;
     line-height: 18px;
     cursor: default;
+    color: #eee;
 
     position: relative;
     white-space: nowrap;
@@ -190,11 +181,11 @@ a.jarves-Select-box-focus {
 }
 
 .jarves-select-chooser-item-active {
-    background-color: #e4e4e4;
+    background-color: lighten($mainColor, 7%);
 }
 
 .jarves-select-chooser-item:hover {
-    background-color: #e5e5e5;
+    background-color: lighten($mainColor, 5%);
     color: white;
 }
 
@@ -222,9 +213,7 @@ a.jarves-Select-separator:link {
 .jarves-Select-disabled:hover,
 .jarves-Select-disabled:active {
     color: #808080;
-    border: 1px solid #E7E7E7;
     opacity: 0.8;
-    background-color: #FEFEFE;
 }
 
 .jarves-field-type-select-with-buttons a.jarves-Button,
