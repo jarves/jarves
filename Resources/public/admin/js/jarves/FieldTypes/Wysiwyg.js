@@ -51,27 +51,27 @@ jarves.FieldTypes.Wysiwyg = new Class({
 
         var config = this.options.configs[this.options.config];
 
-        tinymce.init(Object.merge({
-            mode: 'exact',
-            inline: true,
-            elements: [this.main],
-//            content_document: this.main.getDocument(),
-//            content_window: this.main.getWindow(),
-            setup: function(editor) {
-                this.editor = editor;
-                this.ready = true;
-                if (this.value) {
-                    this.main.set('html', this.value);
-                }
-                editor.on('change', function(ed){
-                    this.checkChange();
-                }.bind(this));
-            }.bind(this)
-        }, config));
-
-        this.main.addEvent('keyup', function(ed){
-            this.checkChange();
-        }.bind(this));
+//        tinymce.init(Object.merge({
+//            mode: 'exact',
+//            inline: true,
+//            elements: [this.main],
+////            content_document: this.main.getDocument(),
+////            content_window: this.main.getWindow(),
+//            setup: function(editor) {
+//                this.editor = editor;
+//                this.ready = true;
+//                if (this.value) {
+//                    this.main.set('html', this.value);
+//                }
+//                editor.on('change', function(ed){
+//                    this.checkChange();
+//                }.bind(this));
+//            }.bind(this)
+//        }, config));
+//
+//        this.main.addEvent('keyup', function(ed){
+//            this.checkChange();
+//        }.bind(this));
     },
 
     checkChange: function () {

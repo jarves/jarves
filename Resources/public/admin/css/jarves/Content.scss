@@ -1,5 +1,4 @@
-@import "../variables";
-@import "../bourbon";
+@import "../base";
 
 .jarves-content {
     min-height: 15px;
@@ -50,15 +49,23 @@
     z-index: 1001;
     right: 3px;
     top: -26px;
-    display: none;
+    visibility: hidden;
     background-color: #333;
     border-radius: 3px;
     color: white;
 }
 
-.jarves-content:hover .jarves-content-actionBar {
-    display: block;
-    @include animation(jarves-Content-ActionBar-fadeIn 0.2s ease-out);
+.jarves-no-touch {
+    .jarves-content:hover .jarves-content-actionBar {
+        display: block;
+        @include animation(jarves-Content-ActionBar-fadeIn 0.2s ease-out);
+    }
+}
+
+.jarves-touch {
+    .jarves-content:hover .jarves-content-actionBar {
+        visibility: visible;
+    }
 }
 
 @include keyframes(jarves-Content-ActionBar-fadeIn) {
@@ -87,10 +94,13 @@
     padding-left: 2px;
 }
 
-.jarves-content:hover .jarves-content-wrapper {
-    outline: 1px dashed rgba(171, 171, 181, 0.45);
-    box-shadow: 0 0 1px #fff;
+.jarves-no-touch {
+    .jarves-content:hover .jarves-content-wrapper {
+        outline: 1px dashed rgba(171, 171, 181, 0.45);
+        box-shadow: 0 0 1px #fff;
+    }
 }
+
 
 //
 //.jarves-content-selected .content-element,

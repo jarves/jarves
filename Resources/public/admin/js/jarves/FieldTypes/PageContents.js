@@ -363,6 +363,8 @@ jarves.FieldTypes.PageContents = new Class({
                     this.treeField.setValue('jarves/node/' + this.getNodeId());
                 }
                 this.adjustAnchors();
+
+                this.getEditor().getContainer().addClass(Modernizr.touch ? 'jarves-touch' : 'jarves-no-touch');
             }
         }.bind(this);
         window.addEvent('jarvesEditorLoaded', this.lastJarvesEditorLoader);

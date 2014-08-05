@@ -35,6 +35,8 @@ jarves.AdminInterface = new Class({
             }
         }).inject(document.body);
 
+        document.body.addClass(Modernizr.touch ? 'jarves-touch' : 'jarves-no-touch');
+
         if (!this.options.frontPage) {
             this.renderLogin();
         }

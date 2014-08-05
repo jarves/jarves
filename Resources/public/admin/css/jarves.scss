@@ -21,6 +21,23 @@ $base-font-size: 13px;
     font-weight: 300;
 }
 
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-corner {
+    background-color: lighten($mainColor, 1%);
+}
+
+::-webkit-scrollbar-track-piece  {
+    background-color: lighten($mainColor, 3%);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: lighten($mainColor, 7%);
+}
+
 .jarves-admin {
     table {
         border-collapse: separate;
@@ -95,12 +112,12 @@ $base-font-size: 13px;
         color: $mainLinkColor;
         display: inline-block;
         padding: 1px 3px;
+        cursor: pointer;
         text-decoration: none;
     }
 
     a:hover {
         color: darken($mainLinkColor, 60%);
-        cursor: pointer;
         background-color: lighten($mainColor, 15%);
     }
 
@@ -441,7 +458,7 @@ input.jarves-main-menu-actions-search-input {
 .jarves-main-menu-actions-links a {
     display: inline-block;
     margin-left: 7px;
-    font-size: 10px;
+    font-size: 11px;
 }
 
 .jarves-main-menu-user-name {

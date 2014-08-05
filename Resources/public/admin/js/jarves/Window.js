@@ -1131,7 +1131,7 @@ jarves.Window = new Class({
             }).inject(this.border);
 
             this.sidebarContainer = new Element('div', {
-                'class': 'jarves-Window-sidebar-container'
+                'class': 'jarves-scrolling jarves-Window-sidebar-container'
             }).inject(this.sidebar);
 
             this.sidebarSplitter = new jarves.LayoutSplitter(this.sidebar, 'left');
