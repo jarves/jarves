@@ -192,7 +192,7 @@ jarves.WindowEdit = new Class({
         this.fireEvent('load', pItem);
 
         var first = this.fieldForm.getFirstField();
-        if (first) {
+        if (first && !jarves.isMobile()) {
             first.focus();
         }
 
