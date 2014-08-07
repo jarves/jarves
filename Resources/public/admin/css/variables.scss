@@ -10,6 +10,11 @@ $mainLinkColor = #CCEBF7;
 $buttonColor = #f8f8f8;
 $buttonColorPrimary = $mainColor;
 
+$linkHoverColor: lighten($mainLinkColor, 60%);
+$linkHoverBgColor: lighten($mainColor, 15%);
+$linkBgColor: lighten($mainColor, 2%);
+$linkColor: white;
+
 @function strip-unit($num) {
     @return $num / ($num * 0 + 1);
 }

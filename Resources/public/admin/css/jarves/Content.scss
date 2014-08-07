@@ -57,7 +57,7 @@
 
 .jarves-no-touch {
     .jarves-content:hover .jarves-content-actionBar {
-        display: block;
+        visibility: visible;
         @include animation(jarves-Content-ActionBar-fadeIn 0.2s ease-out);
     }
 }

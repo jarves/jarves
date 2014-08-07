@@ -15,7 +15,7 @@
     bottom: 0;
     left: 0;
     right: 25px;
-    top: 49px;
+    top: 39px;
 }
 
 .jarves-dialog-content .jarves-Window-border > .jarves-Layout-main-fixed {
@@ -82,8 +82,10 @@
 
 .jarves-Window-win-titleGroups {
 //    @include line-top-left;
-    margin-bottom: 1px;
-    height: 30px;
+//    margin-bottom: 11px;
+    height: 54px;
+    padding-top: 5px;
+    @include box-sizing(border-box);
 }
 
 /*
@@ -364,7 +366,7 @@ h3.jarves-headline {
     @include line-bottom-left;
     position: absolute;
     right: 0;
-    top: 80px;
+    top: 93px;
     bottom: 40px;
     width: 150px;
     color: #ddd;
@@ -389,6 +391,9 @@ h3.jarves-headline {
     background-color: #021216;
 }
 
+.jarves-Window-sidebar .jarves-Window-sidebar-container + .jarves-Splitter-main {
+    left: -28px;
+}
 
 .jarves-Window-sidebar h2 {
     color: white;
@@ -397,8 +402,8 @@ h3.jarves-headline {
 
 .jarves-Window-sidebar a.jarves-Button {
     display: block;
-//    background-image: none;
-//    background-color: transparent;
+    background-image: none;
+    background-color: transparent;
     box-shadow: none;
     color: white;
     border: 0;

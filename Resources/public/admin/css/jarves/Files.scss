@@ -48,17 +48,12 @@
 
 div.jarves-Files-addressFaker {
     cursor: text;
-    margin-top: 3px;
-}
-
-.jarves-Files-search-input {
-    margin-top: 3px;
 }
 
 .jarves-Files-search-input-icon {
     position: absolute;
     right: 6px;
-    top: 3px;
+    top: 6px;
     color: #808080;
 }
 
@@ -67,9 +62,8 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item + .jarves-buttonGroup-i
     box-shadow: none;
     position: relative;
     left: -66px;
-    line-height: 24px;
-    height: 24px;
-    margin-top: 3px;
+    line-height: 28px;
+    height: 28px;
 }
 
 div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
@@ -79,7 +73,8 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
 .jarves-Files-addressFaker > a,
 .jarves-Files-addressFaker > a:link {
     cursor: pointer;
-    margin-left: 5px;
+    line-height: 25px;
+    text-indent: 0;
 }
 
 .jarves-Files-addressFaker-asFile > a:last-child:after {
@@ -88,11 +83,10 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
 
 .jarves-Files-addressFaker > a:after {
     content: '/';
-    padding-left: 3px;
+    padding-left: 5px;
 }
 
 .jarves-Files-addressFaker > a:hover {
-    background-color: silver;
 }
 
 .jarves-Files-actionBar {

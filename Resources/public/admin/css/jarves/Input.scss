@@ -4,7 +4,8 @@
 input.text {
     color: #eee;
     font-size: 12px;
-    line-height: 24px;
+    line-height: 28px;
+    height: 28px;
 
     font-family: 'Open sans', Verdana;
     font-weight: 300;
@@ -19,16 +20,15 @@ input.text {
 
     display: inline-block;
 
-    border: 0;
     background-color: lighten($mainColor, 5%);
 
     min-width: 20px;
-    height: 24px;
 
     -webkit-appearance : none;
 
     @include box-sizing(border-box);
     @include transition(all 0.2s ease-out);
+    border: 1px solid lighten($mainColor, 8%);
 }
 .jarves-Input-text:hover,
 input.text:hover {
@@ -47,7 +47,7 @@ textarea.jarves-Input-text {
 .jarves-Input-text-icon {
     position: absolute;
     left: 5px;
-    top: 4px;
+    top: 6px;
     color: gray;
 }
 

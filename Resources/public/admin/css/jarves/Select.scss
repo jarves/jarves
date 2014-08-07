@@ -3,8 +3,6 @@
 .jarves-Select-wrapper {
     display: inline-block;
     position: relative;
-    height: 30px;
-    line-height: 28px;
 }
 
 .jarves-Select-wrapper > .jarves-Select-box {
@@ -20,27 +18,29 @@ a.jarves-Select-box:link {
 
     overflow: hidden;
     display: inline-block;
-    line-height: 28px;
+    line-height: 24px;
+    height: 28px;
 
     vertical-align: top;
     min-width: 40px;
     margin: 0 4px;
 
-    color: #eee;
-
     text-align: left;
 
     max-width: 100%;
+
+    @include simple-button();
+
 
     @include box-sizing(border-box);
 }
 
 .jarves-Select-box:first-child {
-    margin-left: 0;
+    margin-left: 0 !important;
 }
 
 .jarves-Select-box:last-child {
-    margin-right: 0;
+    margin-right: 0 !important;
 }
 
 .jarves-ButtonGroup > .jarves-Select-box,
@@ -78,7 +78,8 @@ a.jarves-Select-box:hover,
 a.jarves-Select-box-open,
 a.jarves-Select-box-open:link,
 a.jarves-Select-box-open:hover {
-//    background-color: lighten($mainColor, 3%);
+    color: lighten($mainLinkColor, 60%);
+    background-color: lighten($mainColor, 15%);
 }
 
 a.jarves-Select-transparent,

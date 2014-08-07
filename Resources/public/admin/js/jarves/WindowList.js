@@ -246,7 +246,9 @@ jarves.WindowList = new Class({
     renderMultilanguage: function () {
 
         if (this.classProperties.multiLanguage && !this.languageSelect) {
-            this.languageSelect = new jarves.Select(this.topActionBar);
+            this.languageSelect = new jarves.Select(this.actionBarRightTopContainer);
+
+            document.id(this.languageSelect).inject(this.actionBarRightTopContainer, 'top');
 //            document.id(this.languageSelect).setStyle('width', 150);
 
             this.languageSelect.addEvent('change', function() {
@@ -499,8 +501,8 @@ jarves.WindowList = new Class({
     renderTopActionBar: function (container) {
         this.topActionBar = container || this.win.getTitleGroupContainer();
 
-        this.actionBarSearchContainer = new Element('div', {
-            'class': 'jarves-WindowList-searchContainer'
+        this.actionBarRightTopContainer = new Element('div', {
+            'class': 'jarves-WindowList-rightTopContainer'
         }).inject(this.topActionBar);
 
 //        this.topActionBar.setStyle('min-height', 30);
@@ -510,7 +512,7 @@ jarves.WindowList = new Class({
             type: 'text',
             inputIcon: '#icon-search-8',
             inputWidth: 150
-        }, this.actionBarSearchContainer);
+        }, this.actionBarRightTopContainer);
 
         this.actionBarSearchInput.addEvent('change', function(){
             this.onSearchInputChange();

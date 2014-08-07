@@ -240,8 +240,9 @@
 
 .jarves-WindowList-combine-left-top .jarves-Select-box,
 .jarves-WindowList-combine-left-top .jarves-Select-box:link {
-    line-height: 22px;
+    line-height: 24px;
     margin: 0;
+    height: 26px;
 }
 
 .jarves-WindowList-combine-left-top .jarves-Select-box .jarves-Select-box-title {
@@ -287,16 +288,17 @@
 }
 
 .jarves-WindowList-actionBarNavigation {
+    @include line-top;
     text-align: center;
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 45px;
+    height: 40px;
 }
 
 .jarves-Table-windowList {
-    bottom: 46px;
+    bottom: 40px;
     overflow: hidden;
 }
 
@@ -415,7 +417,7 @@ a.jarves-WindowList-search-button-active:link {
 }
 
 .jarves-WindowList-navigationBar {
-    margin-top: 7px;
+    margin-top: 1px;
 }
 
 .jarves-WindowList-navigationBar .jarves-buttonGroup-item,
@@ -440,20 +442,16 @@ a.jarves-WindowList-search-button-active:link {
 a.jarves-windowCombine-left-toggler {
     position: absolute;
     display: block;
-    left: 5px;
     width: 14px;
-    bottom: 0;
+    right: 0px;
+    bottom: -22px;
     padding-left: 0;
-}
-
-a.jarves-windowCombine-left-toggler:hover {
-    background-color: #ddd;
 }
 
 .jarves-WindowList-combine-sidebarContainer {
     @include line-bottom-left;
 }
 
-.jarves-WindowList-searchContainer {
+.jarves-WindowList-rightTopContainer {
     float: right;
 }

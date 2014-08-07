@@ -1,3 +1,5 @@
+@import "../base";
+
 .jarves-field,
 .jarves-field-inputTd {
     position: relative;
@@ -11,6 +13,7 @@
     padding: 5px;
     width: 400px;
     max-width: 100%;
+    padding-bottom: 15px;
 }
 
 td.jarves-field {
@@ -56,6 +59,10 @@ table tr:first-child > .jarves-field-inputTd {
 h2.jarves-field-headline {
     font-size: 12px;
     margin: 2px;
+}
+
+.jarves-field-title {
+    color: white;
 }
 
 .jarves-field-main-small .jarves-field-title div.desc {
@@ -401,4 +408,8 @@ iframe.jarves-Field-info {
 .jarves-field-type-tree {
     display: inline-block;
     min-width: 100%;
+}
+
+.jarves-PageContents-iframe {
+    @include line-top;
 }

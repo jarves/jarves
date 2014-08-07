@@ -59,7 +59,7 @@ jarves.WindowCombine = new Class({
 
         this.combineLeftToggler = new Element('a', {
             'class': 'icon-arrow-left-5 jarves-windowCombine-left-toggler'
-        }).inject(this.contentLayout.getCell(1, 2));
+        }).inject(this.contentLayout.getCell(1, 1));
 
         this.combineLeftToggler.addEvent('click', function() {
             this.displayCombineLeft(!this.isCombineLeftVisible());

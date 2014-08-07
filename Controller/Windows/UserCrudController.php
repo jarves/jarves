@@ -57,14 +57,9 @@ class UserCrudController extends WindowController
 
     public $itemsPerPage = 20;
 
-    public $addIcon = '#icon-plus-5';
-
     public $add = true;
 
-    public $editIcon = '#icon-pencil-8';
     public $edit = true;
-
-    public $removeIcon = '#icon-minus-5';
 
     public $remove = true;
 

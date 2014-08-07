@@ -6,9 +6,8 @@ a.jarves-Button:link {
     padding: 0px 10px;
     position: relative;
     cursor: default;
-    color: #eee;
     line-height: 28px;
-    height: 30px;
+    height: 28px;
     text-align: center;
     margin: 0 4px;
 
@@ -18,7 +17,7 @@ a.jarves-Button:link {
 
     display: inline-block;
 
-//    background-color: lighten($mainColor, 2%);
+    @include simple-button();
 
     @include box-sizing(border-box);
     -webkit-appearance: none;
@@ -38,11 +37,6 @@ a.jarves-button-icon:link {
 
 a.jarves-Button > span {
     position: relative;
-}
-
-a.jarves-Button:hover {
-    color: white;
-//    background-color: lighten($mainColor, 8%);
 }
 
 //.jarves-ActionBar a.jarves-Button,
@@ -73,16 +67,14 @@ a.jarves-Button-textAndIcon:before {
     padding-right: 5px;
 }
 
-//a.jarves-Button:focus {
-//    border: 1px solid #3E9BCB;
-//    outline: 0;
-//    border-color: rgba(47, 140, 189, 0.9);
-//    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
-//    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
-//    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
-//    box-shadow: 0 0 0 3px rgba(47, 140, 189, 0.2);
-//    color: black;
-//}
+a.jarves-Button:focus {
+    outline: 0;
+    border-color: rgba(47, 140, 189, 0.9);
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(47, 140, 189, 0.6);
+    box-shadow: 0 0 0 3px rgba(47, 140, 189, 0.2);
+}
 
 
 a.jarves-Button:active,

@@ -1,3 +1,5 @@
+@import "../base";
+
 .jarves-Slider {
     display: inline-block;
     line-height: 30px;
@@ -23,13 +25,11 @@
 }
 
 .jarves-Slider-knob {
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-    -webkit-border-radius: 10px;
+    border-radius: 2px;
     position: absolute;
     display: block;
-    top: 7px;
-    width: 16px;
-    height:16px;
-    background-color: gray;
+    top: 8px;
+    width: 12px;
+    height:12px;
+    background-color: lighten($mainColor, 15%);
 }

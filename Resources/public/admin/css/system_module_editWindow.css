@@ -1,21 +1,15 @@
 .jarves-system-module-editWindow-windowPane {
-
-    background-image: url(../images/jarves-system-module-editWindow-windowPane-bg.png);
-
     position: absolute;
     left: 0px;
     right: 400px;
     top: 0px;
     bottom: 41px;
-    background-color: white;
     overflow: hidden;
-
 }
 
 .jarves-system-module-editWindow-windowInspector-actionbar,
 .jarves-system-module-editWindow-actionbar {
     border-top: 1px solid silver;
-    background-color: #EEE;
 }
 
 .jarves-system-module-editWindow-actionbar {
@@ -97,7 +91,6 @@
     left: 251px;
     top: 0px;
     bottom: 30px;
-    background-color: #f3f3f3;
 }
 
 .jarves-system-module-windoeEdit-method-actionbar {
@@ -108,7 +101,6 @@
 }
 
 .jarves-system-module-windowEdit-methods-notoverwritten {
-    background-color: silver;
     text-align: center;
     padding-top: 50px;
     bottom: 0px;
@@ -156,7 +148,6 @@
 }
 
 .jarves-system-module-windowEdit-method-codemirror {
-    background-color: white;
     border: 1px solid #bbb;
     margin: 5px;
 }

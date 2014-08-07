@@ -17,17 +17,24 @@ jarves.FieldTypes.PageContents = new Class({
     lastLoadedTreeForDomainId: null,
 
     createLayout: function() {
-        this.mainLayout = new jarves.Layout(this.getContainer(), {
-            layout: [
-                {columns: [null], height: 50},
-                {columns: [null]}
-            ]
-        });
 
-        this.mainLayout.getCell(1, 1).addClass('jarves-ActionBar jarves-Field-Content-ActionBar');
-        this.mainLayout.getTd(1, 1).set('colspan', 2);
+        if (this.options.standalone) {
+            this.titleContainer = this.getWin().getTitleGroupContainer();
+            this.container = this.getWin().getContentContainer();
+        } else {
+            this.mainLayout = new jarves.Layout(this.getContainer(), {
+                layout: [
+                    {columns: [null], height: 50},
+                    {columns: [null]}
+                ]
+            });
+            this.titleContainer = this.mainLayout.getCell(1, 1);
+            this.container = this.mainLayout.getCell(2, 1);
+            this.container.addClass('jarves-ActionBar jarves-Field-Content-ActionBar');
+            this.mainLayout.getTd(1, 1).set('colspan', 2);
+        }
 
-        this.headerLayout = new jarves.Layout(this.mainLayout.getCell(1, 1), {
+        this.headerLayout = new jarves.Layout(this.titleContainer, {
             fixed: false,
             layout: [
                 {columns: [null, 100]}
@@ -67,14 +74,14 @@ jarves.FieldTypes.PageContents = new Class({
                 .addEvent('click', this.saveStandalone.bind(this))
                 .inject(this.headerLayout.getCell(1, 2));
         } else {
-            this.mainLayout.getCell(1, 1).addClass('jarves-Field-content-actionBar');
+            this.titleContainer.addClass('jarves-Field-content-actionBar');
         }
 
         this.getWin().setTitle(t('Home'));
 
         this.editableAreaContainer = new Element('div', {
             style: 'position: absolute; left: 0px; right: 0px; top: 0px; bottom: 0px;'
-        }).inject(this.mainLayout.getCell(2, 1));
+        }).inject(this.container);
 
         this.editableAreaLayout = new jarves.Layout(this.editableAreaContainer, {
             layout: [
@@ -105,11 +112,11 @@ jarves.FieldTypes.PageContents = new Class({
 
         this.slider.setValue(100);
 
-        this.toggleFullscreen = new Element('a', {
-            'class': 'jarves-button-icon icon-expand-5',
-            style: 'padding: 0 15px; margin-left: 15px; margin-right: 0px; border-left: 1px solid #ddd; border-right: 1px solid #ddd;',
-            title: t('Toogle Fullscreen')
-        }).inject(this.zoomContainer);
+//        this.toggleFullscreen = new Element('a', {
+//            'class': 'jarves-button-icon icon-expand-5',
+//            style: 'padding: 0 15px; margin-left: 15px; margin-right: 0px; border-left: 1px solid #ddd; border-right: 1px solid #ddd;',
+//            title: t('Toogle Fullscreen')
+//        }).inject(this.zoomContainer);
 
         var iframeContainer = this.editableAreaLayout.getCell(2, 1);
 
@@ -118,8 +125,7 @@ jarves.FieldTypes.PageContents = new Class({
             style: 'display: block; border: 0; height: 100%; width: 100%;'
         }).inject(iframeContainer);
 
-        iframeContainer.setStyle('border-top', '1px solid #E9E9E9');
-        iframeContainer.addClass('jarves-scrolling');
+        iframeContainer.addClass('jarves-PageContents-iframe');
 
         if (this.options.standalone) {
             this.domainSelection = new jarves.Select(this.headerLayout.getCell(1, 1), {
@@ -183,7 +189,7 @@ jarves.FieldTypes.PageContents = new Class({
         if (!this.treeContainer) {
             this.treeContainer = new Element('div', {
                 'class': 'jarves-scrolling jarves-Field-content-treeContainer'
-            }).inject(this.mainLayout.getCell(2, 1));
+            }).inject(this.container);
         }
 
         this.editableAreaContainer.setStyle('left', 300);
