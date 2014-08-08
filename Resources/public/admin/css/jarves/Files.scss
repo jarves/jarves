@@ -48,6 +48,7 @@
 
 div.jarves-Files-addressFaker {
     cursor: text;
+    text-indent: 0;
 }
 
 .jarves-Files-search-input-icon {
@@ -83,7 +84,8 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
 
 .jarves-Files-addressFaker > a:after {
     content: '/';
-    padding-left: 5px;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 .jarves-Files-addressFaker > a:hover {
@@ -232,7 +234,7 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
 
 .jarves-Files-infos a.jarves-Files-item-selected,
 .jarves-Files-infos a.jarves-Files-item-selected:before {
-    color: white;
+//    color: white;
 }
 
 .jarves-Files-uploadPane {
@@ -241,7 +243,7 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
     right: 30px;
     left: 30px;
     height: 150px;
-    background-color: white;
+//    background-color: white;
     border: 1px solid silver;
 }
 
@@ -328,10 +330,10 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
     font-size: 11px;
 }
 
-.jarves-Files-item-selected .jarves-Files-item-title-dimensions,
-.jarves-Files-item-drag-selected .jarves-Files-item-title-dimensions {
-    color: white;
-}
+//.jarves-Files-item-selected .jarves-Files-item-title-dimensions,
+//.jarves-Files-item-drag-selected .jarves-Files-item-title-dimensions {
+//    color: white;
+//}
 
 .jarves-Files-item:hover div.jarves-Files-item-title,
 .jarves-Files-item-miniatur:hover .jarves-Files-item-miniatur-name {
@@ -345,7 +347,7 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
 
 .jarves-Files-item-title {
     position: relative;
-    color: white;
+//    color: white;
     padding: 0px 4px 1px 4px;
     cursor: default;
     word-wrap: break-word;
@@ -357,19 +359,19 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
     position: absolute;
     z-index: 150000;
 }
-
-.jarves-Files-item-drag-selected div.jarves-Files-item-title,
-.jarves-Files-item-drag-selected:hover div.jarves-Files-item-title,
-.jarves-Files-item-drag-selected:hover .jarves-Files-item-miniatur-name,
-.jarves-Files-item-drag-selected .jarves-Files-item-miniatur-name,
-.jarves-Files-item-selected div.jarves-Files-item-title,
-.jarves-Files-item-selected:hover div.jarves-Files-item-title,
-.jarves-Files-item-selected:hover .jarves-Files-item-miniatur-name,
-.jarves-Files-item-selected .jarves-Files-item-miniatur-name,
-{
-//    background-color: #22638E;
-    color: white;
-}
+//
+//.jarves-Files-item-drag-selected div.jarves-Files-item-title,
+//.jarves-Files-item-drag-selected:hover div.jarves-Files-item-title,
+//.jarves-Files-item-drag-selected:hover .jarves-Files-item-miniatur-name,
+//.jarves-Files-item-drag-selected .jarves-Files-item-miniatur-name,
+//.jarves-Files-item-selected div.jarves-Files-item-title,
+//.jarves-Files-item-selected:hover div.jarves-Files-item-title,
+//.jarves-Files-item-selected:hover .jarves-Files-item-miniatur-name,
+//.jarves-Files-item-selected .jarves-Files-item-miniatur-name,
+//{
+////    background-color: #22638E;
+//    color: white;
+//}
 
 .jarves-Files-item-selected,
 .jarves-Files-item-selected:hover,
@@ -485,7 +487,7 @@ table.jarves-files-search-table tr:hover td {
 }
 
 .jarves-Files-sidebar-more-information {
-    color: white;
+//    color: white;
 }
 
 .jarves-Files-sidebar-more-information-title {

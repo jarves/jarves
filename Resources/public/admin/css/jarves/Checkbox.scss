@@ -66,11 +66,11 @@
 
         @include transition(all 0.2s ease-out);
 
-        width: 23px;
-        height: 23px;
+        width: 25px;
+        height: 25px;
         position: relative;
-        left: 0px;
-        top: 1px;
+        left: -2px;
+        top: 0px;
     }
 
     .jarves-Checkbox-on .jarves-Checkbox-knob {

@@ -413,3 +413,8 @@ iframe.jarves-Field-info {
 .jarves-PageContents-iframe {
     @include line-top;
 }
+
+.jarves-admin .jarves-field-type-childrenSwitcher a,
+.jarves-admin .jarves-field-type-childrenSwitcher a:link {
+    background-color: transparent;
+}

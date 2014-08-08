@@ -75,7 +75,7 @@ jarves.WindowCombine = new Class({
         } else {
             //classic list
             this.mainLeftItems = new Element('div', {
-                'class': 'jarves-WindowList-combine-items jarves-List'
+                'class': 'jarves-List jarves-WindowList-combine-items'
             }).addEvent('scroll', this.checkScrollPosition.bind(this, true)).inject(this.mainLeft, 'top');
 
             this.mainLeftItems.addEvent('click:relay(.jarves-List-item)', function(event, item) {

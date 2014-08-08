@@ -206,7 +206,7 @@ jarves.AdminInterface = new Class({
 
     createLayout: function() {
         this.border = new Element('div', {
-            'class': 'jarves-frame jarves-admin'
+            'class': 'jarves-frame jarves-admin jarves-white'
         }).inject(document.body);
 
         this.mainMenuTop = new Element('div', {
@@ -285,10 +285,6 @@ jarves.AdminInterface = new Class({
             'class': 'jarves-app-container'
         }).inject(this.border);
 
-        this.wmTabContainer = new Element('div', {
-            'class': 'jarves-main-menu-wm-tabs'
-        }).inject(this.appContainer);
-
 //        if (this.options.frontPage) {
 //            this.desktopContainer = this.border;
 //
@@ -305,6 +301,10 @@ jarves.AdminInterface = new Class({
                 'class': 'jarves-desktop jarves-admin'
             }).inject(this.appContainer);
 //        }
+
+        this.wmTabContainer = new Element('div', {
+            'class': 'jarves-main-menu-wm-tabs'
+        }).inject(this.appContainer);
 
         //this.setupMainLinksDragger();
     },
