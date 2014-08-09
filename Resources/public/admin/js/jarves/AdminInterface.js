@@ -277,6 +277,20 @@ jarves.AdminInterface = new Class({
             text: t('Collapse')
         }).inject(this.mainMenuBottom);
 
+        this.mainMenuLightSwitch = new Element('a', {
+            'class': 'jarves-main-menu-light-switch',
+            text: t('Light')
+        }).inject(this.mainMenuBottom);
+
+        this.mainMenuLightSwitch.addEvent('click', function() {
+            if (this.border.hasClass('jarves-white')) {
+                this.border.removeClass('jarves-white');
+            } else {
+                this.border.addClass('jarves-white');
+            }
+        }.bind(this));
+
+
         new Element('span', {
             'class': 'icon-arrow-left-5'
         }).inject(this.mainMenuBottomCollapse);

@@ -22,28 +22,34 @@ $linkHoverBgColor: darken($mainColor, 15%);
 .jarves-admin.jarves-white,
 .jarves-white .jarves-admin {
 
-    ::-webkit-scrollbar-corner {
-        background-color: darken($mainColor, 1%);
-    }
-
-    ::-webkit-scrollbar-track-piece {
-        background-color: darken($mainColor, 6%);
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background-color: darken($mainColor, 35%);
-    }
+//    ::-webkit-scrollbar-corner {
+//        background-color: darken($mainColor, 1%);
+//    }
+//
+//    ::-webkit-scrollbar-track-piece {
+//        background-color: darken($mainColor, 35%);
+//    }
+//
+//    ::-webkit-scrollbar-thumb {
+//        background-color: darken($mainColor, 6%);
+//    }
 
 
     color: #222;
 
-    .jarves-app-container {
+    .jarves-app-container,
+    .jarves-main-dialog-container {
         color: #444;
         background-color: #f0f0f0;
 
         a,
         a:link {
             color: $linkColor;
+//            background-color: $linkBgColor;
+        }
+
+        a:hover {
+            color: $LinkHoverColor;
             background-color: $linkBgColor;
         }
 
@@ -64,6 +70,11 @@ $linkHoverBgColor: darken($mainColor, 15%);
         background-color: #082329;
         border: 1px solid #0B2E36;
     }
+
+    a.jarves-Select-box, a.jarves-Select-box:link {
+        background-color: $linkBgColor;
+    }
+
     .jarves-Select-chooser {
         background-color: $linkBgColor;
     }
@@ -89,6 +100,10 @@ $linkHoverBgColor: darken($mainColor, 15%);
         box-shadow: none;
         line-height: 16px;
     }
+    a.jarves-Select-box:hover, a.jarves-Select-box:link:hover {
+        background-color: $linkHoverBgColor;
+        color: $linkHoverColor;
+    }
 
 
     /*
@@ -103,6 +118,7 @@ $linkHoverBgColor: darken($mainColor, 15%);
     a.jarves-Button,
     a.jarves-Button:link {
         color: #444;
+        background-color: $linkBgColor;
     }
 
     a.jarves-Button:active,
@@ -242,6 +258,13 @@ $linkHoverBgColor: darken($mainColor, 15%);
         background-color: #d6d6d6;
     }
 
+    /*
+     * Dashboard
+     */
+    .jarves-Dashboard-widget-content {
+        background-color: #F7F7F7;
+        color: #222;
+    }
 
     /*
      * Window List/Combine
@@ -353,6 +376,16 @@ $linkHoverBgColor: darken($mainColor, 15%);
     .jarves-Checkbox-knob {
         background-color: white;
     }
+    .jarves-admin a.jarves-Checkbox-off,
+    .jarves-admin a.jarves-Checkbox-off:hover {
+        background-color: #d1d1d1;
+    }
+
+
+    .jarves-admin a.jarves-Checkbox-on,
+    .jarves-admin a.jarves-Checkbox-on:hover {
+        background-color: lighten($blackMainColor, 5%);
+    }
 
     .jarves-windowEdit-form {
         .jarves-tabGroup,
@@ -423,6 +456,11 @@ $linkHoverBgColor: darken($mainColor, 15%);
 
     .jarves-dialog-overlay {
         background-color: rgba(darken($mainColor, 30%), 0.7);
+    }
+
+
+    .jarves-main-dialog-container h1:first-child {
+        color: #222;
     }
 
     .jarves-dialog {

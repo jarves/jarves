@@ -285,6 +285,8 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      * Defines whether the list windows should display the language select box.
      * Note: Your table need a field 'lang' varchar(2). The windowList class filter by this.
      *
+     * If the object is nested=true and have a root object
+     *
      * @var bool
      */
     protected $multiLanguage = false;

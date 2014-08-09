@@ -48,9 +48,8 @@ jarves.WindowAdd = new Class({
 
 
             this.addItemLayout = new jarves.LayoutHorizontal(this.addDialogFieldContainer, {
-                columns: [null, this.classProperties.addMultipleFieldContainerWidth]
+                columns: [null, this.classProperties.addMultipleFieldContainerWidth | '50%' ]
             });
-            new jarves.LayoutSplitter(this.addItemLayout.getColumn(1), 'right');
 
             if (this.classProperties.addMultiple) {
                 if (this.tabPane) {
@@ -114,7 +113,7 @@ jarves.WindowAdd = new Class({
             //            }
 
             this.renderSelectPositionText();
-
+            new jarves.LayoutSplitter(this.addItemLayout.getColumn(1), 'right');
         }
     },
 

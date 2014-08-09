@@ -608,6 +608,10 @@ jarves.WindowEdit = new Class({
     remove: function() {
         this.win.confirm(tf('Really delete %s?', this.getTitleValue()), function(answer) {
 
+            if (!answer) {
+                return;
+            }
+
             this.win.setLoading(true, null, this.container.getCoordinates(this.win));
             var itemPk = jarves.getObjectUrlId(this.classProperties['object'], this.getPrimaryKey());
 

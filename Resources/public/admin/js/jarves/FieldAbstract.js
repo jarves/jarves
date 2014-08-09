@@ -328,15 +328,15 @@ jarves.FieldAbstract = new Class({
             return;
         }
 
-        if (this.invalidIcon) {
+        if (this.invalidText) {
             return;
         } //we're already displaying invalid stuff
 
-        this.invalidIcon = new Element('div', {
-            'class': 'jarves-field-invalid-icon icon-warning blink'
-        }).inject(this.wrapper || this.input, 'after');
+//        this.invalidIcon = new Element('div', {
+//            'class': 'jarves-field-invalid-icon icon-warning blink'
+//        }).inject(this.wrapper || this.input, 'after');
 
-        var text = text || this.options.notValidText || t('The current value is invalid.');
+        text = text || this.options.notValidText || t('The current value is invalid.');
 
         this.invalidText = new Element('div', {
             'class': 'jarves-field-invalid-text',
@@ -355,7 +355,7 @@ jarves.FieldAbstract = new Class({
      */
     showValid: function () {
 
-        if (this.invalidIcon) {
+        if (this.invalidText) {
             //we was invalid before, highlight a smooth green
             if (this.input) {
                 this.input.highlight('green');
@@ -366,10 +366,11 @@ jarves.FieldAbstract = new Class({
             }
 
             //remove the invalid icon and text
-            this.invalidIcon.destroy();
+//            this.invalidIcon.destroy();
             this.invalidText.destroy();
+            delete this.invalidText;
 
-            this.invalidIcon = null;
+//            this.invalidIcon = null;
         }
 
     }

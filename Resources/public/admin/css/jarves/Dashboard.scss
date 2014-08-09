@@ -85,6 +85,17 @@ $containerPadding = 1205-880; //actual window width - container width of our con
     @include animation(kaDashboardNewsItemFadeIn 0.4s);
 }
 
+.jarves-white .jarves-Dashboard-newsFeed-item {
+    a, a:link {
+        background-color: transparent !important;
+        font-weight: 400 !important;
+        color: #555;
+    }
+
+    border-bottom: 1px solid silver;
+    color: #333;
+}
+
 @include keyframes(kaDashboardNewsItemFadeIn) {
     from {
         opacity: 0.4;
@@ -117,11 +128,11 @@ $containerPadding = 1205-880; //actual window width - container width of our con
 }
 
 .jarves-Dashboard-newsFeed-item-verb {
-    margin: 0 4px;
+//    margin: 0 4px;
 }
 
 .jarves-Dashboard-newsFeed-item-object-label {
-    margin-right: 4px;
+//    margin-right: 4px;
 }
 
 .jarves-Dashboard-newsFeed-item-object-label:after {

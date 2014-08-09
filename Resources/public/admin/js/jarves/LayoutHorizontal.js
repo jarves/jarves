@@ -50,21 +50,21 @@ jarves.LayoutHorizontal = new Class({
     /**
      *
      *
-     * @param {jarves.LayoutVertical|Element} pContainer
-     * @param {Object} pOptions
+     * @param {jarves.LayoutVertical|Element} container
+     * @param {Object} options
      */
-    initialize: function (pContainer, pOptions) {
+    initialize: function (container, options) {
 
-        this.setOptions(pOptions);
+        this.setOptions(options);
 
-        if (typeOf(pContainer) == 'null') {
+        if (typeOf(container) == 'null') {
             throw 'pContainer is null.';
         }
 
-        if (instanceOf(pContainer, jarves.LayoutVertical)) {
-            this.vertical = pContainer;
+        if (instanceOf(container, jarves.LayoutVertical)) {
+            this.vertical = container;
         } else {
-            this.vertical = new jarves.LayoutVertical(pContainer, {rows: [], gridLayout: true, fixed: this.options.fixed});
+            this.vertical = new jarves.LayoutVertical(container, {rows: [], gridLayout: true, fixed: this.options.fixed});
         }
 
         this.container = this.vertical.addHorizontal(this, this.options.height);
@@ -84,8 +84,8 @@ jarves.LayoutHorizontal = new Class({
         return this.vertical.getLayout();
     },
 
-    getColumn: function (pColumn) {
-        return this.columns[pColumn - 1];
+    getColumn: function (column) {
+        return this.columns[column - 1];
     },
 
     getTd: function (column) {
@@ -113,9 +113,9 @@ jarves.LayoutHorizontal = new Class({
         return this.layout ? this.layout.getCell(1, 1) : this.container;
     },
 
-    addColumn: function (pWidth) {
+    addColumn: function (width) {
         var td = new Element('td', {
-            width: pWidth,
+            width: width,
             valign: 'top',
             height: this.getContainer().get('height') || '100%'
         }).inject(this.getContainer());
