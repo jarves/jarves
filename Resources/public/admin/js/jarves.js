@@ -1,4 +1,4 @@
-window.jarves = window.jarves || {};
+var jarves = angular.module('jarves', []);
 
 jarves.clipboard = {};
 jarves.settings = {};
@@ -8,6 +8,14 @@ jarves.streamParams = {};
 
 jarves.langs = jarves.langs || {};
 _path = _path || location.pathname.dirname();
+
+jarves.FieldTypes = {};
+jarves.Directives = {};
+jarves.ContentTypes = {};
+jarves.Services = {};
+jarves.Factories = {};
+jarves.Filters = {};
+jarves.Controller = {};
 
 /**
  * Is true if the current browser has a mobile user agent.
@@ -111,10 +119,10 @@ jarves.translate = function(message, plural, count, context) {
         if (typeOf(jarves.lang[id]) == 'array') {
             if (count) {
                 var fn = 'gettext_plural_fn_' + jarves.lang['__lang'];
-                var plural = window[fn](count) + 0;
+                pluralId = window[fn](count) + 0;
 
-                if (count && jarves.lang[id][plural]) {
-                    return jarves.lang[id][plural].replace('%d', count);
+                if (count && jarves.lang[id][pluralId]) {
+                    return jarves.lang[id][pluralId].replace('%d', count);
                 } else {
                     return ((count === null || count === false || count === 1) ? message : plural);
                 }
@@ -969,22 +977,6 @@ jarves.getObjectFieldLabel = function(value, field, fieldId, objectKey, relation
 };
 
 /**
- * Returns the module title of the given module key.
- *
- * @param {String} key
- *
- * @return {String|null} Null if the module does not exist/its not activated.
- */
-jarves.getBundleTitle = function(key) {
-    var config = jarves.getConfig(key);
-    if (!config) {
-        return key;
-    }
-
-    return config.label || config.name;
-};
-
-/**
  *
  * @param {Number} bytes
  * @returns {String}
@@ -1037,26 +1029,16 @@ jarves.getDomain = function(id) {
     return result;
 };
 
-/**
- * Loads all settings from the backend.
- *
- * @param {Array} keyLimitation
- * @param {Function} callback
- */
-jarves.loadSettings = function(keyLimitation, callback) {
-    jarves.adminInterface.loadSettings(keyLimitation, callback);
-};
+///**
+// * Loads all settings from the backend.
+// *
+// * @param {Array} keyLimitation
+// * @param {Function} callback
+// */
+//jarves.loadSettings = function(keyLimitation, callback) {
+//    jarves.adminInterface.loadSettings(keyLimitation, callback);
+//};
 
-/**
- * Returns the bundle configuration array.
- *
- * @param {String} bundleName
- * @returns {Object}
- */
-jarves.getConfig = function(bundleName) {
-    if (!bundleName) return;
-    return jarves.settings.configs[bundleName] || jarves.settings.configs[bundleName.toLowerCase()] || jarves.settings.configsAlias[bundleName] || jarves.settings.configsAlias[bundleName.toLowerCase()];
-};
 
 /**
  * Returns the short bundleName.
@@ -1070,7 +1052,7 @@ jarves.getShortBundleName = function(bundleName) {
 };
 
 /**
- * Returns the bundle name.
+ * Returns the bundle name from a PHP FQ class name.
  *
  * Jarves\JarvesBundle => JarvesBundle
  *
@@ -1082,33 +1064,37 @@ jarves.getBundleName = function(bundleClass) {
 	return split[split.length -1];
 };
 
-/**
- * Loads the main menu.
- */
-jarves.loadMenu = function() {
-    jarves.adminInterface.loadMenu();
-};
+///**
+// * Loads the main menu.
+// */
+//jarves.loadMenu = function() {
+//    jarves.adminInterface.loadMenu();
+//};
 
-/**
- * Sets the current language and reloads all messages.
- *
- * @param {String} languageCode
- */
-jarves.loadLanguage = function(languageCode) {
-    if (!languageCode) {
-        languageCode = 'en';
-    }
-    window._session.lang = languageCode;
+///**
+// * Sets the current language and reloads all messages.
+// *
+// * @param {String} languageCode
+// */
+//jarves.loadLanguage = function(languageCode) {
+//    if (!languageCode) {
+//        languageCode = 'en';
+//    }
+//    window._session.lang = languageCode;
+//
+//    Cookie.write('jarves_language', languageCode);
+//
+//    Asset.javascript(_pathAdmin + 'admin/ui/language-plural?lang=' + languageCode);
+//
+//    new Request.JSON({url: _pathAdmin + 'admin/ui/language?lang=' + languageCode, async: false, noCache: 1, onComplete: function(pResponse) {
+//        jarves.lang = pResponse.data;
+//        Locale.define('en-US', 'Date', jarves.lang);
+//    }}).get();
+//};
+//
 
-    Cookie.write('jarves_language', languageCode);
 
-    Asset.javascript(_pathAdmin + 'admin/ui/language-plural?lang=' + languageCode);
 
-    new Request.JSON({url: _pathAdmin + 'admin/ui/language?lang=' + languageCode, async: false, noCache: 1, onComplete: function(pResponse) {
-        jarves.lang = pResponse.data;
-        Locale.define('en-US', 'Date', jarves.lang);
-    }}).get();
-};
 
 /**
  * Register a new stream and starts probably the stream process.
@@ -1199,7 +1185,7 @@ jarves.setStreamParam = function(key, value) {
     } else {
         jarves.streamParams.params[key] = value;
     }
-}
+};
 
 /**
  * Returns the current value in the clipboard of the interface (not browser)
@@ -1275,15 +1261,15 @@ jarves.openDialog = function(options) {
 
     var target = document.body;
 
-    if (options.target && options.target.getWindow()) {
-        target = options.target.getWindow().document.body;
+    if (options.target) {
+        target = document.id(options.target.ownerDocument.body);
     }
 
-    if ('body' === target.get('tag')) {
-        if (jarvesFrame = target.getElement('.jarves-frame')) {
-            target = jarvesFrame;
-        }
-    }
+//    if ('body' === target.get('tag')) {
+//        if (jarvesFrame = target.getElement('.jarves-frame')) {
+//            target = jarvesFrame;
+//        }
+//    }
 
     if (!jarves.closeDialogsBodys.contains(target)) {
         jarves.closeDialogsBodys.push(target);
@@ -1381,30 +1367,6 @@ jarves.openDialog = function(options) {
     autoPositionLastOverlay.updatePosition = updatePosition;
 
     return autoPositionLastOverlay;
-};
-
-/**
- * Returns the object definition as object.
- *
- * @param {String} objectKey
- *
- * @returns {Object}
- */
-jarves.getObjectDefinition = function(objectKey) {
-    if (typeOf(objectKey) != 'string') {
-        throw 'objectKey is not a string: ' + objectKey;
-    }
-
-    objectKey = jarves.normalizeObjectKey(objectKey);
-
-    var bundleName = ("" + objectKey.split('/')[0]).toLowerCase();
-    var name = objectKey.split('/')[1].lcfirst();
-
-    if (jarves.getConfig(bundleName) && jarves.getConfig(bundleName)['objects'][name]) {
-        var config = jarves.getConfig(bundleName)['objects'][name];
-        config._key = objectKey;
-        return config;
-    }
 };
 
 /**

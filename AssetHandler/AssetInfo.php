@@ -7,12 +7,12 @@ class AssetInfo
     /**
      * @var string
      */
-    protected $file;
+    protected $path;
 
     /**
      * @var string
      */
-    protected $originalFile;
+    protected $originalPath;
 
     /**
      * @var string
@@ -59,17 +59,17 @@ class AssetInfo
     /**
      * @param string $originalFile
      */
-    public function setOriginalFile($originalFile)
+    public function setOriginalPath($originalFile)
     {
-        $this->originalFile = $originalFile;
+        $this->originalPath = $originalFile;
     }
 
     /**
      * @return string
      */
-    public function getOriginalFile()
+    public function getOriginalPath()
     {
-        return $this->originalFile;
+        return $this->originalPath;
     }
 
     /**
@@ -107,17 +107,17 @@ class AssetInfo
     /**
      * @param string $file
      */
-    public function setFile($file)
+    public function setPath($file)
     {
-        $this->file = $file;
+        $this->path = $file;
     }
 
     /**
      * @return string
      */
-    public function getFile()
+    public function getPath()
     {
-        return $this->file;
+        return $this->path;
     }
 
     /**
@@ -152,8 +152,8 @@ class AssetInfo
             return 'text/javascript' === strtolower($this->getContentType());
         }
 
-        if ($this->getFile()) {
-            $exploded = explode('.', $this->getFile());
+        if ($this->getPath()) {
+            $exploded = explode('.', $this->getPath());
             return 'js' === strtolower(array_pop($exploded));
         }
 
@@ -171,8 +171,8 @@ class AssetInfo
             return 'text/css' === strtolower($this->getContentType());
         }
 
-        if ($this->getFile()) {
-            $exploded = explode('.', $this->getFile());
+        if ($this->getPath()) {
+            $exploded = explode('.', $this->getPath());
             return 'css' === strtolower(array_pop($exploded));
         }
     }

@@ -39,7 +39,7 @@ var jarves_system_module = new Class({
 
         /* installed */
         this.installedPane = new Element('div', {
-            'class': 'jarves-jarves-Window-content-withBottomBar'
+            'class': 'jarves-Window-content-withBottomBar'
         }).inject(this.panes['installed']);
         this.installedActionBar = new Element('div', {
             'class': 'jarves-Window-win-buttonBar jarves-ActionBar'
@@ -337,7 +337,7 @@ var jarves_system_module = new Class({
         this.panes['local'].empty();
 
         this.localePane = new Element('div', {
-            'class': 'jarves-jarves-Window-content-withBottomBar'
+            'class': 'jarves-Window-content-withBottomBar'
         }).inject(this.panes['local']);
         var p = this.localePane;
 

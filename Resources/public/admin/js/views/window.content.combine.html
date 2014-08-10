@@ -1,0 +1,46 @@
+<div ng-controller="WindowCombine">
+    <window-frame>
+        <window-toolbar>
+            <button-group>
+                <button pressed="controller.currentView == 1" icon="#icon-list-9" title="List"></button>
+                <button pressed="controller.currentView == 2" icon="#icon-layout" title="Form"></button>
+            </button-group>
+
+            <button-group float="right">
+                <jarves-field ng-if="controller.classProperties.domainDepended" type="domains" ng-model="domain"></jarves-field>
+                <jarves-field ng-if="controller.classProperties.multiLanguage" type="language" ng-model="language"></jarves-field>
+                <input type="text" ng-model="searchQuery"/>
+            </button-group>
+
+        </window-toolbar>
+
+        <window-content>
+            <div ng-if="!controller.classProperties">
+                Loading ...
+            </div>
+            <div ng-if="controller.classProperties">
+                <table width="100%">
+                    <thead>
+                        <tr>
+                            <th ng-repeat="column in controller.classProperties.columns | toArray" width="{{column.width}}" align="{{column.align}}">{{column.label}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in controller.items">
+                            <td ng-repeat="column in controller.classProperties.columns | toArray">
+                                <jarves-object-label data="item" column="column" id="column.$key" object="controller.classProperties.object"></jarves-object-label>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </window-content>
+    </window-frame>
+
+    <window-sidebar label="'Actions'">
+        <button ng-if="controller.currentWindowEdit">Save</button>
+        <splitter></splitter>
+        <button>New</button>
+        <button>New Domain</button>
+    </window-sidebar>
+</div>

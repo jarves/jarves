@@ -24,8 +24,6 @@
 
 .jarves-login-middle .jarves-Select-box,
 .jarves-login-middle .jarves-Select-box:link {
-    line-height: 30px;
-    height: 30px;
     width: auto;
     float: left;
     margin: 0;
@@ -146,6 +144,7 @@
     overflow: hidden;
     background-color: $mainColor;
     z-index: 5;
+    @include transition(all 0.3s ease-out);
 }
 
 .jarves-login-loader-top {
@@ -156,32 +155,23 @@
     bottom: 0px;
 }
 
-.jarves-login-animation-left {
-    position: absolute;
-    left: 0;
-    top: 60px;
-    bottom: 0;
-    background-color: #1D1D22;
+.jarves-login-loader-top.active {
+    height: 91px;
+    border-bottom: 1px solid #aaa;
 }
 
-.jarves-login-animation-top {
-    background-color: #1D1D22;
+.jarves-login-loader-bottom.active {
+    height: 91px;
+    border-top: 1px solid #aaa;
 }
 
-.jarves-ai-loginLoadingBarText {
-    margin: 5px 15px;
-}
-
-.jarves-ai-loginLoadingBarInside {
+.jarves-login-loadingBarInside {
     position: absolute;
     bottom: 0;
     left: 0;
     height: 2px;
     background-color: #22638E;
-}
-
-.jarves-login-input-passwd:focus,
-.jarves-login-input-username:focus {
+    @include transition(all 0.5);
 }
 
 .jarves-login-middle .loginMessage {
@@ -192,25 +182,8 @@
     right: 0;
 }
 
-.jarves-login-middle-form .loginLangSelection {
-    position: absolute;
-    right: 12px;
-    top: 115px;
-    width: 120px;
-    padding: 3px 2px 2px 2px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-}
-
-/* load backend */
-.jarves-ai-loader {
-    position: absolute;
-    bottom: 0px;
-    height: 30px;
-    left: 0px;
-    background-color: #888;
-    z-index: 131313124;
+.jarves-login-middle .loginMessage.red {
+    color: red;
 }
 
 .jarves-login-barrierTape-fullblock {

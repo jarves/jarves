@@ -3,6 +3,7 @@ jarves.Window = new Class({
     Binds: ['close'],
     Implements: [Events, Options],
 
+
     entryPoint: '',
     module: '',
 
@@ -16,13 +17,16 @@ jarves.Window = new Class({
 
     },
 
-    initialize: function (entryPointPath, options, instanceId, parameter, isInline, parentWindowId) {
+    title: 'Loading ...',
+
+    initialize: function (scope, entryPoint, options, instanceId, parameter, isInline, parentWindowId) {
+        this.scope = scope;
         this.params = parameter || {};
         this.setOptions(options);
         this.originParams = Object.clone(this.params);
         
         this.id = instanceId;
-        this.entryPoint = entryPointPath;
+        this.entryPoint = entryPoint;
         this.inline = isInline;
         this.parent = parentWindowId;
 
@@ -37,7 +41,7 @@ jarves.Window = new Class({
 
         this.createWin();
 
-        if (entryPointPath) {
+        if (entryPoint) {
             this.loadContent();
             this.addHotkey('esc', !this.isInline(), false, function (e) {
                 (function () {
@@ -199,7 +203,7 @@ jarves.Window = new Class({
             });
 
             var div = new Element('div', {
-                'class': 'jarves-jarves-Window-loader-content gradient',
+                'class': 'jarves-Window-loader-content gradient',
                 html: "<br/>" + pText
             }).inject(this.loadingObj.td);
 
@@ -481,7 +485,7 @@ jarves.Window = new Class({
     },
 
     toBack: function () {
-        this.title.removeClass('jarves-jarves-Window-inFront');
+        this.title.removeClass('jarves-Window-inFront');
 
         if (!this.isInline() && (!this.children || !this.children.isInline())) {
             this.border.setStyle('display', 'none');
@@ -506,7 +510,7 @@ jarves.Window = new Class({
 
     toFront: function (onlyZIndex) {
         if (this.active) {
-            this.title.addClass('jarves-jarves-Window-inFront');
+            this.title.addClass('jarves-Window-inFront');
             if (this.border.getStyle('display') != 'block') {
                 this.border.setStyles({
                     'display': 'block'
@@ -694,7 +698,7 @@ jarves.Window = new Class({
 
         //search for dialogs
         if (this.border) {
-            var dialogs = this.border.getChildren('.jarves-jarves-Window-prompt');
+            var dialogs = this.border.getChildren('.jarves-Window-prompt');
             if (!dialogs || !dialogs.length) {
                 dialogs = this.border.getChildren('.jarves-dialog-overlay');
             }
@@ -755,7 +759,8 @@ jarves.Window = new Class({
             this.destroy();
         }
 
-        jarves.wm.close(this);
+
+        //jarves.wm.close(this);
     },
 
     destroy: function () {
@@ -792,7 +797,7 @@ jarves.Window = new Class({
     },
 
     getEntryPoint: function () {
-        return this.entryPoint;
+        return this.entryPoint.fullPath;
     },
 
     getId: function () {
@@ -800,7 +805,7 @@ jarves.Window = new Class({
     },
 
     getEntryPointDefinition: function () {
-        return this.entryPointDefinition;
+        return this.entryPoint;
     },
 
     getModule: function () {
@@ -857,7 +862,7 @@ jarves.Window = new Class({
         }.bind(this));
 //
 //            new Element('img', {
-//                src: _path + 'bundles/jarves/admin/images/jarves-jarves-Window-title-path.png'
+//                src: _path + 'bundles/jarves/admin/images/jarves-Window-title-path.png'
 //            }).inject(this.titleTextContainer);
 //
 //            new Element('span', {
@@ -1029,7 +1034,7 @@ jarves.Window = new Class({
         this.border.windowInstance = this;
 
         this.win = this.border;
-        this.title = new Element('div', {'class': 'jarves-Window-win-title'}).inject(this.win);
+        this.title = new Element('div', {'class': 'jarves-Window-title'}).inject(this.win);
 
         this.mainLayout = new jarves.Layout(this.win, {
             layout: [
@@ -1041,13 +1046,13 @@ jarves.Window = new Class({
         this.mainLayout.getCell(1, 1).setStyle('height', 'auto');
 
 
-        this.titlePath = new Element('span', {'class': 'jarves-jarves-Window-titlepath'}).inject(this.title);
-        this.titleTextContainer = new Element('span', {'class': 'jarves-jarves-Window-titlepath-main'}).inject(this.titlePath);
+        this.titlePath = new Element('span', {'class': 'jarves-Window-titlepath'}).inject(this.title);
+        this.titleTextContainer = new Element('span', {'class': 'jarves-Window-titlepath-main'}).inject(this.titlePath);
 
-        this.titleAdditional = new Element('span', {'class': 'jarves-jarves-Window-titlepath-additional'}).inject(this.titlePath);
+        this.titleAdditional = new Element('span', {'class': 'jarves-Window-titlepath-additional'}).inject(this.titlePath);
 
         this.titleGroups =
-            new Element('div', {'class': 'jarves-Window-win-titleGroups'}).inject(this.mainLayout.getCell(1, 1));
+            new Element('div', {'class': 'jarves-Window-titleGroups'}).inject(this.mainLayout.getCell(1, 1));
 
         this.mainLayout.getCell(2, 1).addClass('jarves-Window-win-content-container');
         this.content = new Element('div', {'class': 'jarves-Window-win-content'}).inject(this.mainLayout.getCell(2, 1));
@@ -1257,7 +1262,7 @@ jarves.Window = new Class({
 
     createOverlay: function () {
         var overlay = new Element('div', {
-            'class': 'jarves-jarves-Window-overlay',
+            'class': 'jarves-Window-overlay',
             styles: {
                 opacity: 0.5,
                 position: 'absolute',
@@ -1285,7 +1290,7 @@ jarves.Window = new Class({
 
         ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'].each(function (item) {
             this.sizer[item] = new Element('div', {
-                'class': 'jarves-jarves-Window-sizer jarves-jarves-Window-sizer-' + item
+                'class': 'jarves-Window-sizer jarves-Window-sizer-' + item
             }).inject(this.border);
         }.bind(this));
 

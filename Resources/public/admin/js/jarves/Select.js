@@ -217,9 +217,9 @@ jarves.Select = new Class({
         selectFirstOnNull: true
     },
 
-    initialize: function(pContainer, pOptions) {
-        this.setOptions(pOptions);
-        this.container = pContainer;
+    initialize: function(container, options) {
+        this.setOptions(options);
+        this.container = container;
 
         this.createLayout();
         this.mapEvents();
@@ -240,11 +240,21 @@ jarves.Select = new Class({
         }
     },
 
+    toElement: function() {
+        if (!this.box) {
+            this.box = new Element('a', {
+                href: 'javascript: ;'
+            });
+        }
+        return this.box;
+    },
+
     createLayout: function() {
-        this.box = new Element('a', {
-            href: 'javascript: ;',
-            'class': 'jarves-normalize jarves-Select-box jarves-Select-box-active'
-        }).addEvent('click', this.toggle.bind(this));
+
+        this.box = this.toElement();
+
+        this.box.addClass('jarves-normalize jarves-Select-box jarves-Select-box-active');
+        this.box.addEvent('click', this.toggle.bind(this));
 
         this.box.instance = this;
 
@@ -1134,7 +1144,7 @@ jarves.Select = new Class({
             return;
         }
 
-        if (this.box.getParent('.jarves-Window-win-titleGroups')) {
+        if (this.box.getParent('.jarves-Window-titleGroups')) {
             this.chooser.addClass('jarves-Select-darker');
         } else {
             this.chooser.removeClass('jarves-Select-darker');
@@ -1196,10 +1206,5 @@ jarves.Select = new Class({
             this.chooser.setStyle('height', window.getSize().y);
         }
 
-    },
-
-    toElement: function() {
-        return this.box;
     }
-
 });

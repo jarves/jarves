@@ -674,7 +674,7 @@ var jarves_system_module_edit = new Class({
     saveHelp: function() {
         var req = {};
         var items = [];
-        this.helpPane.getElements('div.jarves-jarves-system-module-help').each(function(div) {
+        this.helpPane.getElements('div.jarves-system-module-help').each(function(div) {
 
             var item = {};
             item.title = div.getElements('input')[0].value;
@@ -697,7 +697,7 @@ var jarves_system_module_edit = new Class({
             pItem = {};
         }
         var main = new Element('div', {
-            'class': 'jarves-jarves-system-module-help',
+            'class': 'jarves-system-module-help',
             style: 'padding: 5px; border-bottom: 1px solid #ddd; margin: 5px;'
         }).inject(this.helpPane);
 

@@ -45,7 +45,7 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
         }
 
         $assetInfo = new AssetInfo();
-        $assetInfo->setFile($targetPath);
+        $assetInfo->setPath($targetPath);
         $assetInfo->setContentType('text/css');
         return $assetInfo;
     }

@@ -1,0 +1,6 @@
+
+msgid "Login"
+msgstr "Anmelden"
+
+msgid "Password"
+msgstr "Passwort"

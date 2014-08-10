@@ -283,9 +283,9 @@ class BackendController extends Controller
             foreach ($bundleConfig->getAdminAssetsInfo() as $assetInfo) {
                 if (!$assetInfo->isStylesheet()) continue;
 
-                $path = $this->getJarves()->resolveWebPath($assetInfo->getFile());
+                $path = $this->getJarves()->resolveWebPath($assetInfo->getPath());
                 if (file_exists($path)) {
-                    $files[] = $assetInfo->getFile();
+                    $files[] = $assetInfo->getPath();
                     $md5String .= filemtime($path);
                 }
             }
@@ -348,10 +348,10 @@ class BackendController extends Controller
             foreach ($bundleConfig->getAdminAssetsInfo() as $assetInfo) {
                 if (!$assetInfo->isJavaScript()) continue;
 
-                $path = $this->getJarves()->resolveWebPath($assetInfo->getFile());
+                $path = $this->getJarves()->resolveWebPath($assetInfo->getPath());
                 if (file_exists($path)) {
-                    $assets[] = $assetInfo->getFile();
-                    $files[] = '--js ' . escapeshellarg($this->getJarves()->resolveInternalPublicPath($assetInfo->getFile()));
+                    $assets[] = $assetInfo->getPath();
+                    $files[] = '--js ' . escapeshellarg($this->getJarves()->resolveInternalPublicPath($assetInfo->getPath()));
                     $mtime = filemtime($path);
                     $newestMTime = max($newestMTime, $mtime);
                     $md5String .= ">$path.$mtime<";
@@ -473,7 +473,7 @@ class BackendController extends Controller
                 if (substr_count($path, '/') <= 3) {
                     if ($subEntryPoint->isLink()) {
                         if ($this->getJarves()->getACL()->check('jarvesbundle:entryPoint', '/' . $path)) {
-                            $entryPoints[$path] = array(
+                            $entryPoints[] = array(
                                 'label' => $subEntryPoint->getLabel(),
                                 'icon' => $subEntryPoint->getIcon(),
                                 'fullPath' => $path,

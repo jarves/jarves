@@ -43,8 +43,8 @@
     top: 0px;
 }
 
-.jarves-Window-win-title,
-.jarves-Window-win-title-inaktive {
+.jarves-Window-title,
+.jarves-Window-title-inaktive {
     position: absolute;
     top: 0;
     left: 0;
@@ -57,7 +57,7 @@
     cursor: default;
 }
 
-.jarves-jarves-Window-inFront {
+.jarves-Window-inFront {
     color: #111;
 }
 
@@ -80,30 +80,30 @@
     content: "\a0";
 }
 
-.jarves-Window-win-titleGroups {
-//    @include line-top-left;
-//    margin-bottom: 11px;
+window-toolbar {
     height: 54px;
     padding-top: 5px;
     @include box-sizing(border-box);
 }
 
-/*
-.jarves-Window-win-titleGroups {
-    display: block;
-    padding: 10px;
-    margin: 0 15px;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 2px;
+window-frame {
+    position: absolute;
+    left: 0;
+    right: 25px;
+    top: 39px;
+    bottom: 0;
+    overflow: visible;
 }
-*/
 
-.jarves-Window-win-titleGroups > .jarves-tabGroup:first-child {
+window-toolbar > *:first-child {
     margin-left: 0;
 }
 
-.jarves-Window-win-title-inaktive {
+window-toolbar > *:last-child {
+    margin-right: 0;
+}
+
+.jarves-Window-title-inaktive {
     color: #555;
 }
 
@@ -111,15 +111,19 @@
     @include line-top;
 }
 
-.jarves-Window-win-content {
+window-content {
+    @include line-top();
     position: absolute;
     left: 0;
     right: 0;
-    top: 0;
+    top: 55px;
     bottom: 0;
     overflow: auto;
 }
 
+window-frame[with-sidebar="true"] {
+    right: 190px;
+}
 
 .jarves-Window-win-content-stick {
     top: 0;
@@ -169,17 +173,17 @@
     margin: 0px;
 }
 
-.jarves-Window-win-titleBar {
+.jarves-Window-titleBar {
     position: absolute;
     top: 10px;
     right: 10px;
 }
 
-.jarves-window-extend-head .jarves-Window-win-titleBar {
+.jarves-window-extend-head .jarves-Window-titleBar {
     top: 4px;
 }
 
-.jarves-Window-win-titleBarIcon {
+.jarves-Window-titleBarIcon {
     margin-left: 2px;
     width: 24px;
     height: 16px;
@@ -191,15 +195,15 @@
     padding: 1px 0;
 }
 
-.jarves-Window-win-titleBarIcon:hover {
+.jarves-Window-titleBarIcon:hover {
     color: #333;
 }
 
-.jarves-Window-win-titleBarIcon:active {
+.jarves-Window-titleBarIcon:active {
     color: #444;
 }
 
-.jarves-jarves-Window-titlepath {
+.jarves-Window-titlePath {
     display: block;
     line-height: 25px;
     font-size: 10px;
@@ -207,12 +211,12 @@
     color: #aaa;
 }
 
-.jarves-jarves-Window-titlepath img {
+.jarves-Window-titlePath img {
     margin: 0 8px;
     width: 4px;
 }
 
-.jarves-jarves-Window-prompt {
+.jarves-Window-prompt {
     position: absolute;
     left: 20px;
     top: 20px;
@@ -221,16 +225,16 @@
     box-shadow: 0px 8px 15px #666;
 }
 
-.jarves-jarves-Window-prompt input.text {
+.jarves-Window-prompt input.text {
     width: 220px;
 }
 
-.jarves-jarves-Window-prompt-text {
+.jarves-Window-prompt-text {
     padding: 5px;
     padding-bottom: 40px;
 }
 
-.jarves-jarves-Window-prompt-text-abs {
+.jarves-Window-prompt-text-abs {
     position: absolute;
     top: 0px;
     padding-top: 5px;
@@ -243,7 +247,7 @@
     padding-bottom: 5px;
 }
 
-.jarves-jarves-Window-prompt-bottom {
+.jarves-Window-prompt-bottom {
     position: absolute;
     text-align: right;
     left: 0px;
@@ -252,7 +256,7 @@
     height: 25px;
 }
 
-.jarves-Window-win-content h3,
+window-content h3,
 h3.jarves-headline {
     margin: 0px;
     cursor: default;
@@ -265,7 +269,7 @@ h3.jarves-headline {
     padding: 0px 3px;
 }
 
-.jarves-jarves-Window-content-withBottomBar {
+.jarves-Window-content-withBottomBar {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -274,7 +278,7 @@ h3.jarves-headline {
     overflow: auto;
 }
 
-.jarves-jarves-Window-loader-content {
+.jarves-Window-loader-content {
     width: 200px;
     margin: auto;
     height: 30px;
@@ -293,20 +297,20 @@ h3.jarves-headline {
     background-color: lighten($mainColor, 15%);
 }
 
-.jarves-jarves-Window-sizer {
+.jarves-Window-sizer {
     position: absolute;
     background-color: white;
 }
 
-.jarves-jarves-Window-sizer-ne,
-.jarves-jarves-Window-sizer-se,
-.jarves-jarves-Window-sizer-nw,
-.jarves-jarves-Window-sizer-sw {
+.jarves-Window-sizer-ne,
+.jarves-Window-sizer-se,
+.jarves-Window-sizer-nw,
+.jarves-Window-sizer-sw {
     width: 8px;
     height: 8px;
 }
 
-.jarves-jarves-Window-sizer-n {
+.jarves-Window-sizer-n {
     cursor: n-resize;
     right: 2px;
     left: 2px;
@@ -314,13 +318,13 @@ h3.jarves-headline {
     height: 6px;
 }
 
-.jarves-jarves-Window-sizer-ne {
+.jarves-Window-sizer-ne {
     cursor: ne-resize;
     top: -4px;
     right: -4px;
 }
 
-.jarves-jarves-Window-sizer-e {
+.jarves-Window-sizer-e {
     cursor: e-resize;
     right: -4px;
     bottom: 2px;
@@ -328,13 +332,13 @@ h3.jarves-headline {
     width: 6px;
 }
 
-.jarves-jarves-Window-sizer-se {
+.jarves-Window-sizer-se {
     cursor: se-resize;
     right: -4px;
     bottom: -4px;
 }
 
-.jarves-jarves-Window-sizer-s {
+.jarves-Window-sizer-s {
     cursor: s-resize;
     right: 2px;
     left: 2px;
@@ -342,13 +346,13 @@ h3.jarves-headline {
     height: 6px;
 }
 
-.jarves-jarves-Window-sizer-sw {
+.jarves-Window-sizer-sw {
     cursor: sw-resize;
     left: -4px;
     bottom: -4px;
 }
 
-.jarves-jarves-Window-sizer-w {
+.jarves-Window-sizer-w {
     cursor: w-resize;
     left: -4px;
     bottom: 2px;
@@ -356,13 +360,13 @@ h3.jarves-headline {
     width: 6px;
 }
 
-.jarves-jarves-Window-sizer-nw {
+.jarves-Window-sizer-nw {
     cursor: nw-resize;
     left: -4px;
     top: -4px;
 }
 
-.jarves-Window-sidebar {
+window-sidebar {
     @include line-bottom-left;
     position: absolute;
     right: 0;
@@ -381,7 +385,7 @@ h3.jarves-headline {
     text-transform: uppercase;
 }
 
-.jarves-Window-sidebar-container {
+window-sidebar-container {
     position: absolute;
     left: 0;
     top: 0;
@@ -391,17 +395,19 @@ h3.jarves-headline {
     background-color: #021216;
 }
 
-.jarves-Window-sidebar .jarves-Window-sidebar-container + .jarves-Splitter-main {
+window-sidebar window-sidebar-container + .jarves-Splitter-main {
     left: -28px;
 }
 
-.jarves-Window-sidebar h2 {
+window-sidebar h2 {
     color: white;
     padding: 0 15px;
 }
 
-.jarves-Window-sidebar a.jarves-Button {
+window-sidebar .jarves-Button {
     display: block;
+    width: 100%;
+    @include box-sizing(box-sizing);
     background-image: none;
     background-color: transparent;
     box-shadow: none;
@@ -414,27 +420,27 @@ h3.jarves-headline {
     @include transition(all 0.2s ease-out);
 }
 
-.jarves-Window-sidebar a.jarves-Button-pressed,
-.jarves-Window-sidebar a.jarves-Button-pressed:link,
-.jarves-Window-sidebar a.jarves-Button-pressed:hover,
-.jarves-Window-sidebar a.jarves-Button-pressed:active {
+window-sidebar .jarves-Button[pressed="true"],
+window-sidebar .jarves-Button[pressed="true"]:link,
+window-sidebar .jarves-Button[pressed="true"]:hover,
+window-sidebar .jarves-Button[pressed="true"]:active {
     top: 0;
     box-shadow: none;
     background-image: none;
     background-color: #3d3d3d;
 }
 
-.jarves-Window-sidebar a.jarves-Button-deactivate,
-.jarves-Window-sidebar a.jarves-Button-deactivate:link,
-.jarves-Window-sidebar a.jarves-Button-deactivate:active,
-.jarves-Window-sidebar a.jarves-Button-deactivate:hover {
+window-sidebar .jarves-Button[disabled="true"],
+window-sidebar .jarves-Button[disabled="true"]:link,
+window-sidebar .jarves-Button[disabled="true"]:active,
+window-sidebar .jarves-Button[disabled="true"]:hover {
     cursor: default;
     color: #808080;
 //    background-color: rgba(0, 0, 0, 0);
 }
 
-.jarves-Window-sidebar a.jarves-Select-box,
-.jarves-Window-sidebar a.jarves-Select-box:link {
+window-sidebar a.jarves-Select-box,
+window-sidebar a.jarves-Select-box:link {
 //    background-image: none;
 //    background-color: transparent;
     padding: 0 15px;
@@ -443,52 +449,52 @@ h3.jarves-headline {
 //    border: 1px solid #9C9C9C;
 }
 
-.jarves-Window-sidebar .jarves-Select-arrow {
+window-sidebar .jarves-Select-arrow {
 //    background-image: none;
 //    background-color: transparent;
 //    border-left: 1px solid #9f9f9f;
 }
 
-.jarves-Window-sidebar .jarves-Select-arrow:before {
+window-sidebar .jarves-Select-arrow:before {
     color: #eee;
 }
 
-.jarves-Window-sidebar .jarves-Splitter-main {
+window-sidebar .jarves-Splitter-main {
     left: -20px;
     border-left: 0;
     width: 20px;
 }
-.jarves-Window-sidebar .jarves-ButtonGroup {
+window-sidebar .jarves-ButtonGroup {
     margin: 0;
     display: block;
     white-space: pre;
     @include line-top-left;
 }
 
-.jarves-Window-sidebar .jarves-ButtonGroup:first-child {
+window-sidebar .jarves-ButtonGroup:first-child {
 //    border-top: 0;
 }
 
-//.jarves-Window-sidebar a.jarves-Button:hover {
+//window-sidebar .jarves-Button:hover {
 //    background-image: none;
 //    background-color: #6e6e6e;
 //}
 
-.jarves-Window-sidebar a.jarves-Button-deactivate:hover {
+window-sidebar .jarves-Button[disabled="true"]:hover {
     cursor: default;
     color: gray;
     background-color: transparent;
 }
 
-.jarves-Window-sidebar-container-small .jarves-Window-sidebar-title {
+window-sidebar-container-small .jarves-Window-sidebar-title {
     display: none;
 }
 
-.jarves-Window-sidebar-container-small .jarves-Button > span {
+window-sidebar-container-small .jarves-Button > span {
     display: none;
 }
 
 
-.jarves-Window-sidebar-delimiter {
+window-sidebar-delimiter {
     @include line-top-left;
 }

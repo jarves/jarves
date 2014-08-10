@@ -672,7 +672,7 @@ var jarves_system_module_view = new Class({
      }
 
      var div = new Element('div', {
-     'class': 'jarves-jarves-modules-depends-status',
+     'class': 'jarves-modules-depends-status',
      style: 'padding: 10px;',
      text: _('Loading ...')
      }).inject( li );

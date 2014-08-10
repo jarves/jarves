@@ -1,4 +1,4 @@
-.jarves-jarves-nodes-frontend-wrapper {
+.jarves-nodes-frontend-wrapper {
     position: absolute;
     top: 0px;
     right: 0px;
@@ -6,7 +6,7 @@
     left: 0px;
 }
 
-.jarves-jarves-nodes-frontend-wrapper iframe {
+.jarves-nodes-frontend-wrapper iframe {
     position: absolute;
     display: block;
     border: 0;

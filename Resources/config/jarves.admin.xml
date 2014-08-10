@@ -6,8 +6,10 @@
             <assets>@JarvesBundle/admin/js/mootools-extras/*.js</assets>
             <asset>@JarvesBundle/admin/js/lib/nunjucks.min.js</asset>
 
+            <asset>@JarvesBundle/admin/js/lib/angular.js</asset>
             <asset>@JarvesBundle/admin/js/jarves.js</asset>
-            <asset>@JarvesBundle/admin/js/jarves/AdminInterface.js</asset>
+            <!--<asset>@JarvesBundle/admin/js/jarves/AdminInterface.js</asset>-->
+            <asset>@JarvesBundle/admin/js/jarves/AdminInterface2.js</asset>
             <asset>@JarvesBundle/admin/js/jarves/Button.js</asset>
             <asset>@JarvesBundle/admin/js/jarves/Select.js</asset>
             <asset>@JarvesBundle/admin/js/jarves/Checkbox.js</asset>
@@ -30,6 +32,12 @@
             <asset>@JarvesBundle/admin/js/jarves/FieldTypes/Select.js</asset>
             <assets>@JarvesBundle/admin/js/jarves/FieldTypes/*.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/LabelTypes/*.js</assets>
+            <assets>@JarvesBundle/admin/js/jarves/Services/*.js</assets>
+            <assets>@JarvesBundle/admin/js/jarves/Directives/InputSelect.js</assets>
+            <assets>@JarvesBundle/admin/js/jarves/Directives/*.js</assets>
+            <assets>@JarvesBundle/admin/js/jarves/Controller/WindowList.js</assets>
+            <assets>@JarvesBundle/admin/js/jarves/Controller/*.js</assets>
+            <assets>@JarvesBundle/admin/js/jarves/Filters/*.js</assets>
 
             <assets>@JarvesBundle/admin/js/jarves/ContentTypes/*.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/ui/*.js</assets>

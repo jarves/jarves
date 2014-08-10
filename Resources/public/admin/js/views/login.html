@@ -1,0 +1,28 @@
+<div ng-controller="AdminLoginController">
+    <div ng-show="loginVisible" class="jarves-login jarves-admin">
+        <div class="jarves-login-middle">
+            <div class="jarves-login-middle-top">
+                <img class="jarves-login-logo" src="{{_path}}/bundles/jarves/admin/images/logo.png">
+            </div>
+            <form id="loginForm" onsubmit="return false;" class="jarves-login-middle-form">
+
+                <input jarves-text name="username" translate ng-model="credentials.username" type="text" placeholder="Username"/>
+                <input jarves-text name="password" translate ng-model="credentials.password" type="password" placeholder="Password"/>
+
+                <jarves-field type="language" ng-model="language"></jarves-field>
+                <button ng-click="doLogin()" translate>Login</button>
+
+                <div class="jarves-login-loader-top" ng-class="{'active': inputBlocked}">
+                    <div class="jarves-login-loadingBarInside" style="width: {{progress}}%"></div>
+                </div>
+                <div class="jarves-login-loader-bottom" ng-class="{'active': inputBlocked}"></div>
+            </form>
+            <div class="loginMessage" ng-class="{'red': loginStatus==2}" ng-switch="loginStatus">
+                <span ng-switch-when="1">Log in ...</span>
+                <span ng-switch-when="2">Login failed</span>
+                <span ng-switch-when="3">Loading interface ...</span>
+                <span ng-switch-when="4">Entering.</span>
+            </div>
+        </div>
+    </div>
+</div>

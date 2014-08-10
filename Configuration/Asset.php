@@ -66,7 +66,7 @@ class Asset extends Model
     public function getAssetInfo()
     {
         $assetInfo = new AssetInfo();
-        $assetInfo->setFile($this->getPath());
+        $assetInfo->setPath($this->getPath());
         $assetInfo->setAllowCompression($this->getCompression());
         return $assetInfo;
     }

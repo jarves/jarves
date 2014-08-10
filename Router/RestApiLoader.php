@@ -150,7 +150,10 @@ class RestApiLoader extends Loader
         foreach ($routes as $name => $route) {
 
             $method = explode('::', $route->getDefault('_controller'))[1];
-            $route->setPath('%jarves_admin_prefix%/' . $pattern . $route->getPath());
+
+            $path = '%jarves_admin_prefix%/' . $pattern . $route->getPath();
+            $route->setPath($path);
+
             $route->setDefault('_jarves_object', $objectName);
             $route->setDefault('_jarves_entry_point', $pattern);
             $this->setupObjectRouteRequirements($route, $object);
@@ -257,7 +260,8 @@ class RestApiLoader extends Loader
                 $this->setupObjectRouteRequirements($route, $relationObject, true);
             }
 
-            $route->setPath($route->getPath() . $routePattern);
+            $path = $route->getPath() . $routePattern;
+            $route->setPath($path);
             $route->setDefault('_jarves_object_requirePk', !!strpos($routePattern, '{pk}'));
 
             $this->setupObjectRouteRequirements($route, $object);

@@ -64,7 +64,7 @@ class Translator implements TranslationInterface
         foreach ($this->jarves->getKernel()->getBundles() as $bundleName => $bundle) {
             $path = $bundle->getPath();
             if ($path) {
-                $path .= "Resources/translations/$lang.po";
+                $path .= "/Resources/translations/$lang.po";
                 $md5 .= @filemtime($path);
                 $bundles[] = $bundleName;
             }

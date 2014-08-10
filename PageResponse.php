@@ -257,7 +257,8 @@ class PageResponse extends Response
     protected function injectAsset($definition)
     {
         $assetInfo = new AssetInfo();
-        $assetInfo->setFile(@$definition['path']);
+        $assetInfo->setPath(@$definition['path']);
+        $assetInfo->setOriginalPath(@$definition['path']);
         $assetInfo->setContent(@$definition['content']);
         $assetInfo->setContentType(@$definition['contentType']);
 
@@ -278,8 +279,8 @@ class PageResponse extends Response
     public function handleAsset(&$assetInfo)
     {
         $assetHandlerContainer = $this->getJarves()->getAssetCompilerContainer();
-        if ($assetInfo->getFile() && $compiler = $assetHandlerContainer->getCompileHandlerByFileExtension($assetInfo->getFile())) {
-            if ($compiledAssetInfo = $compiler->compileFile($assetInfo->getFile())) {
+        if ($assetInfo->getPath() && $compiler = $assetHandlerContainer->getCompileHandlerByFileExtension($assetInfo->getPath())) {
+            if ($compiledAssetInfo = $compiler->compileFile($assetInfo->getPath())) {
                 $assetInfo = $compiledAssetInfo;
             }
         }
@@ -817,7 +818,7 @@ class PageResponse extends Response
             if ($asset->getContentType()) {
                 $loader = $assetHandlerContainer->getLoaderHandlerByContentType($asset->getContentType());
             } else {
-                $loader = $assetHandlerContainer->getLoaderHandlerByExtension($asset->getFile());
+                $loader = $assetHandlerContainer->getLoaderHandlerByExtension($asset->getPath());
             }
 
             if ($loader) {
@@ -831,7 +832,7 @@ class PageResponse extends Response
             if ($asset->getContentType()) {
                 $loader = $assetHandlerContainer->getLoaderHandlerByContentType($asset->getContentType());
             } else {
-                $loader = $assetHandlerContainer->getLoaderHandlerByExtension($asset->getFile());
+                $loader = $assetHandlerContainer->getLoaderHandlerByExtension($asset->getPath());
             }
 
             if ($loader) {

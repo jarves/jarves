@@ -71,7 +71,7 @@ class AdminAssets
         $prefix = substr($this->getJarves()->getAdminPrefix(), 1);
 
         $response->addJsFile($prefix . '/admin/ui/languages');
-        $response->addJsFile($prefix . '/admin/ui/language?lang=en&javascript=1');
+//        $response->addJsFile($prefix . '/admin/ui/language?lang=en&javascript=1');
         $response->addJsFile($prefix . '/admin/ui/language-plural?lang=en');
     }
 
@@ -85,8 +85,8 @@ class AdminAssets
 
         $response->addJs(
             '
-        window._path = window._baseUrl = ' . json_encode($request->getBasePath() . '/') . '
-        window._pathAdmin = ' . json_encode($request->getBaseUrl() . '/' . $prefix . '/')
+        var _path = window._baseUrl = ' . json_encode($request->getBasePath() . '/') . '
+        var _pathAdmin = ' . json_encode($request->getBaseUrl() . '/' . $prefix . '/')
         );
 
         if ($this->getJarves()->getKernel()->isDebug()) {
@@ -111,10 +111,10 @@ class AdminAssets
                         continue;
                     }
 
-                    if ($assetInfo->getFile()) {
+                    if ($assetInfo->getPath()) {
                         // load javascript files, that are not accessible (means those point to a controller)
                         // because those can't be compressed
-                        $path = $this->getJarves()->resolveWebPath($assetInfo->getFile());
+                        $path = $this->getJarves()->resolveWebPath($assetInfo->getPath());
                         if (!file_exists($path)) {
                             $response->addAsset($assetInfo);
                             continue;

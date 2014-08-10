@@ -2913,7 +2913,7 @@ jarves.Files = new Class({
 
             searchPaneCloser = new Element('div', {
                 style: 'position: absolute; top: 3px; right: 3px; font-weight: bold;',
-                'class': 'jarves-Window-win-titleBarIcon jarves-Window-win-titleBarIcon-close'
+                'class': 'jarves-Window-titleBarIcon jarves-Window-titleBarIcon-close'
             }).addEvent('click', function() {
                     this.closeSearch();
                 }.bind(this)).inject(this.searchPane);

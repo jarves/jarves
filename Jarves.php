@@ -796,6 +796,10 @@ class Jarves extends Controller
         return 'web/' . $path;
     }
 
+    /**
+     * @param string $path
+     * @return string
+     */
     public function resolvePublicWebPath($path)
     {
         $webDir = realpath($this->getKernel()->getRootDir().'/../web') . '/';
@@ -809,6 +813,11 @@ class Jarves extends Controller
         }
 
         if (file_exists($webDir . $path)) {
+            return $path;
+        }
+
+        //if its a external path?
+        if (preg_match('/^(http|https|\/\/)/', $path)) {
             return $path;
         }
 

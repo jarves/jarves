@@ -85,7 +85,7 @@ class UITranslationsController extends Controller
      * )
      *
      * @Rest\QueryParam(name="lang", requirements="[a-z]{2,3}", strict=true, description="The language code")
-     * @Rest\QueryParam(name="javascript", requirements=".+", default=false, description="If it should be printed as javascript")
+     *  Rest\QueryParam(name="javascript", requirements=".+", default=false, description="If it should be printed as javascript")
      *
      * @Rest\Get("/admin/ui/language")
      *
@@ -94,7 +94,7 @@ class UITranslationsController extends Controller
      *
      * @return array|string depends on javascript param
      */
-    public function getLanguageAction($lang, $javascript)
+    public function getLanguageAction($lang)
     {
         if (!$this->getJarves()->getTranslator()->isValidLanguage($lang)) {
             $lang = 'en';
@@ -104,21 +104,23 @@ class UITranslationsController extends Controller
         $this->getJarves()->getAdminClient()->syncStore();
 
         $messages = $this->getJarves()->getTranslator()->loadMessages($lang);
-        $template = $this->getJarves()->getTemplating();
+//        $template = $this->getJarves()->getTemplating();
 
-        if ($javascript) {
-            $response = new Response();
-            $response->headers->set('Content-Type', 'text/javascript');
-            $content = "if( typeof(jarves)=='undefined') window.jarves = {}; jarves.lang = " . json_encode($messages, JSON_PRETTY_PRINT);
-            $content .= "\nLocale.define('en-US', 'Date', " . $template->render(
-                'JarvesBundle:Default:javascript-locales.js.twig'
-            ) . ");";
-            $response->setContent($content);
-            return $response;
-        } else {
-            $messages['mootools'] = $template->render('JarvesBundle:Default:javascript-locales.js.twig');
-
-            return $messages;
-        }
+        return $messages ?: [];
+//
+//        if ($javascript) {
+//            $response = new Response();
+//            $response->headers->set('Content-Type', 'text/javascript');
+//            $content = "if( typeof(jarves)=='undefined') window.jarves = {}; jarves.lang = " . json_encode($messages, JSON_PRETTY_PRINT);
+//            $content .= "\nLocale.define('en-US', 'Date', " . $template->render(
+//                'JarvesBundle:Default:javascript-locales.js.twig'
+//            ) . ");";
+//            $response->setContent($content);
+//            return $response;
+//        } else {
+//            $messages['mootools'] = $template->render('JarvesBundle:Default:javascript-locales.js.twig');
+//
+//            return $messages;
+//        }
     }
 }

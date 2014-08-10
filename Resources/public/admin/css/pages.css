@@ -6,6 +6,6 @@
     margin: 0 15px;
 }
 
-.jarves-pages-main-layout + .jarves-Window-win-title {
+.jarves-pages-main-layout + .jarves-Window-title {
     display: none;
 }

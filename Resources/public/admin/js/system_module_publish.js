@@ -91,7 +91,7 @@ var jarves_system_module_publish = new Class({
             'top');
 
         var title = new Element('div', {
-            'class': 'jarves-jarves-Window-prompt-text',
+            'class': 'jarves-Window-prompt-text',
             text: _('Commit message')
         }).inject(dialog.getElement('input'), 'after');
 

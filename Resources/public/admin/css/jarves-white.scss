@@ -109,24 +109,24 @@ $linkHoverBgColor: darken($mainColor, 15%);
     /*
      * Buttons
      */
-    a.jarves-Button:hover,
-    a.jarves-Button:link:hover {
+    .jarves-Button:hover,
+    .jarves-Button:link:hover {
         background-color: $linkHoverBgColor;
         color: $linkHoverColor;
     }
 
-    a.jarves-Button,
-    a.jarves-Button:link {
+    .jarves-Button,
+    .jarves-Button:link {
         color: #444;
         background-color: $linkBgColor;
     }
 
-    a.jarves-Button:active,
-    a.jarves-Button-pressed,
-    a.jarves-Button-pressed:link,
-    a.jarves-Button-pressed:hover,
-    a.jarves-Button-pressed:link:hover,
-    a.jarves-Button-pressed:active {
+    .jarves-Button:active,
+    .jarves-Button-pressed,
+    .jarves-Button-pressed:link,
+    .jarves-Button-pressed:hover,
+    .jarves-Button-pressed:link:hover,
+    .jarves-Button-pressed:active {
         color: #222;
         background-color: darken($mainColor, 25%);
     }
@@ -190,10 +190,10 @@ $linkHoverBgColor: darken($mainColor, 15%);
     .jarves-main-menu-wm-tabs,
     .jarves-desktop,
     .jarves-Window-win-content-container,
-    .jarves-Window-sidebar .jarves-ButtonGroup,
+    window-sidebar .jarves-ButtonGroup,
     .jarves-WindowList-actionBarNavigation,
     .jarves-PageContents-iframe,
-    .jarves-Window-sidebar-title {
+    window-sidebar-title {
         border-top: 1px solid silver;
         &:after {
             display: none;
@@ -203,7 +203,7 @@ $linkHoverBgColor: darken($mainColor, 15%);
         }
     }
 
-    .jarves-Window-sidebar,
+    window-sidebar,
     .jarves-WindowList-combine-left-top,
     .jarves-WindowList-combine-sidebarContainer,
     .jarves-tabGroup,
@@ -222,10 +222,10 @@ $linkHoverBgColor: darken($mainColor, 15%);
     /*
      * Window Sidebar
      */
-    .jarves-Window-sidebar {
+    window-sidebar {
         color: #222;
     }
-    .jarves-Window-sidebar-title {
+    window-sidebar-title {
         color: #444;
     }
 
@@ -493,7 +493,7 @@ $linkHoverBgColor: darken($mainColor, 15%);
         width: 20px;
     }
 //
-    .jarves-Window-sidebar-container {
+    window-sidebar-container {
         background-color: $linkBgColor;
         @include border-left-radius(3px);
     }

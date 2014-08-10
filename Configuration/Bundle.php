@@ -564,8 +564,8 @@ class Bundle extends Model
 
         // collect assets and compile
         foreach ($assets as $asset) {
-            if ($asset->getFile() && $compiler = $assetHandlerContainer->getCompileHandlerByFileExtension($asset->getFile())) {
-                if ($assetInfo = $compiler->compileFile($asset->getFile())) {
+            if ($asset->getPath() && $compiler = $assetHandlerContainer->getCompileHandlerByFileExtension($asset->getPath())) {
+                if ($assetInfo = $compiler->compileFile($asset->getPath())) {
                     $assetInfo->setAllowCompression($asset->getAllowCompression());
                     $result[] = $assetInfo;
                 }

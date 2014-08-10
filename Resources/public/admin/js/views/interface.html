@@ -1,0 +1,46 @@
+<div ng-if="interfaceVisible" class="jarves-frame jarves-admin jarves-white" style="display: block;">
+    <div class="jarves-main-menu-left">
+        <div class="jarves-main-menu-logo-container">
+            <img class="jarves-main-menu-left-logo" src="{{_path}}/bundles/jarves/admin/images/logo.png">
+        </div>
+        <div class="jarves-main-menu-user">
+            <div class="jarves-main-menu-user-name">Welcome, {{_session.firstName}} {{_session.lastName}}</div>
+        </div>
+        <div class="jarves-main-menu-actions"><input class="jarves-Input-text jarves-main-menu-actions-search-input">
+
+            <div class="jarves-main-menu-actions-links"><a>Search</a><a>Wipe Cache</a><a>Logout</a></div>
+        </div>
+        <div class="jarves-main-menu jarves-scrolling">
+
+            <a class="jarves-mainMenu-link icon-stats-up" ng-click="openDashboard()">Dashboard</a>
+
+            <div ng-repeat="category in _menus" class="jarves-mainMenu-cat"
+                 ng-class="{'jarves-mainMenu-cat-hidden': menuHidden[$index]}">
+                <h2 ng-click="menuHidden[$index] = !!!menuHidden[$index]">
+                    {{category.label}}
+                    <span class="jarves-mainMenu-cat-toggle icon-arrow-down-3" title="Hide"></span>
+                </h2>
+                <a ng-repeat="link in category.items" class="jarves-mainMenu-link"
+                   icon="{{link.icon}}" ng-click="openEntryPoint(link)">{{link.label}}</a>
+            </div>
+        </div>
+        <div class="jarves-main-menu-bottom">
+            <a class="jarves-main-menu-bottom-collapse">Collapse<span class="icon-arrow-left-5"></span></a>
+        </div>
+    </div>
+    <div class="jarves-app-container">
+        <div class="jarves-desktop jarves-admin">
+            <jarves-window ng-repeat="windowInfo in windowService.activeEntryPoints" window-info="windowInfo"
+                           ng-class="{'jarves-Window-inFront': windowInfo.window.inFront}"
+                           parameters="windowInfo.params"
+                           parent-id="windowInfo.window.parentId" is-inline="windowInfo.isInline">
+            </jarves-window>
+        </div>
+        <div class="jarves-main-menu-wm-tabs">
+            <div ng-repeat="windowInfo in windowService.activeEntryPoints" class="jarves-wm-tab" icon="{{windowInfo.entryPoint.icon}}"
+                 ng-class="{'jarves-wm-tab-active': windowInfo.window.id == windowService.activeWindowId}" ng-click="windowService.toFront(windowInfo.window.id)">
+                {{windowInfo.window.title}}<a class="icon-cancel-8" ng-click="windowService.close(windowInfo.window.id)"></a>
+            </div>
+        </div>
+    </div>
+</div>
