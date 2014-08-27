@@ -35,7 +35,7 @@
             <assets>@JarvesBundle/admin/js/jarves/Services/*.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Directives/InputSelect.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Directives/*.js</assets>
-            <assets>@JarvesBundle/admin/js/jarves/Controller/WindowList.js</assets>
+            <assets>@JarvesBundle/admin/js/jarves/Controller/ListController.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Controller/*.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Filters/*.js</assets>
 

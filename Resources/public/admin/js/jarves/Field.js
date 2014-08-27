@@ -80,8 +80,8 @@ jarves.Field = new Class({
         definition.object = definition.options && definition.options.object ? definition.options.object : definition.object;
         definition.field = definition.options && definition.options.field ? definition.options.field : definition.field;
 
-        this.field = Object.clone(definition);
-        this.calledDefinition = Object.clone(definition);
+        this.field = jarves.simpleClone(definition);
+        this.calledDefinition = jarves.simpleClone(definition);
 
         if (definition.type == 'predefined') {
             if (!definition.object) {
@@ -107,7 +107,7 @@ jarves.Field = new Class({
             this.field = Object.merge(field, this.field);
         }
 
-        this.definition = Object.clone(this.field);
+        this.definition = jarves.simpleClone(this.field);
 
         this.setOptions(this.field);
         this.container = container;
@@ -318,7 +318,7 @@ jarves.Field = new Class({
     },
 
     renderField: function() {
-        var options = Object.clone(this.definition);
+        var options = jarves.simpleClone(this.definition);
         options.type = this.options.type ? this.options.type : 'text';
         var clazz = jarves.FieldTypes[options.type] || jarves.FieldTypes[options.type.capitalize()];
 
@@ -444,7 +444,7 @@ jarves.Field = new Class({
      * Sets the value.
      *
      * @param {*} value
-     * @param {Boolean} internal Fires fireChange() which fires the 'change' event. Default is false.
+     * @param {Boolean} [internal] Fires fireChange() which fires the 'change' event. Default is false.
      */
     setValue: function(value, internal) {
         if (!this.fieldObject) {

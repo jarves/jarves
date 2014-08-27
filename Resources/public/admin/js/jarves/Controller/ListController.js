@@ -1,14 +1,25 @@
-jarves.Controller.WindowList = new Class({
+jarves.Controller.ListController = new Class({
     Statics: {
         $inject: ['$scope', '$element', '$attrs', '$http', '$q', 'windowService', 'jarves']
     },
-    JarvesController: 'WindowList',
+    JarvesController: 'ListController',
 
+    classProperties: null,
     itemsCount: 0,
     items: [],
     currentPage: 1,
     options: {},
 
+    /**
+     *
+     * @param $scope
+     * @param $element
+     * @param $attrs
+     * @param $http
+     * @param $q
+     * @param {jarves.Services.WindowService} windowService
+     * @param {jarves.Services.Jarves} jarves
+     */
     initialize: function($scope, $element, $attrs, $http, $q, windowService, jarves) {
         this.scope = $scope;
         this.scope.controller = this;
@@ -17,6 +28,19 @@ jarves.Controller.WindowList = new Class({
         this.q = $q;
         this.windowService = windowService;
         this.jarves = jarves;
+        this.loadClassProperties();
+    },
+
+    loadClassProperties: function() {
+        this.http.post(_pathAdmin + this.getEntryPoint()+'/?_method=options')
+            .success(function(response) {
+                this.classProperties = response.data;
+                this.loadPage();
+            }.bind(this))
+            .error(function(response){
+                this.error = response;
+                throw response;
+            }.bind(this));
     },
 
     getEntryPoint: function() {
@@ -64,6 +88,21 @@ jarves.Controller.WindowList = new Class({
             }.bind(this));
 
         return deferred.promise;
-    }
+    },
 
+    getSelected: function() {
+        return this.selected;
+    },
+
+    /**
+     *
+     * @param {Object} item
+     */
+    select: function(item) {
+        this.selected = this.jarves.getObjectPk(this.classProperties.object, item);
+    },
+
+    itemId: function(item) {
+        return this.jarves.getObjectPk(this.classProperties.object, item);
+    }
 });

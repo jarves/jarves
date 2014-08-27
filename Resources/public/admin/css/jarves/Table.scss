@@ -24,7 +24,7 @@ table tr:hover td {
     background-color: lighten($mainColor, 3%);
 }
 
-table tr[selected="true"] td {
+table tr.selected td {
     background-color: lighten($mainColor, 12%);
 }
 
@@ -44,7 +44,7 @@ table tr[selected="true"] td {
         background-color: darken($mainWhiteColor, 3%);
     }
 
-    table tr[selected="true"] td {
-        background-color: darken($mainWhiteColor, 12%);
+    table tr.selected td {
+        background-color: darken($mainWhiteColor, 9%);
     }
 }

@@ -208,30 +208,6 @@ jarves.Services.Jarves = new Class({
     },
 
     /**
-     * Returns the
-     *
-     * @param current
-     * @param entryPoint
-     * @returns {*}
-     */
-    getRelativeEntryPointPath: function(current, entryPoint) {
-        if (typeOf(entryPoint) != 'string' || !entryPoint) {
-            return current;
-        }
-
-        if (entryPoint.substr(0, 1) == '/') {
-            return entryPoint;
-        }
-
-        current = current + '';
-        if (current.substr(current.length - 1, 1) != '/') {
-            current += '/';
-        }
-
-        return current + entryPoint;
-    },
-
-    /**
      * Returns the definition of a entry point.
      *
      * @param {String} path
@@ -324,6 +300,385 @@ jarves.Services.Jarves = new Class({
         }
     },
 
+    /**
+     * Return only the primary key values of a object.
+     *
+     * @param {String} objectKey
+     * @param {Object} item Always a object with the primary key => value pairs.
+     *
+     * @return {Object}
+     */
+    getObjectPk: function(objectKey, item) {
+        var pks = this.getObjectPrimaryList(objectKey);
+        var result = {};
+        Array.each(pks, function(pk) {
+            result[pk] = item[pk];
+        });
+        return result;
+    },
+
+
+    /**
+     * Returns a list of the primary keys.
+     *
+     * @param {String} objectKey
+     *
+     * @return {Array}
+     */
+    getObjectPrimaryList: function(objectKey) {
+        var def = this.getObjectDefinition(objectKey);
+
+        var res = [];
+        Object.each(def.fields, function(field, key) {
+            if (field.primaryKey) {
+                res.push(key);
+            }
+        });
+
+        return res;
+    },
+
+
+    /**
+     * Returns the primaryKey name.
+     *
+     * @param {String} objectKey
+     *
+     * @returns {String}
+     */
+    getObjectPrimaryKey: function(objectKey) {
+        var pks = this.getObjectPrimaryList(objectKey);
+        return pks[0];
+    },
+
+
+    /**
+     *
+     * Return the id or array of internal url id.
+     *
+     * Example:
+     *
+     *    3 => 3
+     *    %252Fadmin%252Fimages%252Fhi.jpg => /admin/images/hi.jpg
+     *    idValue1/idValue2 => {id1: idValue1, id2: idValue2}
+     *
+     * @param {String} objectKey
+     * @param {String} urlId
+     * @returns {String|Object}
+     */
+    getObjectPkFromUrlId: function(objectKey, urlId) {
+        var pks = this.getObjectPrimaryList(objectKey);
+
+        if (1 < pks.length) {
+            var values = jarves.urlDecode(urlId.split('/'));
+            var result = {};
+            Array.each(pks, function(pk, idx) {
+                result[pk] = values[idx];
+            });
+        }
+
+        return jarves.urlDecode(urlId);
+    },
+
+
+    /**
+     * Return the internal representation (id) of object primary keys.
+     *
+     * @param {String} objectKey
+     * @param {Object} item
+     *
+     * @return {String} url encoded string
+     */
+    getObjectUrlId: function(objectKey, item) {
+        var pks = this.getObjectPrimaryList(objectKey);
+
+        if (1 < pks.length) {
+            var values = [];
+            Array.each(pks, function(pk) {
+                values = jarves.urlEncode(item[pk]);
+            });
+            return values.join('/');
+        }
+
+        if (!(pks[0] in item)) {
+            throw pks[0] + ' does not exist in item.';
+        }
+
+        return jarves.urlEncode(item[pks[0]]);
+    },
+
+    /**
+     * Return the origin id of object primary keys. If the object has multiple pks, we return only the first.
+     *
+     * @param {String} objectKey
+     * @param {Object} item
+     *
+     * @return {String|Number}
+     */
+    getObjectId: function(objectKey, item) {
+        var pks = this.getObjectPrimaryList(objectKey);
+
+        return item[pks[0]];
+    },
+
+    /**
+     * Returns the correct escaped id part of the object url (object://<objectName>/<id>).
+     *
+     * @param {String} objectKey
+     * @param {String} id String from jarvesService.getObjectUrlId or jarvesService.getObjectIdFromUrl e.g.
+     */
+    getObjectUrlIdFromId: function(objectKey, id) {
+        return this.hasCompositePk(objectKey) ? id : jarves.urlEncode(id);
+    },
+
+    /**
+     * Returns true if objectKey as more than one primary key.
+     *
+     * @param {String} objectKey
+     * @returns {boolean}
+     */
+    hasCompositePk: function(objectKey) {
+        return 1 < this.getObjectPrimaryList(objectKey).length;
+    },
+
+
+    /**
+     * Return the internal representation (id) of a internal object url.
+     *
+     * Examples:
+     *
+     *  url = object://jarves/user/1
+     *  => 1
+     *
+     *  url = object://jarves/file/%252Fadmin%252Fimages%252Fhi.jpg
+     *  => /admin/images/hi.jpg
+     *
+     *  url = object://jarves/test/pk1/pk2
+     *  => pk1/pk2
+     *
+     * @param {String} url
+     *
+     * @return {String} encoded id
+     */
+    getObjectIdFromUrl: function(url) {
+        var pks = this.getObjectPrimaryList(jarves.getCroppedObjectKey(url));
+
+        var pkString = jarves.getCroppedObjectId(url);
+
+    //    if (1 < pks.length) {
+    //        return pkString; //already correct formatted
+    //    }
+
+        return jarves.urlDecode(pkString);
+    },
+
+
+    /**
+     * Returns the object label, based on a label field or label template (defined
+     * in the object definition).
+     * This function calls perhaps the REST API to get all information.
+     * If you already have an item object, you should probably use jarvesSevice.getObjectLabelByItem();
+     *
+     * You can call this function really fast consecutively, since it queues all and fires
+     * only one REST API call that receives all items at once per object key.(at least after 50ms of the last call).
+     *
+     * @param {String} uri
+     * @param {Function} callback the callback function.
+     *
+     */
+    getObjectLabel: function(uri, callback) {
+        var objectKey = jarves.normalizeObjectKey(jarves.getCroppedObjectKey(uri));
+        var pkString = jarves.getCroppedObjectId(uri);
+        var normalizedUrl = 'object://' + objectKey + '/' + pkString;
+
+        if (this.getObjectLabelBusy[objectKey]) {
+            this.getObjectLabel.delay(10, this.getObjectLabel, [normalizedUrl, callback]);
+            return;
+        }
+
+        if (this.getObjectLabelQTimer[objectKey]) {
+            clearTimeout(this.getObjectLabelQTimer[objectKey]);
+        }
+
+        if (!this.getObjectLabelQ[objectKey]) {
+            this.getObjectLabelQ[objectKey] = {};
+        }
+
+        if (!this.getObjectLabelQ[objectKey][normalizedUrl]) {
+            this.getObjectLabelQ[objectKey][normalizedUrl] = [];
+        }
+
+        this.getObjectLabelQ[objectKey][normalizedUrl].push(callback);
+
+        this.getObjectLabelQTimer[objectKey] = (function() {
+
+            this.getObjectLabelBusy = true;
+
+            var uri = 'object://' + jarves.normalizeObjectKey(objectKey) + '/';
+            Object.each(this.getObjectLabelQ[objectKey], function(cbs, requestedUri) {
+                uri += this.getCroppedObjectId(requestedUri) + '/';
+            });
+            if (uri.substr(-1) == '/') {
+                uri = uri.substr(0, uri.length - 1);
+            }
+
+            new Request.JSON({url: _pathAdmin + 'admin/objects',
+                noCache: 1, noErrorReporting: true,
+                onComplete: function(pResponse) {
+                    var result, fullId, cb;
+
+                    Object.each(pResponse.data, function(item, pk) {
+                        if (item === null) {
+                            return;
+                        }
+
+                        fullId = 'object://' + objectKey + '/' + pk;
+                        result = this.getObjectLabelByItem(objectKey, item, 'field');
+
+                        if (this.getObjectLabelQ[objectKey][fullId]) {
+                            while ((cb = this.getObjectLabelQ[objectKey][fullId].pop())) {
+                                cb(result, item);
+                            }
+                        }
+
+                    }.bind(this));
+
+                    //call the callback of invalid requests with false argument.
+                    Object.each(this.getObjectLabelQ[objectKey], function(cbs) {
+                        cbs.each(function(cb) {
+                            cb.attempt(false);
+                        });
+                    });
+
+                    this.getObjectLabelBusy[objectKey] = false;
+                    this.getObjectLabelQ[objectKey] = {};
+
+                }.bind(this)}).get({url: uri, returnKeyAsRequested: 1});
+
+        }.bind(this)).delay(50);
+    },
+
+    getObjectLabelQ: {},
+    getObjectLabelBusy: {},
+    getObjectLabelQTimer: {},
+
+    /**
+     * Returns the rest entry-point of our API for object access.
+     *
+     * Default is jarves/object/<bundleName>/<objectName>,
+     * but the object has the ability to define its own entry point.
+     *
+     * @param {String} objectKey
+     * @returns {String}
+     */
+    getObjectApiUrl: function(objectKey) {
+        var definition = this.getObjectDefinition(objectKey);
+        if (!definition) {
+            throw 'Definition not found ' + objectKey;
+        }
+
+        if (definition.objectRestEntryPoint) {
+            return _pathAdmin + definition.objectRestEntryPoint;
+        }
+
+        return _pathAdmin + 'object/' + jarves.normalizeObjectKey(objectKey);
+
+    },
+
+    /**
+     * Returns the object label, based on a label field or label template (defined
+     * in the object definition).
+     *
+     * @param {String} objectKey
+     * @param {Object} item
+     * @param {String} mode         'default', 'field' or 'tree'. Default is 'default'
+     * @param {Object} [overwriteDefinition] overwrite definitions stored in the objectKey
+     *
+     * @return {String}
+     */
+    getObjectLabelByItem: function(objectKey, item, mode, overwriteDefinition) {
+
+        var definition = this.getObjectDefinition(objectKey);
+        if (!definition) {
+            throw 'Definition not found ' + objectKey;
+        }
+
+        var template = definition.treeTemplate ? definition.treeTemplate : definition.labelTemplate;
+        var label = definition.treeLabel ? definition.treeLabel : definition.labelField;
+
+        if (overwriteDefinition) {
+            ['fieldTemplate', 'fieldLabel', 'treeTemplate', 'treeLabel'].each(function(map) {
+                if (typeOf(overwriteDefinition[map]) !== 'null') {
+                    definition[map] = overwriteDefinition[map];
+                }
+            });
+        }
+
+        /* field ui */
+        if (mode == 'field' && definition.fieldTemplate) {
+            template = definition.fieldTemplate;
+        }
+
+        if (mode == 'field' && definition.singleItemLabelField) {
+            label = definition.singleItemLabelField;
+        }
+
+        /* tree */
+        if (mode == 'tree' && definition.treeTemplate) {
+            template = definition.treeTemplate;
+        }
+
+        if (mode == 'tree' && definition.treeLabel) {
+            label = definition.treeLabel;
+        }
+
+        if (!template) {
+            //we only have an label field, so return it
+            return item[label];
+        }
+
+        template = this.getObjectLabelByItemTemplates[template] || nunjucks.compile(template);
+        return template.render(item);
+    },
+
+    getObjectLabelByItemTemplates: {},
+
+    /**
+     * Returns all labels for a object item.
+     *
+     * @param {Object}  fields  The array of fields definition, that defines /how/ you want to show the data. limited range of 'type' usage.
+     * @param {Object}  item
+     * @param {String}  objectKey
+     * @param {Boolean} [relationsAsArray] Relations would be returned as arrays/origin or as string(default).
+     *
+     * @return {Object}
+     */
+    getObjectLabels: function(fields, item, objectKey, relationsAsArray) {
+
+        var data = item, dataKey;
+        Object.each(fields, function(field, fieldId) {
+            dataKey = fieldId;
+            if (relationsAsArray && dataKey.indexOf('.') > 0) {
+                dataKey = dataKey.split('.')[0];
+            }
+
+            data[dataKey] = this.getObjectFieldLabel(item, field, fieldId, objectKey, relationsAsArray);
+        }.bind(this));
+
+        return data;
+    },
+
+    /**
+     * Returns a single label for a field of a object item.
+     *
+     * @param {Object} value
+     * @param {Object} field The array of fields definition, that defines /how/ you want to show the data. limited range of 'type' usage.
+     * @param {String} fieldId
+     * @param {String} objectKey
+     * @param {Boolean} [relationsAsArray]
+     *
+     * @return {String} Safe HTML. Escaped with jarves.htmlEntities()
+     */
     getObjectFieldLabel: function(value, field, fieldId, objectKey, relationsAsArray) {
 
         var oriFields = this.getObjectDefinition(objectKey);

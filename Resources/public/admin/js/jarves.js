@@ -487,143 +487,6 @@ jarves.mediaPath = function(path) {
 };
 
 /**
- * Returns a list of the primary keys.
- *
- * @param {String} objectKey
- *
- * @return {Array}
- */
-jarves.getObjectPrimaryList = function(objectKey) {
-    var def = jarves.getObjectDefinition(objectKey);
-
-    var res = [];
-    Object.each(def.fields, function(field, key) {
-        if (field.primaryKey) {
-            res.push(key);
-        }
-    });
-
-    return res;
-};
-
-/**
- * Returns the primaryKey name.
- *
- * @param {String} objectKey
- *
- * @returns {String}
- */
-jarves.getObjectPrimaryKey = function(objectKey) {
-    var pks = jarves.getObjectPrimaryList(objectKey);
-    return pks[0];
-};
-
-/**
- * Return only the primary key values of a object.
- *
- * @param {String} objectKey
- * @param {Object} item Always a object with the primary key => value pairs.
- *
- * @return {Object}
- */
-jarves.getObjectPk = function(objectKey, item) {
-    var pks = jarves.getObjectPrimaryList(objectKey);
-    var result = {};
-    Array.each(pks, function(pk) {
-        result[pk] = item[pk];
-    });
-    return result;
-};
-
-/**
- *
- * Return the id or array of internal url id.
- *
- * Example:
- *
- *    3 => 3
- *    %252Fadmin%252Fimages%252Fhi.jpg => /admin/images/hi.jpg
- *    idValue1/idValue2 => {id1: idValue1, id2: idValue2}
- *
- * @param {String} objectKey
- * @param {String} urlId
- * @returns {String|Object}
- */
-jarves.getObjectPkFromUrlId = function(objectKey, urlId) {
-    var pks = jarves.getObjectPrimaryList(objectKey);
-
-    if (1 < pks.length) {
-        var values = jarves.urlDecode(urlId.split('/'));
-        var result = {};
-        Array.each(pks, function(pk, idx) {
-           result[pk] = values[idx];
-        });
-    }
-
-    return jarves.urlDecode(urlId);
-};
-
-/**
- * Return the internal representation (id) of object primary keys.
- *
- * @param {String} objectKey
- * @param {Object} item
- *
- * @return {String} url encoded string
- */
-jarves.getObjectUrlId = function(objectKey, item) {
-    var pks = jarves.getObjectPrimaryList(objectKey);
-
-    if (1 < pks.length) {
-        var values = [];
-        Array.each(pks, function(pk) {
-            values = jarves.urlEncode(item[pk]);
-        });
-        return values.join('/');
-    }
-
-    if (!(pks[0] in item)) {
-        throw pks[0] + ' does not exist in item.';
-    }
-
-    return jarves.urlEncode(item[pks[0]]);
-};
-
-/**
- * Return the origin id of object primary keys. If the object has multiple pks, we return only the first.
- *
- * @param {String} objectKey
- * @param {Object} item
- *
- * @return {String|Number}
- */
-jarves.getObjectId = function(objectKey, item) {
-    var pks = jarves.getObjectPrimaryList(objectKey);
-
-    return item[pks[0]];
-};
-
-/**
- * Returns the correct escaped id part of the object url (object://<objectName>/<id>).
- *
- * @param {String} objectKey
- * @param {String} id String from jarves.getObjectUrlId or jarves.getObjectIdFromUrl e.g.
- */
-jarves.getObjectUrlIdFromId = function(objectKey, id) {
-    return jarves.hasCompositePk(objectKey) ? id : jarves.urlEncode(id);
-};
-
-/**
- * Returns true if objectKey as more than one primary key.
- *
- * @param {String} objectKey
- * @returns {boolean}
- */
-jarves.hasCompositePk = function(objectKey) {
-    return 1 < jarves.getObjectPrimaryList(objectKey).length;
-};
-
-/**
  * Just converts arguments into a new string :
  *
  *    object://<objectKey>/<id>
@@ -661,6 +524,10 @@ jarves.getCroppedObjectId = function(url) {
     return url;
 };
 
+jarves.compare = function(a, b) {
+    return JSON.encode(a) == JSON.encode(b);
+};
+
 /**
  * This just cut anything but the full raw objectKey.
  *
@@ -687,293 +554,6 @@ jarves.getCroppedObjectKey = function(url) {
     var lastIdx = nextPart.indexOf('/'); //till objectKey/
 
     return -1 === lastIdx ? url : url.substr(0, idx + lastIdx + 1);
-};
-
-/**
- * Return the internal representation (id) of a internal object url.
- *
- * Examples:
- *
- *  url = object://jarves/user/1
- *  => 1
- *
- *  url = object://jarves/file/%252Fadmin%252Fimages%252Fhi.jpg
- *  => /admin/images/hi.jpg
- *
- *  url = object://jarves/test/pk1/pk2
- *  => pk1/pk2
- *
- * @param {String} url
- *
- * @return {String} encoded id
- */
-jarves.getObjectIdFromUrl = function(url) {
-    var pks = jarves.getObjectPrimaryList(jarves.getCroppedObjectKey(url));
-
-    var pkString = jarves.getCroppedObjectId(url);
-
-//    if (1 < pks.length) {
-//        return pkString; //already correct formatted
-//    }
-
-    return jarves.urlDecode(pkString);
-};
-
-/**
- * Returns the object label, based on a label field or label template (defined
- * in the object definition).
- * This function calls perhaps the REST API to get all information.
- * If you already have an item object, you should probably use jarves.getObjectLabelByItem();
- *
- * You can call this function really fast consecutively, since it queues all and fires
- * only one REST API call that receives all items at once per object key.(at least after 50ms of the last call).
- *
- * @param {String} uri
- * @param {Function} callback the callback function.
- *
- */
-jarves.getObjectLabel = function(uri, callback) {
-    var objectKey = jarves.normalizeObjectKey(jarves.getCroppedObjectKey(uri));
-    var pkString = jarves.getCroppedObjectId(uri);
-    var normalizedUrl = 'object://' + objectKey + '/' + pkString;
-
-    if (jarves.getObjectLabelBusy[objectKey]) {
-        jarves.getObjectLabel.delay(10, jarves.getObjectLabel, [normalizedUrl, callback]);
-        return;
-    }
-
-    if (jarves.getObjectLabelQTimer[objectKey]) {
-        clearTimeout(jarves.getObjectLabelQTimer[objectKey]);
-    }
-
-    if (!jarves.getObjectLabelQ[objectKey]) {
-        jarves.getObjectLabelQ[objectKey] = {};
-    }
-
-    if (!jarves.getObjectLabelQ[objectKey][normalizedUrl]) {
-        jarves.getObjectLabelQ[objectKey][normalizedUrl] = [];
-    }
-
-    jarves.getObjectLabelQ[objectKey][normalizedUrl].push(callback);
-
-    jarves.getObjectLabelQTimer[objectKey] = (function() {
-
-        jarves.getObjectLabelBusy = true;
-
-        var uri = 'object://' + jarves.normalizeObjectKey(objectKey) + '/';
-        Object.each(jarves.getObjectLabelQ[objectKey], function(cbs, requestedUri) {
-            uri += jarves.getCroppedObjectId(requestedUri) + '/';
-        });
-        if (uri.substr(-1) == '/') {
-            uri = uri.substr(0, uri.length - 1);
-        }
-
-        new Request.JSON({url: _pathAdmin + 'admin/objects',
-            noCache: 1, noErrorReporting: true,
-            onComplete: function(pResponse) {
-                var result, fullId, cb;
-
-                Object.each(pResponse.data, function(item, pk) {
-                    if (item === null) {
-                        return;
-                    }
-
-                    fullId = 'object://' + objectKey + '/' + pk;
-                    result = jarves.getObjectLabelByItem(objectKey, item, 'field');
-
-                    if (jarves.getObjectLabelQ[objectKey][fullId]) {
-                        while ((cb = jarves.getObjectLabelQ[objectKey][fullId].pop())) {
-                            cb(result, item);
-                        }
-                    }
-
-                });
-
-                //call the callback of invalid requests with false argument.
-                Object.each(jarves.getObjectLabelQ[objectKey], function(cbs) {
-                    cbs.each(function(cb) {
-                        cb.attempt(false);
-                    });
-                });
-
-                jarves.getObjectLabelBusy[objectKey] = false;
-                jarves.getObjectLabelQ[objectKey] = {};
-
-            }}).get({url: uri, returnKeyAsRequested: 1});
-
-    }).delay(50);
-};
-
-/**
- * Returns the rest entry-point of our API for object access.
- *
- * Default is jarves/object/<bundleName>/<objectName>,
- * but the object has the ability to define its own entry point.
- *
- * @param {String} objectKey
- * @returns {String}
- */
-jarves.getObjectApiUrl = function(objectKey) {
-    var definition = jarves.getObjectDefinition(objectKey);
-    if (!definition) {
-        throw 'Definition not found ' + objectKey;
-    }
-
-    if (definition.objectRestEntryPoint) {
-        return _pathAdmin + definition.objectRestEntryPoint;
-    }
-
-    return _pathAdmin + 'object/' + jarves.normalizeObjectKey(objectKey);
-};
-
-jarves.getObjectLabelQ = {};
-jarves.getObjectLabelBusy = {};
-jarves.getObjectLabelQTimer = {};
-
-/**
- * Returns the object label, based on a label field or label template (defined
- * in the object definition).
- *
- * @param {String} objectKey
- * @param {Object} item
- * @param {String} mode         'default', 'field' or 'tree'. Default is 'default'
- * @param {Object} [overwriteDefinition] overwrite definitions stored in the objectKey
- *
- * @return {String}
- */
-jarves.getObjectLabelByItem = function(objectKey, item, mode, overwriteDefinition) {
-
-    var definition = jarves.getObjectDefinition(objectKey);
-    if (!definition) {
-        throw 'Definition not found ' + objectKey;
-    }
-
-    var template = definition.treeTemplate ? definition.treeTemplate : definition.labelTemplate;
-    var label = definition.treeLabel ? definition.treeLabel : definition.labelField;
-
-    if (overwriteDefinition) {
-        ['fieldTemplate', 'fieldLabel', 'treeTemplate', 'treeLabel'].each(function(map) {
-            if (typeOf(overwriteDefinition[map]) !== 'null') {
-                definition[map] = overwriteDefinition[map];
-            }
-        });
-    }
-
-    /* field ui */
-    if (mode == 'field' && definition.fieldTemplate) {
-        template = definition.fieldTemplate;
-    }
-
-    if (mode == 'field' && definition.singleItemLabelField) {
-        label = definition.singleItemLabelField;
-    }
-
-    /* tree */
-    if (mode == 'tree' && definition.treeTemplate) {
-        template = definition.treeTemplate;
-    }
-
-    if (mode == 'tree' && definition.treeLabel) {
-        label = definition.treeLabel;
-    }
-
-    if (!template) {
-        //we only have an label field, so return it
-        return item[label];
-    }
-
-    template = jarves.getObjectLabelByItemTemplates[template] || nunjucks.compile(template);
-    return template.render(item);
-};
-
-jarves.getObjectLabelByItemTemplates = {};
-
-/**
- * Returns all labels for a object item.
- *
- * @param {Object}  fields  The array of fields definition, that defines /how/ you want to show the data. limited range of 'type' usage.
- * @param {Object}  item
- * @param {String}  objectKey
- * @param {Boolean} [relationsAsArray] Relations would be returned as arrays/origin or as string(default).
- *
- * @return {Object}
- */
-jarves.getObjectLabels = function(fields, item, objectKey, relationsAsArray) {
-
-    var data = item, dataKey;
-    Object.each(fields, function(field, fieldId) {
-        dataKey = fieldId;
-        if (relationsAsArray && dataKey.indexOf('.') > 0) {
-            dataKey = dataKey.split('.')[0];
-        }
-
-        data[dataKey] = jarves.getObjectFieldLabel(item, field, fieldId, objectKey, relationsAsArray);
-    }.bind(this));
-
-    return data;
-};
-
-/**
- * Returns a single label for a field of a object item.
- *
- * @param {Object} value
- * @param {Object} field The array of fields definition, that defines /how/ you want to show the data. limited range of 'type' usage.
- * @param {String} fieldId
- * @param {String} objectKey
- * @param {Boolean} [relationsAsArray]
- *
- * @return {String} Safe HTML. Escaped with jarves.htmlEntities()
- */
-jarves.getObjectFieldLabel = function(value, field, fieldId, objectKey, relationsAsArray) {
-
-    var oriFields = jarves.getObjectDefinition(objectKey);
-    if (!oriFields) {
-        throw 'Object not found ' + objectKey;
-    }
-
-    var oriFieldId = fieldId;
-    if (typeOf(fieldId) == 'string' && fieldId.indexOf('.') > 0) {
-        oriFieldId = fieldId.split('.')[0];
-    }
-
-    oriFields = oriFields['fields'];
-    var oriField = oriFields[oriFieldId];
-
-    var showAsField = Object.clone(field || oriField);
-    if (!showAsField.type) {
-        Object.each(oriField, function(v, i) {
-            if (!showAsField[i]) {
-                showAsField[i] = v;
-            }
-        });
-    }
-
-    value = Object.clone(value);
-
-    if (showAsField.type == 'predefined') {
-        if (jarves.getObjectDefinition(showAsField.object)) {
-            showAsField = jarves.getObjectDefinition(showAsField.object).fields[showAsField.field];
-        }
-    }
-
-    showAsField.type = showAsField.type || 'text';
-    if (oriField) {
-        oriField.type = oriField.type || 'text';
-    }
-
-    var clazz = showAsField.type.ucfirst();
-    if (!jarves.LabelTypes[clazz]) {
-        clazz = 'Text';
-    }
-
-    if (relationsAsArray) {
-        showAsField.options = showAsField.options || {};
-        showAsField.options.relationsAsArray = true;
-    }
-
-    var labelType = new jarves.LabelTypes[clazz](oriField, showAsField, fieldId, objectKey);
-
-    return labelType.render(value);
 };
 
 /**
@@ -1049,6 +629,39 @@ jarves.getDomain = function(id) {
  */
 jarves.getShortBundleName = function(bundleName) {
     return jarves.getBundleName(bundleName).toLowerCase().replace(/bundle$/, '');
+};
+
+/**
+ * Returns a absolute path based on a relative one.
+ *
+ * @param {String} current
+ * @param {String} relativePath
+ * @returns {String}
+ */
+jarves.getEntryPointPathForRelative = function(current, relativePath) {
+    if (typeOf(relativePath) != 'string' || !relativePath) {
+        return current;
+    }
+
+    if (relativePath.substr(0, 1) == '/') {
+        return relativePath;
+    }
+
+    current = current + '';
+    if (current.substr(current.length - 1, 1) != '/') {
+        current += '/';
+    }
+
+    return current + relativePath;
+};
+
+jarves.simpleClone = function(value) {
+    var result = {};
+    Object.each(value, function(val, key) {
+        result[key] = val;
+    });
+
+    return result;
 };
 
 /**

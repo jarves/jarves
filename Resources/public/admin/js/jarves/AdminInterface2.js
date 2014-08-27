@@ -223,12 +223,13 @@ jarves.AdminLoginController = new Class({
     },
     JarvesController: 'AdminLoginController',
 
-    initialize: function($rootScope, $scope, $http, translator, jarves) {
+    initialize: function($rootScope, $scope, $http, translator, jarvesServices) {
         this.rootScope = $rootScope;
+        this.rootScope.jarves = jarves;
         this.scope = $scope;
         this.http = $http;
         this.translator = translator;
-        this.jarves = jarves;
+        this.jarves = jarvesServices;
         this.bindToScope(['doLogin']);
 
         this.scope.language = Cookie.read('jarves_language') || 'en';
