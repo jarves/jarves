@@ -10,12 +10,14 @@ jarves.langs = jarves.langs || {};
 _path = _path || location.pathname.dirname();
 
 jarves.FieldTypes = {};
+jarves.LabelTypes = {};
 jarves.Directives = {};
 jarves.ContentTypes = {};
 jarves.Services = {};
 jarves.Factories = {};
 jarves.Filters = {};
 jarves.Controller = {};
+jarves.Fields  = {};
 
 /**
  * Is true if the current browser has a mobile user agent.

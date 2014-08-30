@@ -6,10 +6,10 @@
             </div>
             <form id="loginForm" onsubmit="return false;" class="jarves-login-middle-form">
 
-                <input jarves-text name="username" translate ng-model="credentials.username" type="text" placeholder="Username"/>
+                <jarves-field type="text" translate model="credentials.username" placeholder="Username"></jarves-field>
                 <input jarves-text name="password" translate ng-model="credentials.password" type="password" placeholder="Password"/>
 
-                <jarves-field type="language" ng-model="language"></jarves-field>
+                <!--<jarves-field type="language" ng-model="language"></jarves-field>-->
                 <button ng-click="doLogin()" translate>Login</button>
 
                 <div class="jarves-login-loader-top" ng-class="{'active': inputBlocked}">

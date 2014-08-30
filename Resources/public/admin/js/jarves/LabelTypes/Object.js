@@ -1,5 +1,5 @@
 jarves.LabelTypes['Object'] = new Class({
-    Extends: jarves.LabelAbstract,
+    Extends: jarves.AbstractFieldType,
     
     options: {
         relationsAsArray: false

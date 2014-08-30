@@ -1,5 +1,5 @@
 jarves.LabelTypes.Select = new Class({
-    Extends: jarves.LabelAbstract,
+    Extends: jarves.AbstractFieldType,
 
     render: function(values) {
         this.main = new Element('span');

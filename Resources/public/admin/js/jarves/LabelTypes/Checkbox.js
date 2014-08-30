@@ -1,5 +1,5 @@
 jarves.LabelTypes.Checkbox = new Class({
-    Extends: jarves.LabelAbstract,
+    Extends: jarves.AbstractFieldType,
 
     render: function(values) {
         var value = values[this.fieldId] || '';

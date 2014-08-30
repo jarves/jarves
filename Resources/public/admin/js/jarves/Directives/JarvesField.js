@@ -1,7 +1,7 @@
 jarves.Directives.JarvesField = new Class({
     Extends: jarves.Directives.AbstractDirective,
     JarvesDirective: {
-        name: 'jarvesField',
+        name: 'jarvesField2',
         options: {
             restrict: 'E',
             priority: -1,
@@ -32,8 +32,8 @@ jarves.Directives.JarvesField = new Class({
         this.attributes = attributes;
 
         if (attributes.options) {
-            scope.$watch(attributes['options'], function(options) {
-                this.render(options);
+            scope.$watch(attributes['definition'], function(definition) {
+                this.render(definition);
             }.bind(this));
         } else {
             this.render(attributes);
@@ -46,9 +46,9 @@ jarves.Directives.JarvesField = new Class({
         }
 
         var modelName = options.ngModel || options.model;
-
+        //
         //this.field = new jarves.Field(options, this.element[0], options.id || this.attributes.id);
-
+        //
         //this.field.addEvent('change', function(value){
         //    this.scope.$apply(function() {
         //        this.getParse()(modelName).assign(scope, value);

@@ -1,5 +1,5 @@
 jarves.LabelTypes.Imagemap = new Class({
-    Extends: jarves.LabelAbstract,
+    Extends: jarves.AbstractFieldType,
 
     options: {
         imageMap: {}

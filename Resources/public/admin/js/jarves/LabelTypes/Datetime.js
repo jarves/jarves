@@ -1,5 +1,5 @@
 jarves.LabelTypes.Datetime = new Class({
-    Extends: jarves.LabelTypes.Date,
+    Extends: jarves.AbstractFieldType,
 
     render: function(values) {
         var value = values[this.fieldId] || '';
