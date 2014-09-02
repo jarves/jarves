@@ -17,11 +17,13 @@
 
             <assets>@JarvesBundle/admin/js/jarves/LabelTypes/*.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Services/*.js</assets>
+            <assets>@JarvesBundle/admin/js/jarves/Directives/AbstractDirective.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Directives/InputSelect.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Directives/*.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Controller/ListController.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Controller/*.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Filters/*.js</assets>
+            <assets>@JarvesBundle/admin/js/jarves/Fields/Text.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Fields/*.js</assets>
 
             <!--<assets>@JarvesBundle/admin/js/jarves/ContentTypes/*.js</assets>-->

@@ -6,8 +6,7 @@ jarves.Directives.Layout = new Class({
     JarvesDirective: {
         name: 'jarvesLayout',
         options: {
-            restrict: 'E',
-            controller: jarves.Directives.Layout
+            restrict: 'E'
         }
     },
 

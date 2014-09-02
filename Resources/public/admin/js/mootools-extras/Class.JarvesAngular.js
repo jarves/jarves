@@ -22,11 +22,46 @@
         });
     };
 
-    var getInstance = function(klass) {
-        klass.$prototyping = true;
-        var proto = new klass;
-        delete klass.$prototyping;
-        return proto;
+    Class.Mutators.JarvesField = function(name){
+        if (this.JarvesDirective) {
+            return;
+        }
+
+        var directiveName = 'jarves' + name.ucfirst() + 'Field';
+        //console.log('JarvesField', directiveName, this.prototype.JarvesFieldScope);
+
+        var options = {
+            restrict: 'A',
+            controller: this,
+            //transclude: true,
+            //template: '<ng-transclude></ng-transclude>',
+            scope: {
+                'model': '='
+            },
+            require: [directiveName, 'jarvesField', '?^jarvesField'],
+            link: function(scope, element, attr, ctrl) {
+                var ownController = ctrl[0];
+                var fieldController = ctrl[1];
+                var parentFieldController =  ctrl[2];
+                scope.controller = ownController;
+
+                fieldController.setController(ownController);
+                ownController.setFieldDirective(fieldController);
+
+                if (parentFieldController) {
+                    ownController.setParentFieldDirective(parentFieldController);
+                }
+
+                ownController.link(scope, element, attr);
+            }
+        };
+
+        jarves.directive(
+            directiveName,
+            function() {
+                return options;
+            }
+        );
     };
 
     Class.Mutators.JarvesDirective = function(definition){
@@ -34,13 +69,20 @@
 
         if (true === definition.options.controller) {
             definition.options.controller = this;
-            definition.options.link = function(scope, element, attr, ctrl) {
-                if (!ctrl.isValid) {
-                    ctrl.link(scope, element, attr);
-                } else if (ctrl.isValid()) {
-                    ctrl.link(scope, element, attr);
-                }
-            };
+            if (!definition.options.link) {
+                definition.options.link = function(scope, element, attr, ctrl) {
+                    var ownController;
+                    if ('array' === typeOf(ctrl)) {
+                        ownController = ctrl[0];
+                    } else {
+                        ownController = ctrl;
+                    }
+
+                    if (ownController && ownController.link) {
+                        ownController.link(scope, element, attr, ctrl);
+                    }
+                };
+            }
         }
 
         var options = 'function' === typeOf(definition.options) || 'array' === typeOf(definition.options)

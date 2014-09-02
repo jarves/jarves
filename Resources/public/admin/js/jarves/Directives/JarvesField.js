@@ -1,63 +1,68 @@
 jarves.Directives.JarvesField = new Class({
     Extends: jarves.Directives.AbstractDirective,
+
+    Statics: {
+        $inject: ['$scope', '$element', '$attrs', '$compile', '$http', '$templateCache', '$q']
+    },
     JarvesDirective: {
-        name: 'jarvesField2',
+        name: 'jarvesField',
         options: {
             restrict: 'E',
-            priority: -1,
-            controller: ['$scope', '$element', '$attrs', '$parse', function($scope, $element, $attrs, $parse) {
-                $element.jarvesField = new jarves.Directives.JarvesField($scope, $element, $attrs);
-                $element.jarvesField.setParse($parse);
-                return $element.jarvesField;
-            }],
-            link: function(scope, element, attributes) {
-                element.jarvesField.link(scope, element, attributes);
-            }
+            priority: 5000,
+            terminal: true,
+            controller: true
         }
     },
 
-    parse: null,
+    $scope: null,
+    $element: null,
+    $attrs: null,
+    $compile: null,
+    $http: null,
+    $templateCache: null,
+    $q: null,
 
-    setParse: function(parse) {
-        this.parse = parse;
-    },
+    controller: null,
 
-    getParse: function() {
-        return this.parse;
+    initialize: function($scope, $element, $attrs, $compile, $http, $templateCache, $q) {
+        var actualArguments = arguments;
+        Array.each(this.Statics.$inject, function(name, index) {
+            this[name] = actualArguments[index];
+        }.bind(this));
     },
 
     link: function(scope, element, attributes) {
-        this.scope = scope;
-        this.element = element;
-        this.attributes = attributes;
-
-        if (attributes.options) {
-            scope.$watch(attributes['definition'], function(definition) {
-                this.render(definition);
+        if (this.$attrs.options) {
+            this.$scope.$watch(this.$attrs['definition'], function(definition) {
+                this.load(definition);
             }.bind(this));
         } else {
-            this.render(attributes);
+            this.load(attributes);
         }
     },
 
-    render: function(options) {
-        if (!options.label) {
-            options.noWrapper = true;
+    load: function(definition) {
+        if (!definition.type) {
+            console.error(definition);
+            throw 'no type';
         }
+        this.$element.attr('jarves-%s-field'.sprintf(definition.type.lcfirst()), '');
+        this.$compile(this.$element, null, 5000)(this.$scope);
+    },
 
-        var modelName = options.ngModel || options.model;
-        //
-        //this.field = new jarves.Field(options, this.element[0], options.id || this.attributes.id);
-        //
-        //this.field.addEvent('change', function(value){
-        //    this.scope.$apply(function() {
-        //        this.getParse()(modelName).assign(scope, value);
-        //    }.bind(this))
-        //}.bind(this));
-        //
-        //this.scope.$watch(modelName, function(value){
-        //    this.field.setValue(value);
-        //}.bind(this));
+    /**
+     *
+     * @param {jarves.AbstractFieldType} controller
+     */
+    setController: function(controller){
+        this.controller = controller;
+    },
+
+    /**
+     * @returns {jarves.AbstractFieldType}
+     */
+    getController: function() {
+        return this.controller;
     }
 
 });

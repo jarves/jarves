@@ -1,23 +1,21 @@
 jarves.Fields.Text = new Class({
     Extends: jarves.AbstractFieldType,
 
-    JarvesDirective: {
-        name: 'jarvesField',
-        fieldType: 'text',
-        options: {
-            restrict: 'E',
-            controller: true
-        }
-    },
+    JarvesField: 'text',
+
+    template: 'bundles/jarves/admin/js/views/field.text.html',
 
     link: function(scope, element, attr) {
+        this.attr = attr;
         this.renderTemplateUrl(
-            'bundles/jarves/admin/js/views/field.text.html',
-            function beforeCompile(contents){
-                contents.attr('placeholder', attr.placeholder);
-                contents.attr('translate', attr.translate);
-                contents.attr('model', attr.model);
-            }
+            this.template,
+            this.beforeCompile.bind(this)
         );
+    },
+
+    beforeCompile: function(contents) {
+        contents.attr('placeholder', this.attr.placeholder);
+        contents.attr('translate', this.attr.translate);
+        contents.attr('ng-model', this.attr.model);
     }
 });
