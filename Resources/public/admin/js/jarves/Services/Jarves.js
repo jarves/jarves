@@ -12,7 +12,7 @@
  */
 jarves.Services.Jarves = new Class({
     Statics: {
-        $inject: ['$rootScope', '$http', '$q', 'translator']
+        $inject: ['$rootScope', '$http', '$q', '$injector', 'translator']
     },
     JarvesService: 'jarves',
 
@@ -22,16 +22,17 @@ jarves.Services.Jarves = new Class({
      * @param $rootScope
      * @param $http
      * @param $q
+     * @param $injector
      * @param translator
      */
-    initialize: function($rootScope, $http, $q, translator) {
-        this.rootScope = $rootScope;
-        this.http = $http;
-        this.q = $q;
+    initialize: function($rootScope, $http, $q, $injector, translator) {
+        this.$rootScope = $rootScope;
+        this.$http = $http;
+        this.$q = $q;
+        this.$injector = $injector;
         this.translator = translator;
-        this.rootScope._session = window._session;
-        this.rootScope._settings = {};
-
+        this.$rootScope._session = window._session;
+        this.$rootScope._settings = {};
         console.log('new Service Jarves');
     },
 
@@ -41,7 +42,7 @@ jarves.Services.Jarves = new Class({
      * @param session
      */
     setSession: function(session) {
-        this.rootScope._session = session;
+        this.$rootScope._session = session;
     },
 
     /**
@@ -50,7 +51,7 @@ jarves.Services.Jarves = new Class({
      * @returns {Boolean}
      */
     isLoggedIn: function() {
-        return this.rootScope._session && this.rootScope._session.userId > 0;
+        return this.$rootScope._session && this.$rootScope._session.userId > 0;
     },
 
     /**
@@ -59,9 +60,9 @@ jarves.Services.Jarves = new Class({
      * @returns {promise}
      */
     loadMenu: function() {
-        var deferred = this.q.defer();
+        var deferred = this.$q.defer();
 
-        this.http.get(_pathAdmin + 'admin/backend/menus')
+        this.$http.get(_pathAdmin + 'admin/backend/menus')
             .success(function(response) {
                 this.setMenus(response.data);
                 deferred.resolve();
@@ -105,7 +106,7 @@ jarves.Services.Jarves = new Class({
             categorized[lastKey].items.push(menu);
         }.bind(this));
 
-        this.rootScope._menus = categorized;
+        this.$rootScope._menus = categorized;
     },
 
     /**
@@ -115,31 +116,31 @@ jarves.Services.Jarves = new Class({
      */
     setSettings: function(settings) {
         Object.each(settings, function(val, key) {
-            this.rootScope._settings[key] = val;
+            this.$rootScope._settings[key] = val;
         }.bind(this));
 
-        this.rootScope._settings['images'] = ['jpg', 'jpeg', 'bmp', 'png', 'gif', 'psd'];
+        this.$rootScope._settings['images'] = ['jpg', 'jpeg', 'bmp', 'png', 'gif', 'psd'];
 
-        if (!this.rootScope._settings) {
-            this.rootScope._settings = {};
+        if (!this.$rootScope._settings) {
+            this.$rootScope._settings = {};
         }
 
-        if (typeOf(this.rootScope._settings) != 'object') {
-            this.rootScope._settings = {};
+        if (typeOf(this.$rootScope._settings) != 'object') {
+            this.$rootScope._settings = {};
         }
 
-        if (!this.rootScope._settings['user']['windows']) {
-            this.rootScope._settings['user']['windows'] = {};
+        if (!this.$rootScope._settings['user']['windows']) {
+            this.$rootScope._settings['user']['windows'] = {};
         }
 
-//        if (!this.options.frontPage && this.rootScope._settings.system && this.rootScope._settings.system.systemTitle) {
-//            document.title = this.rootScope._settings.system.systemTitle + t(' | Jarves cms Administration');
+//        if (!this.options.frontPage && this.$rootScope._settings.system && this.$rootScope._settings.system.systemTitle) {
+//            document.title = this.$rootScope._settings.system.systemTitle + t(' | Jarves cms Administration');
 //        }
 
-        this.rootScope._settings.configsAlias = {};
-        Object.each(this.rootScope._settings.configs, function(config, key){
-            this.rootScope._settings.configsAlias[key.toLowerCase()] = this.rootScope._settings.configs[key];
-            this.rootScope._settings.configsAlias[key.toLowerCase().replace(/bundle$/, '')] = this.rootScope._settings.configs[key];
+        this.$rootScope._settings.configsAlias = {};
+        Object.each(this.$rootScope._settings.configs, function(config, key){
+            this.$rootScope._settings.configsAlias[key.toLowerCase()] = this.$rootScope._settings.configs[key];
+            this.$rootScope._settings.configsAlias[key.toLowerCase().replace(/bundle$/, '')] = this.$rootScope._settings.configs[key];
         }.bind(this));
     },
 
@@ -150,11 +151,11 @@ jarves.Services.Jarves = new Class({
      * @returns {promise}
      */
     loadSettings: function(keyLimitation){
-        var deferred = this.q.defer();
+        var deferred = this.$q.defer();
 
         var query = {lang: this.translator.getLanguage(), keys: keyLimitation};
 
-        this.http.get(_pathAdmin + 'admin/backend/settings', {params: query})
+        this.$http.get(_pathAdmin + 'admin/backend/settings', {params: query})
             .success(function(response) {
                 this.setSettings(response.data);
                 deferred.resolve();
@@ -204,7 +205,7 @@ jarves.Services.Jarves = new Class({
      * @returns {Object}
      */
     getSettings: function() {
-        return this.rootScope._settings;
+        return this.$rootScope._settings;
     },
 
     /**
@@ -591,7 +592,7 @@ jarves.Services.Jarves = new Class({
      *
      * @param {String} objectKey
      * @param {Object} item
-     * @param {String} mode         'default', 'field' or 'tree'. Default is 'default'
+     * @param {String} [mode] 'default', 'field' or 'tree'. Default is 'default'
      * @param {Object} [overwriteDefinition] overwrite definitions stored in the objectKey
      *
      * @return {String}
@@ -726,9 +727,14 @@ jarves.Services.Jarves = new Class({
             showAsField.options.relationsAsArray = true;
         }
 
-        var labelType = new jarves.LabelTypes[clazz](oriField, showAsField, fieldId, objectKey);
+        var instance = this.$injector.invoke(jarves.LabelTypes[clazz], null, {
+            oriField: oriField,
+            showAsField: showAsField,
+            fieldId: fieldId,
+            objectKey: objectKey
+        });
 
-        return labelType.render(value);
+        return instance.render(value);
     }
 
 });

@@ -24,6 +24,7 @@
             <assets>@JarvesBundle/admin/js/jarves/Controller/*.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Filters/*.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Fields/Text.js</assets>
+            <assets>@JarvesBundle/admin/js/jarves/Fields/Select.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Fields/*.js</assets>
 
             <!--<assets>@JarvesBundle/admin/js/jarves/ContentTypes/*.js</assets>-->

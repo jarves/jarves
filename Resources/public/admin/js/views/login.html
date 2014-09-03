@@ -9,10 +9,7 @@
                 <jarves-field type="text" translate model="credentials.username" placeholder="Username"></jarves-field>
                 <jarves-field type="password" translate model="credentials.password" placeholder="Password"></jarves-field>
 
-                <jarves-field type="select" model="language">
-                    <option icon="#icon-list">A</option>
-                    <option icon="#icon-apple">B</option>
-                </jarves-field>
+                <jarves-field type="language" model="language"></jarves-field>
                 <button ng-click="doLogin()" translate>Login</button>
 
                 <div class="jarves-login-loader-top" ng-class="{'active': inputBlocked}">

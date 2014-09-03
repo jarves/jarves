@@ -35,7 +35,7 @@
                     <tbody>
                         <tr ng-class="{'selected': $root.jarves.compare(controller.selected, controller.itemId(item))}" ng-repeat="item in controller.items">
                             <td ng-dblclick="controller.select(item)" ng-repeat="column in controller.classProperties.columns | toArray">
-                                <jarves-object-label data="item" column="column" id="column.$key" object="controller.classProperties.object"></jarves-object-label>
+                                <jarves-label data="item" options="column" type="{{column.type}}" id="{{column.$key}}" object="{{controller.classProperties.object}}"></jarves-label>
                             </td>
                         </tr>
                     </tbody>

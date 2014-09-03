@@ -1,5 +1,5 @@
 jarves.LabelTypes['Object'] = new Class({
-    Extends: jarves.AbstractFieldType,
+    Extends: jarves.LabelTypes.AbstractLabelType,
     
     options: {
         relationsAsArray: false
@@ -15,8 +15,8 @@ jarves.LabelTypes['Object'] = new Class({
             },
             'objectLabel': {
                 needValue: 'object',
-                label: t('Object label field (Optional)'),
-                desc: t('The key of the field which should be used as label.')
+                label: 'Object label field (Optional)',
+                desc: 'The key of the field which should be used as label.'
             }
         }
     },

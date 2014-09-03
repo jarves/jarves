@@ -1,5 +1,5 @@
 jarves.LabelTypes.Image = new Class({
-    Extends: jarves.AbstractFieldType,
+    Extends: jarves.LabelTypes.AbstractLabelType,
 
     options: {
         width: '100%'
@@ -8,9 +8,9 @@ jarves.LabelTypes.Image = new Class({
     Statics: {
         options: {
             width: {
-                label: t('Width in px'),
+                label: 'Width in px',
                 type: 'number',
-                desc: t('Default is 100%')
+                desc: 'Default is 100%'
             }
         }
     },

@@ -3,13 +3,11 @@ jarves.Directives.Button = new Class({
         name: 'button',
         options: {
             restrict: 'E',
-            controller: ['$scope', '$element', '$attrs', '$compile', function($scope, $element, $attrs, $compile) {
-                return new jarves.Directives.Button($scope, $element, $attrs, $compile);
-            }]
+            controller: true
         }
     },
 
-    initialize: function(scope, element, attributes, $compile) {
+    link: function(scope, element, attributes) {
         element.addClass('jarves-Button');
         if (attributes['pressed']) {
             scope.$watch(attributes['pressed'], function(pressed){

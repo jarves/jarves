@@ -1,11 +1,11 @@
-jarves.Directives.JarvesField = new Class({
-    Extends: jarves.Directives.AbstractDirective,
+jarves.Directives.JarvesLabel = new Class({
 
     Statics: {
-        $inject: ['$scope', '$element', '$attrs', '$compile', '$http', '$templateCache', '$q']
+        $inject: ['$scope', '$element', '$attrs', '$compile', '$interpolate', 'jarves']
     },
+
     JarvesDirective: {
-        name: 'jarvesField',
+        name: 'jarvesLabel',
         options: {
             restrict: 'E',
             priority: 5000,
@@ -14,15 +14,10 @@ jarves.Directives.JarvesField = new Class({
         }
     },
 
-    $scope: null,
-    $element: null,
-    $attrs: null,
-    $compile: null,
-    $http: null,
-    $templateCache: null,
-    $q: null,
-
-    controller: null,
+    object: null,
+    data: null,
+    column: null,
+    id: null,
 
     initialize: function() {
         var actualArguments = arguments;
@@ -37,7 +32,16 @@ jarves.Directives.JarvesField = new Class({
                 this.load(definition);
             }.bind(this));
         } else {
-            this.load(attributes);
+            var definition = {};
+            var interpolate = {'object': true, 'id': true, 'type': true};
+            Object.each(attributes, function(value, key) {
+                if (key in interpolate) {
+                    definition[key] = this.$interpolate(value)(this.$scope);
+                } else {
+                    definition[key] = this.$scope.$eval(value);
+                }
+            }, this);
+            this.load(definition);
         }
     },
 
@@ -46,23 +50,7 @@ jarves.Directives.JarvesField = new Class({
             console.error(definition);
             throw 'no type';
         }
-        this.$element.attr('jarves-%s-field'.sprintf(definition.type.lcfirst()), '');
+        this.$element.attr('jarves-%s-label'.sprintf(definition.type.lcfirst()), '');
         this.$compile(this.$element, null, 5000)(this.$scope);
-    },
-
-    /**
-     *
-     * @param {jarves.AbstractFieldType} controller
-     */
-    setController: function(controller){
-        this.controller = controller;
-    },
-
-    /**
-     * @returns {jarves.AbstractFieldType}
-     */
-    getController: function() {
-        return this.controller;
     }
-
 });

@@ -27,7 +27,7 @@ jarves.mobile = navigator.userAgent.match(/Android/i) || navigator.userAgent.mat
 
 jarves.isMobile = function() {
     return jarves.mobile;
-}
+};
 
 /**
  * Alias for jarves.t().
@@ -35,249 +35,241 @@ jarves.isMobile = function() {
  * @param {String} p
  * @returns {String}
  */
-jarves._ = function(p) {
-    return t(p);
-};
+//jarves._ = function(p) {
+//    return t(p);
+//};
 
-window.logger = function(){
-    if ('undefined' !== typeof console) {
-        console.error.apply(console, arguments);
-    }
-};
+//jarves.template = new nunjucks.Environment();
+//
+//jarves.template.addFilter('substr', function(str, start, len) {
+//    return str.substr(start, len);
+//});
+//
+//jarves.template.addFilter('strlen', function(str) {
+//    return str.length;
+//});
 
-jarves.template = new nunjucks.Environment();
+//jarves.getCompiledTemplate = function(src, env, path, eagerCompile) {
+//    return new nunjucks.Template(src, jarves.getTemplate(), path, eagerCompile)
+//};
 
-jarves.template.addFilter('substr', function(str, start, len) {
-    return str.substr(start, len);
-});
-
-jarves.template.addFilter('strlen', function(str) {
-    return str.length;
-});
-
-jarves.getCompiledTemplate = function(src, env, path, eagerCompile) {
-    return new nunjucks.Template(src, jarves.getTemplate(), path, eagerCompile)
+/**
+ * Just for console hacking.
+ */
+jarves.applyRootScope = function() {
+    angular.element(document).scope().$apply();
 };
 
 /**
- *
- * @returns {nunjucks.Environment}
- */
-jarves.getTemplate = function() {
-    return jarves.template;
-};
+// *
+// * @returns {nunjucks.Environment}
+// */
+//jarves.getTemplate = function() {
+//    return jarves.template;
+//};
 
-/**
- * Opens the frontend in a new tab.
- */
-jarves.openFrontend = function() {
-    if (top) {
-        top.open(_path, '_blank');
-    }
-};
+///**
+// * @returns {jarves.AdminInterface}
+// */
+//jarves.getAdminInterface = function() {
+//    return jarves.adminInterface;
+//};
 
-/**
- * @returns {jarves.AdminInterface}
- */
-jarves.getAdminInterface = function() {
-    return jarves.adminInterface;
-};
+///**
+// * Return a translated message with plural and context ability
+// * with additional replacement of kml2html.
+// *
+// * @param {String} message Message id (msgid)
+// * @param {String} plural  Message id plural (msgid_plural)
+// * @param {Number} count   the count for plural
+// * @param {String} context the message id of the context (msgctxt)
+// *
+// * @return {String}
+// */
+//window._ = window.t = jarves.t = function(message, plural, count, context) {
+//    return jarves._kml2html(jarves.translate(message, plural, count, context));
+//};
 
-/**
- * Return a translated message with plural and context ability
- * with additional replacement of kml2html.
- *
- * @param {String} message Message id (msgid)
- * @param {String} plural  Message id plural (msgid_plural)
- * @param {Number} count   the count for plural
- * @param {String} context the message id of the context (msgctxt)
- *
- * @return {String}
- */
-window._ = window.t = jarves.t = function(message, plural, count, context) {
-    return jarves._kml2html(jarves.translate(message, plural, count, context));
-};
+///**
+// * Return a translated message with plural and context ability.
+// *
+// * @param {String} message Message id (msgid)
+// * @param {String} plural  Message id plural (msgid_plural)
+// * @param {Number} count   the count for plural
+// * @param {String} context the message id of the context (msgctxt)
+// *
+// * @return {String}
+// */
+//jarves.translate = function(message, plural, count, context) {
+//    if (!jarves && parent) {
+//        jarves = parent.jarves;
+//    }
+//    if (jarves && !jarves.lang && parent && parent.jarves) {
+//        jarves.lang = parent.jarves.lang;
+//    }
+//    var id = (!context) ? message : context + "\004" + message;
+//
+//    if (jarves.lang && jarves.lang[id]) {
+//        if (typeOf(jarves.lang[id]) == 'array') {
+//            if (count) {
+//                var fn = 'gettext_plural_fn_' + jarves.lang['__lang'];
+//                pluralId = window[fn](count) + 0;
+//
+//                if (count && jarves.lang[id][pluralId]) {
+//                    return jarves.lang[id][pluralId].replace('%d', count);
+//                } else {
+//                    return ((count === null || count === false || count === 1) ? message : plural);
+//                }
+//            } else {
+//                return jarves.lang[id][0];
+//            }
+//        } else {
+//            return jarves.lang[id];
+//        }
+//    } else {
+//        return ((!count || count === 1) && count !== 0) ? message : plural;
+//    }
+//};
 
-/**
- * Return a translated message with plural and context ability.
- *
- * @param {String} message Message id (msgid)
- * @param {String} plural  Message id plural (msgid_plural)
- * @param {Number} count   the count for plural
- * @param {String} context the message id of the context (msgctxt)
- *
- * @return {String}
- */
-jarves.translate = function(message, plural, count, context) {
-    if (!jarves && parent) {
-        jarves = parent.jarves;
-    }
-    if (jarves && !jarves.lang && parent && parent.jarves) {
-        jarves.lang = parent.jarves.lang;
-    }
-    var id = (!context) ? message : context + "\004" + message;
+///**
+// * sprintf for translations.
+// *
+// * @return {String}
+// */
+//window.tf = jarves.tf = function() {
+//    var args = Array.from(arguments);
+//    var text = args.shift();
+//    if (typeOf(text) != 'string') {
+//        throw 'First argument has to be a string.';
+//    }
+//
+//    return text.sprintf.apply(text, args);
+//};
+//
+///**
+// * Return a translated message within a context.
+// *
+// * @param {String} context the message id of the context
+// * @param {String} message message id
+// */
+//window.tc = jarves.tc = function(context, message) {
+//    return t(message, null, null, context);
+//};
 
-    if (jarves.lang && jarves.lang[id]) {
-        if (typeOf(jarves.lang[id]) == 'array') {
-            if (count) {
-                var fn = 'gettext_plural_fn_' + jarves.lang['__lang'];
-                pluralId = window[fn](count) + 0;
-
-                if (count && jarves.lang[id][pluralId]) {
-                    return jarves.lang[id][pluralId].replace('%d', count);
-                } else {
-                    return ((count === null || count === false || count === 1) ? message : plural);
-                }
-            } else {
-                return jarves.lang[id][0];
-            }
-        } else {
-            return jarves.lang[id];
-        }
-    } else {
-        return ((!count || count === 1) && count !== 0) ? message : plural;
-    }
-};
-
-/**
- * sprintf for translations.
- *
- * @return {String}
- */
-window.tf = jarves.tf = function() {
-    var args = Array.from(arguments);
-    var text = args.shift();
-    if (typeOf(text) != 'string') {
-        throw 'First argument has to be a string.';
-    }
-
-    return text.sprintf.apply(text, args);
-};
-
-/**
- * Return a translated message within a context.
- *
- * @param {String} context the message id of the context
- * @param {String} message message id
- */
-window.tc = jarves.tc = function(context, message) {
-    return t(message, null, null, context);
-};
-
-/**
- * Replaces some own <jarves:> elements with correct html.
- *
- * @param {String} message
- *
- * @returns {String}
- * @private
- */
-jarves._kml2html = function(message) {
-
-    var kml = ['jarves:help'];
-    if (message) {
-        message = message.replace(/<jarves:help\s+id="(.*)">(.*)<\/jarves:help>/g, '<a href="javascript:;" onclick="jarves.wm.open(\'admin/help\', {id: \'$1\'}); return false;">$2</a>');
-    }
-    return message;
-};
-
-jarves.entrypoint = {
-
-    open: function(path, options, inline, dependWindowId) {
-        var entryPoint = jarves.entrypoint.get(path);
-
-        if (!entryPoint) {
-            throw 'Can not be found entryPoint: ' + path;
-            return false;
-        }
-
-        if (['custom', 'iframe', 'list', 'edit', 'add', 'combine'].contains(entryPoint.type)) {
-            jarves.wm.open(path, options, dependWindowId, inline);
-        } else if (entryPoint.type == 'function') {
-            jarves.entrypoint.exec(entryPoint, options);
-        }
-    },
-
-    getRelative: function(current, entryPoint) {
-
-        if (typeOf(entryPoint) != 'string' || !entryPoint) {
-            return current;
-        }
-
-        if (entryPoint.substr(0, 1) == '/') {
-            return entryPoint;
-        }
-
-        current = current + '';
-        if (current.substr(current.length - 1, 1) != '/') {
-            current += '/';
-        }
-
-        return current + entryPoint;
-
-    },
-
-    //executes a entry point from type function
-    exec: function(entryPoint, options) {
-
-        if (entryPoint.functionType == 'global') {
-            if (window[entryPoint.functionName]) {
-                window[entryPoint.functionName](options);
-            }
-        } else if (entryPoint.functionType == 'code') {
-            eval(entryPoint.functionCode);
-        }
-
-    },
-
-    get: function(path) {
-        if (typeOf(path) != 'string') {
-            return;
-        }
-
-        var splitted = path.split('/');
-        var bundleName = splitted[0];
-
-        splitted.shift();
-
-        var code = splitted.join('/');
-
-        var config, notFound = false, item;
-        path = [];
-
-        config = jarves.getConfig(bundleName);
-
-        if (!config) {
-            throw 'Config not found for bundleName: ' + bundleName;
-        }
-
-        var tempEntry = config.entryPoints[splitted.shift()]
-        if (!tempEntry) {
-            return null;
-        }
-        path.push(tempEntry['label']);
-
-        while (item = splitted.shift()) {
-            if (tempEntry.children && tempEntry.children[item]) {
-                tempEntry = tempEntry.children[item];
-                path.push(tempEntry['label']);
-            } else {
-                notFound = true;
-                break;
-            }
-        }
-
-        if (notFound) {
-            return null;
-        }
-
-        tempEntry._path = path;
-        tempEntry._module = bundleName;
-        tempEntry._code = code;
-
-        return tempEntry;
-    }
-};
+///**
+// * Replaces some own <jarves:> elements with correct html.
+// *
+// * @param {String} message
+// *
+// * @returns {String}
+// * @private
+// */
+//jarves._kml2html = function(message) {
+//
+//    var kml = ['jarves:help'];
+//    if (message) {
+//        message = message.replace(/<jarves:help\s+id="(.*)">(.*)<\/jarves:help>/g, '<a href="javascript:;" onclick="jarves.wm.open(\'admin/help\', {id: \'$1\'}); return false;">$2</a>');
+//    }
+//    return message;
+//};
+//
+//jarves.entrypoint = {
+//
+//    open: function(path, options, inline, dependWindowId) {
+//        var entryPoint = jarves.entrypoint.get(path);
+//
+//        if (!entryPoint) {
+//            throw 'Can not be found entryPoint: ' + path;
+//            return false;
+//        }
+//
+//        if (['custom', 'iframe', 'list', 'edit', 'add', 'combine'].contains(entryPoint.type)) {
+//            jarves.wm.open(path, options, dependWindowId, inline);
+//        } else if (entryPoint.type == 'function') {
+//            jarves.entrypoint.exec(entryPoint, options);
+//        }
+//    },
+//
+//    getRelative: function(current, entryPoint) {
+//
+//        if (typeOf(entryPoint) != 'string' || !entryPoint) {
+//            return current;
+//        }
+//
+//        if (entryPoint.substr(0, 1) == '/') {
+//            return entryPoint;
+//        }
+//
+//        current = current + '';
+//        if (current.substr(current.length - 1, 1) != '/') {
+//            current += '/';
+//        }
+//
+//        return current + entryPoint;
+//
+//    },
+//
+//    //executes a entry point from type function
+//    exec: function(entryPoint, options) {
+//
+//        if (entryPoint.functionType == 'global') {
+//            if (window[entryPoint.functionName]) {
+//                window[entryPoint.functionName](options);
+//            }
+//        } else if (entryPoint.functionType == 'code') {
+//            eval(entryPoint.functionCode);
+//        }
+//
+//    },
+//
+//    get: function(path) {
+//        if (typeOf(path) != 'string') {
+//            return;
+//        }
+//
+//        var splitted = path.split('/');
+//        var bundleName = splitted[0];
+//
+//        splitted.shift();
+//
+//        var code = splitted.join('/');
+//
+//        var config, notFound = false, item;
+//        path = [];
+//
+//        config = jarves.getConfig(bundleName);
+//
+//        if (!config) {
+//            throw 'Config not found for bundleName: ' + bundleName;
+//        }
+//
+//        var tempEntry = config.entryPoints[splitted.shift()]
+//        if (!tempEntry) {
+//            return null;
+//        }
+//        path.push(tempEntry['label']);
+//
+//        while (item = splitted.shift()) {
+//            if (tempEntry.children && tempEntry.children[item]) {
+//                tempEntry = tempEntry.children[item];
+//                path.push(tempEntry['label']);
+//            } else {
+//                notFound = true;
+//                break;
+//            }
+//        }
+//
+//        if (notFound) {
+//            return null;
+//        }
+//
+//        tempEntry._path = path;
+//        tempEntry._module = bundleName;
+//        tempEntry._code = code;
+//
+//        return tempEntry;
+//    }
+//};
 
 /**
  * Replaces all <, >, & and " with html so you can use it in safely innerHTML.
@@ -305,18 +297,18 @@ jarves.htmlEntities = function(value) {
     return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 };
 
-/**
- * Creates a new information bubble on the right corner.
- *
- * @param {String} title
- * @param {String} text
- * @param {String} duration
- *
- * @returns {Element}
- */
-jarves.newBubble = function(title, text, duration) {
-    return jarves.adminInterface.getHelpSystem().newBubble(title, text, duration);
-};
+///**
+// * Creates a new information bubble on the right corner.
+// *
+// * @param {String} title
+// * @param {String} text
+// * @param {String} duration
+// *
+// * @returns {Element}
+// */
+//jarves.newBubble = function(title, text, duration) {
+//    return jarves.adminInterface.getHelpSystem().newBubble(title, text, duration);
+//};
 
 /**
  * Adds a prefix to the keys of pFields.
@@ -595,21 +587,21 @@ jarves.dateTime = function(seconds) {
     return date.format(format);
 };
 
-/**
- * Returns a domain object.
- *
- * @param {Number} id
- * @returns {Object}
- */
-jarves.getDomain = function(id) {
-    var result = null;
-    jarves.settings.domains.each(function(domain) {
-        if (domain.id == id) {
-            result = domain;
-        }
-    });
-    return result;
-};
+///**
+// * Returns a domain object.
+// *
+// * @param {Number} id
+// * @returns {Object}
+// */
+//jarves.getDomain = function(id) {
+//    var result = null;
+//    jarves.settings.domains.each(function(domain) {
+//        if (domain.id == id) {
+//            result = domain;
+//        }
+//    });
+//    return result;
+//};
 
 ///**
 // * Loads all settings from the backend.
@@ -711,135 +703,135 @@ jarves.getBundleName = function(bundleClass) {
 
 
 
-/**
- * Register a new stream and starts probably the stream process.
- *
- * @param {String}   path
- * @param {Function} callback
- */
-jarves.registerStream = function(path, callback) {
-    if (!jarves.streamRegistered[path]) {
-        jarves.streamRegistered[path] = [];
-    }
-    jarves.streamRegistered[path].push(callback);
-    jarves.loadStream();
-};
+///**
+// * Register a new stream and starts probably the stream process.
+// *
+// * @param {String}   path
+// * @param {Function} callback
+// */
+//jarves.registerStream = function(path, callback) {
+//    if (!jarves.streamRegistered[path]) {
+//        jarves.streamRegistered[path] = [];
+//    }
+//    jarves.streamRegistered[path].push(callback);
+//    jarves.loadStream();
+//};
+//
+//jarves.streamRegistered = {};
 
-jarves.streamRegistered = {};
+///**
+// * Register a callback to a stream path. If no stream is remaining the stream process is stopped.
+// *
+// * @param {String}   path
+// * @param {Function} callback
+// */
+//jarves.deRegisterStream = function(path, callback) {
+//    if (!jarves.streamRegistered[path]) {
+//        return;
+//    }
+//    if (callback) {
+//        var index = jarves.streamRegistered[path].indexOf(callback);
+//        if (-1 !== index) {
+//            jarves.streamRegistered[path].splice(index, 1);
+//        }
+//    } else {
+//        delete jarves.streamRegistered[path];
+//    }
+//    jarves.loadStream();
+//};
 
-/**
- * Register a callback to a stream path. If no stream is remaining the stream process is stopped.
- *
- * @param {String}   path
- * @param {Function} callback
- */
-jarves.deRegisterStream = function(path, callback) {
-    if (!jarves.streamRegistered[path]) {
-        return;
-    }
-    if (callback) {
-        var index = jarves.streamRegistered[path].indexOf(callback);
-        if (-1 !== index) {
-            jarves.streamRegistered[path].splice(index, 1);
-        }
-    } else {
-        delete jarves.streamRegistered[path];
-    }
-    jarves.loadStream();
-};
+///**
+// * The stream loader loop.
+// */
+//jarves.loadStream = function() {
+//    if (jarves._lastStreamId) {
+//        clearTimeout(jarves._lastStreamId);
+//    }
+//
+//    jarves.streamParams.streams = [];
+//    Object.each(jarves.streamRegistered, function(cbs, path) {
+//        if (0 !== cbs.length) {
+//            jarves.streamParams.streams.push(path);
+//        }
+//    });
+//
+//    if (0 === jarves.streamParams.streams.length) {
+//        return;
+//    }
+//
+//    jarves._lastStreamId = (function() {
+//        if (window._session.userId > 0) {
+//            new Request.JSON({url: _pathAdmin + 'admin/stream', noCache: 1, onComplete: function(res) {
+//                if (res) {
+//                    if (res.error) {
+//                        jarves.newBubble(t('Stream error'), res.error + ': ' + res.message);
+//                    } else {
+//                        window.fireEvent('stream', res.data);
+//                        Object.each(jarves.streamRegistered, function(cbs, path) {
+//                            Array.each(cbs, function(cb) {
+//                                cb(res.data[path], res.data);
+//                            });
+//                        });
+//                    }
+//                }
+//                jarves._lastStreamId = jarves.loadStream.delay(2 * 1000);
+//            }}).get(jarves.streamParams);
+//        }
+//    }).delay(50);
+//};
 
-/**
- * The stream loader loop.
- */
-jarves.loadStream = function() {
-    if (jarves._lastStreamId) {
-        clearTimeout(jarves._lastStreamId);
-    }
-
-    jarves.streamParams.streams = [];
-    Object.each(jarves.streamRegistered, function(cbs, path) {
-        if (0 !== cbs.length) {
-            jarves.streamParams.streams.push(path);
-        }
-    });
-
-    if (0 === jarves.streamParams.streams.length) {
-        return;
-    }
-
-    jarves._lastStreamId = (function() {
-        if (window._session.userId > 0) {
-            new Request.JSON({url: _pathAdmin + 'admin/stream', noCache: 1, onComplete: function(res) {
-                if (res) {
-                    if (res.error) {
-                        jarves.newBubble(t('Stream error'), res.error + ': ' + res.message);
-                    } else {
-                        window.fireEvent('stream', res.data);
-                        Object.each(jarves.streamRegistered, function(cbs, path) {
-                            Array.each(cbs, function(cb) {
-                                cb(res.data[path], res.data);
-                            });
-                        });
-                    }
-                }
-                jarves._lastStreamId = jarves.loadStream.delay(2 * 1000);
-            }}).get(jarves.streamParams);
-        }
-    }).delay(50);
-};
-
-/**
- *
- * @param {String} key
- * @param {*} value
- */
-jarves.setStreamParam = function(key, value) {
-    if (!jarves.streamParams.params) jarves.streamParams.params = {};
-    if (null === value) {
-        delete jarves.streamParams.params[key];
-    } else {
-        jarves.streamParams.params[key] = value;
-    }
-};
-
-/**
- * Returns the current value in the clipboard of the interface (not browser)
- *
- * @returns {Object} {type: {String}, value: {Mixed}}
- */
-jarves.getClipboard = function() {
-    return jarves.clipboard;
-};
-
-/**
- * Sets the current clipboard of the interface (not browser)
- *
- * @param {String} title
- * @param {String} type
- * @param {Mixed}  value
- */
-jarves.setClipboard = function(title, type, value) {
-    jarves.clipboard = { type: type, value: value };
-    window.fireEvent('clipboard');
-};
-
-/**
- * Checks if current clipboard has the given type.
- *
- * @param {string} type
- *
- * @returns {Boolean}
- */
-jarves.isClipboard = function(type) {
-    return jarves.getClipboard() && type === jarves.getClipboard().type;
-};
-
-/**
- * Clears the clipboard.
- */
-jarves.clearClipboard = function() {
-    jarves.clipboard = {};
-};
+///**
+// *
+// * @param {String} key
+// * @param {*} value
+// */
+//jarves.setStreamParam = function(key, value) {
+//    if (!jarves.streamParams.params) jarves.streamParams.params = {};
+//    if (null === value) {
+//        delete jarves.streamParams.params[key];
+//    } else {
+//        jarves.streamParams.params[key] = value;
+//    }
+//};
+//
+///**
+// * Returns the current value in the clipboard of the interface (not browser)
+// *
+// * @returns {Object} {type: {String}, value: {Mixed}}
+// */
+//jarves.getClipboard = function() {
+//    return jarves.clipboard;
+//};
+//
+///**
+// * Sets the current clipboard of the interface (not browser)
+// *
+// * @param {String} title
+// * @param {String} type
+// * @param {Mixed}  value
+// */
+//jarves.setClipboard = function(title, type, value) {
+//    jarves.clipboard = { type: type, value: value };
+//    window.fireEvent('clipboard');
+//};
+//
+///**
+// * Checks if current clipboard has the given type.
+// *
+// * @param {string} type
+// *
+// * @returns {Boolean}
+// */
+//jarves.isClipboard = function(type) {
+//    return jarves.getClipboard() && type === jarves.getClipboard().type;
+//};
+//
+///**
+// * Clears the clipboard.
+// */
+//jarves.clearClipboard = function() {
+//    jarves.clipboard = {};
+//};
 
 jarves.closeDialogsBodys = [];
 

@@ -1,15 +1,13 @@
 jarves.LabelTypes.Text = new Class({
-    Extends: jarves.AbstractFieldType,
+    Extends: jarves.LabelTypes.AbstractLabelType,
 
-    render: function(values) {
-        var value = values[this.fieldId] || '';
+    JarvesLabel: 'text',
 
-//        var clazz = this.originField.type.charAt(0).toUpperCase() + this.originField.type.slice(1);
-//        if ('Text' !== clazz && jarves.LabelTypes[clazz]) {
-//            var obj = new jarves.LabelTypes[clazz](this.originField, this.definition, this.fieldId, this.objectKey);
-//            return obj.render(values);
-//        }
+    link: function(scope, element, attr) {
+        var span = angular.element('<span></span>');
+        span.attr('ng-bind', '$parent.' + attr.data + '.' + this.getOption('id'));
 
-        return jarves.htmlEntities(value);
+        console.log('link text label', attr, span);
+        this.renderTemplate(span);
     }
 });

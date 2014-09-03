@@ -2,6 +2,7 @@
     <span class="jarves-Select-box-title" icon="{{controller.selectedItem.icon}}">{{controller.selectedItem.label}}</span>
     <span class="jarves-Select-arrow icon-arrow-17"></span>
     <div ng-if="controller.chooserOpen">
-        <a ng-repeat="item in controller.items | toArray" ng-click="controller.select(item.id)" icon="{{item.icon}}" href="javascript:;">{{item.label}})</a>
+        <a ng-repeat="item in controller.items | toArray" ng-click="controller.select(item.$key)" icon="{{item.icon}}"
+           href="javascript:;">{{item.label}}</a>
     </div>
 </a>

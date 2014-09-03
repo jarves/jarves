@@ -1,4 +1,7 @@
 jarves.Directives.JarvesForm = new Class({
+    Statics: {
+        $inject: ['$scope', '$element', '$attrs', '$compile']
+    },
     JarvesDirective: {
         name: 'jarvesForm',
         options: {
@@ -7,18 +10,22 @@ jarves.Directives.JarvesForm = new Class({
                 'fields': '=',
                 'model': '='
             },
-            controller: ['$scope', '$element', '$attrs', '$compile', function ($scope, $element, $attrs, $compile) {
-                return new jarves.Directives.JarvesForm($scope, $element, $attrs, $compile);
-            }]
+            controller: true
         }
     },
 
     initialize: function($scope, $element, $attributes, $compile) {
+        this.$scope = $scope;
+        this.$element = $element;
+        this.$attributes = $attributes;
+        this.$compile = $compile;
+    },
 
-        $scope.$watch('fields', function(fields) {
+    link: function() {
+        this.$scope.$watch('fields', function(fields) {
             var xml = this.buildXml(fields, 'fields');
-            $element.html(xml);
-            $compile($element.contents())($scope);
+            this.$element.html(xml);
+            this.$compile(this.$element.contents())(this.$scope);
         }.bind(this));
     },
 

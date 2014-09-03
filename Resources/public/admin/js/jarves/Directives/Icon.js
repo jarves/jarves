@@ -1,5 +1,4 @@
 jarves.Directives.Icon = new Class({
-
     JarvesDirective: {
         name: 'icon',
         options: {
@@ -9,12 +8,7 @@ jarves.Directives.Icon = new Class({
     },
 
     link: function(scope, element, attributes) {
-        if (!attributes.icon) {
-            return;
-        }
-
         attributes.$observe('icon', function(value) {
-            console.log('icon observe', element.attr('class'), value);
             if (this.oldClass) {
                 element.removeClass(this.oldClass);
             }
@@ -22,8 +16,8 @@ jarves.Directives.Icon = new Class({
                 this.oldImg.destroy();
             }
 
+            if (!value) return;
             if ('#' === value.substr(0, 1)) {
-                console.log('BAM', value.substr(1));
                 element.addClass(value.substr(1));
                 this.oldClass = value.substr(1);
             } else {

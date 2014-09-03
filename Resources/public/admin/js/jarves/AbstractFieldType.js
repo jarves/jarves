@@ -1,17 +1,18 @@
 jarves.AbstractFieldType = new Class({
 
     Statics: {
-        $inject: ['$scope', '$element', '$attrs', '$compile', '$http', '$templateCache', '$q']
+        $inject: ['$scope', '$element', '$attrs', '$compile', '$http', '$templateCache', '$q', '$interpolate']
     },
 
-    //$scope: null,
-    //$element: null,
-    //$attrs: null,
-    //$compile: null,
-    //$http: null,
-    //$templateCache: null,
-    //$q: null,
-    //
+    $scope: null,
+    $element: null,
+    $attrs: null,
+    $compile: null,
+    $http: null,
+    $templateCache: null,
+    $q: null,
+    $parse: null,
+
     //valid: false,
     definition: null,
     options: {},
@@ -21,31 +22,29 @@ jarves.AbstractFieldType = new Class({
 
     children: [],
 
-    initialize: function($scope, $element, $attrs, $compile, $http, $templateCache, $q) {
+    initialize: function() {
         var actualArguments = arguments;
+
+        Array.each(this.Statics.$inject, function(name, index) {
+            this[name] = actualArguments[index];
+        }.bind(this));
+
+        this.interpolateMap = {};
+        Array.each(this.interpolate, function(item){
+            this.interpolateMap[item] = true;
+        }, this);
 
         this.destructorBound = function() {
             //$scope.$off('$destroy', this.destructorBound);
             this.destructor();
         }.bind(this);
 
-        $scope.$on('$destroy', this.destructorBound);
-        //
-        Array.each(this.Statics.$inject, function(name, index) {
-            this[name] = actualArguments[index];
-        }.bind(this));
-
-        //if (this.$attrs.options) {
-        //    this.$scope.$watch(this.$attrs['definition'], function(definition) {
-        //        this.setDefinition(definition);
-        //    }.bind(this));
-        //} else {
-        //    this.setDefinition($attrs);
-        //}
+        this.$scope.$on('$destroy', this.destructorBound);
     },
 
     destructor: function() {
-    }.protect(),
+
+    },
 
     renderTemplateUrl: function(url, beforeCompile){
         var deferred = this.$q.defer();
@@ -63,18 +62,31 @@ jarves.AbstractFieldType = new Class({
         return deferred.promise;
     },
 
+    renderTemplate: function(element) {
+        this.$element.prepend(element);
+        this.$compile(element)(this.$scope);
+    },
+
+    /**
+     *
+     * @param {String} name
+     * @returns {*}
+     */
     getOption: function(name) {
         if (this.options[name]) {
             return this.options[name];
         } else {
-            if (null === this.definition) {
+            if (null === this.definition && this.$attrs.definition) {
                 this.definition = this.$scope.$eval(this.$attrs.definition) || {};
             }
-            if (this.definition[name]) {
+            if (this.definition && this.definition[name]) {
                 return this.options[name] = this.definition[name];
             }
-            if (this.$attrs[name]) {
-                return this.options[name] = this.$scope.eval(this.$attrs[name]);
+
+            if (name in this.interpolateMap) {
+                return this.options[name] = this.$interpolate(this.$attrs[name])(this.$scope);
+            } else {
+                return this.options[name] = this.$scope.$eval(this.$attrs[name]);
             }
         }
     },
@@ -85,7 +97,7 @@ jarves.AbstractFieldType = new Class({
                 cb(definition[name]);
             });
         } else {
-            this.$scope.$watch(this.$attrs[name], cb);
+            this.$attrs.$observe(name, cb);
         }
     },
 

@@ -7,6 +7,8 @@ jarves.Fields.Text = new Class({
 
     link: function(scope, element, attr) {
         this.attr = attr;
+
+
         this.renderTemplateUrl(
             this.template,
             this.beforeCompile.bind(this)
@@ -16,6 +18,6 @@ jarves.Fields.Text = new Class({
     beforeCompile: function(contents) {
         contents.attr('placeholder', this.attr.placeholder);
         contents.attr('translate', this.attr.translate);
-        contents.attr('ng-model', this.attr.model);
+        contents.attr('ng-model', '$parent.' + this.attr.model);
     }
 });

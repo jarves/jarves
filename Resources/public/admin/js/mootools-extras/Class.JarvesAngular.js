@@ -28,16 +28,11 @@
         }
 
         var directiveName = 'jarves' + name.ucfirst() + 'Field';
-        //console.log('JarvesField', directiveName, this.prototype.JarvesFieldScope);
 
         var options = {
             restrict: 'A',
             controller: this,
-            //transclude: true,
-            //template: '<ng-transclude></ng-transclude>',
-            scope: {
-                'model': '='
-            },
+            scope: true,
             require: [directiveName, 'jarvesField', '?^jarvesField'],
             link: function(scope, element, attr, ctrl) {
                 var ownController = ctrl[0];
@@ -53,6 +48,33 @@
                 }
 
                 ownController.link(scope, element, attr);
+            }
+        };
+
+        jarves.directive(
+            directiveName,
+            function() {
+                return options;
+            }
+        );
+    };
+
+
+
+    Class.Mutators.JarvesLabel = function(name){
+        if (this.JarvesDirective) {
+            return;
+        }
+
+        var directiveName = 'jarves' + name.ucfirst() + 'Label';
+
+        var options = {
+            restrict: 'A',
+            controller: this,
+            scope: true,
+            link: function(scope, element, attr, controller) {
+                scope.controller = controller;
+                controller.link(scope, element, attr);
             }
         };
 

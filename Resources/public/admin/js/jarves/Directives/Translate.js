@@ -1,23 +1,25 @@
 jarves.Directives.Translate = new Class({
 
-    JarvesDirective: {
-        name: 'translate',
-        options: ['$parse', 'translator', function($parse, translator){
-            return {
-                restrict: 'A',
-                link: function(scope, element, attrs) {
-                    return new jarves.Directives.Translate(scope, element, attrs, translator, $parse);
-                }
-            }
-        }]
+    Statics: {
+        $inject: ['translator', '$parse']
     },
 
-    initialize: function(scope, element, attributes, translator, parse) {
-        this.scope = scope;
-        this.element = element;
+    JarvesDirective: {
+        name: 'translate',
+        options: {
+            restrict: 'A',
+            controller: true
+        }
+    },
+
+    initialize: function(translator, parse) {
         this.translator = translator;
         this.parse = parse;
+    },
 
+    link: function(scope, element, attributes) {
+        this.scope = scope;
+        this.element = element;
         this.plural = attributes['translatePlural'];
 
         if (this.plural) {
