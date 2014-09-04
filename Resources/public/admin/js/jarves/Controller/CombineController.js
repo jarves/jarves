@@ -1,8 +1,5 @@
 jarves.Controller.CombineController = new Class({
     Extends: jarves.Controller.ListController,
-    Statics: {
-        $inject: ['$scope', '$element', '$attrs', '$http', '$q', 'windowService', 'jarves']
-    },
     JarvesController: 'CombineController',
 
     editClassProperties: null,
@@ -13,7 +10,6 @@ jarves.Controller.CombineController = new Class({
     select: function(item) {
         this.currentView = 2;
         this.selected = this.jarves.getObjectPk(this.classProperties.object, item);
-
     },
 
     /**

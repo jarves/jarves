@@ -359,6 +359,14 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
     protected $itemsPerPage = 15;
 
     /**
+     * If true the results of this controller will be mapped in the objectRepository service at UI side,
+     * which results basically in a re-rendering of changed data related to given $object.
+     *
+     * @var bool
+     */
+    protected $objectRepositoryMapping = true;
+
+    /**
      * Uses the HTTP 'PATCH' instead of the 'PUT'.
      * 'PUT' requires that you send all field, and 'PATCH'
      * only the fields that need to be updated.
@@ -670,7 +678,15 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
                 continue;
             }
 
-            $oField = $this->objectDefinition->getField($key);
+            $fieldName = $key;
+            $objectName = $key;
+
+            if (strpos($key, '.')) {
+                list($objectName, $fieldName) = explode('.', $key);
+                $field['type'] = 'object';
+            }
+
+            $oField = $this->objectDefinition->getField($objectName);
             if ($oField) {
                 if (!isset($field['type'])) {
                     $field['type'] = 'predefined';
@@ -679,14 +695,14 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
                     $field['object'] = $this->getObject();
                 }
                 if (strtolower($field['type']) == 'predefined' && !isset($field['field'])) {
-                    $field['field'] = $key;
+                    $field['field'] = $fieldName;
                 }
 
                 if (!isset($field['label'])) {
                     $field['label'] = $oField->getLabel();
                 }
 
-                if (!isset($field['desc'])) {
+                if (!isset($field['desc']) && $oField->getDesc()) {
                     $field['desc'] = $oField->getDesc();
                 }
 
@@ -695,9 +711,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
                 }
             }
 
-            if (isset($field['depends'])) {
-                $this->prepareFieldDefinition($field['depends']);
-            }
             if (isset($field['children'])) {
                 $this->prepareFieldDefinition($field['children']);
             }

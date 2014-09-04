@@ -5,9 +5,7 @@ jarves.LabelTypes.Text = new Class({
 
     link: function(scope, element, attr) {
         var span = angular.element('<span></span>');
-        span.attr('ng-bind', '$parent.' + attr.data + '.' + this.getOption('id'));
-
-        console.log('link text label', attr, span);
+        span.attr('ng-bind', this.getModelName());
         this.renderTemplate(span);
     }
 });

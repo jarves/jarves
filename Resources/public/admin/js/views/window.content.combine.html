@@ -7,8 +7,8 @@
             </button-group>
 
             <button-group float="right">
-                <jarves-field ng-if="controller.classProperties.domainDepended" type="domains" ng-model="domain"></jarves-field>
-                <jarves-field ng-if="controller.classProperties.multiLanguage" type="language" ng-model="language"></jarves-field>
+                <jarves-field ng-if="controller.classProperties.domainDepended" type="domains" model="domain"></jarves-field>
+                <jarves-field ng-show="controller.classProperties.multiLanguage" type="language" model="language"></jarves-field>
                 <input type="text" ng-model="searchQuery"/>
             </button-group>
 
@@ -19,23 +19,27 @@
                 Loading ...
             </div>
             <div ng-if="controller.classProperties">
-                <div ng-if="controller.currentView == 2">
+                <div ng-show="controller.currentView == 2">
                     <jarves-list>
                         <list-item></list-item>
                     </jarves-list>
                     {{controller.selected}}
-                    <ng-include ng-if="controller.selected" src="'bundles/jarves/admin/js/views/window.content.edit.html'"></ng-include>
+                    <window-edit ng-if="controller.selected" pk="controller.selected" entry-point="controller.getEditEntryPoint()"></window-edit>
                 </div>
-                <table ng-if="controller.currentView == 1" width="100%">
+                <table ng-show="controller.currentView == 1" width="100%">
                     <thead>
                         <tr>
-                            <th ng-repeat="column in controller.classProperties.columns | toArray" fixed="true" width="{{column.width}}" align="{{column.align}}">{{column.label}}</th>
+                            <th ng-repeat="column in controller.classProperties.columns | toArray" width="{{column.width}}" align="{{column.align}}">{{column.label}}</th>
+                            <th ng-if="controller.actions | toArray" width="15"></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr ng-class="{'selected': $root.jarves.compare(controller.selected, controller.itemId(item))}" ng-repeat="item in controller.items">
                             <td ng-dblclick="controller.select(item)" ng-repeat="column in controller.classProperties.columns | toArray">
-                                <jarves-label data="item" options="column" type="{{column.type}}" id="{{column.$key}}" object="{{controller.classProperties.object}}"></jarves-label>
+                                <jarves-label data="$parent.item" definition="column" type="{{column.type}}" id="{{column.$key}}" object="{{controller.classProperties.object}}"></jarves-label>
+                            </td>
+                            <td ng-repeat="action in controller.actions">
+                                <jarves-button action="action"></jarves-button>
                             </td>
                         </tr>
                     </tbody>

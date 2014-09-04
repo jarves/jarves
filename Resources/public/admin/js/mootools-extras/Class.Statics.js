@@ -1,9 +1,13 @@
 (function() {
     Class.Mutators.Statics = function(properties) {
+        if (!this.prototype.Statics) {
+            this.prototype.Statics = {};
+        }
+
         Object.each(properties, function(val, key) {
             this[key] = val;
+            this.prototype.Statics[key] = val;
         }, this);
-        this.prototype.Statics = properties;
     };
 
     var oldExtends = Class.Mutators.Extends;

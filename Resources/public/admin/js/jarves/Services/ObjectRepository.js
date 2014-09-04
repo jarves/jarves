@@ -1,7 +1,7 @@
 jarves.Services.ObjectRepository = new Class({
 
     Statics: {
-        $inject: ['$rootScope', 'backend', 'jarves']
+        $inject: ['$rootScope', '$q', 'backend', 'jarves']
     },
     JarvesService: 'objectRepository',
 
@@ -21,6 +21,8 @@ jarves.Services.ObjectRepository = new Class({
     },
 
     getItems: function(objectKey, options) {
+        var deferred = this.$q.defer();
+
         if (!this.cache[objectKey]) {
             this.cache[objectKey] = {};
         }
@@ -31,9 +33,10 @@ jarves.Services.ObjectRepository = new Class({
 
         this.backend.get('object/' + jarves.normalizeObjectKey(objectKey) + '/?' + queryString).success(function(response) {
             this.mapData(objectKey, response.data);
-        });
+            deferred.resolve(this.cache[objectKey]);
+        }.bind(this));
 
-        return this.cache[objectKey];
+        return deferred.promise;
     },
 
     mapData: function(objectKey, items) {

@@ -11,7 +11,6 @@ jarves.Fields.Select = new Class({
 
     chooserOpen: false,
     items: {},
-    attr: {},
     selected: null,
     selectedItem: {
         icon: null,
@@ -22,7 +21,8 @@ jarves.Fields.Select = new Class({
     objectRepository: null,
 
     link: function(scope, element, attr) {
-        this.attr = attr;
+        this.parent(scope, element, attr);
+
         this.renderTemplateUrl(
             this.template,
             this.beforeCompile.bind(this)
@@ -33,9 +33,9 @@ jarves.Fields.Select = new Class({
 
     setupItems: function() {
         if (this.getOption('object')) {
-            this.prepareItems(this.objectRepository.getItems(this.getOption('object')));
+            this.objectRepository.getItems(this.getOption('object')).then(this.prepareItems.bind(this));
         } else {
-            this.watchOption('items', this.prepareItems.bind(this));
+            this.$scope.$parent.$watch(this.$attrs.items, this.prepareItems.bind(this));
         }
     },
 
@@ -49,7 +49,15 @@ jarves.Fields.Select = new Class({
                     ? item[this.getOption('idField')]
                     : item;
 
-                newItems[id] = {label: this.toLabel(item), id: id};
+                if (!this.getOption('idField') && false === this.getOption('itemsLabelAsValue')) {
+                    id = idx;
+                }
+
+                if ('array' === typeOf(item)) {
+                    newItems[id] = {label: this.toLabel(item[0]), icon: item[1], id: id};
+                } else {
+                    newItems[id] = {label: this.toLabel(item), id: id};
+                }
             }.bind(this));
             this.items = newItems;
         }

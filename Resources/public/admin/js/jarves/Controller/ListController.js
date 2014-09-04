@@ -1,6 +1,6 @@
 jarves.Controller.ListController = new Class({
     Statics: {
-        $inject: ['$scope', '$element', '$attrs', '$http', '$q', 'windowService', 'jarves']
+        $inject: ['$scope', '$element', '$attrs', '$q', 'backend', 'objectRepository', 'windowService', 'jarves']
     },
     JarvesController: 'ListController',
 
@@ -15,24 +15,27 @@ jarves.Controller.ListController = new Class({
      * @param $scope
      * @param $element
      * @param $attrs
-     * @param $http
      * @param $q
+     * @param backend
+     * @param {jarves.Services.ObjectRepository} objectRepository
      * @param {jarves.Services.WindowService} windowService
      * @param {jarves.Services.Jarves} jarves
      */
-    initialize: function($scope, $element, $attrs, $http, $q, windowService, jarves) {
+    initialize: function($scope, $element, $attrs, $q, backend, objectRepository, windowService, jarves) {
         this.scope = $scope;
         this.scope.controller = this;
         this.element = $element;
-        this.http = $http;
+        this.backend = backend;
+        this.objectRepository = objectRepository;
         this.q = $q;
         this.windowService = windowService;
         this.jarves = jarves;
+        this.scope.listController = this;
         this.loadClassProperties();
     },
 
     loadClassProperties: function() {
-        this.http.post(_pathAdmin + this.getEntryPoint()+'/?_method=options')
+        this.backend.post(this.getEntryPoint()+'/?_method=options')
             .success(function(response) {
                 this.classProperties = response.data;
                 this.loadPage();
@@ -70,9 +73,13 @@ jarves.Controller.ListController = new Class({
         //    req.q = this.actionBarSearchInput.getValue();
         //}
 
-        this.http.get(_pathAdmin + this.getEntryPoint() + '/', req)
+        var queryString = Object.toQueryString(req);
+        this.backend.get(this.getEntryPoint() + '/?'+queryString)
             .success(function(response) {
                 this.items = response.data;
+                if (this.classProperties.objectRepositoryMapping) {
+                    this.objectRepository.mapData(this.classProperties.object, response.data);
+                }
             }.bind(this));
     },
 
@@ -81,7 +88,7 @@ jarves.Controller.ListController = new Class({
 
         var query = {};
 
-        this.http.get(_pathAdmin + this.getEntryPoint() + '/:count', query)
+        this.backend.get(this.getEntryPoint() + '/:count', query)
             .success(function(response){
                 this.itemsCount = response.data;
                 deferred.resolve();

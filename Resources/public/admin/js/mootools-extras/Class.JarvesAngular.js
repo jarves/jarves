@@ -59,8 +59,6 @@
         );
     };
 
-
-
     Class.Mutators.JarvesLabel = function(name){
         if (this.JarvesDirective) {
             return;
@@ -72,9 +70,15 @@
             restrict: 'A',
             controller: this,
             scope: true,
-            link: function(scope, element, attr, controller) {
-                scope.controller = controller;
-                controller.link(scope, element, attr);
+            require: [directiveName, '?^jarvesForm'],
+            link: function(scope, element, attr, controllers) {
+                var ownController = controllers[0];
+                var formController = controllers[1];
+                if (formController) {
+                    ownController.setForm(formController);
+                    formController.addField(ownController);
+                }
+                ownController.link(scope, element, attr);
             }
         };
 

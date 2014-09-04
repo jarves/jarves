@@ -15,7 +15,6 @@
             <assets>@JarvesBundle/admin/js/jarves/DashboardWidgets/Base.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/DashboardWidgets/*.js</assets>
 
-            <assets>@JarvesBundle/admin/js/jarves/LabelTypes/*.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Services/*.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Directives/AbstractDirective.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Directives/InputSelect.js</assets>
@@ -26,6 +25,7 @@
             <assets>@JarvesBundle/admin/js/jarves/Fields/Text.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Fields/Select.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/Fields/*.js</assets>
+            <assets>@JarvesBundle/admin/js/jarves/LabelTypes/*.js</assets>
 
             <!--<assets>@JarvesBundle/admin/js/jarves/ContentTypes/*.js</assets>-->
             <assets>@JarvesBundle/admin/js/jarves/ui/*.js</assets>

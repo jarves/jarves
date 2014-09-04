@@ -16,7 +16,7 @@ jarves.FieldTypes.Text = new Class({
             },
             redirectSameValue: {
                 label: t('Redirect this value'),
-                desc: t('Redirect this value to another field with the same result as value. Example: fieldName:modifier1|modifier2,fieldName2:modifier3'),
+                desc: t('Redirect this value to another field with the same result as this value. Example: fieldName:modifier1|modifier2,fieldName2:modifier3'),
                 type: 'text'
             },
             redirectValue: {
@@ -177,29 +177,6 @@ jarves.FieldTypes.Text = new Class({
         }
     },
 
-    bindRedirect: function(key, modifier, onlySame) {
-        var field = this.getFieldContainer().getField(key);
-
-        var doRedirect = function() {
-            var result = this.applyModifier(this.getValue(), modifier);
-            var resultBefore = this.applyModifier(this.oldValue, modifier);
-            if (onlySame) {
-                if (field.getValue() && resultBefore != field.getValue()) {
-                    return;
-                }
-            }
-
-            if (field.getValue() != result) {
-                field.setValue(result, true);
-            }
-        }.bind(this);
-
-        if (field) {
-            this.boundRedirects[key] = true;
-            this.addEvent('change', doRedirect);
-            doRedirect();
-        }
-    },
 
     /**
      * @param {String} str

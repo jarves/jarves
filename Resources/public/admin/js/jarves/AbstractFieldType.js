@@ -1,7 +1,7 @@
 jarves.AbstractFieldType = new Class({
 
     Statics: {
-        $inject: ['$scope', '$element', '$attrs', '$compile', '$http', '$templateCache', '$q', '$interpolate']
+        $inject: ['$scope', '$element', '$attrs', '$compile', '$parse', '$timeout', '$http', '$templateCache', '$q', '$interpolate']
     },
 
     $scope: null,
@@ -12,6 +12,7 @@ jarves.AbstractFieldType = new Class({
     $templateCache: null,
     $q: null,
     $parse: null,
+    $timeout: null,
 
     //valid: false,
     definition: null,
@@ -21,6 +22,9 @@ jarves.AbstractFieldType = new Class({
     parentFieldDirective: null,
 
     children: [],
+    form: null,
+
+    interpolate: ['model', 'label', 'description', 'noWrapper', ''],
 
     initialize: function() {
         var actualArguments = arguments;
@@ -28,6 +32,8 @@ jarves.AbstractFieldType = new Class({
         Array.each(this.Statics.$inject, function(name, index) {
             this[name] = actualArguments[index];
         }.bind(this));
+
+        this.$scope.controller = this;
 
         this.interpolateMap = {};
         Array.each(this.interpolate, function(item){
@@ -46,13 +52,24 @@ jarves.AbstractFieldType = new Class({
 
     },
 
+    /**
+     * @param {jarves.Directives.JarvesForm} form
+     */
+    setForm: function(form) {
+        this.form = form;
+    },
+
+    getId: function() {
+        return this.getOption('id');
+    },
+
     renderTemplateUrl: function(url, beforeCompile){
         var deferred = this.$q.defer();
         this.$http.get(url, {cache: this.$templateCache})
             .success(function(response){
                 var element = angular.element(response);
 
-                this.$element.prepend(element);
+                this.injectFieldElement(element);
                 if (beforeCompile) {
                     beforeCompile(element);
                 }
@@ -62,8 +79,17 @@ jarves.AbstractFieldType = new Class({
         return deferred.promise;
     },
 
+    injectFieldElement: function(element) {
+        if (this.fieldContainer) {
+            this.fieldContainer.append(element);
+        } else {
+            this.$element.prepend(element);
+        }
+    },
+
     renderTemplate: function(element) {
-        this.$element.prepend(element);
+        element = angular.element(element);
+        this.injectFieldElement(element);
         this.$compile(element)(this.$scope);
     },
 
@@ -77,32 +103,87 @@ jarves.AbstractFieldType = new Class({
             return this.options[name];
         } else {
             if (null === this.definition && this.$attrs.definition) {
-                this.definition = this.$scope.$eval(this.$attrs.definition) || {};
+                this.definition = this.$scope.$parent.$eval(this.$attrs.definition) || {};
+                if (this.definition.options) {
+                    this.definition = Object.merge(this.definition, this.definition.options);
+                }
             }
-            if (this.definition && this.definition[name]) {
+            if (this.definition && name in this.definition) {
                 return this.options[name] = this.definition[name];
             }
 
+            if (!this.$attrs[name]) {
+                return null;
+            }
             if (name in this.interpolateMap) {
-                return this.options[name] = this.$interpolate(this.$attrs[name])(this.$scope);
+                return this.options[name] = this.$interpolate(this.$attrs[name])(this.$scope.$parent);
             } else {
-                return this.options[name] = this.$scope.$eval(this.$attrs[name]);
+                return this.options[name] = this.$scope.$parent.$eval(this.$attrs[name]);
             }
         }
     },
 
-    watchOption: function(name, cb) {
-        if (this.$attrs.definition) {
-            this.$scope.$watch(this.$attrs.definition, function(definition) {
-                cb(definition[name]);
-            });
-        } else {
-            this.$attrs.$observe(name, cb);
-        }
+    isValid: function(highlight) {
+        var valid = true;
+
+        return valid;
+    },
+
+    setValue: function(value) {
+        var modelName = this.getModelName();
+        this.$timeout(function() {
+            this.$parse(modelName).assign(this.$scope, value);
+        }.bind(this));
+    },
+
+    setModelValue: function(modelName, value) {
+        this.$timeout(function() {
+            this.$parse(modelName).assign(this.$scope, value);
+        }.bind(this));
+    },
+
+    getModelValue: function(modelName) {
+        return this.$scope.$eval(modelName);
+    },
+
+    getValue: function() {
+        var modelName = this.getModelName();
+        return this.$scope.$eval(modelName);
+    },
+
+    getModelName: function() {
+        return this.getOption('model') || '$parent.model.' + this.getOption('id');
+    },
+
+    getRelativeModelName: function(key) {
+        var myModelName = this.getModelName();
+        var parts = myModelName.split('.');
+        parts.pop();
+
+        return parts.join('.') + '.' + key;
     },
 
     link: function(scope, element, attributes) {
-        //
+        if (this.getOption('noWrapper')) {
+            return;
+        }
+
+        this.label = this.getOption('label');
+        this.description = this.getOption('description') || this.getOption('desc');
+
+
+        this.labelElement = angular.element('<div class="jarves-Field-title" ng-bind="controller.label"></div>');
+        this.descElement = angular.element('<div class="jarves-Field-description" ng-if="controller.description" ng-bind="controller.description"></div>');
+
+        this.fieldContainer = angular.element('<div class="jarves-Field-container"></div>');
+
+        this.$element.prepend(this.descElement);
+        this.$element.prepend(this.labelElement);
+        this.labelElement.after(this.fieldContainer);
+
+        this.$compile(this.descElement)(this.$scope);
+        this.$compile(this.labelElement)(this.$scope);
+        this.$compile(this.fieldContainer)(this.$scope);
     },
 
     /**
