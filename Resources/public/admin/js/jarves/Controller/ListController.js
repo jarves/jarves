@@ -73,14 +73,35 @@ jarves.Controller.ListController = new Class({
         //    req.q = this.actionBarSearchInput.getValue();
         //}
 
-        var queryString = Object.toQueryString(req);
-        this.backend.get(this.getEntryPoint() + '/?'+queryString)
-            .success(function(response) {
-                this.items = response.data;
-                if (this.classProperties.objectRepositoryMapping) {
-                    this.objectRepository.mapData(this.classProperties.object, response.data);
-                }
-            }.bind(this));
+        this.collection = this.objectRepository.newCollection(this.classProperties.object);
+        this.collection.setOrder('title');
+        this.collection.setEntryPoint(this.getEntryPoint());
+        this.collection.setQueryOption('withAcl', true);
+        //this.collection.setRepositoryMapping(this.classProperties.objectRepositoryMapping);
+        this.collection.setSelection(this.getSelection());
+        this.collection.change(function(items) {
+            this.items = items;
+        }.bind(this));
+
+        this.collection.load({
+            offset: (this.classProperties.itemsPerPage * page) - this.classProperties.itemsPerPage,
+            limit: this.classProperties.itemsPerPage
+        });
+    },
+
+    getSelection: function() {
+        var selection = [];
+        Object.each(this.classProperties.columns, function(column, id) {
+            selection.push(id);
+            if (column.selected) {
+                Array.each(column.selected, function(field) {
+                    if (-1 !== selection.indexOf(field)) {
+                        selection.push(field);
+                    }
+                });
+            }
+        });
+        return selection;
     },
 
     loadItemCount: function() {

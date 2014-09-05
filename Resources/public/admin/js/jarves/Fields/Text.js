@@ -167,7 +167,7 @@ jarves.Fields.Text = new Class({
             var currentValue = this.getModelValue(this.getRelativeModelName(targetModelName));
             var convertedNew = this.applyModifier(value, modifier);
             var convertedOld = this.applyModifier(oldValue, modifier);
-            console.log('new change', this.getModelName(),' => ', this.getRelativeModelName(targetModelName), ':', value, '=>', convertedNew, '(', currentValue,')');
+            //console.log('new change', this.getModelName(),' => ', this.getRelativeModelName(targetModelName), ':', value, '=>', convertedNew, '(', currentValue,')');
 
             if (onlySame) {
                 if (convertedOld != currentValue) {
@@ -206,7 +206,11 @@ jarves.Fields.Text = new Class({
     beforeCompile: function(contents) {
         contents.attr('placeholder', this.attr.placeholder);
         contents.attr('translate', this.attr.translate);
-        contents.attr('ng-model', 'model.' + this.getOption('id'));
+        contents.attr('ng-model', this.getParentModelName());
+        var width;
+        if (width = this.getOption('width')) {
+            contents.css('width', width);
+        }
         contents.attr('ng-trim', false);
     }
 });

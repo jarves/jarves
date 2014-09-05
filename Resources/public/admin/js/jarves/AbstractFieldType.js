@@ -24,7 +24,7 @@ jarves.AbstractFieldType = new Class({
     children: [],
     form: null,
 
-    interpolate: ['model', 'label', 'description', 'noWrapper', ''],
+    optionsReferences: ['definition'],
 
     initialize: function() {
         var actualArguments = arguments;
@@ -35,9 +35,12 @@ jarves.AbstractFieldType = new Class({
 
         this.$scope.controller = this;
 
-        this.interpolateMap = {};
-        Array.each(this.interpolate, function(item){
-            this.interpolateMap[item] = true;
+        this.optionsReferencesMap = {};
+        Array.each(this.optionsReferences, function(item){
+            this.optionsReferencesMap[item] = true;
+        }, this);
+        Array.each(this.additionalOptionsReferences, function(item){
+            this.optionsReferencesMap[item] = true;
         }, this);
 
         this.destructorBound = function() {
@@ -61,6 +64,14 @@ jarves.AbstractFieldType = new Class({
 
     getId: function() {
         return this.getOption('id');
+    },
+
+    getModelName: function() {
+        return this.getOption('model') ||  'model.' + this.getOption('id');
+    },
+
+    getParentModelName: function() {
+        return '$parent.' + this.getModelName();
     },
 
     renderTemplateUrl: function(url, beforeCompile){
@@ -115,10 +126,10 @@ jarves.AbstractFieldType = new Class({
             if (!this.$attrs[name]) {
                 return null;
             }
-            if (name in this.interpolateMap) {
-                return this.options[name] = this.$interpolate(this.$attrs[name])(this.$scope.$parent);
-            } else {
+            if (name in this.optionsReferencesMap) {
                 return this.options[name] = this.$scope.$parent.$eval(this.$attrs[name]);
+            } else {
+                return this.options[name] = this.$interpolate(this.$attrs[name])(this.$scope.$parent);
             }
         }
     },
@@ -151,9 +162,9 @@ jarves.AbstractFieldType = new Class({
         return this.$scope.$eval(modelName);
     },
 
-    getModelName: function() {
-        return this.getOption('model') || '$parent.model.' + this.getOption('id');
-    },
+    //getModelName: function() {
+    //    return this.getOption('model') || '$parent.model.' + this.getOption('id');
+    //},
 
     getRelativeModelName: function(key) {
         var myModelName = this.getModelName();

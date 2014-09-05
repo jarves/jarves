@@ -1,4 +1,4 @@
-.jarves-widget-main {
+.jarves-Widget-main {
     border: 1px solid gray;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -15,7 +15,7 @@
     margin-bottom: 10px;
 }
 
-.jarves-widget-overview {
+.jarves-Widget-overview {
     background-color: #eee;
     border: 1px solid silver;
     background-image: none;
@@ -25,7 +25,7 @@
     color: #555;
 }
 
-.jarves-widget-title {
+.jarves-Widget-title {
     padding: 6px 4px 5px 5px;
     color: white;
     margin: 4px 0px;
@@ -34,7 +34,7 @@
     font-size: 11px;
 }
 
-.jarves-widget-content {
+.jarves-Widget-content {
     position: absolute;
     top: 25px;
     left: 0px;
@@ -42,7 +42,7 @@
     bottom: 0px;
 }
 
-.jarves-widget-bottom {
+.jarves-Widget-bottom {
     position: absolute;
     display: none;
     bottom: 0px;
@@ -53,46 +53,46 @@
 
 }
 
-.jarves-widget-main .jarves-Table-head th {
+.jarves-Widget-main .jarves-Table-head th {
     border-bottom: 1px solid gray;
     border-left: 1px solid #555555;
     color: #EEEEEE;
     background-color: #616161;
 }
 
-.jarves-widget-main .jarves-Table-head {
+.jarves-Widget-main .jarves-Table-head {
     background-color: #666666;
 }
 
-.jarves-widget-main .jarves-Table-body td {
+.jarves-Widget-main .jarves-Table-body td {
     color: #eee;
 }
 
-.jarves-widget-main .jarves-Table-body tr.two td {
+.jarves-Widget-main .jarves-Table-body tr.two td {
     background-color: #717171;
 }
 
-.jarves-widget-main .jarves-Table-body tr.one td {
+.jarves-Widget-main .jarves-Table-body tr.one td {
     background-color: #7b7b7b;
 }
 
-.jarves-widget-main a,
-.jarves-widget-main a:link {
+.jarves-Widget-main a,
+.jarves-Widget-main a:link {
     color: #eee;
 }
 
-.jarves-widget-knoptodesktop {
+.jarves-Widget-knoptodesktop {
     position: absolute;
     right: 5px;
     top: 5px;
     cursor: pointer;
 }
 
-.jarves-widget-overview .jarves-widget-content {
+.jarves-Widget-overview .jarves-Widget-content {
     top: 26px;
 }
 
-.jarves-widget-overview .jarves-widget-title {
+.jarves-Widget-overview .jarves-Widget-title {
     -moz-border-radius-topleft: 5px;
     -moz-border-radius-topright: 5px;
     background-color: #ccc;
@@ -101,45 +101,45 @@
     font-weight: normal;
 }
 
-.jarves-widget-overview .jarves-Table-head {
+.jarves-Widget-overview .jarves-Table-head {
     background-color: #ddd;
     border-left: 0px;
 }
 
-.jarves-widget-overview .jarves-Table-head th {
+.jarves-Widget-overview .jarves-Table-head th {
     color: #777;
     border: 0px;
     border-bottom: 1px solid #ddd;
 }
 
-.jarves-widget-overview .jarves-Table-body td,
-.jarves-widget-overview .jarves-Table-body td a,
-.jarves-widget-overview .jarves-Table-body td a:link {
+.jarves-Widget-overview .jarves-Table-body td,
+.jarves-Widget-overview .jarves-Table-body td a,
+.jarves-Widget-overview .jarves-Table-body td a:link {
     color: #444;
 }
 
-.jarves-widget-overview .jarves-Table-body tr.two td {
+.jarves-Widget-overview .jarves-Table-body tr.two td {
     background-color: #e4e4e4;
 }
 
-.jarves-widget-overview .jarves-Table-body tr.one td {
+.jarves-Widget-overview .jarves-Table-body tr.one td {
     background-color: #e9e9e9;
 }
 
-.jarves-widget-overview .jarves-widget-content {
+.jarves-Widget-overview .jarves-Widget-content {
     bottom: 2px;
 }
 
-.jarves-widget-overview .jarves-widget-bottom {
+.jarves-Widget-overview .jarves-Widget-bottom {
     height: 2px;
     border-top: 1px solid #ccc;
 }
 
-.jarves-widget-main .jarves-Table-body tr:hover td {
+.jarves-Widget-main .jarves-Table-body tr:hover td {
     background-color: #999;
 }
 
-.jarves-widget-overview .jarves-Table-body tr:hover td {
+.jarves-Widget-overview .jarves-Table-body tr:hover td {
     background-color: #ddd;
 }
 

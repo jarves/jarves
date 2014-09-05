@@ -358,13 +358,13 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      */
     protected $itemsPerPage = 15;
 
-    /**
-     * If true the results of this controller will be mapped in the objectRepository service at UI side,
-     * which results basically in a re-rendering of changed data related to given $object.
-     *
-     * @var bool
-     */
-    protected $objectRepositoryMapping = true;
+//    /**
+//     * If true the results of this controller will be mapped in the objectRepository service at UI side,
+//     * which results basically in a re-rendering of changed data related to given $object.
+//     *
+//     * @var bool
+//     */
+//    protected $objectRepositoryMapping = true;
 
     /**
      * Uses the HTTP 'PATCH' instead of the 'PUT'.
@@ -599,12 +599,18 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
     public function getInfo()
     {
-        $vars = get_object_vars($this);
-        $blacklist = array('objectDefinition', 'entryPoint');
+//        $vars = get_object_vars($this);
+        $vars = [];
+        $reflect = new \ReflectionClass($this);
+        foreach ($reflect->getProperties() as $property) {
+            $vars[] = $property->getName();
+        }
+
+        $blacklist = array_flip(array('objectDefinition', 'entryPoint', 'request', 'obj'));
         $result = array();
 
-        foreach ($vars as $var => $val) {
-            if (in_array($var, $blacklist)) {
+        foreach ($vars as $var) {
+            if (isset($blacklist[$var])) {
                 continue;
             }
             $method = 'get' . ucfirst($var);
@@ -2724,6 +2730,54 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
     public function setDomain($domain)
     {
         $this->domain = (int)$domain;
+    }
+
+//    /**
+//     * @return boolean
+//     */
+//    public function getObjectRepositoryMapping()
+//    {
+//        return $this->objectRepositoryMapping;
+//    }
+//
+//    /**
+//     * @param boolean $objectRepositoryMapping
+//     */
+//    public function setObjectRepositoryMapping($objectRepositoryMapping)
+//    {
+//        $this->objectRepositoryMapping = $objectRepositoryMapping;
+//    }
+
+    /**
+     * @return string
+     */
+    public function getOrderBy()
+    {
+        return $this->orderBy;
+    }
+
+    /**
+     * @param string $orderBy
+     */
+    public function setOrderBy($orderBy)
+    {
+        $this->orderBy = $orderBy;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderByDirection()
+    {
+        return $this->orderByDirection;
+    }
+
+    /**
+     * @param string $orderByDirection
+     */
+    public function setOrderByDirection($orderByDirection)
+    {
+        $this->orderByDirection = $orderByDirection;
     }
 
 }

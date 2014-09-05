@@ -727,7 +727,7 @@ jarves.Services.Jarves = new Class({
             showAsField.options.relationsAsArray = true;
         }
 
-        var instance = this.$injector.invoke(jarves.LabelTypes[clazz], null, {
+        var instance = this.$injector.instantiate(jarves.LabelTypes[clazz], {
             oriField: oriField,
             showAsField: showAsField,
             fieldId: fieldId,

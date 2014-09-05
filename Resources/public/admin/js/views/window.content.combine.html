@@ -7,9 +7,9 @@
             </button-group>
 
             <button-group float="right">
-                <jarves-field ng-if="controller.classProperties.domainDepended" type="domains" model="domain"></jarves-field>
-                <jarves-field ng-show="controller.classProperties.multiLanguage" type="language" model="language"></jarves-field>
-                <input type="text" ng-model="searchQuery"/>
+                <jarves-field ng-if="controller.classProperties.domainDepended" type="domains" model="controller.domain"></jarves-field>
+                <jarves-field ng-show="controller.classProperties.multiLanguage" type="language" model="controller.language"></jarves-field>
+                <jarves-field type="text" model="controller.searchQuery" width="'120px'" />
             </button-group>
 
         </window-toolbar>
@@ -20,11 +20,10 @@
             </div>
             <div ng-if="controller.classProperties">
                 <div ng-show="controller.currentView == 2">
-                    <jarves-list>
+                    <jarves-list items="controller.">
                         <list-item></list-item>
                     </jarves-list>
-                    {{controller.selected}}
-                    <window-edit ng-if="controller.selected" pk="controller.selected" entry-point="controller.getEditEntryPoint()"></window-edit>
+                    <form-edit ng-if="controller.selected" pk="controller.selected" entry-point="controller.getEditEntryPoint()"></form-edit>
                 </div>
                 <table ng-show="controller.currentView == 1" width="100%">
                     <thead>
@@ -49,7 +48,7 @@
     </window-frame>
 
     <window-sidebar label="'Actions'">
-        <button ng-if="controller.editController">Save</button>
+        <button ng-if="controller.editController" ng-click="controller.editController.save()">Save<span ng-if="controller.editController.hasChanges()">*</span></button>
         <splitter></splitter>
         <button>New</button>
         <button>New Domain</button>

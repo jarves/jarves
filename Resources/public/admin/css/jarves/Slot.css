@@ -1,13 +1,13 @@
-.jarves-slot {
+.jarves-Slot {
     min-height: 20px;
 }
 
-.jarves-slot-highlight {
+.jarves-Slot-highlight {
     outline: 1px solid #003366;
     background-color: rgba(34, 124, 160, 0.1);
 }
 
-.jarves-slot-header {
+.jarves-Slot-header {
     border-top-right-radius: 3px;
     border-top-left-radius: 3px;
     border: 1px solid #4E4E4E;
@@ -15,7 +15,7 @@
     min-height: 22px;
 }
 
-.jarves-slot-header-inner {
+.jarves-Slot-header-inner {
     border-top-right-radius: 3px;
     border-top-left-radius: 3px;
     border-top: 1px solid #66CEFF;
@@ -24,7 +24,7 @@
     min-height: 22px;
 }
 
-.jarves-slot-header-title {
+.jarves-Slot-header-title {
     margin: 1px 5px;
     line-height: 20px;
     float: left;
@@ -33,15 +33,15 @@
     text-shadow: 0 1px 0 #333;
 }
 
-.jarves-slot-header-actions {
+.jarves-Slot-header-actions {
     margin: 1px 5px;
     float: right;
     line-height: 20px;
     color: white;
 }
 
-.jarves-slot-header-actions a,
-.jarves-slot-header-actions a:link {
+.jarves-Slot-header-actions a,
+.jarves-Slot-header-actions a:link {
     font-family: 'icomoon';
     font-style: normal;
     speak: none;
@@ -52,10 +52,10 @@
     text-shadow: 0 1px 0 #333;
 }
 
-.jarves-slot-header-actions a:hover {
+.jarves-Slot-header-actions a:hover {
     color: #ddd;
 }
 
-.jarves-slot-header-actions a:active {
+.jarves-Slot-header-actions a:active {
     color: #aaa;
 }

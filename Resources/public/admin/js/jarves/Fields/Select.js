@@ -7,6 +7,8 @@ jarves.Fields.Select = new Class({
 
     JarvesField: 'select',
 
+    additionalOptionsReferences: ['items'],
+
     template: 'bundles/jarves/admin/js/views/field.select.html',
 
     chooserOpen: false,
@@ -28,6 +30,11 @@ jarves.Fields.Select = new Class({
             this.beforeCompile.bind(this)
         );
 
+        scope.$parent.$watch(this.getModelName(), function(value) {
+            this.value = value;
+            this.updateSelected();
+        }.bind(this));
+
         this.setupItems();
     },
 
@@ -35,15 +42,17 @@ jarves.Fields.Select = new Class({
         if (this.getOption('object')) {
             this.objectRepository.getItems(this.getOption('object')).then(this.prepareItems.bind(this));
         } else {
-            this.$scope.$parent.$watch(this.$attrs.items, this.prepareItems.bind(this));
+            this.prepareItems(this.getOption('items'));
         }
     },
 
     prepareItems: function(items) {
         var newItems = [], id;
 
+        console.log('prepareItems', this.$attrs.items, items);
+
         if ('array' === typeOf(items)) {
-            Array.each(items, function(item) {
+            Array.each(items, function(item, idx) {
 
                 id = this.getOption('idField') && 'object' === typeOf(item)
                     ? item[this.getOption('idField')]
@@ -69,6 +78,12 @@ jarves.Fields.Select = new Class({
 
             this.items = newItems;
         }
+
+        this.updateSelected();
+    },
+
+    updateSelected: function() {
+        this.selectedItem = this.items[this.value];
     },
 
     /**

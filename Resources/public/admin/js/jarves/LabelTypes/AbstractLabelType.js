@@ -1,9 +1,8 @@
 jarves.LabelTypes.AbstractLabelType = new Class({
     Extends: jarves.AbstractFieldType,
-    interpolate: ['id', 'object', 'type'],
 
     getModelName: function() {
-        return this.$attrs.data + '.' + this.getOption('id');
+        return this.getOption('model') || this.$attrs.data + '.' + this.getOption('id');
     },
 
     getParentModelName: function() {

@@ -26,7 +26,6 @@ jarves.LabelTypes.Select = new Class({
 
         scope.$parent.$watch(this.getModelName(), function(id) {
             this.value = id;
-            console.log('update data', id);
             this.updateSelected();
         }.bind(this));
 
