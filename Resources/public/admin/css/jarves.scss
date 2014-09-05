@@ -88,12 +88,10 @@ $base-font-size: 13px;
         overflow: hidden;
     }
 
-    //    a[class^="icon-"],
-    //    a[class*=" icon-"]{
-    //        text-decoration: none;
-    //        line-height: 28px;
-    //        padding: 0 2px;
-    //    }
+    *[class^="icon-"]:before, *[class*=" icon-"]:before {
+        text-decoration: none;
+        padding-right: 5px;
+    }
 
     td {
         vertical-align: top;

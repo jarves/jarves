@@ -60,6 +60,41 @@ jarves.applyRootScope = function() {
     angular.element(document).scope().$apply();
 };
 
+jarves.isDifferent = function(a, b) {
+    var changed;
+    if ('object' === typeOf(a)) {
+        changed = false;
+        if (Object.getLength(a) !== Object.getLength(b)) {
+            return true;
+        }
+
+        Object.each(a, function(v, k) {
+            if (changed) return false;
+            changed = jarves.isDifferent(v, b[k]);
+        }.bind(this));
+        return changed;
+    }
+
+    if ('array' === typeOf(a)) {
+        changed = false;
+        if (a.length !== b.length) {
+            return true;
+        }
+        Array.each(a, function(v, k) {
+            if (changed) return false;
+            changed = jarves.isDifferent(v, b[k]);
+        }.bind(this));
+        return changed;
+    }
+
+    return !angular.equals(a, b);
+};
+
+jarves.logger = function() {
+    var args = Array.prototype.slice.call(arguments);
+    args.unshift('Logger: ');
+    console.log.apply(console, args);
+};
 /**
 // *
 // * @returns {nunjucks.Environment}

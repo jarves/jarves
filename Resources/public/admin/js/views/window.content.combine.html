@@ -9,7 +9,7 @@
             <button-group float="right">
                 <jarves-field ng-if="controller.classProperties.domainDepended" type="domains" model="controller.domain"></jarves-field>
                 <jarves-field ng-show="controller.classProperties.multiLanguage" type="language" model="controller.language"></jarves-field>
-                <jarves-field type="text" model="controller.searchQuery" width="'120px'" />
+                <jarves-field type="text" model="controller.searchQuery" width="120px" ></jarves-field>
             </button-group>
 
         </window-toolbar>
@@ -20,37 +20,27 @@
             </div>
             <div ng-if="controller.classProperties">
                 <div ng-show="controller.currentView == 2">
-                    <jarves-list items="controller.">
-                        <list-item></list-item>
-                    </jarves-list>
-                    <form-edit ng-if="controller.selected" pk="controller.selected" entry-point="controller.getEditEntryPoint()"></form-edit>
+                    <jarves-list onselect="controller.select(pk)" entry-point="controller.getEntryPoint()"></jarves-list>
+                    <jarves-form name="editForm" ng-if="controller.editView == 1 && controller.selected" pk="controller.selected" entry-point="controller.getEditEntryPoint()"></jarves-form>
+                    <jarves-form name="addForm" ng-if="controller.editView == 2" entry-point="controller.getAddEntryPoint()"></jarves-form>
                 </div>
-                <table ng-show="controller.currentView == 1" width="100%">
-                    <thead>
-                        <tr>
-                            <th ng-repeat="column in controller.classProperties.columns | toArray" width="{{column.width}}" align="{{column.align}}">{{column.label}}</th>
-                            <th ng-if="controller.actions | toArray" width="15"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-class="{'selected': $root.jarves.compare(controller.selected, controller.itemId(item))}" ng-repeat="item in controller.items">
-                            <td ng-dblclick="controller.select(item)" ng-repeat="column in controller.classProperties.columns | toArray">
-                                <jarves-label data="$parent.item" definition="column" type="{{column.type}}" id="{{column.$key}}" object="{{controller.classProperties.object}}"></jarves-label>
-                            </td>
-                            <td ng-repeat="action in controller.actions">
-                                <jarves-button action="action"></jarves-button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div ng-show="controller.currentView == 1">
+                    <jarves-grid name="listGrid" entry-point="controller.getEntryPoint()" onselect="controller.select(pk)"></jarves-grid>
+                </div>
             </div>
         </window-content>
     </window-frame>
 
     <window-sidebar label="'Actions'">
-        <button ng-if="controller.editController" ng-click="controller.editController.save()">Save<span ng-if="controller.editController.hasChanges()">*</span></button>
-        <splitter></splitter>
-        <button>New</button>
-        <button>New Domain</button>
+        <button ng-if="forms.editForm && controller.editView == 1" ng-click="forms.editForm.save()" icon="#icon-checkmark-6" translate>
+            Save
+            <span ng-if="controller.formController.hasChanges()">*</span>
+        </button>
+        <button ng-if="forms.addForm && controller.editView == 2" ng-click="forms.addForm.add()" translate>Save</button>
+        <button ng-if="forms.editForm && controller.editView == 1" ng-click="forms.editForm.remove()" icon="{{controller.classProperties.removeIcon}}" translate>Remove</button>
+        <button ng-if="forms.editForm && controller.editView == 1" ng-click="forms.editForm.reset()" icon="#icon-escape" translate>Remove</button>
+        <window-sidebar-delimiter>d</window-sidebar-delimiter>
+        <button ng-click="controller.showAdd()" translate icon="{{controller.classProperties.addIcon}}">New</button>
+        <button ng-if="controller.classProperties.nestedRootAdd" icon="{{controller.classProperties.nestedRootAddIcon}}" ng-click="controller.showAdd()" translate>New Domain</button>
     </window-sidebar>
 </div>

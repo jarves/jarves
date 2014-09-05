@@ -12,7 +12,7 @@
  */
 jarves.Services.Jarves = new Class({
     Statics: {
-        $inject: ['$rootScope', '$http', '$q', '$injector', 'translator']
+        $inject: ['$rootScope', 'backend', '$q', '$injector', 'translator']
     },
     JarvesService: 'jarves',
 
@@ -20,14 +20,14 @@ jarves.Services.Jarves = new Class({
      * @constructor
      *
      * @param $rootScope
-     * @param $http
+     * @param backend
      * @param $q
      * @param $injector
      * @param translator
      */
-    initialize: function($rootScope, $http, $q, $injector, translator) {
+    initialize: function($rootScope, backend, $q, $injector, translator) {
         this.$rootScope = $rootScope;
-        this.$http = $http;
+        this.backend = backend;
         this.$q = $q;
         this.$injector = $injector;
         this.translator = translator;
@@ -55,6 +55,15 @@ jarves.Services.Jarves = new Class({
     },
 
     /**
+     *
+     * @param {String} entryPoint
+     * @returns {HttpPromise}
+     */
+    loadEntryPointOptions: function(entryPoint) {
+        return this.backend.post(entryPoint + '/?_method=options');
+    },
+
+    /**
      * Loads all menu items from the backend.
      *
      * @returns {promise}
@@ -62,7 +71,7 @@ jarves.Services.Jarves = new Class({
     loadMenu: function() {
         var deferred = this.$q.defer();
 
-        this.$http.get(_pathAdmin + 'admin/backend/menus')
+        this.backend.get('admin/backend/menus')
             .success(function(response) {
                 this.setMenus(response.data);
                 deferred.resolve();
@@ -155,7 +164,7 @@ jarves.Services.Jarves = new Class({
 
         var query = {lang: this.translator.getLanguage(), keys: keyLimitation};
 
-        this.$http.get(_pathAdmin + 'admin/backend/settings', {params: query})
+        this.backend.get('admin/backend/settings', {params: query})
             .success(function(response) {
                 this.setSettings(response.data);
                 deferred.resolve();
@@ -474,94 +483,94 @@ jarves.Services.Jarves = new Class({
     },
 
 
-    /**
-     * Returns the object label, based on a label field or label template (defined
-     * in the object definition).
-     * This function calls perhaps the REST API to get all information.
-     * If you already have an item object, you should probably use jarvesSevice.getObjectLabelByItem();
-     *
-     * You can call this function really fast consecutively, since it queues all and fires
-     * only one REST API call that receives all items at once per object key.(at least after 50ms of the last call).
-     *
-     * @param {String} uri
-     * @param {Function} callback the callback function.
-     *
-     */
-    getObjectLabel: function(uri, callback) {
-        var objectKey = jarves.normalizeObjectKey(jarves.getCroppedObjectKey(uri));
-        var pkString = jarves.getCroppedObjectId(uri);
-        var normalizedUrl = 'object://' + objectKey + '/' + pkString;
-
-        if (this.getObjectLabelBusy[objectKey]) {
-            this.getObjectLabel.delay(10, this.getObjectLabel, [normalizedUrl, callback]);
-            return;
-        }
-
-        if (this.getObjectLabelQTimer[objectKey]) {
-            clearTimeout(this.getObjectLabelQTimer[objectKey]);
-        }
-
-        if (!this.getObjectLabelQ[objectKey]) {
-            this.getObjectLabelQ[objectKey] = {};
-        }
-
-        if (!this.getObjectLabelQ[objectKey][normalizedUrl]) {
-            this.getObjectLabelQ[objectKey][normalizedUrl] = [];
-        }
-
-        this.getObjectLabelQ[objectKey][normalizedUrl].push(callback);
-
-        this.getObjectLabelQTimer[objectKey] = (function() {
-
-            this.getObjectLabelBusy = true;
-
-            var uri = 'object://' + jarves.normalizeObjectKey(objectKey) + '/';
-            Object.each(this.getObjectLabelQ[objectKey], function(cbs, requestedUri) {
-                uri += this.getCroppedObjectId(requestedUri) + '/';
-            });
-            if (uri.substr(-1) == '/') {
-                uri = uri.substr(0, uri.length - 1);
-            }
-
-            new Request.JSON({url: _pathAdmin + 'admin/objects',
-                noCache: 1, noErrorReporting: true,
-                onComplete: function(pResponse) {
-                    var result, fullId, cb;
-
-                    Object.each(pResponse.data, function(item, pk) {
-                        if (item === null) {
-                            return;
-                        }
-
-                        fullId = 'object://' + objectKey + '/' + pk;
-                        result = this.getObjectLabelByItem(objectKey, item, 'field');
-
-                        if (this.getObjectLabelQ[objectKey][fullId]) {
-                            while ((cb = this.getObjectLabelQ[objectKey][fullId].pop())) {
-                                cb(result, item);
-                            }
-                        }
-
-                    }.bind(this));
-
-                    //call the callback of invalid requests with false argument.
-                    Object.each(this.getObjectLabelQ[objectKey], function(cbs) {
-                        cbs.each(function(cb) {
-                            cb.attempt(false);
-                        });
-                    });
-
-                    this.getObjectLabelBusy[objectKey] = false;
-                    this.getObjectLabelQ[objectKey] = {};
-
-                }.bind(this)}).get({url: uri, returnKeyAsRequested: 1});
-
-        }.bind(this)).delay(50);
-    },
-
-    getObjectLabelQ: {},
-    getObjectLabelBusy: {},
-    getObjectLabelQTimer: {},
+    ///**
+    // * Returns the object label, based on a label field or label template (defined
+    // * in the object definition).
+    // * This function calls perhaps the REST API to get all information.
+    // * If you already have an item object, you should probably use jarvesSevice.getObjectLabelByItem();
+    // *
+    // * You can call this function really fast consecutively, since it queues all and fires
+    // * only one REST API call that receives all items at once per object key.(at least after 50ms of the last call).
+    // *
+    // * @param {String} uri
+    // * @param {Function} callback the callback function.
+    // *
+    // */
+    //getObjectLabel: function(uri, callback) {
+    //    var objectKey = jarves.normalizeObjectKey(jarves.getCroppedObjectKey(uri));
+    //    var pkString = jarves.getCroppedObjectId(uri);
+    //    var normalizedUrl = 'object://' + objectKey + '/' + pkString;
+    //
+    //    if (this.getObjectLabelBusy[objectKey]) {
+    //        this.getObjectLabel.delay(10, this.getObjectLabel, [normalizedUrl, callback]);
+    //        return;
+    //    }
+    //
+    //    if (this.getObjectLabelQTimer[objectKey]) {
+    //        clearTimeout(this.getObjectLabelQTimer[objectKey]);
+    //    }
+    //
+    //    if (!this.getObjectLabelQ[objectKey]) {
+    //        this.getObjectLabelQ[objectKey] = {};
+    //    }
+    //
+    //    if (!this.getObjectLabelQ[objectKey][normalizedUrl]) {
+    //        this.getObjectLabelQ[objectKey][normalizedUrl] = [];
+    //    }
+    //
+    //    this.getObjectLabelQ[objectKey][normalizedUrl].push(callback);
+    //
+    //    this.getObjectLabelQTimer[objectKey] = (function() {
+    //
+    //        this.getObjectLabelBusy = true;
+    //
+    //        var uri = 'object://' + jarves.normalizeObjectKey(objectKey) + '/';
+    //        Object.each(this.getObjectLabelQ[objectKey], function(cbs, requestedUri) {
+    //            uri += this.getCroppedObjectId(requestedUri) + '/';
+    //        });
+    //        if (uri.substr(-1) == '/') {
+    //            uri = uri.substr(0, uri.length - 1);
+    //        }
+    //
+    //        new Request.JSON({url: _pathAdmin + 'admin/objects',
+    //            noCache: 1, noErrorReporting: true,
+    //            onComplete: function(pResponse) {
+    //                var result, fullId, cb;
+    //
+    //                Object.each(pResponse.data, function(item, pk) {
+    //                    if (item === null) {
+    //                        return;
+    //                    }
+    //
+    //                    fullId = 'object://' + objectKey + '/' + pk;
+    //                    result = this.getObjectLabelByItem(objectKey, item, 'field');
+    //
+    //                    if (this.getObjectLabelQ[objectKey][fullId]) {
+    //                        while ((cb = this.getObjectLabelQ[objectKey][fullId].pop())) {
+    //                            cb(result, item);
+    //                        }
+    //                    }
+    //
+    //                }.bind(this));
+    //
+    //                //call the callback of invalid requests with false argument.
+    //                Object.each(this.getObjectLabelQ[objectKey], function(cbs) {
+    //                    cbs.each(function(cb) {
+    //                        cb.attempt(false);
+    //                    });
+    //                });
+    //
+    //                this.getObjectLabelBusy[objectKey] = false;
+    //                this.getObjectLabelQ[objectKey] = {};
+    //
+    //            }.bind(this)}).get({url: uri, returnKeyAsRequested: 1});
+    //
+    //    }.bind(this)).delay(50);
+    //},
+    //
+    //getObjectLabelQ: {},
+    //getObjectLabelBusy: {},
+    //getObjectLabelQTimer: {},
 
     /**
      * Returns the rest entry-point of our API for object access.
