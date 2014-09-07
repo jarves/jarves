@@ -558,6 +558,9 @@ class Bundle extends Model
      */
     public function getAdminAssetsInfo()
     {
+        return $this->collectAdminAssetsInfo();
+
+
         $assets = $this->collectAdminAssetsInfo();
         $assetHandlerContainer = $this->getJarves()->getAssetCompilerContainer();
         $result = [];

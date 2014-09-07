@@ -1,0 +1,16 @@
+<window-frame>
+
+    <jarves-form name="main" pk="{id: 2}" object="jarvespublication/newsCategory" entry-point="'object/jarvespublication/newsCategory'">
+
+        <jarves-field type="text" label="Title" model="model.title"></jarves-field>
+        <jarves-field type="file" label="File" model="model.file"></jarves-field>
+
+        title: <jarves-label type="text" model="model.title"></jarves-label><br />
+        test: {{model.test}}<br/>
+        form: {{form.getName()}}<br/>
+
+        <button ng-click="form.save()">Save</button>
+
+    </jarves-form>
+
+</window-frame>

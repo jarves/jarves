@@ -93,7 +93,13 @@ jarves.Services.WindowService = new Class({
             window = this.getWindow(window);
         }
 
+        if (this.activeWindow && this.activeWindow != window) {
+            this.activeWindow.setActive(false);
+        }
+
         this.activeWindowId = window.getId();
+        this.activeWindow = window;
+        this.activeWindow.setActive(true);
     },
 
 //    /**

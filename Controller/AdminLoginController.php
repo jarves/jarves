@@ -32,11 +32,9 @@ class AdminLoginController extends PluginController
         $adminAssets->addLanguageResources();
         $adminAssets->addSessionScripts();
 
-
         $response = $this->getJarves()->getPageResponse();
         $indexView = $this->getJarves()->resolvePublicWebPath('@JarvesBundle/admin/js/views/login.html');
         $interfaceView = $this->getJarves()->resolvePublicWebPath('@JarvesBundle/admin/js/views/interface.html');
-
 
         $response->setBody("
 <div ng-controller=\"AdminController\">
@@ -48,7 +46,7 @@ class AdminLoginController extends PluginController
             "
         tinymce.baseURL =  _path+'bundles/jarves/tinymce',
         window.addEvent('domready', function(){
-            jarves.adminInterface = new jarves.App();
+            jarves.adminInterface = new JarvesApp();
         });
 "
         );

@@ -33,11 +33,12 @@
             restrict: 'A',
             controller: this,
             scope: true,
-            require: [directiveName, 'jarvesField', '?^jarvesField'],
+            require: [directiveName, 'jarvesField', '?^jarvesField', '?^jarvesForm'],
             link: function(scope, element, attr, ctrl) {
                 var ownController = ctrl[0];
                 var fieldController = ctrl[1];
                 var parentFieldController =  ctrl[2];
+                var jarvesFormController =  ctrl[3];
                 scope.controller = ownController;
 
                 fieldController.setController(ownController);
@@ -47,7 +48,11 @@
                     ownController.setParentFieldDirective(parentFieldController);
                 }
 
-                ownController.link(scope, element, attr);
+                if (jarvesFormController) {
+                    jarvesFormController.addField(ownController);
+                }
+
+                ownController.link.apply(ownController, arguments);
             }
         };
 
@@ -73,12 +78,7 @@
             require: [directiveName, '?^jarvesForm'],
             link: function(scope, element, attr, controllers) {
                 var ownController = controllers[0];
-                var formController = controllers[1];
-                if (formController) {
-                    ownController.setForm(formController);
-                    formController.addField(ownController);
-                }
-                ownController.link(scope, element, attr);
+                ownController.link.apply(ownController, arguments);
             }
         };
 
@@ -105,7 +105,7 @@
                     }
 
                     if (ownController && ownController.link) {
-                        ownController.link(scope, element, attr, ctrl);
+                        ownController.link.apply(ownController, arguments);
                     }
                 };
             }

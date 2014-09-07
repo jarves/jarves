@@ -25,6 +25,12 @@ jarves.Directives.Icon = new Class({
                     src: _path + value
                 }).inject(element[0], 'top');
             }
+
+            if (!attributes.ngBind && !element.text()) {
+                element.addClass('icon-no-text');
+            } else {
+                element.removeClass('icon-no-text');
+            }
         }.bind(this));
 
     }

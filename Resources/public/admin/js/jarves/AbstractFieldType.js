@@ -197,6 +197,10 @@ jarves.AbstractFieldType = new Class({
         this.$compile(this.fieldContainer)(this.$scope);
     },
 
+    save: function() {
+        return true;
+    },
+
     /**
      *
      * @param {jarves.AbstractFieldType} child

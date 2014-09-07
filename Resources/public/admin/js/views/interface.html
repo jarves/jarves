@@ -31,14 +31,14 @@
     <div class="jarves-app-container">
         <div class="jarves-desktop jarves-admin">
             <jarves-window ng-repeat="windowInfo in windowService.activeEntryPoints" window-info="windowInfo"
-                           ng-class="{'jarves-Window-inFront': windowInfo.window.inFront}"
+                           ng-class="{'jarves-Window-inFront': windowInfo.window.active}"
                            parameters="windowInfo.params"
                            parent-id="windowInfo.window.parentId" is-inline="windowInfo.isInline">
             </jarves-window>
         </div>
         <div class="jarves-main-menu-wm-tabs">
             <div ng-repeat="windowInfo in windowService.activeEntryPoints" class="jarves-wm-tab" icon="{{windowInfo.entryPoint.icon}}"
-                 ng-class="{'jarves-wm-tab-active': windowInfo.window.id == windowService.activeWindowId}" ng-click="windowService.toFront(windowInfo.window.id)">
+                 ng-class="{'jarves-wm-tab-active': windowInfo.window.active}" ng-click="windowService.toFront(windowInfo.window.id)">
                 {{windowInfo.window.title}}<a class="icon-cancel-8" ng-click="windowService.close(windowInfo.window.id)"></a>
             </div>
         </div>

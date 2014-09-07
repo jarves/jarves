@@ -4,7 +4,7 @@ namespace Jarves\Configuration;
 
 class EntryPoint extends Model
 {
-    protected $attributes = ['path', 'type', 'icon', 'multi', 'link', 'system'];
+    protected $attributes = ['path', 'type', 'icon', 'multi', 'link', 'system', 'templateUrl'];
 
     protected $_excludeFromExport = ['parentInstance', 'fullPath', 'bundle'];
 
@@ -62,6 +62,11 @@ class EntryPoint extends Model
      * @var EntryPoint
      */
     protected $parentInstance;
+
+    /**
+     * @var string
+     */
+    protected $templateUrl;
 
     /**
      * @var string
@@ -334,4 +339,21 @@ class EntryPoint extends Model
     {
         return true === $this->system;
     }
+
+    /**
+     * @return string
+     */
+    public function getTemplateUrl()
+    {
+        return $this->templateUrl;
+    }
+
+    /**
+     * @param string $templateUrl
+     */
+    public function setTemplateUrl($templateUrl)
+    {
+        $this->templateUrl = $templateUrl;
+    }
+
 }

@@ -302,12 +302,20 @@ jarves.Services.Jarves = new Class({
 
         var bundleName = ("" + objectKey.split('/')[0]).toLowerCase();
         var name = objectKey.split('/')[1].lcfirst();
+        var config;
 
         if (this.getConfig(bundleName) && this.getConfig(bundleName)['objects'][name]) {
-            var config = this.getConfig(bundleName)['objects'][name];
-            config._key = objectKey;
-            return config;
+            if (config = this.getConfig(bundleName)['objects'][name]) {
+                config._key = objectKey;
+            }
         }
+
+        if (!config) {
+            console.log('objects available in bundle %s: '.sprintf(bundleName), Object.keys(this.getConfig(bundleName)['objects']));
+            throw new Error('No definition for object %s found.'.sprintf(objectKey));
+        }
+
+        return config;
     },
 
     /**

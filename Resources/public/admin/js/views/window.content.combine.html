@@ -18,14 +18,28 @@
             <div ng-if="!controller.classProperties">
                 Loading ...
             </div>
-            <div ng-if="controller.classProperties">
-                <div ng-show="controller.currentView == 2">
-                    <jarves-list onselect="controller.select(pk)" entry-point="controller.getEntryPoint()"></jarves-list>
-                    <jarves-form name="editForm" ng-if="controller.editView == 1 && controller.selected" pk="controller.selected" entry-point="controller.getEditEntryPoint()"></jarves-form>
-                    <jarves-form name="addForm" ng-if="controller.editView == 2" entry-point="controller.getAddEntryPoint()"></jarves-form>
+            <div ng-if="controller.classProperties" style="height: 100%;">
+                <div ng-show="controller.currentView == 2" style="height: 100%">
+                    <jarves-layout>
+                        <layout-row>
+                            <layout-cell width="250" resizer="right">
+                                <jarves-list model="controller.selected" entry-point="controller.getEntryPoint()">
+                                    {{title}}
+                                </jarves-list>
+                            </layout-cell>
+                            <layout-cell>
+                                <jarves-form name="editForm" ng-if="controller.editView == 1 && controller.selected"
+                                             pk="controller.selected" entry-point="controller.getEditEntryPoint()" options-entry-point="controller.getEditEntryPoint()">
+
+
+                                    <jarves-field type="text" label="teschd" model="model.title"></jarves-field></jarves-form>
+                                <jarves-form name="addForm" ng-if="controller.editView == 2" entry-point="controller.getAddEntryPoint()" options-entry-point="controller.getAddEntryPoint()"></jarves-form>
+                            </layout-cell>
+                        </layout-row>
+                    </jarves-layout>
                 </div>
                 <div ng-show="controller.currentView == 1">
-                    <jarves-grid name="listGrid" entry-point="controller.getEntryPoint()" onselect="controller.select(pk)"></jarves-grid>
+                    <jarves-grid name="listGrid" entry-point="controller.getEntryPoint()" model="controller.selected"></jarves-grid>
                 </div>
             </div>
         </window-content>

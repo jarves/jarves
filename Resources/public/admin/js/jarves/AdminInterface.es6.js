@@ -1,13 +1,25 @@
-jarves.App = new Class({
-    initialize: function(container) {
+class JarvesApp {
+    constructor(container){
         this.container = container || document;
         this.bootstrap();
-    },
+    }
 
-    bootstrap: function() {
+    bootstrap() {
         angular.bootstrap(this.container, ['jarves']);
     }
-});
+}
+
+
+//jarves.App = new Class({
+//    initialize: function(container) {
+//        this.container = container || document;
+//        this.bootstrap();
+//    },
+//
+//    bootstrap: function() {
+//        angular.bootstrap(this.container, ['jarves']);
+//    }
+//});
 
 var AngularController = new Class({
     scopeBlackList: ['Binds', 'scopeBlackList', 'initialize', 'caller', 'scope', 'bindToScope', 'publishScope'],

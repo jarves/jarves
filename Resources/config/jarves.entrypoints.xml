@@ -12,7 +12,7 @@
       <entryPoint path="dashboard" icon="#icon-chart-5">
         <label>Dashboard</label>
       </entryPoint>
-      <entryPoint path="pages" type="custom" icon="#icon-monitor" link="true">
+      <entryPoint path="pages" type="custom" templateUrl="@JarvesBundle/admin/js/views/pages.html" icon="#icon-monitor" link="true">
         <label>Pages</label>
       </entryPoint>
       <entryPoint path="nodes" type="combine" icon="#icon-tree" link="true" multi="true">

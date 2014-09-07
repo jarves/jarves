@@ -332,6 +332,39 @@ jarves.htmlEntities = function(value) {
     return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 };
 
+/**
+ *
+ * @param path
+ */
+jarves.getPublicPath = function(path) {
+    var matches = path.match(/@([a-zA-Z_]*)\/(.*)/);
+    if (matches && matches[1]) {
+        path = 'bundles/'+jarves.getShortBundleName(matches[1]) + '/' + matches[2];
+    }
+    return _path + path;
+};
+
+jarves.countWatchers = function() {
+    var root = angular.element(document);
+    var watchers = [];
+
+    var f = function (element) {
+        if (element.data().hasOwnProperty('$scope')) {
+            angular.forEach(element.data().$scope.$$watchers, function (watcher) {
+                watchers.push(watcher);
+            });
+        }
+
+        angular.forEach(element.children(), function (childElement) {
+            f(angular.element(childElement));
+        });
+    };
+
+    f(root);
+
+    return watchers.length;
+};
+
 ///**
 // * Creates a new information bubble on the right corner.
 // *

@@ -13,7 +13,7 @@ use Jarves\AssetHandler\AssetInfo;
  */
 class Asset extends Model
 {
-    protected $attributes = ['compression'];
+    protected $attributes = ['compression', 'priority'];
     protected $nodeValueVar = 'path';
 
     /**
@@ -27,6 +27,11 @@ class Asset extends Model
      * @var bool
      */
     protected $compression = true;
+
+    /**
+     * @var int
+     */
+    protected $priority = 0;
 
     /**
      * @param boolean $compression
@@ -67,7 +72,25 @@ class Asset extends Model
     {
         $assetInfo = new AssetInfo();
         $assetInfo->setPath($this->getPath());
+        $assetInfo->setPriority($this->getPriority());
         $assetInfo->setAllowCompression($this->getCompression());
         return $assetInfo;
     }
+
+    /**
+     * @return int
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param int $priority
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority + 0;
+    }
+
 }

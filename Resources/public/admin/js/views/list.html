@@ -1,0 +1,2 @@
+<jarves-list-item ng-repeat="item in controller.items" ng-class="{'selected': $root.jarves.compare(controller.selected, controller.getPk(item))}" ng-click="controller.selected = controller.getPk(item)">
+</jarves-list-item>

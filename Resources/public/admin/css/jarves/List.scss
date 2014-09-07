@@ -1,16 +1,14 @@
 @import "../base";
 
-.jarves-List {
-    position: absolute;
-    left: 0;
-    top: 46px;
-    bottom: 0px;
-    right: 0;
+jarves-list {
+    display: block;
+    height: 100%;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 }
 
-.jarves-List-split {
+jarves-list-delimiter {
+    display: block;
     padding: 3px 6px;
     border-bottom: 1px solid lighten($mainColor, 10%);
     background-color: lighten($mainColor, 3%);
@@ -19,7 +17,8 @@
     text-transform: uppercase;
 }
 
-.jarves-List-item {
+jarves-list-item {
+    display: block;
     border-bottom: 1px solid lighten($mainColor, 10%);
     cursor: pointer;
     padding: 6px;
@@ -32,7 +31,7 @@
     transition-duration: .3s;
 }
 
-.jarves-List-item h2 {
+jarves-list-item h2 {
     padding: 0px;
     margin: 1px 0px 4px 0px;
     font-size: 13px;
@@ -40,16 +39,16 @@
     font-weight: normal;
 }
 
-.jarves-List-item .sub {
+jarves-list-item .sub {
     color: #ccc;
 }
 
-.jarves-List-item:hover {
+jarves-list-item:hover {
     background-color: lighten($mainColor, 2%);
 }
 
-.jarves-List-item.active,
-.jarves-List-item.active:hover {
+jarves-list-item.selected,
+jarves-list-item.selected:hover {
     background-color: lighten($mainColor, 4%);
 }
 

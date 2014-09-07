@@ -5,7 +5,7 @@ jarves.Controller.WindowController = new Class({
     },
     JarvesController: 'jarvesWindowController',
 
-    inFront: false,
+    active: false,
 
     view: 'bundles/jarves/admin/js/views/window.content.default.html',
 
@@ -16,12 +16,13 @@ jarves.Controller.WindowController = new Class({
     content: null,
     frame: null,
 
-    initialize: function($scope, $element, $attrs, windowService, jarves) {
+    initialize: function($scope, $element, $attrs, windowService, jarvesService) {
         this.scope = $scope;
+        this.scope.forms = {};
         this.element = $element;
         this.attributes = $attrs;
         this.windowService = windowService;
-        this.jarves = jarves;
+        this.jarves = jarvesService;
         this.entryPoint = this.scope.windowInfo.entryPoint;
         this.id = this.scope.windowInfo.id;
         this.parentId = this.scope.parentWindowId;
@@ -29,8 +30,12 @@ jarves.Controller.WindowController = new Class({
         this.parameters = this.scope.parameters;
         this.originParameters = JSON.decode(JSON.encode(this.scope.parameters));
 
-        if ('custom' !== this.entryPoint.type && this.entryPoint.type) {
-            this.view = 'bundles/jarves/admin/js/views/window.content.' + this.entryPoint.type.toLowerCase() + '.html';
+        if (this.entryPoint.templateUrl) {
+            this.view = jarves.getPublicPath(this.entryPoint.templateUrl);
+        } else {
+            if ('custom' !== this.entryPoint.type && this.entryPoint.type) {
+                this.view = 'bundles/jarves/admin/js/views/window.content.' + this.entryPoint.type.toLowerCase() + '.html';
+            }
         }
 
         console.log('new JarvesWindowController', this.entryPoint, this.view);
@@ -49,6 +54,10 @@ jarves.Controller.WindowController = new Class({
         this.loadContent();
     },
 
+    setActive: function(active) {
+        this.active = active;
+    },
+
     /**
      * @param {jqLite} element
      */
@@ -58,6 +67,8 @@ jarves.Controller.WindowController = new Class({
             this.getFrame().attr('with-sidebar', true);
         }
     },
+
+
 
     /**
      *

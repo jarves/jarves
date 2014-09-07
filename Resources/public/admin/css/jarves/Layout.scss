@@ -1,0 +1,21 @@
+jarves-layout {
+    display: table;
+    width: 100%;
+    height: 100%;
+    table-layout: fixed;
+}
+
+layout-row {
+    display: table-row;
+}
+
+layout-cell {
+    display: table-cell;
+}
+
+layout-cell-wrapper {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}

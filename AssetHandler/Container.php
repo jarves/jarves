@@ -69,6 +69,11 @@ class Container
     {
         $exploded = explode('.', $filePath);
         $extension = array_pop($exploded);
+        $extensionLong = array_pop($exploded) . '.' . $extension;
+
+        if ($serviceId = @$this->handlerByExtension[strtolower($extensionLong)]) {
+            return $this->container->get($serviceId);
+        }
         if ($serviceId = @$this->handlerByExtension[strtolower($extension)]) {
             return $this->container->get($serviceId);
         }
@@ -93,7 +98,11 @@ class Container
     {
         $exploded = explode('.', $filePath);
         $extension = array_pop($exploded);
+        $extensionLong = array_pop($exploded) . '.' . $extension;
 
+        if ($serviceId = @$this->loaderByExtension[strtolower($extensionLong)]) {
+            return $this->container->get($serviceId);
+        }
         if ($serviceId = @$this->loaderByExtension[strtolower($extension)]) {
             return $this->container->get($serviceId);
         }

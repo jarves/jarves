@@ -7,7 +7,7 @@
 
             <asset>@JarvesBundle/admin/js/lib/angular.js</asset>
             <asset>@JarvesBundle/admin/js/jarves.js</asset>
-            <asset>@JarvesBundle/admin/js/jarves/AdminInterface.js</asset>
+            <asset>@JarvesBundle/admin/js/jarves/AdminInterface.es6.js</asset>
             <assets>@JarvesBundle/admin/js/jarves/*.js</assets>
             <assets>@JarvesBundle/admin/js/lib/*.js</assets>
             <assets>@JarvesBundle/admin/js/jarves/DashboardWidgets/Base.js</assets>

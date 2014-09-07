@@ -480,6 +480,7 @@ class BackendController extends Controller
                                 'path' => $subEntryPoint->getPath(),
                                 'type' => $subEntryPoint->getType(),
                                 'system' => $subEntryPoint->getSystem(),
+                                'templateUrl' => $subEntryPoint->getTemplateUrl(),
                                 'level' => substr_count($path, '/')
                             );
                         }

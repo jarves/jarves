@@ -39,6 +39,11 @@ class AssetInfo
     protected $allowCompression = true;
 
     /**
+     * @var int
+     */
+    protected $priority = 0;
+
+    /**
      * @param string $key
      * @param $data
      */
@@ -175,6 +180,22 @@ class AssetInfo
             $exploded = explode('.', $this->getPath());
             return 'css' === strtolower(array_pop($exploded));
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param int $priority
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
     }
 
 }

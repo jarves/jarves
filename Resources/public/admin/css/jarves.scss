@@ -93,6 +93,10 @@ $base-font-size: 13px;
         padding-right: 5px;
     }
 
+    .icon-no-text:before {
+        padding-right: 0;
+    }
+
     td {
         vertical-align: top;
     }

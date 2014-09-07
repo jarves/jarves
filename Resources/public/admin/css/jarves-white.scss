@@ -302,25 +302,25 @@ $linkHoverBgColor: darken($mainColor, 15%);
     /*
      * List
      */
-    .jarves-List-split {
+    jarves-list-delimiter {
         background-color: #ECECEC;
         border-bottom: 1px solid #d1d1d1;
         color: #666;
     }
 
-    .jarves-List-item:hover,
-    .jarves-List-item.active,
-    .jarves-List-item.active:hover {
+    jarves-list-item:hover,
+    jarves-list-item.selected,
+    jarves-list-item.selected:hover {
         background-color: #DFDFDF;
         border-bottom: 1px solid #c1c1c1;
         color: #444;
     }
 
-    .jarves-List-item {
+    jarves-list-item {
         border-bottom: 1px solid #d1d1d1;
     }
 
-    .jarves-List-item .sub {
+    jarves-list-item .sub {
         color: #555;
     }
 

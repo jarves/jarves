@@ -13,12 +13,14 @@ jarves.Controller.CombineController = new Class({
     initialize: function(scope) {
         scope.forms = {};
         this.parent.apply(this, arguments);
-    },
 
-    select: function(item) {
-        this.currentView = 2;
-        this.editView = 1;
-        this.selected = this.jarves.getObjectPk(this.classProperties.object, item);
+        scope.$watch('controller.selected', function(value) {
+            if (value) {
+                //console.log('combine selected: ', this.selected);
+                this.currentView = 2;
+                this.editView = 1;
+            }
+        }.bind(this));
     },
 
     showAdd: function() {

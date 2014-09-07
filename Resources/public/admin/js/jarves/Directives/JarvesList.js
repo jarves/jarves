@@ -1,14 +1,15 @@
-jarves.Directives.JarvesGrid = new Class({
+jarves.Directives.JarvesList = new Class({
     Statics: {
         $inject: ['$scope', '$element', '$attrs', 'backend', '$q', '$parse', 'windowService', 'jarves', 'objectRepository']
     },
 
     JarvesDirective: {
-        name: 'jarvesGrid',
+        name: 'jarvesList',
         options: {
             restrict: 'E',
             scope: true,
-            templateUrl: 'bundles/jarves/admin/js/views/grid.html',
+            transclude: true,
+            templateUrl: 'bundles/jarves/admin/js/views/list.html',
             controller: true
         }
     },
@@ -62,19 +63,12 @@ jarves.Directives.JarvesGrid = new Class({
         }.bind(this));
     },
 
-    getEntryPoint: function() {
-        return this.entryPoint;
+    link: function(scope, element, attributes, controller, transclude) {
+        console.log(element.contents());
     },
 
-    loadClassProperties: function() {
-        this.backend.post(this.getEntryPoint()+'/?_method=options')
-            .success(function(response) {
-                this.classProperties = response.data;
-            }.bind(this))
-            .error(function(response){
-                this.error = response;
-                throw response;
-            }.bind(this));
+    getEntryPoint: function() {
+        return this.entryPoint;
     },
 
     loadPage: function(page) {

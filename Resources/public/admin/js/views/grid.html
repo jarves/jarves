@@ -6,8 +6,8 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-class="{'selected': $root.jarves.compare(controller.selected, controller.itemId(item))}" ng-repeat="item in controller.items">
-        <td ng-dblclick="controller.select(item)" ng-repeat="column in controller.classProperties.columns | toArray">
+    <tr ng-class="{'selected': $root.jarves.compare(controller.selected, controller.getPk(item))}" ng-repeat="item in controller.items">
+        <td ng-dblclick="controller.selected = controller.getPk(item)" ng-repeat="column in controller.classProperties.columns | toArray">
             <jarves-label data="$parent.item" definition="column" type="{{column.type}}" id="{{column.$key}}" object="{{controller.classProperties.object}}"></jarves-label>
         </td>
         <td ng-repeat="action in controller.actions">

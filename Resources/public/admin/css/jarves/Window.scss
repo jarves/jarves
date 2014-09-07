@@ -1,46 +1,7 @@
 @import "../base";
 
-.jarves-Window-border {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    overflow: hidden;
-    min-height: 250px;
-//    background-color: #fafafa;
-}
-
-.jarves-Window-border > .jarves-Layout-main-fixed {
-    bottom: 0;
-    left: 0;
-    right: 25px;
-    top: 39px;
-}
-
-.jarves-dialog-content .jarves-Window-border > .jarves-Layout-main-fixed {
-    left: 25px;
-}
-
-.jarves-frontpage-backend .jarves-Window-border {
-    left: 221px;
-}
-
-.jarves-window-extend-head .jarves-Window-win-content {
-    top: 62px;
-}
-
-.jarves-Window-border-inline {
-    position: relative;
-}
-
-.jarves-Window-win-inline {
-    overflow: auto;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0px;
-    top: 0px;
+jarves-window {
+    display: none;
 }
 
 .jarves-Window-title,
@@ -58,26 +19,7 @@
 }
 
 .jarves-Window-inFront {
-    color: #111;
-}
-
-.jarves-Window-win-buttonBar,
-.window-bottom-bar {
-    @include line-top;
-    position: absolute;
-    height: 25px;
-    line-height: 25px;
-
-    text-align: right;
-    padding: 0px 15px;
-    bottom: 14px;
-    left: 0;
-    right: 0;
-}
-
-/* make line-height working even if there are only block-inline events. */
-.jarves-Window-win-buttonBar::before {
-    content: "\a0";
+    display: block;
 }
 
 window-toolbar {
@@ -125,84 +67,6 @@ window-frame[with-sidebar="true"] {
     right: 190px;
 }
 
-.jarves-Window-win-content-stick {
-    top: 0;
-    border-top: 0;
-}
-
-
-.jarves-Window-win-content-with-bottom {
-    bottom: 45px;
-}
-
-
-.jarves-windowEdit-actions,
-.jarves-Window-bottom {
-    text-align: right;
-    position: absolute;
-    bottom: 5px;
-    left: 15px;
-    right: 15px;
-}
-
-/* make line-height working even if there are only block-inline events. */
-.jarves-windowEdit-actions::before,
-.jarves-Window-bottom::before {
-    content: "\a0";
-}
-
-.jarves-windowEdit-actions a.icon-warning,
-.jarves-Window-bottom a.icon-warning {
-    margin-right: 18px;
-}
-
-
-.jarves-Window-win-inline .jarves-Window-win-content {
-    top: 0px;
-}
-
-.jarves-Window-win-bottom-maximized {
-    background-image: none;
-}
-
-.jarves-Window-iframe {
-    width: 100%;
-    height: 100%;
-    border: 0px;
-    padding: 0px;
-    margin: 0px;
-}
-
-.jarves-Window-titleBar {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-}
-
-.jarves-window-extend-head .jarves-Window-titleBar {
-    top: 4px;
-}
-
-.jarves-Window-titleBarIcon {
-    margin-left: 2px;
-    width: 24px;
-    height: 16px;
-    background-repeat: no-repeat;
-    font-size: 14px;
-    text-align: center;
-    color: #444;
-    display: inline-block;
-    padding: 1px 0;
-}
-
-.jarves-Window-titleBarIcon:hover {
-    color: #333;
-}
-
-.jarves-Window-titleBarIcon:active {
-    color: #444;
-}
-
 .jarves-Window-titlePath {
     display: block;
     line-height: 25px;
@@ -216,156 +80,6 @@ window-frame[with-sidebar="true"] {
     width: 4px;
 }
 
-.jarves-Window-prompt {
-    position: absolute;
-    left: 20px;
-    top: 20px;
-    width: 230px;
-    background-color: #eee;
-    box-shadow: 0px 8px 15px #666;
-}
-
-.jarves-Window-prompt input.text {
-    width: 220px;
-}
-
-.jarves-Window-prompt-text {
-    padding: 5px;
-    padding-bottom: 40px;
-}
-
-.jarves-Window-prompt-text-abs {
-    position: absolute;
-    top: 0px;
-    padding-top: 5px;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    left: 0px;
-    right: 0px;
-    bottom: 38px;
-    min-height: 50px;
-    padding-bottom: 5px;
-}
-
-.jarves-Window-prompt-bottom {
-    position: absolute;
-    text-align: right;
-    left: 0px;
-    right: 10px;
-    bottom: 8px;
-    height: 25px;
-}
-
-window-content h3,
-h3.jarves-headline {
-    margin: 0px;
-    cursor: default;
-    font-weight: normal;
-    padding-left: 1px;
-    color: #555;
-    height: 23px;
-    line-height: 23px;
-    font-size: 11px;
-    padding: 0px 3px;
-}
-
-.jarves-Window-content-withBottomBar {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    right: 0px;
-    bottom: 41px;
-    overflow: auto;
-}
-
-.jarves-Window-loader-content {
-    width: 200px;
-    margin: auto;
-    height: 30px;
-    line-height: 20px;
-
-    border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-
-    font-size: 18px;
-    font-weight: bold;
-    padding: 25px;
-    color: white;
-
-    position: relative;
-    background-color: lighten($mainColor, 15%);
-}
-
-.jarves-Window-sizer {
-    position: absolute;
-    background-color: white;
-}
-
-.jarves-Window-sizer-ne,
-.jarves-Window-sizer-se,
-.jarves-Window-sizer-nw,
-.jarves-Window-sizer-sw {
-    width: 8px;
-    height: 8px;
-}
-
-.jarves-Window-sizer-n {
-    cursor: n-resize;
-    right: 2px;
-    left: 2px;
-    top: -4px;
-    height: 6px;
-}
-
-.jarves-Window-sizer-ne {
-    cursor: ne-resize;
-    top: -4px;
-    right: -4px;
-}
-
-.jarves-Window-sizer-e {
-    cursor: e-resize;
-    right: -4px;
-    bottom: 2px;
-    top: 2px;
-    width: 6px;
-}
-
-.jarves-Window-sizer-se {
-    cursor: se-resize;
-    right: -4px;
-    bottom: -4px;
-}
-
-.jarves-Window-sizer-s {
-    cursor: s-resize;
-    right: 2px;
-    left: 2px;
-    bottom: -4px;
-    height: 6px;
-}
-
-.jarves-Window-sizer-sw {
-    cursor: sw-resize;
-    left: -4px;
-    bottom: -4px;
-}
-
-.jarves-Window-sizer-w {
-    cursor: w-resize;
-    left: -4px;
-    bottom: 2px;
-    top: 2px;
-    width: 6px;
-}
-
-.jarves-Window-sizer-nw {
-    cursor: nw-resize;
-    left: -4px;
-    top: -4px;
-}
-
 window-sidebar {
     @include line-bottom-left;
     position: absolute;
@@ -374,15 +88,6 @@ window-sidebar {
     bottom: 40px;
     width: 150px;
     color: #ddd;
-}
-
-.jarves-Window-sidebar-title {
-    @include line-top-left;
-    text-align: center;
-    padding-top: 4px;
-    padding-bottom: 5px;
-    font-size: 12px;
-    text-transform: uppercase;
 }
 
 window-sidebar-container {
@@ -497,4 +202,6 @@ window-sidebar-container-small .jarves-Button > span {
 
 window-sidebar-delimiter {
     @include line-top-left;
+    display: block;
+    height: 1px;
 }

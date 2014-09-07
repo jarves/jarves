@@ -1,4 +1,4 @@
-jarves.Fields.SelectOption = new Class({
+jarves.Directives.SelectOption = new Class({
     //Extends: jarves.AbstractFieldType,
 
     //Statics: {

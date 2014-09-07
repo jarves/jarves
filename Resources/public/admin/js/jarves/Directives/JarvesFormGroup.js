@@ -10,7 +10,7 @@ jarves.Directives.JarvesFormGroup = new Class({
                 'fields': '=',
                 'model': '='
             },
-            require: ['jarvesFormGroup', '?^jarvesForm'],
+            require: ['jarvesFormGroup'],
             controller: true
         }
     },
@@ -47,7 +47,7 @@ jarves.Directives.JarvesFormGroup = new Class({
             this.formController = controllers[1];
 
             if (this.formController) {
-                this.formController.addForm(this.getName(), this);
+                this.formController.addFormGroup(this.getName(), this);
             }
         }
 
@@ -56,14 +56,6 @@ jarves.Directives.JarvesFormGroup = new Class({
             this.$element.html(xml);
             this.$compile(this.$element.contents())(this.$scope);
         }.bind(this));
-    },
-
-    /**
-     *
-     * @param {jarves.AbstractFieldType} fieldController
-     */
-    addField: function(fieldController) {
-        this.fields[fieldController.getId()] = fieldController;
     },
 
     buildXml: function(fields, parentModelName, depth) {

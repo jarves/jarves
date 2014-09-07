@@ -39,6 +39,7 @@ parameters:
      jarves.configuration.database.connection.main.class: Jarves\Configuration\Connection
 
      jarves.asset_handler.scss.class: Jarves\AssetHandler\ScssHandler
+     jarves.asset_handler.es6.class: Jarves\AssetHandler\ES6JsHandler
      jarves.asset_handler.css.class: Jarves\AssetHandler\CssHandler
      jarves.asset_handler.js.class: Jarves\AssetHandler\JsHandler
      jarves.asset_handler.container.class: Jarves\AssetHandler\Container
@@ -211,17 +212,33 @@ services:
         arguments: ["@service_container"]
         class: %jarves.asset_handler.container.class%
 
-     jarves.asset_handler.scss:
+
+     jarves.asset_handler.compiler.scss:
         class: %jarves.asset_handler.scss.class%
         arguments: ["@jarves"]
         tags:
             - { name: jarves.asset_handler.compiler, extension: scss }
+
+
+     jarves.asset_handler.compiler.es6js:
+        class: %jarves.asset_handler.es6.class%
+        arguments: ["@jarves"]
+        tags:
+            - { name: jarves.asset_handler.compiler, contentType: 'text/es6', extension: es6.js }
+
 
      jarves.asset_handler.css:
         class: %jarves.asset_handler.css.class%
         arguments: ["@jarves"]
         tags:
             - { name: jarves.asset_handler.loader, contentType: 'text/css', extension: css }
+
+     jarves.asset_handler.es6js:
+        class: %jarves.asset_handler.es6.class%
+        arguments: ["@jarves"]
+        tags:
+            - { name: jarves.asset_handler.loader, contentType: 'text/es6', extension: es6.js }
+
 
      jarves.asset_handler.js:
         class: %jarves.asset_handler.js.class%
