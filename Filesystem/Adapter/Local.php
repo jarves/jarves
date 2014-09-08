@@ -434,6 +434,9 @@ class Local extends AbstractAdapter
     {
         if (is_file($source)) {
             if ($overwrite || !is_file($dest)) {
+                if (!file_exists($parentDir = dirname($dest))) {
+                    mkdir($parentDir, 0777, true);
+                }
                 if (!@copy($source, $dest)) {
                     throw new FileNotWritableException(sprintf('Can not copy `%s` to `%s`. Permission denied.', $source, $dest));
                 }

@@ -2,7 +2,7 @@
 
 namespace Jarves\AssetHandler;
 
-class CssHandler extends AbstractHandler implements LoaderHandlerInterface
+class CssHandler extends AbstractHandler
 {
     protected function getTag(AssetInfo $assetInfo)
     {
@@ -27,6 +27,10 @@ EOF
                 $assetInfo->getContent()
             );
         }
+    }
+
+    public function needsGrouping() {
+        return true;
     }
 
     /**

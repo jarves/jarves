@@ -15,6 +15,11 @@ class Container
     protected $handlerByExtension;
 
     /**
+     * @var CompileHandlerInterface[]
+     */
+    protected $handlerByType;
+
+    /**
      * @var LoaderHandlerInterface[]
      */
     protected $loaderByContentType;
@@ -41,6 +46,16 @@ class Container
     public function registerCompileHandlerByExtension($fileExtension, $serviceId)
     {
         $this->handlerByExtension[strtolower($fileExtension)] = $serviceId;
+    }
+
+
+    /**
+     * @param string $fileExtension
+     * @param string $serviceId
+     */
+    public function registerCompileHandlerByContentType($contentType, $serviceId)
+    {
+        $this->handlerByType[strtolower($contentType)] = $serviceId;
     }
 
     /**
@@ -75,6 +90,17 @@ class Container
             return $this->container->get($serviceId);
         }
         if ($serviceId = @$this->handlerByExtension[strtolower($extension)]) {
+            return $this->container->get($serviceId);
+        }
+    }
+
+    /**
+     * @param string $type
+     * @return CompileHandlerInterface
+     */
+    public function getCompileHandlerByContentType($type)
+    {
+        if ($serviceId = @$this->handlerByType[strtolower($type)]) {
             return $this->container->get($serviceId);
         }
     }

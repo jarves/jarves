@@ -21,11 +21,19 @@ class AssetCompilerCompilerPass implements CompilerPassInterface
 
         foreach ($compilerServices as $id => $tagAttributes) {
             foreach ($tagAttributes as $attributes) {
+                if (isset($attributes['contentType'])) {
+                    foreach (explode(',', $attributes['contentType']) as $contentType) {
+                        $definition->addMethodCall(
+                            'registerCompileHandlerByContentType',
+                            array($contentType, $id)
+                        );
+                    }
+                }
                 if (isset($attributes['extension'])) {
-                    foreach ((array)$attributes['extension'] as $contentType) {
+                    foreach (explode(',', $attributes['extension']) as $extension) {
                         $definition->addMethodCall(
                             'registerCompileHandlerByExtension',
-                            array($contentType, $id)
+                            array($extension, $id)
                         );
                     }
                 }
@@ -39,7 +47,7 @@ class AssetCompilerCompilerPass implements CompilerPassInterface
         foreach ($loaderServices as $id => $tagAttributes) {
             foreach ($tagAttributes as $attributes) {
                 if (isset($attributes['contentType'])) {
-                    foreach ((array)$attributes['contentType'] as $contentType) {
+                    foreach (explode(',', $attributes['contentType']) as $contentType) {
                         $definition->addMethodCall(
                             'registerLoaderHandlerByContentType',
                             array($contentType, $id)
@@ -47,7 +55,7 @@ class AssetCompilerCompilerPass implements CompilerPassInterface
                     }
                 }
                 if (isset($attributes['extension'])) {
-                    foreach ((array)$attributes['extension'] as $extension) {
+                    foreach (explode(',', $attributes['extension']) as $extension) {
                         $definition->addMethodCall(
                             'registerLoaderHandlerByExtension',
                             array($extension, $id)

@@ -6,8 +6,9 @@ use Jarves\Tools;
 
 class ScssHandler extends AbstractHandler implements CompileHandlerInterface
 {
-    public function compileFile($assetPath)
+    public function compileFile(AssetInfo $assetInfo)
     {
+        $assetPath = $assetInfo->getPath();
         $localPath = $this->getAssetPath($assetPath);
         if (!file_exists($localPath)){
             return null;
@@ -48,6 +49,10 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
         $assetInfo->setPath($targetPath);
         $assetInfo->setContentType('text/css');
         return $assetInfo;
+    }
+
+    public function needsGrouping() {
+        return false;
     }
 
     /**

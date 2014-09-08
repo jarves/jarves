@@ -1,54 +1,37 @@
 <config>
     <bundle>
         <adminAssets>
-            <asset>@JarvesBundle/admin/mootools-core-1.4.5-fixed-memory-leak.js</asset>
-            <asset>@JarvesBundle/admin/mootools-more.js</asset>
-            <assets>@JarvesBundle/admin/js/mootools-extras/*.js</assets>
+            <!--<asset src="@JarvesBundle/admin/mootools-core-1.4.5-fixed-memory-leak.js />-->
+            <!--<asset src="@JarvesBundle/admin/mootools-more.js />-->
+            <!--<assets src="@JarvesBundle/admin/js/mootools-extras/*.js />-->
 
-            <asset>@JarvesBundle/admin/js/lib/angular.js</asset>
-            <asset>@JarvesBundle/admin/js/jarves.js</asset>
-            <asset>@JarvesBundle/admin/js/jarves/AdminInterface.es6.js</asset>
-            <assets>@JarvesBundle/admin/js/jarves/*.js</assets>
-            <assets>@JarvesBundle/admin/js/lib/*.js</assets>
-            <assets>@JarvesBundle/admin/js/jarves/DashboardWidgets/Base.js</assets>
-            <assets>@JarvesBundle/admin/js/jarves/DashboardWidgets/*.js</assets>
+            <asset src="@JarvesBundle/libraries/angular.js" />
+            <asset type="module" src="@JarvesBundle/module.js"/>
+            <asset type="module" src="@JarvesBundle/utils.js"/>
+            <asset type="module" src="@JarvesBundle/JarvesApp.js"/>
+            <asset type="module" priority="-1000" src="@JarvesBundle/bootstrap.js"/>
+            <assets type="module" src="@JarvesBundle/controller/*"/>
+            <assets type="module" src="@JarvesBundle/services/*"/>
 
-            <assets>@JarvesBundle/admin/js/jarves/Services/*.js</assets>
-            <assets>@JarvesBundle/admin/js/jarves/Directives/AbstractDirective.js</assets>
-            <assets>@JarvesBundle/admin/js/jarves/Directives/InputSelect.js</assets>
-            <assets>@JarvesBundle/admin/js/jarves/Directives/*.js</assets>
-            <assets>@JarvesBundle/admin/js/jarves/Controller/ListController.js</assets>
-            <assets>@JarvesBundle/admin/js/jarves/Controller/*.js</assets>
-            <assets>@JarvesBundle/admin/js/jarves/Filters/*.js</assets>
-            <assets>@JarvesBundle/admin/js/jarves/Fields/Text.js</assets>
-            <assets>@JarvesBundle/admin/js/jarves/Fields/Select.js</assets>
-            <assets>@JarvesBundle/admin/js/jarves/Fields/*.js</assets>
-            <assets>@JarvesBundle/admin/js/jarves/LabelTypes/*.js</assets>
+            <asset src="@JarvesBundle/fonts/icons/style.css"/>
 
-            <!--<assets>@JarvesBundle/admin/js/jarves/ContentTypes/*.js</assets>-->
-            <assets>@JarvesBundle/admin/js/jarves/ui/*.js</assets>
+            <!--<asset src="@JarvesBundle/codemirror/lib/codemirror.js />-->
+            <!--<asset src="@JarvesBundle/codemirror/addon/mode/loadmode.js />-->
+            <!--<asset src="@JarvesBundle/codemirror/addon/selection/active-line.js />-->
+            <!--<asset src="@JarvesBundle/codemirror/lib/codemirror.css"/>-->
 
-            <assets>@JarvesBundle/admin/js/extras/*.js</assets>
-            <asset compression="false">@JarvesBundle/tinymce/tinymce.min.js</asset>
-
-            <asset>@JarvesBundle/admin/icons/style.css</asset>
-
-            <asset>@JarvesBundle/codemirror/lib/codemirror.js</asset>
-            <asset>@JarvesBundle/codemirror/addon/mode/loadmode.js</asset>
-            <asset>@JarvesBundle/codemirror/addon/selection/active-line.js</asset>
-            <asset>@JarvesBundle/codemirror/lib/codemirror.css</asset>
-
-            <asset>@JarvesBundle/font/OpenSans/open-sans.css</asset>
-            <asset>@JarvesBundle/font/OpenSans/open-sans-condensed.css</asset>
-            <assets>@JarvesBundle/admin/css/jarves.scss</assets>
-            <assets>@JarvesBundle/admin/css/jarves-white.scss</assets>
-            <asset>@JarvesBundle/admin/css/jarves/Button.scss</asset>
-            <asset>@JarvesBundle/admin/css/jarves/ButtonGroup.scss</asset>
-            <assets>@JarvesBundle/admin/css/lib/*.css</assets>
-            <assets>@JarvesBundle/admin/css/jarves/*.css</assets>
-            <assets>@JarvesBundle/admin/css/jarves/*.scss</assets>
-            <assets>@JarvesBundle/admin/css/jarves/ui/*.css</assets>
-            <assets>@JarvesBundle/admin/css/jarves/Field/*</assets>
+            <asset src="@JarvesBundle/fonts/OpenSans/open-sans.css"/>
+            <asset src="@JarvesBundle/fonts/OpenSans/open-sans-condensed.css"/>
+            
+            <assets src="@JarvesBundle/css/admin/jarves.scss"/>
+            <assets src="@JarvesBundle/css/admin/jarves-white.scss"/>
+            <asset src="@JarvesBundle/css/admin/jarves/Button.scss"/>
+            <asset src="@JarvesBundle/css/admin/jarves/ButtonGroup.scss"/>
+            <assets src="@JarvesBundle/css/admin/lib/*.css"/>
+            <assets src="@JarvesBundle/css/admin/jarves/*.css"/>
+            <assets src="@JarvesBundle/css/admin/jarves/*.scss"/>
+            <assets src="@JarvesBundle/css/admin/jarves/ui/*.css"/>
+            <assets src="@JarvesBundle/css/admin/jarves/Field/*" />
         </adminAssets>
         <streams>
             <stream path="load">

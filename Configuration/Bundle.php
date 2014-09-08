@@ -559,25 +559,25 @@ class Bundle extends Model
     public function getAdminAssetsInfo()
     {
         return $this->collectAdminAssetsInfo();
-
-
-        $assets = $this->collectAdminAssetsInfo();
-        $assetHandlerContainer = $this->getJarves()->getAssetCompilerContainer();
-        $result = [];
-
-        // collect assets and compile
-        foreach ($assets as $asset) {
-            if ($asset->getPath() && $compiler = $assetHandlerContainer->getCompileHandlerByFileExtension($asset->getPath())) {
-                if ($assetInfo = $compiler->compileFile($asset->getPath())) {
-                    $assetInfo->setAllowCompression($asset->getAllowCompression());
-                    $result[] = $assetInfo;
-                }
-            } else {
-                $result[] = $asset;
-            }
-        }
-
-        return $result;
+//
+//
+//        $assets = $this->collectAdminAssetsInfo();
+//        $assetHandlerContainer = $this->getJarves()->getAssetCompilerContainer();
+//        $result = [];
+//
+//        // collect assets and compile
+//        foreach ($assets as $asset) {
+//            if ($asset->getPath() && $compiler = $assetHandlerContainer->getCompileHandlerByFileExtension($asset->getPath())) {
+//                if ($assetInfo = $compiler->compileFile($asset->getPath())) {
+//                    $assetInfo->setAllowCompression($asset->getAllowCompression());
+//                    $result[] = $assetInfo;
+//                }
+//            } else {
+//                $result[] = $asset;
+//            }
+//        }
+//
+//        return $result;
     }
 
     /**

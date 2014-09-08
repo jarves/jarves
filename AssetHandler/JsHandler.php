@@ -29,6 +29,10 @@ EOF
         }
     }
 
+    public function needsGrouping() {
+        return true;
+    }
+
     /**
      * @param AssetInfo[] $assetsInfo
      * @param bool $concatenation

@@ -267,17 +267,16 @@ class PageResponse extends Response
         $assetInfo->setContentType(@$definition['contentType']);
         $assetInfo->setPriority(@$definition['priority']+0);
 
-        if (!$this->handleAsset($assetInfo)) {
-            return;
-        }
+        foreach ($this->handleAsset($assetInfo) as $asset) {
 
-        if ('bottom' === strtolower(@$definition['position'])) {
-            if (!$this->hasAsset($assetInfo, $this->assetsInfoBottom)) {
-                $this->assetsInfoBottom[$assetInfo->getPriority()][] = $assetInfo;
-            }
-        } else {
-            if (!$this->hasAsset($assetInfo)) {
-                $this->assetsInfo[$assetInfo->getPriority()][] = $assetInfo;
+            if ('bottom' === strtolower(@$definition['position'])) { //instead of position use $asset->getPossition();
+                if (!$this->hasAsset($asset, $this->assetsInfoBottom)) {
+                    $this->assetsInfoBottom[$asset->getPriority()][] = $asset;
+                }
+            } else {
+                if (!$this->hasAsset($asset)) {
+                    $this->assetsInfo[$asset->getPriority()][] = $asset;
+                }
             }
         }
     }
@@ -287,21 +286,35 @@ class PageResponse extends Response
      *
      * @param AssetInfo $assetInfo
      *
-     * @return boolean
+     * @return AssetInfo[]
      */
     public function handleAsset(&$assetInfo)
     {
         $assetHandlerContainer = $this->getJarves()->getAssetCompilerContainer();
-        if ($assetInfo->getPath() && $compiler = $assetHandlerContainer->getCompileHandlerByFileExtension($assetInfo->getPath())) {
-            if ($compiledAssetInfo = $compiler->compileFile($assetInfo->getPath())) {
+        $compiler = $assetHandlerContainer->getCompileHandlerByContentType($assetInfo->getContentType());
+        if (!$compiler) {
+            $compiler = $assetHandlerContainer->getCompileHandlerByFileExtension($assetInfo->getPath());
+        }
+
+        if (!$compiler) {
+            return [$assetInfo]; //no compiler found, so ok
+        }
+
+        if ($compiledAssetInfoResult = $compiler->compileFile($assetInfo)) {
+            if (is_array($compiledAssetInfoResult)) {
+                return $compiledAssetInfoResult;
+            } else {
+                $compiledAssetInfo = $compiledAssetInfoResult;
                 if ($compiledAssetInfo instanceof AssetInfo) {
+                    if ($this->hasAsset($compiledAssetInfo)) {
+                        return []; //asset already in
+                    }
                     $assetInfo = $compiledAssetInfo;
                 }
-                return true;
+                return [$assetInfo];
             }
-            return false;
         }
-        return true;
+        return [];
     }
 
     public function hasAsset(AssetInfo $assetInfo, $assets = null) {
@@ -340,11 +353,10 @@ class PageResponse extends Response
      */
     public function addAsset(AssetInfo $assetInfo)
     {
-        if (!$this->hasAsset($assetInfo)) {
-            if (!$this->handleAsset($assetInfo)) {
-                return;
+        foreach ($this->handleAsset($assetInfo) as $asset) {
+            if (!$this->hasAsset($asset)) {
+                $this->assetsInfo[$asset->getPriority()][] = $asset;
             }
-            $this->assetsInfo[$assetInfo->getPriority()][] = $assetInfo;
         }
     }
 
@@ -845,11 +857,10 @@ class PageResponse extends Response
         // sort by priority, highest => lowest
         krsort($this->assetsInfo);
         krsort($this->assetsInfoBottom);
-        // flatten arrays
 
+        // flatten arrays
         $assetsTop = $this->assetsInfo ? call_user_func_array('array_merge', $this->assetsInfo) : [];
         $assetsBottom = $this->assetsInfoBottom ? call_user_func_array('array_merge', $this->assetsInfoBottom) : [];
-
 
         $tagsJsTop = '';
         $tagsCssTop = '';
@@ -866,6 +877,7 @@ class PageResponse extends Response
         // group all asset per loader
         $lastLoader = null;
         $group = 0;
+//        var_dump($assetsTop); exit;
         foreach ($assetsTop as $asset) {
             if ($asset->getContentType()) {
                 $loader = $assetHandlerContainer->getLoaderHandlerByContentType($asset->getContentType());
@@ -874,15 +886,22 @@ class PageResponse extends Response
             }
 
             if ($loader) {
-                if ($loader !== $lastLoader) {
+                if ($loader->needsGrouping()) {
+                    if ($loader !== $lastLoader) {
+                        $group++;
+                        $lastLoader = $loader;
+                    }
+                    //group those stuff
+                    $assetsTopGrouped[get_class($loader) . '_' . $group][] = $asset;
+                    $loaderMap[get_class($loader) . '_' . $group] = $loader;
+                } else {
                     $group++;
-                    $lastLoader = $loader;
+                    $assetsTopGrouped[get_class($loader)][] = $asset;
+                    $loaderMap[get_class($loader)] = $loader;
                 }
-                //group those stuff
-                $assetsTopGrouped[spl_object_hash($loader) . '_' . $group][] = $asset;
-                $loaderMap[spl_object_hash($loader) . '_' . $group] = $loader;
             }
         }
+//        var_dump($assetsTopGrouped); exit;
 
 //        // todo, remove duplicate code
 //        foreach ($assetsBottom as $asset) {

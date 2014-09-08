@@ -39,7 +39,8 @@ parameters:
      jarves.configuration.database.connection.main.class: Jarves\Configuration\Connection
 
      jarves.asset_handler.scss.class: Jarves\AssetHandler\ScssHandler
-     jarves.asset_handler.es6.class: Jarves\AssetHandler\ES6JsHandler
+     jarves.asset_handler.traceur.module.class: Jarves\AssetHandler\TraceurModuleHandler
+     jarves.asset_handler.traceur.script.class: Jarves\AssetHandler\TraceurScriptHandler
      jarves.asset_handler.css.class: Jarves\AssetHandler\CssHandler
      jarves.asset_handler.js.class: Jarves\AssetHandler\JsHandler
      jarves.asset_handler.container.class: Jarves\AssetHandler\Container
@@ -213,32 +214,40 @@ services:
         class: %jarves.asset_handler.container.class%
 
 
+      # Traceur
+
+     jarves.asset_handler.compiler.traceur.module.compiler:
+        class: %jarves.asset_handler.traceur.module.class%
+        arguments: ["@jarves"]
+        tags:
+            - { name: jarves.asset_handler.compiler, contentType: 'module' }
+
+#     jarves.asset_handler.compiler.traceur.script.compiler:
+#        class: %jarves.asset_handler.traceur.script.class%
+#        arguments: ["@jarves"]
+#        tags:
+#            - { name: jarves.asset_handler.compiler, contentType: 'es6', extension: es6.js }
+
+     jarves.asset_handler.traceur.module.loader:
+        class: %jarves.asset_handler.traceur.module.class%
+        arguments: ["@jarves"]
+        tags:
+            - { name: jarves.asset_handler.loader, contentType: 'module', extension: es6.js }
+
+
+     # SCSS
      jarves.asset_handler.compiler.scss:
         class: %jarves.asset_handler.scss.class%
         arguments: ["@jarves"]
         tags:
             - { name: jarves.asset_handler.compiler, extension: scss }
 
-
-     jarves.asset_handler.compiler.es6js:
-        class: %jarves.asset_handler.es6.class%
-        arguments: ["@jarves"]
-        tags:
-            - { name: jarves.asset_handler.compiler, contentType: 'text/es6', extension: es6.js }
-
-
+     # CSS/JS
      jarves.asset_handler.css:
         class: %jarves.asset_handler.css.class%
         arguments: ["@jarves"]
         tags:
             - { name: jarves.asset_handler.loader, contentType: 'text/css', extension: css }
-
-     jarves.asset_handler.es6js:
-        class: %jarves.asset_handler.es6.class%
-        arguments: ["@jarves"]
-        tags:
-            - { name: jarves.asset_handler.loader, contentType: 'text/es6', extension: es6.js }
-
 
      jarves.asset_handler.js:
         class: %jarves.asset_handler.js.class%

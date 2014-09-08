@@ -13,13 +13,13 @@ use Jarves\AssetHandler\AssetInfo;
  */
 class Asset extends Model
 {
-    protected $attributes = ['compression', 'priority'];
-    protected $nodeValueVar = 'path';
+    protected $attributes = ['compression', 'priority', 'type'];
+    protected $nodeValueVar = 'content';
 
     /**
      * @var string
      */
-    protected $path;
+    protected $src;
 
     /**
      * If the asset can be compressed with other equal files (js/css compression)
@@ -32,6 +32,48 @@ class Asset extends Model
      * @var int
      */
     protected $priority = 0;
+
+    /**
+     * @var string
+     */
+    protected $type;
+
+    /**
+     * @var string
+     */
+    protected $content;
+
+    /**
+     * @return string
+     */
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    /**
+     * @param string $content
+     */
+    public function setContent($content)
+    {
+        $this->content = $content;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
 
     /**
      * @param boolean $compression
@@ -50,19 +92,19 @@ class Asset extends Model
     }
 
     /**
-     * @param string $path
+     * @param string $src
      */
-    public function setPath($path)
+    public function setSrc($src)
     {
-        $this->path = $path;
+        $this->src = $src;
     }
 
     /**
      * @return string
      */
-    public function getPath()
+    public function getSrc()
     {
-        return $this->path;
+        return $this->src;
     }
 
     /**
@@ -71,9 +113,11 @@ class Asset extends Model
     public function getAssetInfo()
     {
         $assetInfo = new AssetInfo();
-        $assetInfo->setPath($this->getPath());
+        $assetInfo->setPath($this->getSrc());
         $assetInfo->setPriority($this->getPriority());
         $assetInfo->setAllowCompression($this->getCompression());
+        $assetInfo->setContentType($this->getType());
+        $assetInfo->setContent($this->getContent());
         return $assetInfo;
     }
 
