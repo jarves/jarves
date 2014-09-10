@@ -1,6 +1,7 @@
 import {Inject} from '../annotations';
+import angular from '../angular';
 
-@Inject('$scope', '$element', '$attrs', '$compile', '$parse', '$timeout', '$http', '$templateCache', '$q', '$interpolate')
+@Inject('$scope, $element, $attrs, $compile, $parse, $timeout, $http, $templateCache, $q, $interpolate')
 export default class AbstractFieldType {
     constructor($scope, $element, $attrs, $compile, $parse, $timeout, $http, $templateCache, $q, $interpolate) {
         this.$scope = $scope;
@@ -63,6 +64,9 @@ export default class AbstractFieldType {
 
     renderTemplateUrl(url, beforeCompile){
         var deferred = this.$q.defer();
+        if (!url) {
+            throw 'no template url defined';
+        }
         this.$http.get(url, {cache: this.$templateCache})
             .success(function(response){
                 var element = angular.element(response);
@@ -103,7 +107,7 @@ export default class AbstractFieldType {
             if (null === this.definition && this.$attrs.definition) {
                 this.definition = this.$scope.$parent.$eval(this.$attrs.definition) || {};
                 if (this.definition.options) {
-                    this.definition = Object.merge(this.definition, this.definition.options);
+                    this.definition = angular.extend(this.definition, this.definition.options);
                 }
             }
             if (this.definition && name in this.definition) {

@@ -47,12 +47,12 @@ class UserCrudController extends WindowController
 
     public $itemLayout = '
     <div title="#{{id}}">
-        <b>{{username}}</b>
-        {%if firstName or lastName%}
-            (<span>{{firstName}}</span>{% if lastName %} <span>{{lastName}}</span>{% endif %})
-        {%endif%}
-        {%if email%}<div class="sub">{{email}}</div>{%endif%}
-        <div class="sub">{%if groups%}{{groups.name}}{%endif%}</div>
+        <b>{{item.username}}</b>
+        <span ng-if="item.firstName && item.lastName">
+            ({{item.firstName}}<span ng-if="item.lastName"> {{item.lastName}}</span>)
+        </span>
+        <div ng-if="item.email" class="sub">{{item.email}}</div>
+        <div ng-if="item.groups.name" class="sub">{{item.groups.name}}</div>
     </div>';
 
     public $itemsPerPage = 20;

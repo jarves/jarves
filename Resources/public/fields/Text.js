@@ -1,5 +1,7 @@
 import AbstractFieldType from './AbstractFieldType';
 import {Field} from '../annotations';
+import angular from '../angular'
+import {each} from '../utils';
 
 @Field('text')
 export default class Text extends AbstractFieldType {
@@ -133,14 +135,14 @@ export default class Text extends AbstractFieldType {
      * @returns {String}
      */
     applyModifier(value, modifierString) {
-        value = 'string' === typeOf(value) ? value : '';
+        value = angular.isString(value) ? value : '';
         var modifiers = modifierString.toLowerCase().split('|');
 
-        Array.each(modifiers, function (modifier) {
+        for (let modifier of modifiers) {
             if (Text[modifier]) {
                 value = Text[modifier](value);
             }
-        }.bind(this));
+        }
 
         return value;
     }
@@ -151,10 +153,10 @@ export default class Text extends AbstractFieldType {
      */
     parseRedirects(str) {
         var redirects = {};
-        str.split(',').each(function(line) {
+        for (let line of str.split(',')) {
             var splitted = line.split(':');
             redirects[splitted[0]] = splitted[1];
-        });
+        }
 
         return redirects;
     }
@@ -164,20 +166,21 @@ export default class Text extends AbstractFieldType {
 
         if (this.getOption('redirectValue')) {
             redirects = this.parseRedirects(this.getOption('redirectValue'));
-            Object.each(redirects, function(modifiers, key) {
+
+            for (let [key, modifiers] of each(redirects)) {
                 if (!(key in this.boundRedirects)) {
                     this.bindRedirect(key, modifiers);
                 }
-            }.bind(this));
+            }
         }
 
         if (this.getOption('redirectSameValue')) {
             redirects = this.parseRedirects(this.getOption('redirectSameValue'));
-            Object.each(redirects, function(modifiers, key) {
+            for (let [key, modifiers] of each(redirects)) {
                 if (!(key in this.boundRedirects)) {
                     this.bindRedirect(key, modifiers, true);
                 }
-            }.bind(this));
+            }
         }
     }
 

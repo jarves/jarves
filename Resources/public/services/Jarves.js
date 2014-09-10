@@ -1,5 +1,7 @@
-import {each, eachValue, normalizeObjectKey} from '../utils';
+import {each, eachValue, normalizeObjectKey, urlEncode} from '../utils';
 import {Inject} from '../annotations';
+import {baseUrl, baseRestUrl} from '../config';
+import angular from '../angular';
 
 /**
  * Uses the $rootScope.
@@ -14,13 +16,6 @@ import {Inject} from '../annotations';
 @Inject('$rootScope, backend, $q, $injector, translator')
 export default class Jarves {
 
-    /**
-     * @param $rootScope
-     * @param backend
-     * @param $q
-     * @param $injector
-     * @param translator
-     */
     constructor($rootScope, backend, $q, $injector, translator) {
         this.$rootScope = $rootScope;
         this.backend = backend;
@@ -131,7 +126,7 @@ export default class Jarves {
             this.$rootScope._settings = {};
         }
 
-        if ('object' !== typeof this.$rootScope._settings) {
+        if (!angular.isObject(this.$rootScope._settings)) {
             this.$rootScope._settings = {};
         }
 
@@ -222,7 +217,7 @@ export default class Jarves {
      * @returns {Object}
      */
     getEntryPoint(path) {
-        if ('sting' !== typeof path) {
+        if (!angular.isString(path)) {
             return;
         }
 
@@ -292,7 +287,7 @@ export default class Jarves {
      * @returns {Object}
      */
     getObjectDefinition(objectKey) {
-        if ('string' !== typeof objectKey) {
+        if (!angular.isString(objectKey)) {
             throw 'objectKey is not a string: ' + objectKey;
         }
 
@@ -410,7 +405,7 @@ export default class Jarves {
         if (1 < pks.length) {
             var values = [];
             for (let pk of pks){ 
-                values = jarves.urlEncode(item[pk]);
+                values = urlEncode(item[pk]);
             }
             return values.join('/');
         }
@@ -419,7 +414,7 @@ export default class Jarves {
             throw pks[0] + ' does not exist in item.';
         }
 
-        return jarves.urlEncode(item[pks[0]]);
+        return urlEncode(item[pks[0]]);
     }
 
     /**
@@ -443,7 +438,7 @@ export default class Jarves {
      * @param {String} id String from jarves.getObjectUrlId or jarves.getObjectIdFromUrl e.g.
      */
     getObjectUrlIdFromId(objectKey, id) {
-        return this.hasCompositePk(objectKey) ? id : jarves.urlEncode(id);
+        return this.hasCompositePk(objectKey) ? id : urlEncode(id);
     }
 
     /**
@@ -591,10 +586,10 @@ export default class Jarves {
         }
 
         if (definition.objectRestEntryPoint) {
-            return _pathAdmin + definition.objectRestEntryPoint;
+            return jarvesRESTURL + definition.objectRestEntryPoint;
         }
 
-        return _pathAdmin + 'object/' + normalizeObjectKey(objectKey);
+        return jarvesRESTURL + 'object/' + normalizeObjectKey(objectKey);
 
     }
 
@@ -698,7 +693,7 @@ export default class Jarves {
         }
 
         var oriFieldId = fieldId;
-        if ('string' === typeof fieldId && fieldId.indexOf('.') > 0) {
+        if (angular.isString(fieldId) && fieldId.indexOf('.') > 0) {
             oriFieldId = fieldId.split('.')[0];
         }
 

@@ -1,4 +1,5 @@
 import ListController from './ListController';
+import {getEntryPointPathForRelative} from '../utils'
 
 export default class CombineController extends ListController {
     constructor($scope, ...deps) {
@@ -25,10 +26,10 @@ export default class CombineController extends ListController {
     }
 
     getEditEntryPoint() {
-        return jarves.getEntryPointPathForRelative(this.getEntryPoint(), this.classProperties.editEntrypoint);
+        return getEntryPointPathForRelative(this.getEntryPoint(), this.classProperties.editEntrypoint);
     }
 
     getAddEntryPoint() {
-        return jarves.getEntryPointPathForRelative(this.getEntryPoint(), this.classProperties.addEntrypoint);
+        return getEntryPointPathForRelative(this.getEntryPoint(), this.classProperties.addEntrypoint);
     }
 }

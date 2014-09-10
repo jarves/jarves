@@ -24,14 +24,11 @@
                         <layout-row>
                             <layout-cell width="250" resizer="right">
                                 <jarves-list model="controller.selected" entry-point="controller.getEntryPoint()">
-                                    {{title}}
                                 </jarves-list>
                             </layout-cell>
                             <layout-cell>
                                 <jarves-form name="editForm" ng-if="controller.editView == 1 && controller.selected"
                                              pk="controller.selected" entry-point="controller.getEditEntryPoint()" options-entry-point="controller.getEditEntryPoint()">
-
-
                                     <jarves-field type="text" label="teschd" model="model.title"></jarves-field></jarves-form>
                                 <jarves-form name="addForm" ng-if="controller.editView == 2" entry-point="controller.getAddEntryPoint()" options-entry-point="controller.getAddEntryPoint()"></jarves-form>
                             </layout-cell>

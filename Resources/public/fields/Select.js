@@ -1,11 +1,12 @@
 import AbstractFieldType from './AbstractFieldType';
 import {Field, InjectAsProperty} from '../annotations';
 import {each} from '../utils';
+import angular from '../angular'
 
 @Field('select')
 @InjectAsProperty('objectRepository')
 export default class Select extends AbstractFieldType {
-    constructor(...deps) {
+    constructor(...args) {
         this.additionalOptionsReferences = ['items'];
         this.chooserOpen = false;
         this.items = {};
@@ -17,7 +18,7 @@ export default class Select extends AbstractFieldType {
         };
         this.objectRepository = null;
         this.template = 'bundles/jarves/views/field.select.html';
-        super(...deps);
+        super(...args);
     }
 
     link(scope, element, attr) {
@@ -38,7 +39,7 @@ export default class Select extends AbstractFieldType {
 
     setupItems() {
         if (this.getOption('object')) {
-            this.objectRepository.getItems(this.getOption('object')).then(() => this.prepareItems(...arguments));
+            this.objectRepository.getItems(this.getOption('object')).then((...args) => this.prepareItems(...args));
         } else {
             this.prepareItems(this.getOption('items'));
         }
@@ -47,11 +48,9 @@ export default class Select extends AbstractFieldType {
     prepareItems(items) {
         var newItems = [], id;
 
-        console.log('prepareItems', this.$attrs.items, items);
-
-        if ('array' === typeOf(items)) {
+        if (angular.isArray(items)) {
             for (let [idx, item] of each(items)) {
-                id = this.getOption('idField') && 'object' === typeOf(item)
+                id = this.getOption('idField') && angular.isObject(item)
                     ? item[this.getOption('idField')]
                     : item;
 
@@ -59,19 +58,22 @@ export default class Select extends AbstractFieldType {
                     id = idx;
                 }
 
-                if ('array' === typeOf(item)) {
+                if (angular.isArray(item)) {
                     newItems[id] = {label: this.toLabel(item[0]), icon: item[1], id: id};
                 } else {
                     newItems[id] = {label: this.toLabel(item), id: id};
                 }
             }
-
             this.items = newItems;
         }
 
-        if ('object' === typeOf(items)) {
-            for (let [id, value] of each(items)){
-                newItems[id] = {label: this.toLabel(value), id: id};
+        if (angular.isObject(items)) {
+            for (let [id, item] of each(items)) {
+                if (angular.isArray(item)) {
+                    newItems[id] = {label: this.toLabel(item[0]), icon: item[1], id: id};
+                } else {
+                    newItems[id] = {label: this.toLabel(item), id: id};
+                }
             }
 
             this.items = newItems;
@@ -96,17 +98,16 @@ export default class Select extends AbstractFieldType {
         this.selected = id;
         this.selectedItem = this.items[id];
     }
-
     /**
      * @param {Object|String} item
      * @return {String}
      */
     toLabel(item) {
-        if ('object' === typeOf(item) && this.getOption('object')) {
+        if (angular.isObject(item) && this.getOption('object')) {
             return this.jarves.getObjectLabelByItem(this.getOption('object'), item);
         }
 
-        if ('string' === typeOf(item)) {
+        if (angular.isString(item)) {
             return item;
         }
     }

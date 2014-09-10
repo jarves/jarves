@@ -19,7 +19,7 @@ export default class JarvesField {
     }
 
     link(scope, element, attributes) {
-        if (this.$attrs.definition) {
+        if (attributes['definition']) {
             this.$scope.$watch(attributes['definition'], (definition) => {
                 this.load(definition);
             });
@@ -29,9 +29,12 @@ export default class JarvesField {
     }
 
     load(definition) {
+        if (!definition) {
+            throw 'invalid value for definition attribute in <jarves-field definition="%s" />'.sprintf(this.$attrs.definition);
+        }
         if (!definition.type) {
             console.error(definition);
-            throw 'no type';
+            throw 'no type define in <jarves-field />';
         }
         this.$element.attr('jarves-%s-field'.sprintf(definition.type.lcfirst()), '');
         this.$compile(this.$element, null, 5000)(this.$scope);

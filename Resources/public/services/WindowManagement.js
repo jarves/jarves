@@ -2,6 +2,7 @@ import Jarves from './Jarves';
 import WindowController from '../controller/WindowController';
 import {each, eachValue} from '../utils';
 import {Inject} from '../annotations';
+import angular from '../angular';
 
 @Inject('jarves')
 export default class WindowService {
@@ -90,7 +91,7 @@ export default class WindowService {
      * @param {Number|jarves.Controller.WindowController} window
      */
     toFront(window) {
-        if ('number' === typeof window) {
+        if (angular.isNumber(window)) {
             window = this.getWindow(window);
         }
 

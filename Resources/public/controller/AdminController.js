@@ -1,4 +1,6 @@
 import {Inject} from '../annotations';
+import {baseUrl, baseRestUrl} from '../config';
+import angular from '../angular';
 
 @Inject('$rootScope, $scope, $q, $http, jarves, windowManagement')
 export default class AdminController {
@@ -11,8 +13,8 @@ export default class AdminController {
         this.jarves = jarves;
         this.windowService = windowManagement;
 
-        this.scope._path = _path;
-        this.scope._pathadmin = _pathAdmin;
+        this.scope._baseUrl = baseUrl;
+        this.scope._baseRestUrl = baseRestUrl;
         this.scope.windowService = windowManagement;
         this.scope.menuHidden = {};
         this.scope.loadInterface = (...args) => this.loadInterface(...args);
@@ -97,7 +99,7 @@ export default class AdminController {
      * @throws Error when entryPoint is not found
      */
     openEntryPoint(entryPoint, options, inline, dependWindowId) {
-        entryPoint = 'object' === typeof entryPoint ? entryPoint : this.getJarves().getEntryPoint(entryPoint);
+        entryPoint = angular.isObject(entryPoint) ? entryPoint : this.getJarves().getEntryPoint(entryPoint);
 
         if (!entryPoint) {
             throw new Error('Can not be found entryPoint: ' + entryPoint);

@@ -1,3 +1,6 @@
+import {baseUrl, baseRestUrl} from './config';
+import angular from './angular';
+
 /**
 * Is true if the current browser has a mobile user agent.
 * @return {Boolean}
@@ -7,73 +10,111 @@ export function isMobile() {
 }
 
 /**
+ * Generator to iterate over array and object key,value pairs.
+ *
+ * Use it like:
+ *
+ * for (let [key, value] of each(myObject)) {
+ * }
+ * 
+ */
+export function *each(obj) {
+    for(let key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            yield [key, obj[key]];
+        }
+    }
+}
+
+/**
+ * Generator to iterate over array and object values.
+ */
+export function *eachValue(obj) {
+    for(let key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            yield obj[key];
+        }
+    }
+}
+/**
+ * Generator to iterate over array and object keys.
+ */
+export function *eachKey(obj) {
+    for(let key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            yield key;
+        }
+    }
+}
+
+/**
 * Just for console hacking.
 */
-export function applyRootScope() {
+window.applyRootScope = function() {
     angular.element(document).scope().$apply();
 }
 
 export function isDifferent(a, b) {
     var changed;
-    if ('object' === typeOf(a)) {
+    if (angular.isObject(a)) {
         changed = false;
-        if (Object.getLength(a) !== Object.getLength(b)) {
+        if (Object.keys(a).length !== Object.keys(b).length) {
             return true;
         }
 
-        Object.each(a, function(v, k) {
+        for (let [k, v] of each(a)) {
             if (changed) return false;
             changed = isDifferent(v, b[k]);
-        }.bind(this));
+        }
         return changed;
     }
 
-    if ('array' === typeOf(a)) {
+    if (angular.isArray(a)) {
         changed = false;
         if (a.length !== b.length) {
             return true;
         }
-        Array.each(a, function(v, k) {
+        for (let [k, v] of each(a)) {
             if (changed) return false;
             changed = isDifferent(v, b[k]);
-        }.bind(this));
+        }
         return changed;
     }
 
     return !angular.equals(a, b);
 }
 
-export function logger() {
-    var args = Array.prototype.slice.call(arguments);
+export function logger(...args) {
     args.unshift('Logger: ');
     console.log.apply(console, args);
 }
 
-/**
-* Replaces all <, >, & and " with html so you can use it in safely innerHTML.
-*
-* @param {String}   value
-* @returns {string} Safe for innerHTML usage.
-*/
-export function htmlEntities(value) {
-    if ('null' === typeOf(value)) return '';
-    if ('array' === typeOf(value)) {
-        Array.each(value, function(v, k) {
-            value[k] = htmlEntities(v);
-        });
-        return value;
-    }
-    if ('object' === typeOf(value)) {
-        Object.each(value, function(v, k) {
-            value[k] = htmlEntities(v);
-        });
-        return value;
-    }
-    if ('element' === typeOf(value)) {
-        return value;
-    }
-    return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
+// /**
+// * Replaces all <, >, & and " with html so you can use it in safely innerHTML.
+// *
+// * @param {String}   value
+// * @returns {string} Safe for innerHTML usage.
+// */
+// export function htmlEntities(value) {
+//     if (!value) return '';
+//     if (angular.isArray(value)) {
+
+//         Array.each(value, function(v, k) {
+//             value[k] = htmlEntities(v);
+//         });
+//         return value;
+//     }
+//     if ('object' === typeOf(value)) {
+//         Object.each(value, function(v, k) {
+//             value[k] = htmlEntities(v);
+//         });
+//         return value;
+//     }
+//     if ('element' === typeOf(value)) {
+//         return value;
+//     }
+//     return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+// }
 
 /**
 *
@@ -84,10 +125,10 @@ export function getPublicPath(path) {
     if (matches && matches[1]) {
         path = 'bundles/'+getShortBundleName(matches[1]) + '/' + matches[2];
     }
-    return _path + path;
+    return baseUrl + path;
 }
 
-export function countWatchers() {
+window.countWatchers = function() {
     var root = angular.element(document);
     var watchers = [];
 
@@ -131,13 +172,13 @@ export function countWatchers() {
 * @param {String} prefix
 */
 export function addFieldKeyPrefix(fields, prefix) {
-    Object.each(fields, function(field, key) {
+    for (let [key, field] of each(fields)) {
         fields[prefix + '[' + key + ']'] = field;
         delete fields[key];
         if (fields.children) {
             addFieldKeyPrefix(field.children, prefix);
         }
-    });
+    }
 }
 
 /**
@@ -173,15 +214,15 @@ export function getClass(classPath) {
 */
 export function urlEncode(value) {
 	var result;
-    if (typeOf(value) == 'string') {
+    if (angular.isString(value)) {
         return encodeURIComponent(value).replace(/\%2F/g, '%252F'); //fix apache default setting
-    } else if (typeOf(value) == 'array') {
+    } else if (angular.isArray(value)) {
         result = '';
         Array.each(value, function(item) {
             result += urlEncode(item) + ',';
         });
         return result.substr(0, result.length - 1);
-    } else if (typeOf(value) == 'object') {
+    } else if (angular.isObject(value)) {
         result = '';
         Array.each(value, function(item, key) {
             result += key + '=' + urlEncode(item) + ',';
@@ -200,7 +241,7 @@ export function urlEncode(value) {
 * @return {String}
 */
 export function urlDecode(value) {
-    if (typeOf(value) != 'string') {
+    if (!angular.isString(value)) {
         return value;
     }
 
@@ -261,7 +302,7 @@ export function normalizeEntryPointPath(path) {
 */
 export function mediaPath(path) {
 
-    if (typeOf(path) != 'string') {
+    if (!angular.isString(path)) {
         return path;
     }
 
@@ -270,11 +311,11 @@ export function mediaPath(path) {
     }
 
     if (path.substr(0, 1) == '/') {
-        return _path + path.substr(1);
+        return baseUrl + path.substr(1);
     } else if (path.substr(0, 7) == 'http://') {
         return path;
     } else {
-        return _path + '' + path;
+        return baseUrl + '' + path;
     }
 }
 
@@ -299,7 +340,7 @@ export function getObjectUrl(objectKey, id) {
 * @return {String}
 */
 export function getCroppedObjectId(url) {
-    if ('string' !== typeOf(url)) {
+    if (!angular.isString(url)) {
         return url;
     }
 
@@ -332,7 +373,7 @@ export function compare(a, b) {
 * @return {String} the objectKey
 */
 export function getCroppedObjectKey(url) {
-    if ('string' !== typeOf(url)) {
+    if (!angular.isString(url)) {
         return url;
     }
 
@@ -404,7 +445,7 @@ export function getShortBundleName(bundleName) {
 * @returns {String}
 */
 export function getEntryPointPathForRelative(current, relativePath) {
-    if (typeOf(relativePath) != 'string' || !relativePath) {
+    if (!angular.isString(relativePath) || !relativePath) {
         return current;
     }
 
@@ -422,9 +463,9 @@ export function getEntryPointPathForRelative(current, relativePath) {
 
 export function simpleClone(value) {
     var result = {};
-    Object.each(value, function(val, key) {
+    for (let [key, val] of each(value)) {
         result[key] = val;
-    });
+    }
 
     return result;
 }
@@ -482,7 +523,7 @@ export function getFieldCaching() {
                         }
                     }
                 },
-                'cache_params[files_path]': {
+                'cache_params[files]': {
                     needValue: 'files',
                     type: 'text',
                     label: 'Caching directory',
@@ -552,44 +593,6 @@ export function generateNoise(element, opacity) {
     element.style.backgroundImage = "url(" + canvas.toDataURL("image/png") + ")";
 }
 
-/**
- * Generator to iterate over array and object key,value pairs.
- *
- * Use it like:
- *
- * for (let [key, value] of each(myObject)) {
- * }
- * 
- */
-export function *each(obj) {
-    for(let key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            yield [key, obj[key]];
-        }
-    }
-}
-
-/**
- * Generator to iterate over array and object values.
- */
-export function *eachValue(obj) {
-    for(let key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            yield obj[key];
-        }
-    }
-}
-/**
- * Generator to iterate over array and object keys.
- */
-export function *eachKey(obj) {
-    for(let key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            yield key;
-        }
-    }
-}
-
 export function toQueryString(obj) {
     var parts = [];
     for (var i in obj) {
@@ -600,7 +603,7 @@ export function toQueryString(obj) {
     return parts.join("&");
 }
 
-import {Field, Filter, Parser, Directive, Inject, InjectAsProperty} from './annotations';
+import {Field, Label, Filter, Parser, Directive, Inject, InjectAsProperty} from './annotations';
 
 /**
  * Prepares a class constructor for angular depency injection.
@@ -664,7 +667,8 @@ export function registerModuleField(angularModule, controller) {
 
     var directiveName = 'jarves' + FieldAnnotation.name.ucfirst() + 'Field';
 
-    var options = {
+    var options = FieldAnnotation.options || {};
+    options = angular.extend({
         restrict: 'A',
         controller: controller,
         scope: true,
@@ -695,7 +699,7 @@ export function registerModuleField(angularModule, controller) {
 
             ownController.link.apply(ownController, [scope, element, attr, controllersToPass, transclude]);
         }
-    };
+    }, options);
 
     console.log('register field', FieldAnnotation.name, options);
     angularModule.directive(
@@ -722,6 +726,55 @@ export function registerModuleFilter(angularModule, controller) {
 }
 
 /**
+ * Registers a new jarves label.
+ * 
+ * @param  {AngularModule} angularModule
+ * @param  {Function} controller
+ */
+export function registerModuleLabel(angularModule, controller) {
+
+
+    var parser = new Parser(controller);
+    var annotations = parser.getAnnotations(Label);
+    if (!annotations.length) {
+        throw 'No Field annotations on class ' + controller
+    }
+    var LabelAnnotation = annotations[0];
+    controller = getPreparedConstructor(controller);
+
+    var directiveName = 'jarves' + LabelAnnotation.name.ucfirst() + 'Label';
+
+
+    var options = LabelAnnotation.options || {};
+    options = angular.extend({
+        restrict: 'A',
+        controller: controller,
+        scope: true,
+        require: [directiveName, '?^jarvesForm'],
+        link: function(scope, element, attr, ctrl, transclude) {
+            var ownController = ctrl[0];
+            scope.controller = ownController;
+            var controllersToPass = ctrl;
+            controllersToPass.shift();
+
+            if (controllersToPass && 1 === controllersToPass.length) {
+                controllersToPass = controllersToPass[0];
+            }
+
+            ownController.link.apply(ownController, [scope, element, attr, controllersToPass, transclude]);
+        }
+    }, options);
+
+    console.log('register label', LabelAnnotation.name, options);
+    angularModule.directive(
+        directiveName,
+        function() {
+            return options;
+        }
+    );
+}
+
+/**
  * Registers a new angular directive.
  * 
  * @param  {AngularModule} angularModule
@@ -744,13 +797,13 @@ export function registerModuleDirective(angularModule, controller) {
     }
 
     if (!definition.link) {
-        if ('array' === typeof definition.require && DirectiveAnnotation.name !== definition.require[0]) {
+        if (angular.isArray(definition.require) && DirectiveAnnotation.name !== definition.require[0]) {
             definition.require.unshift(DirectiveAnnotation.name);
         }
 
         definition.link = function(scope, element, attr, ctrl, transclude) {
             var ownController, controllersToPass;
-            if ('array' === typeof ctrl) {
+            if (angular.isArray(ctrl)) {
                 ownController = ctrl[0];
                 controllersToPass = ctrl;
                 controllersToPass.shift();
@@ -769,7 +822,7 @@ export function registerModuleDirective(angularModule, controller) {
     }
 
     console.log('register directive', DirectiveAnnotation.name, definition);
-    var options = 'function' === typeof definition || 'array' === typeof definition
+    var options = angular.isFunction(definition) || angular.isArray(definition)
         ? definition
         : function(){ return definition; };
 

@@ -1,4 +1,5 @@
 import {Directive} from '../annotations';
+import {baseUrl, baseRestUrl} from '../config';
 
 @Directive('icon', {
     restrict: 'A'
@@ -19,7 +20,7 @@ export default class Icon {
                 this.oldClass = value.substr(1);
             } else {
                 this.oldImg = new Element('img', {
-                    src: _path + value
+                    src: baseUrl + value
                 }).inject(element[0], 'top');
             }
 

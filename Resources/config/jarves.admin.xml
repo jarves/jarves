@@ -12,7 +12,9 @@
             <asset type="module" src="@JarvesBundle/JarvesApp.js"/>
             <assets type="module" src="@JarvesBundle/controller/*"/>
             <assets type="module" src="@JarvesBundle/fields/*"/>
+            <assets type="module" src="@JarvesBundle/labels/*"/>
             <assets type="module" src="@JarvesBundle/services/*"/>
+            <assets type="module" src="@JarvesBundle/directives/*"/>
             <assets type="module" src="@JarvesBundle/directives/*"/>
             <asset src="@JarvesBundle/fonts/icons/style.css"/>
 

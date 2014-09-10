@@ -26,8 +26,8 @@ export default class ObjectCollection {
         if (!this.customEntryPoint) {
             this.entryPoint = 'object/' + normalizeObjectKey(objectKey);
         }
-        this.objectRepository.offObjectChange(this.reload);
-        this.objectRepository.onObjectChange(this.objectKey, this.reload);
+        this.objectRepository.offObjectChange(() => this.reload());
+        this.objectRepository.onObjectChange(this.objectKey, () => this.reload());
     }
 
     setOrder(field) {

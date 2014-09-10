@@ -3,7 +3,10 @@ import {each} from '../utils';
 
 @Directive('jarvesFormGroup', {
     restrict: 'E',
-    scope: true,
+    scope: {
+        'fields': '=',
+        'model': '='
+    },
     require: ['jarvesFormGroup'],
 })
 @Inject('$scope, $element, $attrs, $compile, $interpolate')
@@ -35,13 +38,13 @@ export default class JarvesFormGroup {
 
     link(scope, element, attributes, controllers) {
 
-        if (controllers[1]) {
-            this.formController = controllers[1];
+        // if (controllers[1]) {
+        //     this.formController = controllers[1];
 
-            if (this.formController) {
-                this.formController.addFormGroup(this.getName(), this);
-            }
-        }
+        //     if (this.formController) {
+        //         this.formController.addFormGroup(this.getName(), this);
+        //     }
+        // }
 
         this.$scope.$parent.$watch(attributes.fields, (fields) => {
             var xml = this.buildXml(fields, 'fields');
@@ -57,7 +60,7 @@ export default class JarvesFormGroup {
 
         var spacing = ' '.repeat(depth * 4);
 
-        for (let [field, idx] of each(fields)) {
+        for (let [id, field] of each(fields)) {
             field.id = field.id || id;
 
             var modelName = parentModelName + '.' + id;

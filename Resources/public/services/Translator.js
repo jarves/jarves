@@ -1,10 +1,10 @@
 import {Inject} from '../annotations';
 
-@Inject('$rootScope, $http')
+@Inject('$rootScope, backend')
 export default class Translator {
-    constructor($rootScope, $http) {
+    constructor($rootScope, backend) {
         this.rootScope = $rootScope;
-        this.http = $http;
+        this.backend = backend;
         this.translations = {};
         this.currentLanguage = 'en';
     }
@@ -18,7 +18,7 @@ export default class Translator {
 
         //Asset.javascript(_pathAdmin + 'admin/ui/language-plural?lang=' + this.currentLanguage);
 
-        this.http.get(_pathAdmin + 'admin/ui/language?lang=' + this.currentLanguage, {})
+        this.backend.get('admin/ui/language?lang=' + this.currentLanguage, {})
             .success(function(response){
                 this.rootScope.jarvesTranslation = response.data || {};
             }.bind(this));

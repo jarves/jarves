@@ -1,5 +1,6 @@
 import {isDifferent, each} from '../utils';
 import {Directive, Inject} from '../annotations';
+import angular from '../angular';
 
 @Directive('jarvesForm', {
     restrict: 'E',
@@ -180,7 +181,7 @@ export default class JarvesForm {
             var id = this.jarves.getObjectUrlId(this.getObjectKey(), this.originalData);
 
             this.backend.patch(this.getEntryPoint() + '/' + id, data)
-                .success(() => this.handleSaveResponse());
+                .success((response) => this.handleSaveResponse(response));
         });
     }
 
@@ -188,7 +189,7 @@ export default class JarvesForm {
         this.callSave().then(() => {
             var data = this.$scope.model;
             this.backend.post(this.getEntryPoint() + '/', data)
-                .success(() => this.handleSaveResponse());
+                .success((response) => this.handleSaveResponse(response));
         });
     }
 
@@ -216,7 +217,7 @@ export default class JarvesForm {
         for (let [idx, field] of each(this.fields)) {
             try {
                 var promise = field.save();
-                if ('object' === typeof promise && promise.then) {
+                if (angular.isObject(promise) && promise.then) {
                     promise.then(function done(){
                         setDone(idx);
                     }, function error(message) {

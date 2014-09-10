@@ -25,6 +25,25 @@ abstract class ObjectCrudController extends ObjectCrud
         Return $request ? Objects::normalizeObjectKey($request->attributes->get('_jarves_object')) : '';
     }
 
+    /**
+     * @ApiDoc(
+     *    description="Returns the class definition/properties of the class behind this Framework-Window"
+     * )
+     *
+     * @Rest\View()
+     * @Rest\Options("/")
+     *
+     * @return array
+     */
+    public function getInfoAction()
+    {
+        $obj = $this->getObj();
+        $info = $obj->getInfo();
+        $info['_isClassDefinition'] = true;
+
+        return $info;
+    }
+
 //    maybe in v1.1
 //    public function getCondition()
 //    {

@@ -1,3 +1,5 @@
+import angular from './angular';
+
 export class Directive {
     constructor(name, options){
         this.name = name;
@@ -12,6 +14,13 @@ export class Filter {
 }
 
 export class Field {
+    constructor(name, options){
+        this.name = name;
+        this.options = options;
+    }
+}
+
+export class Label {
     constructor(name, options){
         this.name = name;
         this.options = options;
@@ -58,7 +67,7 @@ export class Parser {
 	extractAnnotations(constructor) {
 		var annotations = constructor.annotations || [];
 		var parent = Object.getPrototypeOf(constructor);
-		if ('function' === typeof parent) {
+		if (angular.isFunction(parent)) {
 			annotations = annotations.concat(this.extractAnnotations(parent));
 		}
 		return annotations;

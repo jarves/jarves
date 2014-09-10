@@ -1,8 +1,11 @@
-export default class LoginController{
-    constructor($rootScope, $scope, $http, translator, jarves) {
+import {Inject} from '../annotations';
+
+@Inject('$rootScope, $scope, backend, translator, jarves')
+export default class LoginController {
+    constructor($rootScope, $scope, backend, translator, jarves) {
         this.rootScope = $rootScope;
         this.scope = $scope;
-        this.http = $http;
+        this.backend = backend;
         this.translator = translator;
         this.jarves = jarves;
         this.scope.doLogin = () => this.doLogin();
@@ -47,7 +50,7 @@ export default class LoginController{
     doLogin() {
         this.blockInput();
         this.scope.loginStatus = 1;
-        this.http.post(_pathAdmin + 'admin/login', this.scope.credentials)
+        this.backend.post('admin/login', this.scope.credentials)
             .success((response) => this.success(response))
             .error((response) => this.error(response));
     }

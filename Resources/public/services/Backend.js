@@ -1,5 +1,5 @@
-
 import {Inject} from '../annotations';
+import {baseRestUrl} from '../config';
 
 @Inject('$rootScope, $http')
 export default class Backend {
@@ -14,7 +14,10 @@ export default class Backend {
      * @returns {String}
      */
     getUrl(url) {
-        return _pathAdmin + url;
+        if (!url) {
+            throw new 'No url defined';
+        }
+        return baseRestUrl + url;
     }
 
     preparePromise(httpPromise) {

@@ -1,7 +1,17 @@
 <window-frame>
 
-    <jarves-form name="main" pk="{id: 2}" object="jarvespublication/newsCategory" entry-point="'object/jarvespublication/newsCategory'">
+My List ({{myListSelected}})
+	<jarves-list model="myListSelected" items="[{title: 'teschd'}, {title: 'another'}]">
+		<jarves-list-template>
+			{{item.title}}
+		</jarves-list-template>
+	</jarves-list>
 
+Category List ({{categoryListSelected}})
+	<jarves-list model="categoryListSelected" entry-point="'object/jarvespublication/newsCategory'">
+	</jarves-list>
+
+    <jarves-form name="main" pk="{id: 2}" object="jarvespublication/newsCategory" entry-point="'object/jarvespublication/newsCategory'">
         <jarves-field type="text" label="Title" model="model.title"></jarves-field>
         <jarves-field type="file" label="File" model="model.file"></jarves-field>
 
@@ -10,7 +20,6 @@
         form: {{form.getName()}}<br/>
 
         <button ng-click="form.save()">Save</button>
-
     </jarves-form>
 
 </window-frame>
