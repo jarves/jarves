@@ -1,7 +1,8 @@
-jarves.Filters.toArray = new Class({
-    JarvesFilter: 'toArray',
+import {Filter} from '../annotations';
 
-    filter: function (obj) {
+@Filter('toArray')
+export default class ToArray {
+    filter(obj) {
         if (!(obj instanceof Object)) {
             return obj;
         }
@@ -10,4 +11,4 @@ jarves.Filters.toArray = new Class({
             return Object.defineProperty(obj[key], '$key', {__proto__: null, value: key});
         });
     }
-});
+}

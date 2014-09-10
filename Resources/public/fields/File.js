@@ -1,18 +1,18 @@
-jarves.Fields.File = new Class({
-    Extends: jarves.AbstractFieldType,
+import AbstractFieldType from './AbstractFieldType';
+import {Field, InjectAsProperty} from '../annotations';
 
-    Statics: {
-        $inject: ['$scope', '$element', '$attrs', '$timeout', '$compile', '$http', '$templateCache', '$q', '$interpolate', 'objectRepository', 'jarves']
-    },
+@Field('file')
+@InjectAsProperty('objectRepository')
+export default class File extends AbstractFieldType {
+    constructor(){
+        super.apply(this, arguments);
+        this.template = 'bundles/jarves/admin/js/views/field.file.html';
+        this.path = '';
+        this.value = '';
+        this.objectRepository = null;
+    }
 
-    JarvesField: 'file',
-
-    template: 'bundles/jarves/admin/js/views/field.file.html',
-
-    path: '',
-    value: '',
-
-    link: function(scope, element, attr) {
+    link(scope, element, attr) {
         this.parent(scope, element, attr);
 
         this.renderTemplateUrl(
@@ -23,18 +23,17 @@ jarves.Fields.File = new Class({
             this.value = value;
             this.updateSelected();
         }.bind(this));
+    }
 
-    },
+    openChooser() {
 
-    openChooser: function() {
+    }
 
-    },
+    updateSelected() {
 
-    updateSelected: function() {
+    }
 
-    },
-
-    save: function() {
+    save() {
         var deferred = this.$q.defer();
 
         this.$timeout(function() {
@@ -43,4 +42,4 @@ jarves.Fields.File = new Class({
 
         return deferred.promise;
     }
-});
+}

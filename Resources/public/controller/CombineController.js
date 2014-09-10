@@ -1,15 +1,15 @@
 import ListController from './ListController';
 
 export default class CombineController extends ListController {
-    constructor(scope) {
+    constructor($scope, ...deps) {
         this.currentView = 1;
         this.editView = 1;
         this.selected = null;
 
-        super(scope);
-        scope.forms = {};
+        super($scope, ...deps);
+        $scope.forms = {};
 
-        scope.$watch('controller.selected', function(value) {
+        $scope.$watch('controller.selected', function(value) {
             if (value) {
                 //console.log('combine selected: ', this.selected);
                 this.currentView = 2;

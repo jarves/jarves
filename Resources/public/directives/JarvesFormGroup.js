@@ -1,36 +1,28 @@
-jarves.Directives.JarvesFormGroup = new Class({
-    Statics: {
-        $inject: ['$scope', '$element', '$attrs', '$compile', '$interpolate']
-    },
-    JarvesDirective: {
-        name: 'jarvesFormGroup',
-        options: {
-            restrict: 'E',
-            scope: {
-                'fields': '=',
-                'model': '='
-            },
-            require: ['jarvesFormGroup'],
-            controller: true
-        }
-    },
+import {Directive, Inject} from '../annotations';
+import {each} from '../utils';
 
-    fields: {},
-    editController: null,
-
-    initialize: function($scope, $element, $attributes, $compile, $interpolate) {
+@Directive('jarvesFormGroup', {
+    restrict: 'E',
+    scope: true,
+    require: ['jarvesFormGroup'],
+})
+@Inject('$scope, $element, $attrs, $compile, $interpolate')
+export default class JarvesFormGroup {
+    constructor($scope, $element, $attrs, $compile, $interpolate) {
+        this.fields = {};
+        this.editController = null;
         this.$scope = $scope;
         this.$element = $element;
-        this.$attributes = $attributes;
+        this.$attrs = $attrs;
         this.$compile = $compile;
         this.$interpolate = $interpolate;
-    },
+    }
 
-    getName: function() {
-        return this.$attributes.name ? this.$interpolate(this.$attributes.name)(this.$scope) : '';
-    },
+    getName() {
+        return this.$attrs.name ? this.$interpolate(this.$attributes.attrs)(this.$scope) : '';
+    }
 
-    isValid: function(highlight) {
+    isValid(highlight) {
         var valid = true;
         Object.each(this.fields, function(field) {
             if (!field.isValid(highlight)) {
@@ -39,9 +31,9 @@ jarves.Directives.JarvesFormGroup = new Class({
         });
 
         return valid;
-    },
+    }
 
-    link: function(scope, element, attributes, controllers) {
+    link(scope, element, attributes, controllers) {
 
         if (controllers[1]) {
             this.formController = controllers[1];
@@ -51,21 +43,21 @@ jarves.Directives.JarvesFormGroup = new Class({
             }
         }
 
-        this.$scope.$watch('fields', function(fields) {
+        this.$scope.$parent.$watch(attributes.fields, (fields) => {
             var xml = this.buildXml(fields, 'fields');
             this.$element.html(xml);
             this.$compile(this.$element.contents())(this.$scope);
-        }.bind(this));
-    },
+        });
+    }
 
-    buildXml: function(fields, parentModelName, depth) {
+    buildXml(fields, parentModelName, depth) {
         var xml = [];
 
         depth = depth || 0;
 
         var spacing = ' '.repeat(depth * 4);
 
-        Object.each(fields, function(field, id) {
+        for (let [field, idx] of each(fields)) {
             field.id = field.id || id;
 
             var modelName = parentModelName + '.' + id;
@@ -76,8 +68,8 @@ jarves.Directives.JarvesFormGroup = new Class({
             }
             line += spacing + '</jarves-field>\n';
             xml.push(line);
-        }.bind(this));
+        }
 
         return xml.join("\n");
     }
-});
+}

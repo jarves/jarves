@@ -1,23 +1,16 @@
-jarves.Directives.Translate = new Class({
+import {Directive} from '../annotations';
 
-    Statics: {
-        $inject: ['translator', '$parse']
-    },
+@Directive('translate', {
+    restrict: 'A'
+})
+export default class Translate {
 
-    JarvesDirective: {
-        name: 'translate',
-        options: {
-            restrict: 'A',
-            controller: true
-        }
-    },
-
-    initialize: function(translator, parse) {
+    constructor(translator, $parse) {
         this.translator = translator;
-        this.parse = parse;
-    },
+        this.$parse = $parse;
+    }
 
-    link: function(scope, element, attributes) {
+    link(scope, element, attributes) {
         this.scope = scope;
         this.element = element;
         this.plural = attributes['translatePlural'];
@@ -32,24 +25,23 @@ jarves.Directives.Translate = new Class({
         this.translator.watch(this.translate.bind(this));
 
         this.translate();
-    },
+    }
 
-    translate: function() {
+    translate() {
         var translated;
 
         if (this.originText) {
-            translated = this.translator.translate(this.originText, this.parse(this.plural)(this.scope), this.plural);
+            translated = this.translator.translate(this.originText, this.$parse(this.plural)(this.scope), this.plural);
             if (this.element.text() !== translated) {
                 this.element.text(translated);
             }
         }
 
         if (this.originPlaceholder) {
-            translated = this.translator.translate(this.parse(this.originPlaceholder)(this.scope));
+            translated = this.translator.translate(this.$parse(this.originPlaceholder)(this.scope));
             if (this.element.attr('placeholder') !== translated) {
                 this.element.attr('placeholder', translated);
             }
         }
     }
-
-});
+}

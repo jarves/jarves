@@ -1,16 +1,13 @@
-jarves.Directives.Button = new Class({
-    JarvesDirective: {
-        name: 'button',
-        options: {
-            restrict: 'E',
-            controller: true
-        }
-    },
+import {Directive} from '../annotations';
 
-    link: function(scope, element, attributes) {
+@Directive('button', {
+    restrict: 'E'
+})
+export default class Button {
+    link(scope, element, attributes) {
         element.addClass('jarves-Button');
         if (attributes['pressed']) {
-            scope.$watch(attributes['pressed'], function(pressed){
+            scope.$watch(attributes['pressed'], (pressed) => {
                 if (pressed) {
                     element.addClass('jarves-Button-pressed');
                 } else {
@@ -19,5 +16,4 @@ jarves.Directives.Button = new Class({
             });
         }
     }
-
-});
+}

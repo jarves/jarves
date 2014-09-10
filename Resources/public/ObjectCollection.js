@@ -1,83 +1,81 @@
-jarves.ObjectCollection = new Class({
-    Binds: ['handleLoadResponse', 'reload'],
-    Statics: {
-        $inject: ['$q', 'backend', 'objectRepository']
-    },
+import {Inject} from './annotations';
+import {normalizeObjectKey, toQueryString} from './utils';
+import angular from './angular';
+ 
+@Inject('$q, backend, objectRepository')
+export default class ObjectCollection {
+    constructor($q, backend, objectRepository) {
+        this.objectKey = '';
+        this.selection = [];
+        this.order = '';
+        this.orderDirection = 'asc';
+        this.entryPoint = '';
+        this.customEntryPoint = false;
+        this.repositoryMapping = true;
 
-    objectKey: '',
-    selection: [],
+        this.queryOptions = {};
+        this.callbacks = [];
 
-    order: '',
-    orderDirection: 'asc',
-    entryPoint: '',
-    customEntryPoint: false,
-    repositoryMapping: true,
-
-    queryOptions: {},
-
-    callbacks: [],
-
-    initialize: function($q, backend, objectRepository) {
         this.$q = $q;
         this.backend = backend;
         this.objectRepository = objectRepository;
-    },
+    }
 
-    setObjectKey: function(objectKey) {
+    setObjectKey(objectKey) {
         this.objectKey = objectKey;
         if (!this.customEntryPoint) {
-            this.entryPoint = 'object/' + jarves.normalizeObjectKey(objectKey);
+            this.entryPoint = 'object/' + normalizeObjectKey(objectKey);
         }
         this.objectRepository.offObjectChange(this.reload);
         this.objectRepository.onObjectChange(this.objectKey, this.reload);
-    },
+    }
 
-    setOrder: function(field) {
+    setOrder(field) {
         this.order = field;
-    },
+    }
 
-    setEntryPoint: function(entryPoint) {
+    setEntryPoint(entryPoint) {
         this.entryPoint = entryPoint;
         this.customEntryPoint = !!entryPoint;
         if (!entryPoint && this.objectKey) {
-            this.entryPoint = 'object/' + jarves.normalizeObjectKey(this.objectKey);
+            this.entryPoint = 'object/' + normalizeObjectKey(this.objectKey);
         }
-    },
+    }
 
-    setSelection: function(selection) {
+    setSelection(selection) {
         this.selection = selection;
-    },
+    }
 
-    setQueryOption: function(key, value) {
+    setQueryOption(key, value) {
         this.queryOptions[key] = value;
-    },
+    }
 
-    setRepositoryMapping: function(active) {
+    setRepositoryMapping(active) {
         this.setRepositoryMapping = active;
-    },
+    }
 
-    change: function(fn) {
+    change(fn) {
         this.callbacks.push(fn);
-    },
+    }
 
-    load: function(queryOptions) {
+    load(queryOptions) {
         this.lastQueryOptions = angular.copy(queryOptions);
         queryOptions = queryOptions || {};
-        queryOptions = Object.merge(this.queryOptions, queryOptions);
+        queryOptions = angular.extend(this.queryOptions, queryOptions);
 
         queryOptions.fields = this.selection.join(',');
         queryOptions.order = {};
         queryOptions.order[this.order] = this.orderDirection;
 
-        this.backend.get(this.entryPoint + '/?' + Object.toQueryString(queryOptions))
-            .success(this.handleLoadResponse);
-    },
+        this.backend.get(this.entryPoint + '/?' + toQueryString(queryOptions))
+            .success((response) => this.handleLoadResponse(response));
+    }
 
-    reload: function() {
+    reload() {
         this.load(this.lastQueryOptions);
-    },
+    }
 
-    handleLoadResponse: function(response) {
+    handleLoadResponse(response) {
         //if (this.repositoryMapping) {
         //    this.items = this.objectRepository.mapData(this.objectKey, response.data, true);
         //} else {
@@ -85,12 +83,12 @@ jarves.ObjectCollection = new Class({
         //}
 
         this.fireChanges();
-    },
-
-    fireChanges: function() {
-        Array.each(this.callbacks, function(callback) {
-            callback(this.items);
-        }.bind(this));
     }
 
-});
+    fireChanges() {
+        for (let callback of this.callbacks) {
+            callback(this.items);
+        }
+    }
+
+}

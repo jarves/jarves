@@ -1,3 +1,7 @@
+
+import {Inject} from '../annotations';
+
+@Inject('$rootScope, $http')
 export default class Backend {
     constructor($rootScope, $http) {
         this.$rootScope = $rootScope;

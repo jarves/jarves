@@ -1,16 +1,13 @@
-jarves.Directives.InputText = new Class({
-    JarvesDirective: {
-        name: 'jarvesText',
-        options: {
-            restrict: 'A',
-            controller: true
-        }
-    },
+import {Directive} from '../annotations';
 
-    link: function(scope, element, attributes) {
+@Directive('jarvesText', {
+    restrict: 'A'
+})
+export default class InputText {
+    link(scope, element, attributes) {
         var allowedTypes = ['text', 'password'];
         if (!attributes.type || -1 !== allowedTypes.indexOf(attributes.type)) {
             element.addClass('jarves-Input-text');
         }
     }
-});
+}

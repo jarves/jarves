@@ -1,56 +1,53 @@
-jarves.Directives.JarvesLabel = new Class({
+import {Directive} from '../annotations';
+import {each} from '../utils';
 
-    Statics: {
-        $inject: ['$scope', '$element', '$attrs', '$compile', '$interpolate', 'jarves']
-    },
+@Directive('jarvesLabel', {
+    restrict: 'E',
+    priority: 5000,
+    terminal: true
+})
+export default class JarvesLabel {
+    constructor($scope, $element, $attrs, $compile, $interpolate, jarves) {
+        this.$scope = $scope;
+        this.$element = $element;
+        this.$attrs = $attrs;
+        this.$compile = $compile;
+        this.$interpolate = $interpolate;
+        this.jarves = jarves;
 
-    JarvesDirective: {
-        name: 'jarvesLabel',
-        options: {
-            restrict: 'E',
-            priority: 5000,
-            terminal: true,
-            controller: true
-        }
-    },
+        this.object = null;
+        this.data = null;
+        this.column = null;
+        this.id = null;
+    }
 
-    object: null,
-    data: null,
-    column: null,
-    id: null,
-
-    initialize: function() {
-        var actualArguments = arguments;
-        Array.each(this.Statics.$inject, function(name, index) {
-            this[name] = actualArguments[index];
-        }.bind(this));
-    },
-
-    link: function(scope, element, attributes) {
+    link(scope, element, attributes) {
         if (this.$attrs.definition) {
-            this.$scope.$watch(this.$attrs['definition'], function(definition) {
+            this.$scope.$watch(this.$attrs['definition'], (definition) => {
                 this.load(definition);
-            }.bind(this));
+            });
         } else {
             var definition = {};
             var interpolate = {'object': true, 'id': true, 'type': true};
-            Object.each(attributes, function(value, key) {
+
+            for (let [key, value] of each(attributes)) {
                 if (key in interpolate) {
                     definition[key] = this.$interpolate(value)(this.$scope);
                 } else {
                     definition[key] = this.$scope.$eval(value);
                 }
-            }, this);
+            }
+
             this.load(definition);
         }
-    },
+    }
 
-    load: function(definition) {
+    load(definition) {
         if (!definition.type) {
             console.error(definition);
-            throw 'no type';
+            throw 'no type defined in <jarves-label>';
         }
         this.$element.attr('jarves-%s-label'.sprintf(definition.type.lcfirst()), '');
         this.$compile(this.$element, null, 5000)(this.$scope);
     }
-});
+}

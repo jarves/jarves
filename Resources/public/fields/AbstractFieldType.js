@@ -1,80 +1,67 @@
-jarves.AbstractFieldType = new Class({
+import {Inject} from '../annotations';
 
-    Statics: {
-        $inject: ['$scope', '$element', '$attrs', '$compile', '$parse', '$timeout', '$http', '$templateCache', '$q', '$interpolate']
-    },
+@Inject('$scope', '$element', '$attrs', '$compile', '$parse', '$timeout', '$http', '$templateCache', '$q', '$interpolate')
+export default class AbstractFieldType {
+    constructor($scope, $element, $attrs, $compile, $parse, $timeout, $http, $templateCache, $q, $interpolate) {
+        this.$scope = $scope;
+        this.$element = $element;
+        this.$attrs = $attrs;
+        this.$compile = $compile;
+        this.$parse = $parse;
+        this.$timeout = $timeout;
+        this.$http = $http;
+        this.$templateCache = $templateCache;
+        this.$q = $q;
+        this.$interpolate = $interpolate;
 
-    $scope: null,
-    $element: null,
-    $attrs: null,
-    $compile: null,
-    $http: null,
-    $templateCache: null,
-    $q: null,
-    $parse: null,
-    $timeout: null,
-
-    //valid: false,
-    definition: null,
-    options: {},
-
-    fieldDirective: null,
-    parentFieldDirective: null,
-
-    children: [],
-    form: null,
-
-    optionsReferences: ['definition'],
-
-    initialize: function() {
-        var actualArguments = arguments;
-
-        Array.each(this.Statics.$inject, function(name, index) {
-            this[name] = actualArguments[index];
-        }.bind(this));
-
+        this.options = {};
+        this.definition = null;
+        this.form = null;
+        this.children = [];
+        this.fieldDirective = null;
+        this.parentFieldDirective = null;
+        this.optionsReferences = ['definition'];
+        this.additionalOptionsReferences = [];
         this.$scope.controller = this;
 
         this.optionsReferencesMap = {};
-        Array.each(this.optionsReferences, function(item){
+        this.optionsReferencesMap = {};
+
+        for (let item of this.optionsReferences) {
             this.optionsReferencesMap[item] = true;
-        }, this);
-        Array.each(this.additionalOptionsReferences, function(item){
+        }
+
+        for (let item of this.additionalOptionsReferences) {
             this.optionsReferencesMap[item] = true;
-        }, this);
+        }
 
-        this.destructorBound = function() {
-            //$scope.$off('$destroy', this.destructorBound);
-            this.destructor();
-        }.bind(this);
+        this.$scope.$on('$destroy', () => this.destructor());
+    }
 
-        this.$scope.$on('$destroy', this.destructorBound);
-    },
+    destructor() {
 
-    destructor: function() {
-
-    },
+    }
 
     /**
      * @param {jarves.Directives.JarvesForm} form
      */
-    setForm: function(form) {
+    setForm(form) {
         this.form = form;
-    },
+    }
 
-    getId: function() {
+    getId() {
         return this.getOption('id');
-    },
+    }
 
-    getModelName: function() {
+    getModelName() {
         return this.getOption('model') ||  'model.' + this.getOption('id');
-    },
+    }
 
-    getParentModelName: function() {
+    getParentModelName() {
         return '$parent.' + this.getModelName();
-    },
+    }
 
-    renderTemplateUrl: function(url, beforeCompile){
+    renderTemplateUrl(url, beforeCompile){
         var deferred = this.$q.defer();
         this.$http.get(url, {cache: this.$templateCache})
             .success(function(response){
@@ -88,28 +75,28 @@ jarves.AbstractFieldType = new Class({
                 deferred.resolve();
             }.bind(this));
         return deferred.promise;
-    },
+    }
 
-    injectFieldElement: function(element) {
+    injectFieldElement(element) {
         if (this.fieldContainer) {
             this.fieldContainer.append(element);
         } else {
             this.$element.prepend(element);
         }
-    },
+    }
 
-    renderTemplate: function(element) {
+    renderTemplate(element) {
         element = angular.element(element);
         this.injectFieldElement(element);
         this.$compile(element)(this.$scope);
-    },
+    }
 
     /**
      *
      * @param {String} name
      * @returns {*}
      */
-    getOption: function(name) {
+    getOption(name) {
         if (this.options[name]) {
             return this.options[name];
         } else {
@@ -132,49 +119,49 @@ jarves.AbstractFieldType = new Class({
                 return this.options[name] = this.$interpolate(this.$attrs[name])(this.$scope.$parent);
             }
         }
-    },
+    }
 
-    isValid: function(highlight) {
+    isValid(highlight) {
         var valid = true;
 
         return valid;
-    },
+    }
 
-    setValue: function(value) {
+    setValue(value) {
         var modelName = this.getModelName();
         this.$timeout(function() {
             this.$parse(modelName).assign(this.$scope, value);
         }.bind(this));
-    },
+    }
 
-    setModelValue: function(modelName, value) {
+    setModelValue(modelName, value) {
         this.$timeout(function() {
             this.$parse(modelName).assign(this.$scope, value);
         }.bind(this));
-    },
+    }
 
-    getModelValue: function(modelName) {
+    getModelValue(modelName) {
         return this.$scope.$eval(modelName);
-    },
+    }
 
-    getValue: function() {
+    getValue() {
         var modelName = this.getModelName();
         return this.$scope.$eval(modelName);
-    },
+    }
 
-    //getModelName: function() {
+    //getModelName() {
     //    return this.getOption('model') || '$parent.model.' + this.getOption('id');
     //},
 
-    getRelativeModelName: function(key) {
+    getRelativeModelName(key) {
         var myModelName = this.getModelName();
         var parts = myModelName.split('.');
         parts.pop();
 
         return parts.join('.') + '.' + key;
-    },
+    }
 
-    link: function(scope, element, attributes) {
+    link(scope, element, attributes) {
         if (this.getOption('noWrapper')) {
             return;
         }
@@ -195,38 +182,38 @@ jarves.AbstractFieldType = new Class({
         this.$compile(this.descElement)(this.$scope);
         this.$compile(this.labelElement)(this.$scope);
         this.$compile(this.fieldContainer)(this.$scope);
-    },
+    }
 
-    save: function() {
+    save() {
         return true;
-    },
+    }
 
     /**
      *
      * @param {jarves.AbstractFieldType} child
      */
-    addChildren: function(child) {
+    addChildren(child) {
         this.children.push(child);
-    },
+    }
 
     /**
      *
      * @param {jarves.Directives.JarvesField} controller
      */
-    setFieldDirective: function(directiveController){
+    setFieldDirective(directiveController){
         this.fieldDirective = directiveController;
-    },
+    }
 
     /**
      *
      * @param {jarves.Directives.JarvesField} directiveController
      */
-    setParentFieldDirective: function(directiveController) {
+    setParentFieldDirective(directiveController) {
         this.parentFieldDirective = directiveController;
         this.parentFieldDirective.getController().addChildren(this);
-    },
+    }
 
-    getParentController: function() {
+    getParentController() {
         return this.parentFieldDirective.getController();
     }
-});
+}

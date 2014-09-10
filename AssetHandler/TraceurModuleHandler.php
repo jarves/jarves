@@ -82,13 +82,15 @@ class TraceurModuleHandler extends JsHandler implements CompileHandlerInterface
                 array_pop($mapName);
                 $mapName[] = 'map';
                 $mapName = implode('.', $mapName);
-                $this->jarves->getWebFileSystem()->move('traceur_compiled.map', $mapName);
                 $contents = file_get_contents($output);
-                $contents = str_replace(
-                    '//# sourceMappingURL=traceur_compiled.map',
-                    '//# sourceMappingURL=' . basename($mapName),
-                    $contents
-                );
+                if (file_exists('traceur_compiled.map')) {
+                    $this->jarves->getWebFileSystem()->move('traceur_compiled.map', $mapName);
+                    $contents = str_replace(
+                        '//# sourceMappingURL=traceur_compiled.map',
+                        '//# sourceMappingURL=' . basename($mapName),
+                        $contents
+                    );
+                }
                 $contents .= "//compile-md5: $md5";
                 file_put_contents($output, $contents);
             } else {

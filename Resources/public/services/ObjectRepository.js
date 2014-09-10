@@ -1,64 +1,49 @@
+import {Inject} from '../annotations';
+import ObjectCollection from '../ObjectCollection';
+import {getPreparedConstructor, each, normalizeObjectKey} from '../utils';
+
+@Inject('$rootScope, $q, $injector, $timeout, backend, jarves')
 export default class ObjectRepository {
-
-    //Statics: {
-    //    $inject: ['$rootScope', '$q', '$injector', '$timeout', 'backend', 'jarves']
-    //},
-    //JarvesService: 'objectRepository',
-    //
-    //instancePool: {
-    //},
-    //
-    //
-    //changesCallback: {},
-
-    /**
-     *
-     * @param {Scope} $rootScope
-     * @param $q
-     * @param $injector
-     * @param $timeout
-     * @param {jarves.Services.Backend} backend
-     * @param {jarves.Services.Jarves} jarvesService
-     */
-    constructor($rootScope, $q, $injector, $timeout, backend, jarvesService) {
+    constructor($rootScope, $q, $injector, $timeout, backend, jarves) {
         this.$rootScope = $rootScope;
         this.$q = $q;
         this.$timeout = $timeout;
         this.$injector = $injector;
         this.backend = backend;
-        this.jarves = jarvesService;
-        jarves.fireObjectChange = function(objectKey) {
-            this.fireObjectChange(jarves.normalizeObjectKey(objectKey));
-        }.bind(this);
+        this.jarves = jarves;
+        this.changesCallback = {};
+        jarves.fireObjectChange = (objectKey) => {
+            this.fireObjectChange(normalizeObjectKey(objectKey));
+        };
     }
 
     onObjectChange(objectKey, cb) {
-        if (!this.changesCallback[objectKey]) {
+        if (!(objectKey in this.changesCallback)) {
             this.changesCallback[objectKey] = [];
         }
         this.changesCallback[objectKey].push(cb);
     }
 
     offObjectChange(cb) {
-        Object.each(this.changesCallback, function(cbs, objectKey) {
-            Array.each(cbs, function(cb, idx) {
+        for (let [objectKey, cbs] of each(this.changesCallback)) {
+            for (let [idx, cb] of each(cbs)) {
                 if (cb === cb) {
                     cbs.splice(idx, 1);
                 }
-            });
-        });
+            }
+        }
     }
 
     fireObjectChange(objectKey) {
         if (this.changesCallback[objectKey]) {
-            Array.each(this.changesCallback[objectKey], function(cb) {
+            for (let cb of this.changesCallback[objectKey]) {
                 cb();
-            });
+            }
         }
     }
 
     newCollection(objectKey) {
-        var collection = this.$injector.instantiate(jarves.ObjectCollection);
+        var collection = this.$injector.instantiate(getPreparedConstructor(ObjectCollection));
         collection.setObjectKey(objectKey);
 
         return collection;

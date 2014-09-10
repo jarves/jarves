@@ -751,15 +751,15 @@
   ($traceurRuntime.createClass)(UncoatedModuleInstantiator, {getUncoatedModule: function() {
       if (this.value_)
         return this.value_;
-      try {
+      //try {
         return this.value_ = this.func.call(global);
-      } catch (ex) {
-        if (ex instanceof ModuleEvaluationError) {
-          ex.loadedBy(this.url);
-          throw ex;
-        }
-        throw new ModuleEvaluationError(this.url, ex);
-      }
+      //} catch (ex) {
+      //  if (ex instanceof ModuleEvaluationError) {
+      //    ex.loadedBy(this.url);
+      //    throw ex;
+      //  }
+      //  throw new ModuleEvaluationError(this.url, ex);
+      //}
     }}, {}, UncoatedModuleEntry);
   function getUncoatedModuleInstantiator(name) {
     if (!name)

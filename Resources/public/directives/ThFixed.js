@@ -1,22 +1,8 @@
-jarves.Directives.ThFixed = new Class({
+import {Directive} from '../annotations';
 
-    JarvesDirective: {
-        name: 'fixed',
-        options: ['$parse', function($parse) {
-            return {
-                restrict: 'A',
-                priority: -100,
-                link: function(scope, element, attrs) {
-                    if ('tr' === element[0].tagName.toLowerCase()) {
-                        return new jarves.Directives.ThFixed(scope, element, attrs, $parse);
-                    }
-                }
-            }
-        }]
-    },
-
-    initialize: function(scope, element, attributes, $parse) {
-
-    }
-
-});
+@Directive('fixed', {
+    restrict: 'A',
+    priority: -100,
+})
+export default class ThFixed {
+}

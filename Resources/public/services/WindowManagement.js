@@ -1,6 +1,9 @@
 import Jarves from './Jarves';
 import WindowController from '../controller/WindowController';
+import {each, eachValue} from '../utils';
+import {Inject} from '../annotations';
 
+@Inject('jarves')
 export default class WindowService {
 
     /**
@@ -54,7 +57,7 @@ export default class WindowService {
      */
     checkOpen (entryPoint, instanceId, params) {
         var opened = false;
-        Object.each(this.activeEntryPoints, function (info) {
+        for (let info of eachValue(this.activeEntryPoints)) {
             var win = info.window;
             if (win && win.getEntryPoint() == entryPoint) {
                 if (instanceId && instanceId == win.getId()) {
@@ -67,7 +70,7 @@ export default class WindowService {
                 }
                 opened = win;
             }
-        });
+        }
 
         return opened;
     }
@@ -87,7 +90,7 @@ export default class WindowService {
      * @param {Number|jarves.Controller.WindowController} window
      */
     toFront(window) {
-        if ('number' === typeOf(window)) {
+        if ('number' === typeof window) {
             window = this.getWindow(window);
         }
 

@@ -1,68 +1,54 @@
-jarves.Directives.JarvesField = new Class({
-    Extends: jarves.Directives.AbstractDirective,
+import {Directive, Inject} from '../annotations';
+import AbstractFieldType from '../fields/AbstractFieldType';
 
-    Statics: {
-        $inject: ['$scope', '$element', '$attrs', '$compile', '$http', '$templateCache', '$q']
-    },
-    JarvesDirective: {
-        name: 'jarvesField',
-        options: {
-            restrict: 'E',
-            priority: 5000,
-            terminal: true,
-            controller: true
-        }
-    },
+@Directive('jarvesField', {
+    restrict: 'E',
+    priority: 5000,
+    terminal: true
+})
+@Inject('$scope, $element, $attrs, $compile, $http, $templateCache, $q')
+export default class JarvesField {
+    constructor($scope, $element, $attrs, $compile, $http, $templateCache, $q) {
+        this.$scope = $scope;
+        this.$element = $element;
+        this.$attrs = $attrs;
+        this.$compile = $compile;
+        this.$http = $http;
+        this.$templateCache = $http;
+        this.$q = $q;
+    }
 
-    $scope: null,
-    $element: null,
-    $attrs: null,
-    $compile: null,
-    $http: null,
-    $templateCache: null,
-    $q: null,
-
-    controller: null,
-
-    initialize: function() {
-        var actualArguments = arguments;
-        Array.each(this.Statics.$inject, function(name, index) {
-            this[name] = actualArguments[index];
-        }.bind(this));
-    },
-
-    link: function(scope, element, attributes) {
+    link(scope, element, attributes) {
         if (this.$attrs.definition) {
-            this.$scope.$watch(this.$attrs['definition'], function(definition) {
+            this.$scope.$watch(attributes['definition'], (definition) => {
                 this.load(definition);
-            }.bind(this));
+            });
         } else {
             this.load(attributes);
         }
-    },
+    }
 
-    load: function(definition) {
+    load(definition) {
         if (!definition.type) {
             console.error(definition);
             throw 'no type';
         }
         this.$element.attr('jarves-%s-field'.sprintf(definition.type.lcfirst()), '');
         this.$compile(this.$element, null, 5000)(this.$scope);
-    },
+    }
 
     /**
      *
-     * @param {jarves.AbstractFieldType} controller
+     * @param {AbstractFieldType} controller
      */
-    setController: function(controller){
+    setController(controller){
         this.controller = controller;
-    },
-
-    /**
-     * @returns {jarves.AbstractFieldType}
-     */
-    getController: function() {
-        return this.controller;
     }
 
-});
+    /**
+     * @returns {AbstractFieldType}
+     */
+    getController() {
+        return this.controller;
+    }
+}

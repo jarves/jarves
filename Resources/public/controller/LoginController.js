@@ -5,7 +5,7 @@ export default class LoginController{
         this.http = $http;
         this.translator = translator;
         this.jarves = jarves;
-        this.scope.doLogin = this.doLogin;
+        this.scope.doLogin = () => this.doLogin();
 
         //this.scope.language = Cookie.read('jarves_language') || 'en';
         this.scope.language = 'en';
@@ -48,8 +48,8 @@ export default class LoginController{
         this.blockInput();
         this.scope.loginStatus = 1;
         this.http.post(_pathAdmin + 'admin/login', this.scope.credentials)
-            .success(this.success)
-            .error(this.error);
+            .success((response) => this.success(response))
+            .error((response) => this.error(response));
     }
 
     success(response) {

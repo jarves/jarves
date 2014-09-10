@@ -1,5 +1,7 @@
-export default class AdminController {
+import {Inject} from '../annotations';
 
+@Inject('$rootScope, $scope, $q, $http, jarves, windowManagement')
+export default class AdminController {
     constructor($rootScope, $scope, $q, $http, jarves, windowManagement) {
         this.scope = $scope;
         $rootScope.jarves = jarves;
@@ -13,8 +15,8 @@ export default class AdminController {
         this.scope._pathadmin = _pathAdmin;
         this.scope.windowService = windowManagement;
         this.scope.menuHidden = {};
-        this.scope.loadInterface = this.loadInterface;
-        this.scope.openEntryPoint = this.openEntryPoint;
+        this.scope.loadInterface = (...args) => this.loadInterface(...args);
+        this.scope.openEntryPoint = (...args) => this.openEntryPoint(...args);
 
         this.scope.interfaceVisible = false;
         this.scope._session = window._session;
@@ -95,14 +97,13 @@ export default class AdminController {
      * @throws Error when entryPoint is not found
      */
     openEntryPoint(entryPoint, options, inline, dependWindowId) {
-
-        entryPoint = 'object' === typeOf(entryPoint) ? entryPoint : this.getJarves().getEntryPoint(entryPoint);
+        entryPoint = 'object' === typeof entryPoint ? entryPoint : this.getJarves().getEntryPoint(entryPoint);
 
         if (!entryPoint) {
             throw new Error('Can not be found entryPoint: ' + entryPoint);
         }
 
-        if (['custom', 'iframe', 'list', 'edit', 'add', 'combine'].contains(entryPoint.type)) {
+        if (-1 !== ['custom', 'iframe', 'list', 'edit', 'add', 'combine'].indexOf(entryPoint.type)) {
             return this.loadWindow(entryPoint, options, dependWindowId, inline);
         } else if (entryPoint.type == 'function') {
             //return jarves.entrypoint.exec(entryPoint, options);

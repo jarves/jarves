@@ -1,17 +1,11 @@
-jarves.Directives.Layout = new Class({
+import {Directive, Inject} from '../annotations';
 
-    Statics: {
-        $inject: ['$scope', '$element', '$attrs']
-    },
-    JarvesDirective: {
-        name: 'jarvesLayout',
-        options: {
-            restrict: 'E'
-        }
-    },
-
-    initialize: function(scope, element, attributes) {
-        console.log('new layout', scope, element);
+@Directive('jarvesLayout', {
+    restrict: 'E'
+})
+@Inject('$scope, $element, $attrs')
+export default class Layout {
+    constructor($scope, $element, $attrs) {
+        // console.log('new layout', scope, element);
     }
-
-});
+}

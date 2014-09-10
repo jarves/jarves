@@ -1,14 +1,11 @@
-jarves.Directives.Icon = new Class({
-    JarvesDirective: {
-        name: 'icon',
-        options: {
-            restrict: 'A',
-            controller: true
-        }
-    },
+import {Directive} from '../annotations';
 
-    link: function(scope, element, attributes) {
-        attributes.$observe('icon', function(value) {
+@Directive('icon', {
+    restrict: 'A'
+})
+export default class Icon {
+    link(scope, element, attributes) {
+        attributes.$observe('icon', (value)  => {
             if (this.oldClass) {
                 element.removeClass(this.oldClass);
             }
@@ -31,8 +28,6 @@ jarves.Directives.Icon = new Class({
             } else {
                 element.removeClass('icon-no-text');
             }
-        }.bind(this));
-
+        });
     }
-
-});
+}

@@ -1,19 +1,20 @@
-import utils from '../utils'
+import {getPublicPath,eachValue} from '../utils';
+import angular from '../angular';
 
 export default class WindowController {
-    constructor($scope, $element, $attrs, windowService, jarves) {
+    constructor($scope, $element, $attrs, windowManagement, jarves) {
         this.scope = $scope;
         this.scope.forms = {};
         this.element = $element;
         this.attributes = $attrs;
-        this.windowService = windowService;
+        this.windowManagement = windowManagement;
         this.jarves = jarves;
         this.entryPoint = this.scope.windowInfo.entryPoint;
         this.id = this.scope.windowInfo.id;
         this.parentId = this.scope.parentWindowId;
         this.inline = !!this.scope.isInline;
         this.parameters = this.scope.parameters;
-        this.originParameters = JSON.decode(JSON.encode(this.scope.parameters));
+        this.originParameters = angular.fromJson(angular.toJson(this.scope.parameters));
 
         this.active = false;
         this.title = '';
@@ -21,17 +22,18 @@ export default class WindowController {
         this.sidebar = null;
         this.content = null;
         this.frame = null;
-        this.view = 'bundles/jarves/admin/js/views/window.content.default.html';
+        this.view = 'bundles/jarves/views/window.content.default.html';
 
         if (this.entryPoint.templateUrl) {
-            this.view = utils.getPublicPath(this.entryPoint.templateUrl);
+            this.view = getPublicPath(this.entryPoint.templateUrl);
         } else {
             if ('custom' !== this.entryPoint.type && this.entryPoint.type) {
-                this.view = 'bundles/jarves/admin/js/views/window.content.' + this.entryPoint.type.toLowerCase() + '.html';
+                this.view = 'bundles/jarves/views/window.content.' + this.entryPoint.type.toLowerCase() + '.html';
             }
         }
 
         console.log('new JarvesWindowController', this.entryPoint, this.view);
+
 
         this.scope.windowInfo.window = this;
         this.scope.window = this;
@@ -39,8 +41,8 @@ export default class WindowController {
         this.setTitle(this.entryPoint.label);
 
         if (this.parentId) {
-            if (typeOf(this.parentId) == 'number' && windowService.getWindow(this.parentId)) {
-                windowService.getWindow(this.parentId).setChildren(this);
+            if (typeOf(this.parentId) == 'number' && windowManagement.getWindow(this.parentId)) {
+                windowManagement.getWindow(this.parentId).setChildren(this);
             }
         }
 
@@ -60,8 +62,6 @@ export default class WindowController {
             this.getFrame().attr('with-sidebar', true);
         }
     }
-
-
 
     /**
      *
@@ -151,11 +151,11 @@ export default class WindowController {
 
         titlePath.push(title);
 
-        var path = Array.clone(this.getEntryPointDefinition()._path);
+        var path = this.getEntryPointDefinition()._path || []; //todo, _path is empty 
         path.pop();
-        Array.each(path, function (label) {
+        for (let label of path) {
             titlePath.push(label);
-        }.bind(this));
+        }
 
         titlePath.push(this.scope.title);
         this.titlePath = titlePath;
@@ -186,14 +186,14 @@ export default class WindowController {
     }
 
     close() {
-        this.windowService.unregister(this.getId());
+        this.windowManagement.unregister(this.getId());
     }
 
     loadContent() {
-        this.windowService.toFront(this);
+        this.windowManagement.toFront(this);
 
         if (!this.entryPoint.multi) {
-            var win = this.windowService.checkOpen(this.getEntryPoint(), this.id);
+            var win = this.windowManagement.checkOpen(this.getEntryPoint(), this.id);
             if (win) {
                 if (win.softOpen) {
                     win.softOpen(this.params);

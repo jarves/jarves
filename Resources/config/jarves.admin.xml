@@ -1,19 +1,26 @@
 <config>
     <bundle>
+        <fields>
+            <field name="test" module="@JarvesBundle/fields/Text">
+                <option name="modifier" label="Modifier" />
+            </field>
+        </fields>
         <adminAssets>
-            <!--<asset src="@JarvesBundle/admin/mootools-core-1.4.5-fixed-memory-leak.js />-->
-            <!--<asset src="@JarvesBundle/admin/mootools-more.js />-->
-            <!--<assets src="@JarvesBundle/admin/js/mootools-extras/*.js />-->
-
-            <asset src="@JarvesBundle/libraries/angular.js" />
-            <asset type="module" src="@JarvesBundle/module.js"/>
+            <asset priority="2000" src="@JarvesBundle/libraries/angular.js"/>
+            <assets priority="2000" src="@JarvesBundle/prototypes/String/*"/>
             <asset type="module" src="@JarvesBundle/utils.js"/>
             <asset type="module" src="@JarvesBundle/JarvesApp.js"/>
-            <asset type="module" priority="-1000" src="@JarvesBundle/bootstrap.js"/>
             <assets type="module" src="@JarvesBundle/controller/*"/>
+            <assets type="module" src="@JarvesBundle/fields/*"/>
             <assets type="module" src="@JarvesBundle/services/*"/>
-
+            <assets type="module" src="@JarvesBundle/directives/*"/>
             <asset src="@JarvesBundle/fonts/icons/style.css"/>
+
+
+            <asset type="module" src="@JarvesBundle/ObjectCollection.js"/>
+            <asset type="module" src="@JarvesBundle/annotations.js"/>
+            <asset type="module" src="@JarvesBundle/module.js"/>
+            <asset type="module" priority="-1000" src="@JarvesBundle/bootstrap.js"/>
 
             <!--<asset src="@JarvesBundle/codemirror/lib/codemirror.js />-->
             <!--<asset src="@JarvesBundle/codemirror/addon/mode/loadmode.js />-->
@@ -22,7 +29,7 @@
 
             <asset src="@JarvesBundle/fonts/OpenSans/open-sans.css"/>
             <asset src="@JarvesBundle/fonts/OpenSans/open-sans-condensed.css"/>
-            
+
             <assets src="@JarvesBundle/css/admin/jarves.scss"/>
             <assets src="@JarvesBundle/css/admin/jarves-white.scss"/>
             <asset src="@JarvesBundle/css/admin/jarves/Button.scss"/>
@@ -31,7 +38,7 @@
             <assets src="@JarvesBundle/css/admin/jarves/*.css"/>
             <assets src="@JarvesBundle/css/admin/jarves/*.scss"/>
             <assets src="@JarvesBundle/css/admin/jarves/ui/*.css"/>
-            <assets src="@JarvesBundle/css/admin/jarves/Field/*" />
+            <assets src="@JarvesBundle/css/admin/jarves/Field/*"/>
         </adminAssets>
         <streams>
             <stream path="load">

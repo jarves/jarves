@@ -1,48 +1,15 @@
-jarves.Directives.JarvesForm = new Class({
-    Statics: {
-        $inject: ['$scope', '$element', '$attrs', 'backend', '$q', 'windowService', 'jarves', 'objectRepository', '$interpolate']
-    },
+import {isDifferent, each} from '../utils';
+import {Directive, Inject} from '../annotations';
 
-    JarvesDirective: {
-        name: 'jarvesForm',
-        options: {
-            restrict: 'E',
-            scope: true,
-            transclude: true,
-            templateUrl: 'bundles/jarves/admin/js/views/form.html',
-            controller: true
-        }
-    },
-
-    pk: null,
-    entryPoint: null,
-
-    fields: [],
-
-    optionsEntryPoint: '',
-    noDataChanged: false,
-    originalData: {},
-    itemLoaded: false,
-
-    options: {
-        fields: null,
-        object: null,
-        objectKey: null
-    },
-
-    /**
-     *
-     * @param $scope
-     * @param $element
-     * @param $attrs
-     * @param backend
-     * @param $q
-     * @param {jarves.Services.WindowService} windowService
-     * @param {jarves.Services.Jarves} jarvesServices
-     * @param {jarves.Services.ObjectRepository} objectRepository
-     * @param $interpolate
-     */
-    initialize: function($scope, $element, $attrs, backend, $q, windowService, jarvesServices, objectRepository, $interpolate) {
+@Directive('jarvesForm', {
+    restrict: 'E',
+    scope: true,
+    transclude: true,
+    templateUrl: 'bundles/jarves/views/form.html'
+})
+@Inject('$scope, $element, $attrs, backend, $q, jarves, objectRepository, $interpolate')
+export default class JarvesForm {
+    constructor($scope, $element, $attrs, backend, $q, jarves, objectRepository, $interpolate) {
         this.$scope = $scope;
         this.$scope.model = {title: 'empty', test: 'a'};
         this.$scope.controller = this;
@@ -50,19 +17,32 @@ jarves.Directives.JarvesForm = new Class({
         this.backend = backend;
         this.$attrs = $attrs;
         this.$q = $q;
-        this.windowService = windowService;
-        this.jarves = jarvesServices;
+        this.jarves = jarves;
         this.objectRepository = objectRepository;
         this.$interpolate = $interpolate;
 
-        $scope.$on("$destroy", function() {
+        this.pk = null;
+        this.entryPoint = null;
+        this.fields = [];
+        this.optionsEntryPoint = '';
+        this.noDataChanged = false;
+        this.originalData = {};
+        this.itemLoaded = false;
+
+        this.options = {
+            fields: null,
+                object: null,
+                objectKey: null
+        };
+
+        $scope.$on("$destroy", () => {
             if (this.getName()) {
                 delete $scope.parentForms[this.getName()];
             }
-        }.bind(this));
-    },
+        });
+    }
 
-    link: function(scope, element, attributes, controllers, transclude) {
+    link(scope, element, attributes, controllers, transclude) {
         scope.parentForms = scope.forms;
 
         transclude(scope, function(clone) {
@@ -81,13 +61,13 @@ jarves.Directives.JarvesForm = new Class({
         scope.forms = {};
         this.forms = scope.forms;
 
-        Object.each(Object.clone(this.options), function(value, key) {
+        for (let [key, value] of each(this.options)) {
             if (this.$attrs[key]) {
                 this.options[key] = this.$interpolate(this.$attrs[key])(this.$scope.$parent);
             }
-        }.bind(this));
+        }
 
-        scope.$parent.$watchGroup([attributes.pk, attributes.entryPoint, attributes.optionsEntryPoint], function(values) {
+        scope.$parent.$watchGroup([attributes.pk, attributes.entryPoint, attributes.optionsEntryPoint], (values) => {
             this.pk = values[0];
             this.entryPoint = values[1];
             this.optionsEntryPoint = values[2];
@@ -99,71 +79,71 @@ jarves.Directives.JarvesForm = new Class({
                     this.loadData();
                 }
             }
-        }.bind(this));
-    },
+        });
+    }
 
-    getName: function() {
+    getName() {
         if (!this.name && this.$attrs.name) {
             this.name = this.$interpolate(this.$attrs.name)(this.$scope);
         }
 
         return this.name;
-    },
+    }
 
     /**
      *
      * @param {jarves.AbstractFieldType} field
      */
-    addField: function(field) {
+    addField(field) {
         this.fields.push(field)
-    },
+    }
 
-    getEntryPoint: function() {
+    getEntryPoint() {
         return this.entryPoint || this.$scope.windowInfo.entryPoint.fullPath;
-    },
+    }
 
-    loadClassProperties: function(optionsEntryPoint) {
+    loadClassProperties(optionsEntryPoint) {
         if (this.lastLoadedClassPropertiesPath === optionsEntryPoint) {
             this.loadData();
             return;
         }
 
         this.backend.post(optionsEntryPoint + '/?_method=options')
-            .success(function(response) {
+            .success((response) => {
                 this.options = response.data;
                 console.log('options loaded from entry point');
                 if (this.pk) {
                     this.loadData();
                 }
                 this.lastLoadedClassPropertiesPath = optionsEntryPoint;
-            }.bind(this))
-            .error(function(response) {
+            })
+            .error((response) => {
                 this.error = response;
                 throw response;
-            }.bind(this));
-    },
+            });
+    }
 
-    getPrimaryKey: function() {
+    getPrimaryKey() {
         return this.pk;
-    },
+    }
 
-    loadData: function() {
+    loadData() {
         console.log('loadData', this.options);
 
         var id = this.jarves.getObjectUrlId(this.getObjectKey(), this.getPrimaryKey());
 
         this.backend.get(this.getEntryPoint() + '/' + id)
-            .success(function(response) {
+            .success((response) => {
                 this.originalData = angular.copy(response.data);
                 this.$scope.model = response.data;
                 console.log('loaded', this.$scope.model);
                 this.itemLoaded = true;
-            }.bind(this))
-            .error(function(response) {
+            })
+            .error((response) => {
                 this.error = response;
                 throw response;
-            }.bind(this));
-    },
+            });
+    }
 
     /**
      *
@@ -171,18 +151,18 @@ jarves.Directives.JarvesForm = new Class({
      *
      * @returns {Boolean}
      */
-    isValid: function(highlight) {
+    isValid(highlight) {
         var valid = true;
-        Array.each(this.fields, function(field) {
+        for (let field of this.fields) {
             if (!field.isValid(highlight)) {
                 valid = false;
             }
-        });
+        }
 
         return valid;
-    },
+    }
 
-    getObjectKey: function() {
+    getObjectKey() {
         var objectKey = this.options['object'] || this.options['objectKey'];
 
         if (!objectKey) {
@@ -190,34 +170,34 @@ jarves.Directives.JarvesForm = new Class({
         }
 
         return objectKey;
-    },
+    }
 
-    save: function() {
+    save() {
         this.noDataChanged = false;
 
-        this.callSave().then(function() {
+        this.callSave().then(() => {
             var data = this.getChangedData();
             var id = this.jarves.getObjectUrlId(this.getObjectKey(), this.originalData);
 
             this.backend.patch(this.getEntryPoint() + '/' + id, data)
-                .success(this.handleSaveResponse.bind(this));
-        }.bind(this));
-    },
+                .success(() => this.handleSaveResponse());
+        });
+    }
 
-    add: function() {
-        this.callSave().then(function() {
+    add() {
+        this.callSave().then(() => {
             var data = this.$scope.model;
             this.backend.post(this.getEntryPoint() + '/', data)
-                .success(this.handleSaveResponse.bind(this));
-        }.bind(this));
-    },
+                .success(() => this.handleSaveResponse());
+        });
+    }
 
     /**
      * Calls all save() methods at all our fields and sub forms.
      *
      * @return promise
      */
-    callSave: function() {
+    callSave() {
         var deferred = this.$q.defer();
 
         var maxCount = this.fields.length, count = 0;
@@ -233,13 +213,13 @@ jarves.Directives.JarvesForm = new Class({
             }
         }
 
-        Array.each(this.fields, function(field, idx) {
+        for (let [idx, field] of each(this.fields)) {
             try {
                 var promise = field.save();
-                if ('object' === typeOf(promise) && promise.then) {
-                    promise.then(function(){
+                if ('object' === typeof promise && promise.then) {
+                    promise.then(function done(){
                         setDone(idx);
-                    }, function(message) {
+                    }, function error(message) {
                         deferred.reject(message);
                     });
                 } else {
@@ -249,34 +229,33 @@ jarves.Directives.JarvesForm = new Class({
                 deferred.reject();
                 throw e;
             }
-        });
+        }
 
         return deferred.promise;
-    },
+    }
 
-    getChangedData: function() {
+    getChangedData() {
         var diff = {};
 
-        Object.each(this.$scope.model, function(value, key) {
-            if (jarves.isDifferent(value, this.originalData[key])) {
+        for (let [key, value] of each(this.$scope.model)) {
+            if (isDifferent(value, this.originalData[key])) {
                 diff[key] = value;
             }
-        }, this);
+        }
 
         return diff;
-    },
+    }
 
-    hasChanges: function() {
+    hasChanges() {
         if (!this.itemLoaded) {
             return false;
         }
 
         var diff = this.getChangedData();
         return 0 < Object.getLength(diff);
-    },
+    }
 
-    handleSaveResponse: function(response) {
-        console.log('saved');
+    handleSaveResponse(response) {
         this.originalData = angular.copy(this.$scope.model);
         if (true === response.data) {
             this.objectRepository.fireObjectChange(this.getObjectKey());
@@ -287,4 +266,4 @@ jarves.Directives.JarvesForm = new Class({
         }
     }
 
-});
+}

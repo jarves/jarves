@@ -1,15 +1,12 @@
-export default class Translator {
-    //Statics: {
-    //    $inject: ['$rootScope', '$http']
-    //},
-    //JarvesService: 'translator',
-    //
-    //translations: {},
-    //currentLanguage: 'en',
+import {Inject} from '../annotations';
 
+@Inject('$rootScope, $http')
+export default class Translator {
     constructor($rootScope, $http) {
         this.rootScope = $rootScope;
         this.http = $http;
+        this.translations = {};
+        this.currentLanguage = 'en';
     }
 
     watch(cb) {

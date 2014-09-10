@@ -1,15 +1,17 @@
-jarves.Fields.Language = new Class({
-    Extends: jarves.Fields.Select,
+import AbstractFieldType from './AbstractFieldType';
+import {Field} from '../annotations';
+import {eachValue} from '../utils';
+import Select from './Select';
 
-    JarvesField: 'language',
-
-    setupItems: function() {
-        console.log(jarves.possibleLangs);
+@Field('language')
+export default class Language extends Select {
+    setupItems() {
         var newItems = {};
-        Object.each(jarves.possibleLangs, function(item) {
+
+        for (let item of eachValue(jarves.possibleLangs)) {
             newItems[item.code] = {label: '%s (%s, %s)'.sprintf(item.title, item.code, item.langtitle)};
-        });
+        }
 
         this.items = newItems;
     }
-});
+}

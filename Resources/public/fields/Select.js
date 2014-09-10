@@ -1,59 +1,56 @@
-jarves.Fields.Select = new Class({
-    Extends: jarves.AbstractFieldType,
+import AbstractFieldType from './AbstractFieldType';
+import {Field, InjectAsProperty} from '../annotations';
+import {each} from '../utils';
 
-    Statics: {
-        $inject: ['$scope', '$element', '$attrs', '$compile', '$http', '$templateCache', '$q', '$interpolate', 'objectRepository', 'jarves']
-    },
+@Field('select')
+@InjectAsProperty('objectRepository')
+export default class Select extends AbstractFieldType {
+    constructor(...deps) {
+        this.additionalOptionsReferences = ['items'];
+        this.chooserOpen = false;
+        this.items = {};
+        this.selected = {};
+        this.selectedItem = {
+            icon: null,
+            label: '',
+            id: null
+        };
+        this.objectRepository = null;
+        this.template = 'bundles/jarves/views/field.select.html';
+        super(...deps);
+    }
 
-    JarvesField: 'select',
-
-    additionalOptionsReferences: ['items'],
-
-    template: 'bundles/jarves/admin/js/views/field.select.html',
-
-    chooserOpen: false,
-    items: {},
-    selected: null,
-    selectedItem: {
-        icon: null,
-        label: '',
-        id: null
-    },
-
-    objectRepository: null,
-
-    link: function(scope, element, attr) {
-        this.parent(scope, element, attr);
+    link(scope, element, attr) {
+        super(scope, element, attr);
 
         this.renderTemplateUrl(
             this.template,
-            this.beforeCompile.bind(this)
+            () => this.beforeCompile()
         );
 
-        scope.$parent.$watch(this.getModelName(), function(value) {
+        scope.$parent.$watch(this.getModelName(), (value) => function(value) {
             this.value = value;
             this.updateSelected();
-        }.bind(this));
+        });
 
         this.setupItems();
-    },
+    }
 
-    setupItems: function() {
+    setupItems() {
         if (this.getOption('object')) {
-            this.objectRepository.getItems(this.getOption('object')).then(this.prepareItems.bind(this));
+            this.objectRepository.getItems(this.getOption('object')).then(() => this.prepareItems(...arguments));
         } else {
             this.prepareItems(this.getOption('items'));
         }
-    },
+    }
 
-    prepareItems: function(items) {
+    prepareItems(items) {
         var newItems = [], id;
 
         console.log('prepareItems', this.$attrs.items, items);
 
         if ('array' === typeOf(items)) {
-            Array.each(items, function(item, idx) {
-
+            for (let [idx, item] of each(items)) {
                 id = this.getOption('idField') && 'object' === typeOf(item)
                     ? item[this.getOption('idField')]
                     : item;
@@ -67,43 +64,44 @@ jarves.Fields.Select = new Class({
                 } else {
                     newItems[id] = {label: this.toLabel(item), id: id};
                 }
-            }.bind(this));
+            }
+
             this.items = newItems;
         }
 
         if ('object' === typeOf(items)) {
-            Object.each(items, function(value, id) {
+            for (let [id, value] of each(items)){
                 newItems[id] = {label: this.toLabel(value), id: id};
-            }, this);
+            }
 
             this.items = newItems;
         }
 
         this.updateSelected();
-    },
+    }
 
-    updateSelected: function() {
+    updateSelected() {
         this.selectedItem = this.items[this.value];
-    },
+    }
 
     /**
      *
      * @param {*} id
      */
-    select: function(id) {
+    select(id) {
         this.chooserOpen = false;
         if ('null' === this.items[id]) {
             return;
         }
         this.selected = id;
         this.selectedItem = this.items[id];
-    },
+    }
 
     /**
      * @param {Object|String} item
      * @return {String}
      */
-    toLabel: function(item) {
+    toLabel(item) {
         if ('object' === typeOf(item) && this.getOption('object')) {
             return this.jarves.getObjectLabelByItem(this.getOption('object'), item);
         }
@@ -111,26 +109,26 @@ jarves.Fields.Select = new Class({
         if ('string' === typeOf(item)) {
             return item;
         }
-    },
+    }
 
-    addOption: function(values) {
+    addOption(values) {
         this.items[values.id] = values;
-    },
+    }
 
-    setOption: function(oldId, values) {
+    setOption(oldId, values) {
         delete this.items[oldId];
         this.addOption(values);
-    },
+    }
 
-    beforeCompile: function(contents) {
+    beforeCompile(contents) {
 
-    },
+    }
 
-    openChooser: function() {
+    openChooser() {
         this.chooserOpen = true;
-    },
+    }
 
-    toggle: function() {
+    toggle() {
         this.chooserOpen = !this.chooserOpen;
     }
-});
+}
