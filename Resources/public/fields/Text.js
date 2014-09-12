@@ -105,8 +105,8 @@ export default class Text extends AbstractFieldType {
         super(...deps);
     }
 
-    link(scope, element, attr) {
-        super(scope, element, attr);
+    link(scope, element, attr, controller, transclude) {
+        super(scope, element, attr, controller, transclude);
         this.attr = attr;
 
         this.renderTemplateUrl(
@@ -123,7 +123,7 @@ export default class Text extends AbstractFieldType {
             this.$scope.$watch(this.getModelName(), function(value) {
                 var newValue = this.applyModifier(value, this.getOption('modifier'));
                 if (newValue !== value) {
-                    this.setValue(newValue);
+                    this.setModelValue(newValue);
                 }
             }.bind(this));
         }

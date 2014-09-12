@@ -46,6 +46,14 @@ export default class Jarves {
         return this.$rootScope._session && this.$rootScope._session.userId > 0;
     }
 
+    logout() {
+        this.loginController.logout();
+    }
+
+    log(...args) {
+        window.console.log(...args);
+    }
+
     /**
      *
      * @param {String} entryPoint

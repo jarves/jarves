@@ -51,35 +51,28 @@ jarves-list-item.selected:hover {
     background-color: lighten($mainColor, 4%);
 }
 
-.jarves-List-loader:hover {
-    background-image: none;
-    background-color: transparent;
-}
+.jarves-white {
 
-.jarves-List-info,
-.jarves-List-loader {
-    padding: 10px;
-    color: silver;
-    text-align: center;
-    cursor: default;
-}
+    jarves-list-delimiter {
+        background-color: #ECECEC;
+        border-bottom: 1px solid #d1d1d1;
+        color: #666;
+    }
 
-.jarves-List-showRemove .jarves-List-item-remove {
-    display: block;
-}
+    jarves-list-item:hover,
+    jarves-list-item.selected,
+    jarves-list-item.selected:hover {
+        background-color: #DFDFDF;
+        border-bottom: 1px solid #c1c1c1;
+        color: #444;
+    }
 
-.jarves-List-item-remove {
-    position: absolute;
-    background-color: white;
-    right: 0;
-    top: 0;
-    display: none;
-    cursor: default;
-    bottom: 0;
-    -moz-transition-duration: .3s;
-    -webkit-transition-duration: .3s;
-    -o-transition-duration: .3s;
-    -ms-transition-duration: .3s;
-    transition-duration: .3s;
-    padding: 5px;
+    jarves-list-item {
+        border-bottom: 1px solid #d1d1d1;
+    }
+
+    jarves-list-item .sub {
+        color: #555;
+    }
+    
 }

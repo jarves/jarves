@@ -672,13 +672,13 @@ export function registerModuleField(angularModule, controller) {
         restrict: 'A',
         controller: controller,
         scope: true,
+        transclude: true,
         require: [directiveName, 'jarvesField', '?^jarvesField', '?^jarvesForm'],
         link: function(scope, element, attr, ctrl, transclude) {
             var ownController = ctrl[0];
             var fieldController = ctrl[1];
             var parentFieldController =  ctrl[2];
             var jarvesFormController =  ctrl[3];
-            scope.controller = ownController;
             var controllersToPass = ctrl;
             controllersToPass.shift();
 
@@ -697,7 +697,7 @@ export function registerModuleField(angularModule, controller) {
                 controllersToPass = controllersToPass[0];
             }
 
-            ownController.link.apply(ownController, [scope, element, attr, controllersToPass, transclude]);
+            ownController.link(...[scope, element, attr, controllersToPass, transclude]);
         }
     }, options);
 
@@ -753,7 +753,6 @@ export function registerModuleLabel(angularModule, controller) {
         require: [directiveName, '?^jarvesForm'],
         link: function(scope, element, attr, ctrl, transclude) {
             var ownController = ctrl[0];
-            scope.controller = ownController;
             var controllersToPass = ctrl;
             controllersToPass.shift();
 
@@ -797,6 +796,10 @@ export function registerModuleDirective(angularModule, controller) {
     }
 
     if (!definition.link) {
+        if (angular.isString(definition.require)) {
+            definition.require = [definition.require];
+        }
+
         if (angular.isArray(definition.require) && DirectiveAnnotation.name !== definition.require[0]) {
             definition.require.unshift(DirectiveAnnotation.name);
         }
@@ -821,7 +824,6 @@ export function registerModuleDirective(angularModule, controller) {
         };
     }
 
-    console.log('register directive', DirectiveAnnotation.name, definition);
     var options = angular.isFunction(definition) || angular.isArray(definition)
         ? definition
         : function(){ return definition; };

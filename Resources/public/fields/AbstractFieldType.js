@@ -23,7 +23,7 @@ export default class AbstractFieldType {
         this.parentFieldDirective = null;
         this.optionsReferences = ['definition'];
         this.additionalOptionsReferences = [];
-        this.$scope.controller = this;
+        this.$scope.fieldController = this;
 
         this.optionsReferencesMap = {};
         this.optionsReferencesMap = {};
@@ -131,26 +131,24 @@ export default class AbstractFieldType {
         return valid;
     }
 
-    setValue(value) {
+    setModelValue(value) {
         var modelName = this.getModelName();
+        this.$parse(modelName).assign(this.$scope.$parent, value);
+    }
+
+    onModelValueChange(cb) {
+        this.$scope.$parent.$watch(this.getModelName(),cb);
+    }
+
+    setAnotherModelValue(modelName, value) {
         this.$timeout(function() {
-            this.$parse(modelName).assign(this.$scope, value);
+            this.$parse(modelName).assign(this.$scope.$parent, value);
         }.bind(this));
     }
 
-    setModelValue(modelName, value) {
-        this.$timeout(function() {
-            this.$parse(modelName).assign(this.$scope, value);
-        }.bind(this));
-    }
-
-    getModelValue(modelName) {
-        return this.$scope.$eval(modelName);
-    }
-
-    getValue() {
+    getModelValue() {
         var modelName = this.getModelName();
-        return this.$scope.$eval(modelName);
+        return this.$scope.$parent.$eval(modelName);
     }
 
     //getModelName() {
@@ -165,27 +163,36 @@ export default class AbstractFieldType {
         return parts.join('.') + '.' + key;
     }
 
-    link(scope, element, attributes) {
-        if (this.getOption('noWrapper')) {
+    link(scope, element, attributes, controller, transclude) {
+        if (this.getOption('inline') || 'inline' in this.$attrs) {
+            this.$element.addClass('jarves-Field-no-wrapper');
+            transclude(scope, (clone) => {
+                element.append(clone);
+            })
             return;
         }
 
         this.label = this.getOption('label');
         this.description = this.getOption('description') || this.getOption('desc');
 
-
-        this.labelElement = angular.element('<div class="jarves-Field-title" ng-bind="controller.label"></div>');
-        this.descElement = angular.element('<div class="jarves-Field-description" ng-if="controller.description" ng-bind="controller.description"></div>');
-
+        this.labelElement = angular.element('<div class="jarves-Field-title" ng-bind="fieldController.label"></div>');
+        this.descriptionElement = angular.element('<div class="jarves-Field-description" ng-if="fieldController.description" ng-bind="fieldController.description"></div>');
         this.fieldContainer = angular.element('<div class="jarves-Field-container"></div>');
+        this.childrenContainer = angular.element('<div class="jarves-Field-children"></div>');
 
-        this.$element.prepend(this.descElement);
+        this.$element.prepend(this.descriptionElement);
         this.$element.prepend(this.labelElement);
-        this.labelElement.after(this.fieldContainer);
+        this.descriptionElement.after(this.fieldContainer);
+        this.fieldContainer.after(this.childrenContainer);
 
-        this.$compile(this.descElement)(this.$scope);
         this.$compile(this.labelElement)(this.$scope);
+        this.$compile(this.descriptionElement)(this.$scope);
         this.$compile(this.fieldContainer)(this.$scope);
+        this.$compile(this.childrenContainer)(this.$scope);
+
+        transclude(scope, (clone) => {
+            this.childrenContainer.append(clone);
+        })
     }
 
     save() {

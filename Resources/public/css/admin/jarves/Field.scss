@@ -1,1 +1,35 @@
 @import "../base";
+
+jarves-field {
+    display: block;
+    padding: 5px;
+    max-width: 400px;
+    padding-bottom: 15px;
+}
+
+.jarves-Field-no-wrapper {
+    display: inline-block;
+    max-width: 100%;
+    padding: 0;
+    vertical-align: top;
+}
+
+.jarves-Field-description {
+    padding: 3px 0 0 20px;
+    color: #74818A;
+    line-height: 14px;
+    font-size: 12px;
+}
+
+.jarves-Field-container {
+    position: relative;
+    margin: 5px 20px 2px 20px;
+}
+
+jarves-form-group {
+    display: block;
+}
+
+jarves-form { 
+    display: block;
+}

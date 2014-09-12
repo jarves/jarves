@@ -64,7 +64,7 @@ window-content {
 }
 
 window-frame[with-sidebar="true"] {
-    right: 190px;
+    right: 180px;
 }
 
 .jarves-Window-titlePath {
@@ -100,6 +100,12 @@ window-sidebar-container {
     background-color: #021216;
 }
 
+.jarves-white {
+    window-sidebar-container {
+        background-color: $whiteLinkBgColor;
+    }
+}
+
 window-sidebar window-sidebar-container + .jarves-Splitter-main {
     left: -28px;
 }
@@ -109,7 +115,7 @@ window-sidebar h2 {
     padding: 0 15px;
 }
 
-window-sidebar .jarves-Button {
+window-sidebar button {
     display: block;
     width: 100%;
     @include box-sizing(box-sizing);
@@ -125,33 +131,29 @@ window-sidebar .jarves-Button {
     @include transition(all 0.2s ease-out);
 }
 
-window-sidebar .jarves-Button[pressed="true"],
-window-sidebar .jarves-Button[pressed="true"]:link,
-window-sidebar .jarves-Button[pressed="true"]:hover,
-window-sidebar .jarves-Button[pressed="true"]:active {
+window-sidebar button.pressed,
+window-sidebar button.pressed:link,
+window-sidebar button.pressed:hover,
+window-sidebar button.pressed:active {
     top: 0;
     box-shadow: none;
     background-image: none;
     background-color: #3d3d3d;
 }
 
-window-sidebar .jarves-Button[disabled="true"],
-window-sidebar .jarves-Button[disabled="true"]:link,
-window-sidebar .jarves-Button[disabled="true"]:active,
-window-sidebar .jarves-Button[disabled="true"]:hover {
+window-sidebar button.disabled,
+window-sidebar button.disabled:link,
+window-sidebar button.disabled:active,
+window-sidebar button.disabled:hover {
     cursor: default;
     color: #808080;
-//    background-color: rgba(0, 0, 0, 0);
 }
 
 window-sidebar a.jarves-Select-box,
 window-sidebar a.jarves-Select-box:link {
-//    background-image: none;
-//    background-color: transparent;
     padding: 0 15px;
     color: white;
     width: 100% !important;
-//    border: 1px solid #9C9C9C;
 }
 
 window-sidebar .jarves-Select-arrow {
@@ -169,23 +171,23 @@ window-sidebar .jarves-Splitter-main {
     border-left: 0;
     width: 20px;
 }
-window-sidebar .jarves-ButtonGroup {
+window-sidebar buttonGroup {
     margin: 0;
     display: block;
     white-space: pre;
     @include line-top-left;
 }
 
-window-sidebar .jarves-ButtonGroup:first-child {
+window-sidebar buttonGroup:first-child {
 //    border-top: 0;
 }
 
-//window-sidebar .jarves-Button:hover {
+//window-sidebar button:hover {
 //    background-image: none;
 //    background-color: #6e6e6e;
 //}
 
-window-sidebar .jarves-Button[disabled="true"]:hover {
+window-sidebar button[disabled="true"]:hover {
     cursor: default;
     color: gray;
     background-color: transparent;
@@ -195,13 +197,69 @@ window-sidebar-container-small .jarves-Window-sidebar-title {
     display: none;
 }
 
-window-sidebar-container-small .jarves-Button > span {
+window-sidebar-container-small button > span {
     display: none;
 }
 
+.jarves-Window-sidebar-title {
+    @include line-top-left;
+    text-align: center;
+    padding-top: 4px;
+    padding-bottom: 5px;
+    font-size: 12px;
+    text-transform: uppercase;
+}
 
 window-sidebar-delimiter {
     @include line-top-left;
     display: block;
     height: 1px;
+}
+
+.jarves-Window-sidebar-resizer {
+    left: -30px;
+    width: 30px;
+    right: auto;
+}
+
+window-dialog {
+    text-align: center;
+}
+
+.jarves-WindowDialog-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba($mainColor, 0.7);
+}
+
+.jarves-WindowDialog-container {
+    margin: 0 auto;
+    position: relative;
+    max-height: 80%;
+    max-width: 80%;
+    overflow: auto;
+    background-color: $mainColor;
+    box-shadow: 0 5px 9px lighten($mainColor, 20%);
+}
+
+.jarves-white {
+    .jarves-Window-sidebar-title {
+        @include white-line-top;
+    }
+
+    window-sidebar 
+        @include white-line-bottom;
+    }
+
+    .jarves-WindowDialog-overlay {
+        background-color: rgba($whiteMainColor, 0.7);
+    }
+
+    .jarves-WindowDialog-container {
+        background-color: $whiteMainColor;
+        box-shadow: 0 5px 9px darken($whiteMainColor, 20%);
+    }
 }

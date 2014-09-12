@@ -10,6 +10,7 @@ td {
     cursor: default;
     line-height: 18px;
     border-bottom: 1px solid lighten($mainColor, 2%);
+    color: $mainTextColor;
 }
 
 th {
@@ -28,23 +29,39 @@ table tr.selected td {
     background-color: lighten($mainColor, 12%);
 }
 
+td[jarves-grid-actions] {
+    white-space: nowrap;
+}
 
+td[jarves-grid-actions] button {
+    background-color: transparent !important;
+    padding: 0 2px;
+    margin: 0;
+    cursor: pointer;
+    line-height: 20px;
+    height: auto;
+}
+
+td[jarves-grid-actions] button:hover {
+    outline: 1px dashed silver;
+}
 
 .jarves-white {
     th,
     td {
-        border-bottom: 1px solid darken($mainWhiteColor, 5%);
+        border-bottom: 1px solid darken($whiteMainColor, 5%);
+        color: $whiteMainTextColor;
     }
 
     table tr:nth-child(odd) td {
-        background-color: rgba(darken($mainWhiteColor, 10%), 0.05);
+        background-color: rgba(darken($whiteMainColor, 10%), 0.05);
     }
 
     table tr:hover td {
-        background-color: darken($mainWhiteColor, 3%);
+        background-color: darken($whiteMainColor, 3%);
     }
 
     table tr.selected td {
-        background-color: darken($mainWhiteColor, 9%);
+        background-color: darken($whiteMainColor, 9%);
     }
 }

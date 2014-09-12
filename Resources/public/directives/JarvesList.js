@@ -59,7 +59,6 @@ export default class JarvesList {
     }
 
     link(scope, element, attributes, controller, transclude) {
-
         if (this.getEntryPoint()) {
             this.jarves.loadEntryPointOptions(this.getEntryPoint()).success((response) => {
                 this.classProperties = response.data;
@@ -99,11 +98,16 @@ export default class JarvesList {
     getItemTemplateElement() {
         if (!this.itemTemplateElement) {
             if (!this.getEntryPoint()) {
-                throw '<jarves-list> does not contain a <jarves-list-template> element.';
+                throw '<jarves-list> does not contain a <jarves-list-template> element nor e entry-point defined.';
+            }
+
+            var objectDefinition = this.jarves.getObjectDefinition(this.classProperties.object);
+            if (objectDefinition.labelField) {
+                return angular.element('<b>{{item.' + objectDefinition.labelField + '}}');
             }
 
             if (!this.classProperties.columns) {
-                throw '<jarves-list> entry-point has no columns defined.';
+                throw '<jarves-list>\' entry-point with object %s has no columns nor a label field defined.'.sprintf(this.classProperties.object);
             }
 
             if (this.classProperties.itemLayout) {
@@ -261,7 +265,7 @@ export default class JarvesList {
             return angular.equals(this.selectedPk, pk);
         }
 
-        return this.selected === index; //$root.jarves.compare(controller.selected, controller.getPk(item));
+        return this.selected === index; 
     }
 
     getPk(item) {

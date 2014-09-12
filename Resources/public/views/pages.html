@@ -7,6 +7,15 @@ My List ({{myListSelected}})
 		</jarves-list-template>
 	</jarves-list>
 
+    My Select ({{mySelect}}):
+
+    <jarves-field type="select" model="mySelect">
+        <select-option>Teschd</select-option>
+        <select-option>Teschd2</select-option>
+    </jarves-field>
+
+    <jarves-field type="text" model="mySelect"></jarves-field>
+
 Category List ({{categoryListSelected}})
 	<jarves-list model="categoryListSelected" entry-point="'object/jarvespublication/newsCategory'">
 	</jarves-list>
@@ -21,5 +30,8 @@ Category List ({{categoryListSelected}})
 
         <button ng-click="form.save()">Save</button>
     </jarves-form>
-
 </window-frame>
+
+<window-sidebar>
+    Teschd
+</window-sidebar>

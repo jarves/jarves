@@ -2,14 +2,14 @@
     <div ng-show="loginVisible" class="jarves-login jarves-admin">
         <div class="jarves-login-middle">
             <div class="jarves-login-middle-top">
-                <img class="jarves-login-logo" src="{{_path}}/bundles/jarves/admin/images/logo.png">
+                <img class="jarves-login-logo" src="{{_baseUrl}}/bundles/jarves/images/logo.png">
             </div>
             <form id="loginForm" onsubmit="return false;" class="jarves-login-middle-form">
 
-                <jarves-field type="text" translate model="credentials.username" placeholder="Username"></jarves-field>
-                <jarves-field type="password" translate model="credentials.password" placeholder="Password"></jarves-field>
+                <jarves-field type="text" translate inline model="credentials.username" placeholder="Username"></jarves-field>
+                <jarves-field type="password" translate inline model="credentials.password" placeholder="Password"></jarves-field>
 
-                <jarves-field type="language" model="language"></jarves-field>
+                <jarves-field type="language" inline model="language"></jarves-field>
                 <button ng-click="doLogin()" translate>Login</button>
 
                 <div class="jarves-login-loader-top" ng-class="{'active': inputBlocked}">
@@ -22,6 +22,7 @@
                 <span ng-switch-when="2">Login failed</span>
                 <span ng-switch-when="3">Loading interface ...</span>
                 <span ng-switch-when="4">Entering.</span>
+                <span ng-switch-when="5">Logged out.</span>
             </div>
         </div>
     </div>

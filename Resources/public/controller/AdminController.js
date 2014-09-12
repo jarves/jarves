@@ -19,6 +19,7 @@ export default class AdminController {
         this.scope.menuHidden = {};
         this.scope.loadInterface = (...args) => this.loadInterface(...args);
         this.scope.openEntryPoint = (...args) => this.openEntryPoint(...args);
+        this.scope.logout = (...args) => this.logout(...args);
 
         this.scope.interfaceVisible = false;
         this.scope._session = window._session;
@@ -26,6 +27,11 @@ export default class AdminController {
 
     showInterface() {
         this.scope.interfaceVisible = true;
+    }
+
+    logout() {
+        this.scope.interfaceVisible = false;
+        this.jarves.logout();
     }
 
     loadInterface() {

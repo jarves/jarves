@@ -21,15 +21,15 @@ export default class Select extends AbstractFieldType {
         super(...args);
     }
 
-    link(scope, element, attr) {
-        super(scope, element, attr);
+    link(scope, element, attr, controller, transclude) {
+        super(scope, element, attr, controller, transclude);
 
         this.renderTemplateUrl(
             this.template,
             () => this.beforeCompile()
         );
 
-        scope.$parent.$watch(this.getModelName(), (value) => function(value) {
+        this.onModelValueChange((value) => {
             this.value = value;
             this.updateSelected();
         });
@@ -39,6 +39,7 @@ export default class Select extends AbstractFieldType {
 
     setupItems() {
         if (this.getOption('object')) {
+            //todo change to objectcollection
             this.objectRepository.getItems(this.getOption('object')).then((...args) => this.prepareItems(...args));
         } else {
             this.prepareItems(this.getOption('items'));
@@ -95,8 +96,9 @@ export default class Select extends AbstractFieldType {
         if ('null' === this.items[id]) {
             return;
         }
-        this.selected = id;
+        this.value = id;
         this.selectedItem = this.items[id];
+        this.setModelValue(id);
     }
     /**
      * @param {Object|String} item

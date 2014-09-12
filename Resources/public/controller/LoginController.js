@@ -1,14 +1,16 @@
 import {Inject} from '../annotations';
 
-@Inject('$rootScope, $scope, backend, translator, jarves')
+@Inject('$rootScope, $scope, backend, translator, jarves, $timeout')
 export default class LoginController {
-    constructor($rootScope, $scope, backend, translator, jarves) {
+    constructor($rootScope, $scope, backend, translator, jarves, $timeout) {
         this.rootScope = $rootScope;
         this.scope = $scope;
         this.backend = backend;
         this.translator = translator;
         this.jarves = jarves;
+        this.$timeout = $timeout;
         this.scope.doLogin = () => this.doLogin();
+        this.jarves.loginController = this;
 
         //this.scope.language = Cookie.read('jarves_language') || 'en';
         this.scope.language = 'en';
@@ -38,6 +40,18 @@ export default class LoginController {
         window._session.lang = this.scope.language;
         //Cookie.write('jarves_language', this.scope.language);
         this.translator.setLanguage(this.scope.language);
+    }
+
+    logout() {
+        this.scope.loginStatus = 5;
+        this.$timeout(() => {
+            this.scope.loginStatus = 0;
+        }, 2000);
+
+        this.scope.loginVisible = true;
+        this.$timeout(() => {
+            this.scope.inputBlocked = false;
+        }, 10);
     }
 
     /**

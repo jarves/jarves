@@ -7,6 +7,8 @@
         </fields>
         <adminAssets>
             <asset priority="2000" src="@JarvesBundle/libraries/angular.js"/>
+            <asset priority="2000" src="@JarvesBundle/libraries/angular-animate.min.js"/>
+            <asset priority="2000" src="@JarvesBundle/libraries/hammer.min.js"/>
             <assets priority="2000" src="@JarvesBundle/prototypes/String/*"/>
             <asset type="module" src="@JarvesBundle/utils.js"/>
             <asset type="module" src="@JarvesBundle/JarvesApp.js"/>
@@ -17,7 +19,6 @@
             <assets type="module" src="@JarvesBundle/directives/*"/>
             <assets type="module" src="@JarvesBundle/directives/*"/>
             <asset src="@JarvesBundle/fonts/icons/style.css"/>
-
 
             <asset type="module" src="@JarvesBundle/ObjectCollection.js"/>
             <asset type="module" src="@JarvesBundle/annotations.js"/>
@@ -33,7 +34,7 @@
             <asset src="@JarvesBundle/fonts/OpenSans/open-sans-condensed.css"/>
 
             <assets src="@JarvesBundle/css/admin/jarves.scss"/>
-            <assets src="@JarvesBundle/css/admin/jarves-white.scss"/>
+            <!--<assets src="@JarvesBundle/css/admin/jarves-white.scss"/>-->
             <asset src="@JarvesBundle/css/admin/jarves/Button.scss"/>
             <asset src="@JarvesBundle/css/admin/jarves/ButtonGroup.scss"/>
             <assets src="@JarvesBundle/css/admin/lib/*.css"/>

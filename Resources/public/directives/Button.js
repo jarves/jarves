@@ -5,15 +5,41 @@ import {Directive} from '../annotations';
 })
 export default class Button {
     link(scope, element, attributes) {
-        element.addClass('jarves-Button');
-        if (attributes['pressed']) {
-            scope.$watch(attributes['pressed'], (pressed) => {
-                if (pressed) {
-                    element.addClass('jarves-Button-pressed');
-                } else {
-                    element.removeClass('jarves-Button-pressed');
+
+        if (attributes.focus) {
+            scope.$watch(attributes.focus, (value) => {
+                if (value) {
+                    element[0].focus();
                 }
             });
         }
+
+        if (attributes['pressed']) {
+            scope.$watch(attributes['pressed'], (pressed) => {
+                if (pressed) {
+                    element.addClass('pressed');
+                } else {
+                    element.removeClass('pressed');
+                }
+            });
+        }
+
+        var clicked = false;
+        element.on('mousedown', function() {
+            clicked = true;
+        });
+
+        element.on('focus', (e) => {
+            setTimeout(() => {
+                if (!clicked) {
+                    element.addClass('focus');
+                }
+            }, 10);
+        });
+
+        element.on('blur', (e) => {
+            element.removeClass('focus');
+            clicked = false;
+        });
     }
 }

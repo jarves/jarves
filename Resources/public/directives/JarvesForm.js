@@ -5,12 +5,11 @@ import angular from '../angular';
 @Directive('jarvesForm', {
     restrict: 'E',
     scope: true,
-    transclude: true,
-    templateUrl: 'bundles/jarves/views/form.html'
+    transclude: true
 })
-@Inject('$scope, $element, $attrs, backend, $q, jarves, objectRepository, $interpolate')
+@Inject('$scope, $element, $attrs, backend, $q, jarves, objectRepository, $interpolate, $compile')
 export default class JarvesForm {
-    constructor($scope, $element, $attrs, backend, $q, jarves, objectRepository, $interpolate) {
+    constructor($scope, $element, $attrs, backend, $q, jarves, objectRepository, $interpolate, $compile) {
         this.$scope = $scope;
         this.$scope.model = {title: 'empty', test: 'a'};
         this.$scope.controller = this;
@@ -21,6 +20,7 @@ export default class JarvesForm {
         this.jarves = jarves;
         this.objectRepository = objectRepository;
         this.$interpolate = $interpolate;
+        this.$compile = $compile;
 
         this.pk = null;
         this.entryPoint = null;
@@ -41,6 +41,8 @@ export default class JarvesForm {
                 delete $scope.parentForms[this.getName()];
             }
         });
+
+        this.template = '<jarves-form-group ng-if="controller.options.fields" fields="controller.options.fields" model="model"></jarves-form-group>';
     }
 
     link(scope, element, attributes, controllers, transclude) {
@@ -73,7 +75,10 @@ export default class JarvesForm {
             this.entryPoint = values[1];
             this.optionsEntryPoint = values[2];
 
-            if (this.optionsEntryPoint) {
+            if (this.lastLoadedClassPropertiesPath !== this.optionsEntryPoint) {
+                this.formGroup = angular.element(this.template);
+                element.prepend(this.formGroup);
+                this.$compile(this.formGroup)(scope);
                 this.loadClassProperties(this.optionsEntryPoint);
             } else {
                 if (this.entryPoint) {
@@ -253,7 +258,8 @@ export default class JarvesForm {
         }
 
         var diff = this.getChangedData();
-        return 0 < Object.getLength(diff);
+        console.log('haschanges', diff);
+        return !angular.equals({}, diff);
     }
 
     handleSaveResponse(response) {

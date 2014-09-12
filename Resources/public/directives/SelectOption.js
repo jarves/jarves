@@ -2,13 +2,14 @@ import {Directive} from '../annotations';
 
 @Directive('selectOption', {
     restrict: 'E',
-    require: ['option', '?^jarvesSelectField'],
+    require: ['^jarvesSelectField'],
 })
 export default class SelectOption {
-    link(scope, element, attributes, controllers) {
-        var controller = controllers[0];
+    link(scope, element, attributes, controller) {
+        console.info('link selectOption', controller);
         if (controller) {
             var value = this.parseValues(element, attributes);
+            console.log('selectoption new value', value);
             controller.addOption(value);
 
             element.addClass('ng-hide');

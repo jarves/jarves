@@ -6,6 +6,7 @@ import {Directive} from '../annotations';
 })
 export default class WindowFrame {
     link(scope, element, attributes, controller) {
+        console.log('link frame');
         controller.setFrame(element);
     }
 }

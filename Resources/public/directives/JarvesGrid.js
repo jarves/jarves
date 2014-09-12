@@ -1,5 +1,6 @@
 import {Directive, Inject} from '../annotations';
 import {each} from '../utils';
+import angular from '../angular';
 
 import Jarves from '../services/Jarves';
 import WindowManagement from '../services/WindowManagement';
@@ -8,6 +9,7 @@ import ObjectRepository from '../services/ObjectRepository';
 @Directive('jarvesGrid', {
     restrict: 'E',
     scope: true,
+    transclude: true,
     templateUrl: 'bundles/jarves/views/grid.html'
 })
 @Inject('$scope, $element, $attrs, backend, $q, $parse, jarves, objectRepository')
@@ -16,7 +18,7 @@ export default class JarvesGrid {
     constructor($scope, $element, $attrs, backend, $q, $parse, jarves, objectRepository) {
         this.$scope = $scope;
         this.$parse = $parse;
-        this.$scope.controller = this;
+        this.$scope.gridController = this;
         this.element = $element;
         this.backend = backend;
         this.q = $q;
@@ -34,13 +36,14 @@ export default class JarvesGrid {
                 this.selected = value;
             });
 
-            $scope.$watch('controller.selected', (value) => {
+            $scope.$watch('gridController.selected', (value) => {
                 this.$parse(this.$attrs.model).assign(this.$scope.$parent, value);
             });
         }
     }
 
-    link() {
+    link(scope, element, attributes, controller, transclude) {
+        this.transclude = transclude;
         this.jarves.loadEntryPointOptions(this.getEntryPoint()).success((response) => {
             this.classProperties = response.data;
             if (this.classProperties.object && this.preSelect) {
@@ -159,6 +162,12 @@ export default class JarvesGrid {
                this.$parse(this.$attrs.model).assign(this.$scope.$parent, this.selected);
            //}
        }
+    }
+
+    isSelected(item) {
+        var pk = this.jarves.getObjectPk(this.classProperties.object, item);
+
+        return angular.equals(pk, this.selected);
     }
 
     getPk(item) {

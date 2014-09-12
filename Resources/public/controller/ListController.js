@@ -4,7 +4,7 @@ import {Inject} from '../annotations';
 export default class ListController {
     constructor($scope, $element, $attrs, $q, backend, objectRepository, jarves) {
         this.scope = $scope;
-        this.scope.controller = this;
+        this.scope.listController = this;
         this.element = $element;
         this.backend = backend;
         this.objectRepository = objectRepository;
@@ -16,7 +16,6 @@ export default class ListController {
         this.jarves.loadEntryPointOptions(this.getEntryPoint()).success(function(response) {
             this.classProperties = response.data;
         }.bind(this));
-
     }
 
     getEntryPoint() {

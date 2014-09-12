@@ -92,6 +92,9 @@ export default class WindowController {
      */
     setFrame(element) {
         this.frame = element;
+        if (this.sidebar) {
+            this.frame.attr('with-sidebar', true);
+        }
     }
 
     /**
@@ -173,7 +176,14 @@ export default class WindowController {
      * angular link method
      */
     link() {
-        this.element.addClass('jarves-admin jarves-Window-border');
+        this.element.addClass('jarves-Window-border');
+
+        this.dialogContainer = angular.element('<div class="jarves-Window-dialog-container"></div>');
+        this.element.append(this.dialogContainer);
+    }
+
+    getDialogContainer() {
+        return this.dialogContainer;
     }
 
     /**

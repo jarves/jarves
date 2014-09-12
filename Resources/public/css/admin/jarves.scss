@@ -1,7 +1,5 @@
 @import "base";
 
-
-
 html, body {
     margin: 0;
     padding: 0;
@@ -40,7 +38,15 @@ $base-font-size: 13px;
 //    background-color: lighten($mainColor, 7%);
 //}
 
+button::-moz-focus-inner {
+    border:0;
+    padding:0;
+}
+
 .jarves-admin {
+
+    color: $mainTextColor;
+
     table {
         border-collapse: separate;
         border-spacing: 0px;
@@ -74,6 +80,10 @@ $base-font-size: 13px;
     h2.light,
     h3.light {
         font-weight: 300;
+    }
+
+    stylesheetstrong, b {
+        font-weight: 400;
     }
 
     .jarves-clear {
@@ -151,6 +161,10 @@ $base-font-size: 13px;
     }
 }
 
+
+
+
+
 .jarves-border {
     border: 1px solid #e6e6e6;
     border-radius: 3px;
@@ -166,118 +180,6 @@ $base-font-size: 13px;
 
 .jarves-description {
     color: #a5a5a5;
-}
-
-.jarves-Full {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-}
-
-.jarves-Full-top {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-}
-
-.jarves-Full-bottom {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-}
-
-.jarves-Full-left {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-}
-
-.jarves-Full-right {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-}
-
-.jarves-content-row {
-    padding: 5px 10px;
-}
-
-.jarves_wysiwyg_toolbar > div > div {
-    display: block !important;
-    width: auto !important;
-
-}
-
-.jarves_wysiwyg_toolbar .mce-menubar {
-    width: auto !important;
-    height: auto !important;
-}
-
-.jarves_wysiwyg_toolbar .mce-container {
-    position: relative !important;
-    top: 0 !important;
-    background: transparent;
-    border: 0;
-}
-
-.jarves_wysiwyg_toolbar .mce-container,
-.jarves_wysiwyg_toolbar .mce-container > div,
-.jarves_wysiwyg_toolbar .mce-container > div > div {
-    width: auto !important;
-    height: auto !important;
-    white-space: normal !important;
-    text-align: center;
-    border-radius: 0;
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
-    box-shadow: none;
-}
-
-.jarves_wysiwyg_toolbar .mce-btn-group .mce-btn.mce-disabled,
-.jarves_wysiwyg_toolbar .mce-btn-group .mce-btn.mce-disabled:hover,
-.jarves_wysiwyg_toolbar .mce-btn-group .mce-btn.mce-active,
-.jarves_wysiwyg_toolbar .mce-btn-group .mce-btn.mce-active:hover,
-.jarves_wysiwyg_toolbar .mce-btn-group .mce-btn:active,
-.jarves_wysiwyg_toolbar .mce-btn-group .mce-btn:hover,
-.jarves_wysiwyg_toolbar .mce-btn-group .mce-btn:focus,
-.jarves_wysiwyg_toolbar .mce-btn:hover,
-.jarves_wysiwyg_toolbar .mce-btn:focus,
-.jarves_wysiwyg_toolbar .mce-btn {
-    background-image: none;
-    box-shadow: none;
-}
-
-.jarves_wysiwyg_toolbar .mce-btn,
-.jarves_wysiwyg_toolbar .mce-panel {
-    background-color: $mainColor;
-}
-.jarves_wysiwyg_toolbar {
-    .mce-btn i {
-        text-shadow: none;
-    }
-    .mce-btn button,
-    .mce-ico,
-    .mce-menubtn span {
-        color: white;
-    }
-
-    .mce-btn:hover, .mce-btn:focus {
-        color: lighten($mainLinkColor, 60%);
-        background-color: lighten($mainColor, 15%);
-        background-image: none;
-    }
-
-    .mce-btn.mce-active, .mce-btn.mce-active:hover {
-        color: lighten($mainLinkColor, 60%);
-        background-color: lighten($mainColor, 10%);
-        background-image: none;
-    }
 }
 
 .jarves-frame {
@@ -381,6 +283,12 @@ $base-font-size: 13px;
     padding: 1px 0;
 }
 
+.jarves-main-menu-logo-container {
+    @include line-top-right;
+    margin-top: 13px;
+    padding: 6px 0;
+}
+
 .jarves-wm-tab {
     line-height: 30px;
     display: inline-block;
@@ -469,6 +377,11 @@ $base-font-size: 13px;
     overflow: auto;
 }
 
+.jarves-main-menu-left-logo {
+    margin: 25px auto;
+    width: 55px;
+}
+
 .jarves-main-menu-actions,
 .jarves-main-menu-user {
     text-align: right;
@@ -505,10 +418,6 @@ input.jarves-main-menu-actions-search-input {
     font-weight: 300;
 }
 
-.jarves-main-menu-user .username {
-    color: #ddd;
-}
-
 .jarves-frame .jarves-main-menu-user a.jarves-Button,
 .jarves-frame .jarves-main-menu-user a.jarves-Button:link {
     background-color: transparent;
@@ -541,213 +450,126 @@ input.jarves-main-menu-actions-search-input {
     border-top-right-radius: 5px;
 }
 
-div.jarves-mainLinks a.bar-dock-logo {
-    width: 30px;
-    padding-left: 5px;
-    padding-right: 5px;
-}
 
-.jarves-main-menu-login-name {
-    text-decoration: none;
-    padding: 8px 5px;
-    padding-top: 8px;
-    font-weight: bold;
-}
+/*
+ * WHITE interfaces
+ */
+.jarves-white {
 
-.jarves-iconbar-item {
-    white-space: nowrap;
-    height: 60px;
-    padding: 0px 5px;
-    line-height: 60px;
-    position: relative;
-    display: inline-block;
-}
+    .jarves-app-container,
+    .jarves-main-dialog-container {
+        color: $whiteMainTextColor;
+        background-color: #f0f0f0;
 
-.jarves-iconbar-item > a,
-.jarves-iconbar-item > a:link {
-    color: #f3f3f3;
-    padding: 0 2px;
-    display: inline-block;
-    text-decoration: none;
-    position: relative;
-    text-shadow: 0px 1px 0px #333
-}
+        a,
+        a:link {
+            color: $whiteLinkColor;
+        }
 
-.jarves-iconbar-item > a:hover:before {
-    color: #ccc;
-}
+        a:hover {
+            color: $whiteLinkHoverColor;
+            background-color: $whiteLinkBgColor;
+        }
 
-.jarves-iconbar-item > a:active:before {
-    color: #999;
-}
 
-.input-round-wrapper {
-    -moz-border-radius: 7px;
-    -webkit-border-radius: 7px;
-    border-radius: 7px;
-    border: 1px solid #888;
-    padding-right: 8px;
-    border-top: 1px solid #666;
-}
+        h1 {
+            color: #797979;
+        }
 
-.jarves-search {
-    position: relative;
-    padding: 0 25px;
-    height: 75px;
-    display: inline-block;
-    line-height: 75px;
-    border-left: 1px solid #39739A;
-}
-
-.jarves-search .jarves-Input-text {
-    box-shadow: none;
-    border: 0;
-}
-
-.jarves-menu-dialog-cat {
-    background-color: #F3F3F3;
-    border-top: 1px solid #E0E0E0;
-    padding: 5px;
-}
-
-.jarves-menu-dialog-cat:nth-child(2n) {
-    background-color: #EFEFEF;
-}
-
-a.jarves-menu-dialog-link {
-    display: inline-block;
-    margin: 15px;
-    padding: 5px;
-    font-size: 15px;
-    color: #444;
-    cursor: pointer;
-    text-align: center;
-}
-
-.jarves-menu-dialog-link > span {
-    display: block;
-    padding-bottom: 7px;
-}
-
-a.jarves-menu-dialog-link:hover {
-    border: 1px solid #C0C0C0;
-    background-color: #F3F3F3;
-    margin: 14px;
-}
-
-a.jarves-main-menu-start {
-    width: 40px;
-}
-
-img.jarves-main-menu-start {
-    width: 30px;
-}
-
-.jarves-main-menu-left-logo {
-    margin: 25px auto;
-    width: 55px;
-}
-
-.jarves-main-menu-logo-container {
-    margin-top: 13px;
-    @include line-top-right(13px);
-    padding: 6px 0;
-}
-
-.jarves-search-query-icon {
-    position: absolute;
-    right: 31px;
-    top: 31px;
-}
-
-a.jarves-create-search-index-icon.green {
-    background-position: left -19px;
-}
-
-a.jarves-create-search-index-icon.yellow {
-    background-position: left -38px;
-}
-
-a.jarves-create-search-index-icon.red {
-    background-position: left -57px;
-}
-
-.jarves-mini-search {
-    position: absolute;
-    bottom: 27px;
-    left: 5px;
-    width: 250px;
-    min-height: 46px;
-    background-color: #F7F7F7;
-    padding: 4px;
-    z-index: 1500000;
-    border: 1px solid #C5C5C5;
-    border-bottom: 0px;
-    max-height: 80%;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-.jarves-mini-search-loading {
-    padding: 5px;
-}
-
-.jarves-mini-search-loading img {
-    margin-right: 4px;
-}
-
-.jarves-mini-search-results h3 {
-    border-bottom: 1px dotted #aaa;
-    font-size: 12px;
-    color: #444;
-    margin: 2px 0px;
-    padding: 2px 0px;
-}
-
-.jarves-mini-search-results ul {
-    padding-left: 19px;
-}
-
-.jarves-mini-search-results a,
-.jarves-mini-search-results a:link {
-    display: block;
-    margin-bottom: 2px;
-}
-
-/**
-*
-* Styles for jarves.Buttons, jarves.Tabs etc
-* for a white background
-*
-*/
-.jarves-main-menu-light .jarves-Window-win-buttonGroup {
-    border-bottom: 1px solid #999; /*#888;*/
-    border-right: 1px solid #999; /*#777;*/
-    border-left: 1px solid #999; /*#777;*/
-    border-top: 1px solid #777; /*#555;*/
-    box-shadow: 0px 1px 0px #eee;
-}
-
-.jarves-loader-main-absolute {
-    left: 0px;
-    right: 0px;
-    top: 0px;
-    bottom: 0px;
-    position: absolute;
-}
-
-@-webkit-keyframes blink {
-    from {
-        opacity: 1.0;
+        h2 {
+            color: #969696;
+        }
     }
-    to {
-        opacity: 0.0;
-    }
-}
 
-.blink {
-    -webkit-animation-name: blink;
-    -webkit-animation-iteration-count: infinite;
-    -webkit-animation-timing-function: cubic-bezier(1.0, 0, 0, 1.0);
-    -webkit-animation-duration: 2s;
+    /*
+     * Window List/Combine
+     */
+    .jarves-Combine-editForm {
+        background-color: #F5F5F5;
+        border-bottom: 1px solid silver;
+    }
+    .jarves-Combine-list {
+        background-color: transparent;
+        border-bottom: 1px solid silver;
+    }
+
+    /*
+     * Reset line-top and bottom
+     */
+    .jarves-main-menu-wm-tabs,
+    .jarves-desktop {
+        @include white-line-top;
+    }
+
+    /*
+     * Window Sidebar
+     */
+    window-sidebar {
+        color: #222;
+    }
+    .jarves-Window-sidebar-title {
+        color: #444;
+    }
+
+    /*
+     * Dashboard
+     */
+    .jarves-Dashboard-widget-content {
+        background-color: #F7F7F7;
+        color: #222;
+    }
+
+    .jarves-app-container:before {
+        position: absolute;
+        background-color: #f0f0f0;
+        bottom: 0;
+        top: 0;
+        content: '';
+        left: -20px;
+        width: 20px;
+    }
+
+    .jarves-app-container:after {
+        position: absolute;
+        background-color: #f0f0f0;
+        bottom: 0;
+        top: 0;
+        content: '';
+        right: -20px;
+        width: 20px;
+    }
+
+    /*
+     * WindowManager Tabs
+     */
+    .jarves-main-menu-actions .jarves-Input-text {
+        background-color: #082329;
+        border: 1px solid #0B2E36;
+    }
+
+    .jarves-wm-tab > a, .jarves-wm-tab > a:link {
+        background-color: transparent;
+    }
+    .jarves-wm-tab > a:hover {
+        background-color: darken($whiteMainColor, 20%);
+    }
+    .jarves-wm-tab {
+        color: #555;
+        background-color: #DBDBDB;
+        border-right: 1px solid #E2E2E2;
+    }
+    .jarves-wm-tab:hover {
+        background-color: darken($whiteMainColor, 5%);
+    }
+    .jarves-wm-tab-active, .jarves-wm-tab-active:hover {
+        color: #333;
+        background-color: $whiteMainColor;
+        height: 31px;
+    }
+    .jarves-main-menu-wm-tabs {
+        padding: 0;
+    }
+    .jarves-desktop {
+        top: 44px;
+    }
 }

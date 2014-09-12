@@ -30,9 +30,19 @@ input.text {
     @include transition(all 0.2s ease-out);
     border: 1px solid lighten($mainColor, 8%);
 }
+
 .jarves-Input-text:hover,
 input.text:hover {
     background-color: lighten($mainColor, 7%);
+}
+
+.jarves-white {
+    .jarves-Input-text, input.text {
+        border-radius: 2px;
+        background-color: #fafafa;
+        border: 1px solid #dadada;
+        color: #333;
+    }
 }
 
 textarea.jarves-Input-text {

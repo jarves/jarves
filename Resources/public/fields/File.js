@@ -12,8 +12,8 @@ export default class File extends AbstractFieldType {
         this.objectRepository = null;
     }
 
-    link(scope, element, attr) {
-        super(scope, element, attr);
+    link(scope, element, attr, controller, transclude) {
+        super(scope, element, attr, controller, transclude);
 
         this.renderTemplateUrl(
             this.template

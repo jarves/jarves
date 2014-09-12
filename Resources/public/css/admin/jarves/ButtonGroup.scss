@@ -3,18 +3,33 @@
 button-group {
     margin: 0 4px;
     display: inline-block;
-
     white-space: nowrap;
-    position: relative;
-    vertical-align: top;
 }
 
-button-group > * {
+button-group:first-child {
+    margin-left: 0;
+}
+
+button-group:last-child {
+    margin-right: 0;
+}
+
+button-group > button {
     margin-left: 0 !important;
     margin-right: 0 !important;
     float: left;
 }
 
+button-group:after {
+    clear: both;
+    content: ' ';
+    display: table;
+}
+
 button-group[float="right"] {
     float: right;
+}
+
+button-group[float="left"] {
+    float: left;
 }

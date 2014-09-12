@@ -1,32 +1,11 @@
 import AbstractLabel from './AbstractLabel';
-import {Label} from '../annotations';
+import {Label, InjectAsProperty} from '../annotations';
 import {each} from '../utils';
 import angular from '../angular';
 
 @Label('select')
+@InjectAsProperty('objectRepository')
 export default class Select extends AbstractLabel {
-
-// jarves.LabelTypes.Select = new Class({
-//     Extends: jarves.LabelTypes.AbstractLabelType,
-
-//     Statics: {
-//         $inject: ['$scope', '$element', '$attrs', '$compile', '$parse', '$timeout', '$http', '$templateCache', '$q', '$interpolate', 'objectRepository']
-//     },
-
-//     objectRepository: null,
-//     //options: {
-//     //    relationsAsArray: false
-//     //},
-
-//     JarvesLabel: 'select',
-
-//     template: 'bundles/jarves/admin/js/views/label.select.html',
-
-//     selectedItem: {},
-//     data: {},
-//     value: null,
-//     items: {},
-//     
     constructor(...deps) {
         super(...deps);
         this.template = 'bundles/jarves/views/label.select.html';
@@ -35,7 +14,6 @@ export default class Select extends AbstractLabel {
         this.data = {};
         this.value = null;
         this.items = {};
-        console.info('new Select label');
     }
 
     link(scope, element, attributes) {
@@ -43,12 +21,12 @@ export default class Select extends AbstractLabel {
             this.template
         );
 
-        scope.$parent.$watch(this.getModelName(), function(id) {
-            this.value = id;
-            this.updateSelected();
-        }.bind(this));
-
         this.setupItems();
+
+        this.onModelValueChange((value) => {
+            this.value = value;
+            this.updateSelected();
+        });
     }
 
     updateSelected() {
@@ -57,6 +35,7 @@ export default class Select extends AbstractLabel {
 
     setupItems() {
         if (this.getOption('object')) {
+            //todo change to objectcollection
             this.objectRepository.getItems(this.getOption('object')).then(this.prepareItems.bind(this));
         } else {
             this.prepareItems(this.getOption('items'));

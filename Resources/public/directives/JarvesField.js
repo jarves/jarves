@@ -18,7 +18,9 @@ export default class JarvesField {
         this.$q = $q;
     }
 
-    link(scope, element, attributes) {
+    link(scope, element, attributes, controller, transclude) {
+        console.info('new jarvesField', !!transclude);
+        this.transclude = transclude;
         if (attributes['definition']) {
             this.$scope.$watch(attributes['definition'], (definition) => {
                 this.load(definition);
@@ -33,8 +35,7 @@ export default class JarvesField {
             throw 'invalid value for definition attribute in <jarves-field definition="%s" />'.sprintf(this.$attrs.definition);
         }
         if (!definition.type) {
-            console.error(definition);
-            throw 'no type define in <jarves-field />';
+            console.error('no type define in <jarves-field />', definition);
         }
         this.$element.attr('jarves-%s-field'.sprintf(definition.type.lcfirst()), '');
         this.$compile(this.$element, null, 5000)(this.$scope);
