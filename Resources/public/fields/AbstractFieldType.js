@@ -141,9 +141,9 @@ export default class AbstractFieldType {
     }
 
     setAnotherModelValue(modelName, value) {
-        this.$timeout(function() {
-            this.$parse(modelName).assign(this.$scope.$parent, value);
-        }.bind(this));
+        // this.$timeout(function() {
+        this.$parse(modelName).assign(this.$scope.$parent, value);
+        // }.bind(this));
     }
 
     getModelValue() {
@@ -151,16 +151,22 @@ export default class AbstractFieldType {
         return this.$scope.$parent.$eval(modelName);
     }
 
-    //getModelName() {
+    getAnotherModelValue(modelName) {
+        return this.$scope.$parent.$eval(modelName);
+    }
+
+    // getModelName() {
     //    return this.getOption('model') || '$parent.model.' + this.getOption('id');
-    //},
+    // }
 
     getRelativeModelName(key) {
         var myModelName = this.getModelName();
         var parts = myModelName.split('.');
         parts.pop();
 
-        return parts.join('.') + '.' + key;
+        var prefix = parts.join('.');
+
+        return (prefix ? prefix + '.' : '') + key;
     }
 
     link(scope, element, attributes, controller, transclude) {
@@ -192,9 +198,22 @@ export default class AbstractFieldType {
 
         transclude(scope, (clone) => {
             this.childrenContainer.append(clone);
-        })
+        });
+
+        this.setDefaultValue();
     }
 
+    setDefaultValue() {
+        var defaultValue = this.getOption('default');
+        if (defaultValue) {
+            this.setModelValue(defaultValue);
+        }
+    }
+
+    /** 
+     * Do some way to save not yet saved data. Propably uploading a file or something.
+     * Return a promise if it should be asynchronouse.
+     */
     save() {
         return true;
     }

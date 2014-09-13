@@ -5,7 +5,7 @@ import {Directive} from '../annotations';
     require: '^jarvesWindow',
     transclude: true,
     scope: {
-        label: '='
+        label: '@'
     },
     template: '<window-sidebar-container><div class="jarves-Window-sidebar-title">{{label}}</div><div ng-transclude></div></window-sidebar-container>'
 })

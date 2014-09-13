@@ -117,11 +117,8 @@ export default class JarvesForm {
         this.backend.post(optionsEntryPoint + '/?_method=options')
             .success((response) => {
                 this.options = response.data;
-                console.log('options loaded from entry point');
-                if (this.pk) {
-                    this.loadData();
-                }
                 this.lastLoadedClassPropertiesPath = optionsEntryPoint;
+                this.loadData();
             })
             .error((response) => {
                 this.error = response;
@@ -134,6 +131,11 @@ export default class JarvesForm {
     }
 
     loadData() {
+        if (!this.pk) {
+            this.originalData = angular.copy(this.$scope.model);
+            return;
+        }
+
         console.log('loadData', this.options);
 
         var id = this.jarves.getObjectUrlId(this.getObjectKey(), this.getPrimaryKey());
@@ -253,10 +255,6 @@ export default class JarvesForm {
     }
 
     hasChanges() {
-        if (!this.itemLoaded) {
-            return false;
-        }
-
         var diff = this.getChangedData();
         console.log('haschanges', diff);
         return !angular.equals({}, diff);

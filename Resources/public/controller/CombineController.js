@@ -30,37 +30,57 @@ export default class CombineController extends ListController {
 
         $scope.$watch('combineController.selected', function(value, oldValue) {
             if (!angular.equals(this.editId, value)) {
+                console.log('selected change', this.scope.forms.addForm, this.scope.forms.addForm ? this.scope.forms.addForm.getChangedData(): null);
                 if (this.scope.forms.addForm && this.scope.forms.addForm.hasChanges()) {
-                    this.showUnsagedDialog = true;
                     this.unsavedDialogOldValue = oldValue;
+                    this.showUnsavedDialog = true;
+                    // this.switchBackToEditView = 2;
                     return;
                 }
                 if (this.scope.forms.editForm && this.scope.forms.editForm.hasChanges()) {
-                    this.showUnsagedDialog = true;
                     this.unsavedDialogOldValue = oldValue;
+                    this.showUnsavedDialog = true;
+                    // this.switchBackToEditView = this.editView;
                     return;
                 }
             }
 
             this.editId = value;
 
-            if (value) {
+            if (this.switchToEditView) {
+                this.editView = this.switchToEditView;
+                delete this.switchToEditView;
+            } else if (this.editId) {
                 this.currentView = 2;
                 this.editView = 1;
             }
         }.bind(this));
     }
 
-    stopUnsagedDialog() {
+
+    unsavedDialogStay() {
         this.selected = this.unsavedDialogOldValue;
-        this.showUnsagedDialog = false;
         delete this.unsavedDialogOldValue;
+        // this.editView = this.switchBackToEditView;
+        this.showUnsavedDialog = false;
+        // delete this.switchBackToEditView;
+        delete this.switchToEditView;
     }
 
-    continueUnsagedialog() {
+    unsaveDialogDiscard() {
+        console.log('switch back to ', this.selected, this.switchToEditView, this.switchBackToEditView);
         this.editId = this.selected;
-        this.showUnsagedDialog = false;
         delete this.unsavedDialogOldValue;
+        this.showUnsavedDialog = false;
+
+        if (this.switchToEditView) {
+            this.editView = this.switchToEditView;
+            delete this.switchToEditView;
+        } else if (this.editId) {
+            this.currentView = 2;
+            this.editView = 1;
+        }
+
     }
 
     edit(pk) {
@@ -75,8 +95,8 @@ export default class CombineController extends ListController {
 
     showAdd() {
         this.currentView = 2;
-        this.editView = 2;
-        this.selected = null;
+        this.switchToEditView = 2;
+        this.selected = null; //triggers $watch .selected and use if anything is good switchToEditView as new view
     }
 
     getEditEntryPoint() {

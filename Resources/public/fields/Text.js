@@ -187,18 +187,19 @@ export default class Text extends AbstractFieldType {
     bindRedirect(targetModelName, modifier, onlySame) {
 
         this.$scope.$watch(this.getModelName(), function(value, oldValue) {
-            var currentValue = this.getModelValue(this.getRelativeModelName(targetModelName));
+            var currentValue = this.getAnotherModelValue(this.getRelativeModelName(targetModelName)) || '';
             var convertedNew = this.applyModifier(value, modifier);
             var convertedOld = this.applyModifier(oldValue, modifier);
-            //console.log('new change', this.getModelName(),' => ', this.getRelativeModelName(targetModelName), ':', value, '=>', convertedNew, '(', currentValue,')');
+            // console.log('new change', this.getModelName(),' => ', this.getRelativeModelName(targetModelName), ':', value, '=>', convertedNew, '(', currentValue,')');
 
             if (onlySame) {
                 if (convertedOld != currentValue) {
+                    // console.log('not equal', convertedOld, currentValue);
                     return;
                 }
             }
 
-            this.setModelValue(this.getRelativeModelName(targetModelName), convertedNew);
+            this.setAnotherModelValue(this.getRelativeModelName(targetModelName), convertedNew);
         }.bind(this));
 
         //

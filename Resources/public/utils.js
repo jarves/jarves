@@ -628,7 +628,7 @@ export function getPreparedConstructor(controller) {
     var propertyMap = {};
 
     if (!injectAsProperty.length && !annotations.length) {
-        return controller;
+        return false;
     }
 
     for (let annotation of injectAsProperty) {
@@ -636,16 +636,18 @@ export function getPreparedConstructor(controller) {
         propertyMap[annotation.propertyName] = $inject.length - 1;
     }
 
-    var constructor = (...deps) => {
+    var constructor = $inject;
+
+    constructor.push((...deps) => {
         var args = deps.slice(0, injectsViaInjectCount);
         var instance = new controller(...args);
         for (let [name, position] of each(propertyMap)) {
             instance[name] = deps[position];
         }
         return instance;
-    };
+    });
 
-    constructor.$inject = $inject;
+    // constructor.$inject = $inject;
 
     return constructor;
 }
@@ -663,14 +665,15 @@ export function registerModuleField(angularModule, controller) {
         throw 'No Field annotations on class ' + controller
     }
     var FieldAnnotation = annotations[0];
-    controller = getPreparedConstructor(controller);
+    var constructor = getPreparedConstructor(controller);
+    if (!constructor) constructor = controller;
 
     var directiveName = 'jarves' + FieldAnnotation.name.ucfirst() + 'Field';
 
     var options = FieldAnnotation.options || {};
     options = angular.extend({
         restrict: 'A',
-        controller: controller,
+        controller: constructor,
         scope: true,
         transclude: true,
         require: [directiveName, 'jarvesField', '?^jarvesField', '?^jarvesForm'],
@@ -701,7 +704,6 @@ export function registerModuleField(angularModule, controller) {
         }
     }, options);
 
-    console.log('register field', FieldAnnotation.name, options);
     angularModule.directive(
         directiveName,
         function() {
@@ -718,11 +720,25 @@ export function registerModuleFilter(angularModule, controller) {
     }
     var FilterAnnotation = annotations[annotations.length-1];
 
-    controller = getPreparedConstructor(controller);
+    var constructor = getPreparedConstructor(controller);
 
-    angularModule.filter(FilterAnnotation.name, function() {
-        return (new controller).filter;
-    });
+    if (!constructor) {
+        constructor = function() {
+            let instance = new controller();
+            return instance.filter;
+        }
+        angularModule.filter(FilterAnnotation.name, constructor);
+    } else {
+        var diFunction = constructor[constructor.length - 1];
+        var overwrittenConstructor = constructor;
+
+        overwrittenConstructor[overwrittenConstructor.length - 1] = function(...deps) {
+            var instance = diFunction(...deps);
+            return instance.filter.bind(instance);
+        }
+
+        angularModule.filter(FilterAnnotation.name, overwrittenConstructor);
+    }
 }
 
 /**
@@ -740,7 +756,8 @@ export function registerModuleLabel(angularModule, controller) {
         throw 'No Field annotations on class ' + controller
     }
     var LabelAnnotation = annotations[0];
-    controller = getPreparedConstructor(controller);
+    var constructor = getPreparedConstructor(controller);
+    if (!constructor) constructor = controller;
 
     var directiveName = 'jarves' + LabelAnnotation.name.ucfirst() + 'Label';
 
@@ -748,7 +765,7 @@ export function registerModuleLabel(angularModule, controller) {
     var options = LabelAnnotation.options || {};
     options = angular.extend({
         restrict: 'A',
-        controller: controller,
+        controller: constructor,
         scope: true,
         require: [directiveName, '?^jarvesForm'],
         link: function(scope, element, attr, ctrl, transclude) {
@@ -764,7 +781,6 @@ export function registerModuleLabel(angularModule, controller) {
         }
     }, options);
 
-    console.log('register label', LabelAnnotation.name, options);
     angularModule.directive(
         directiveName,
         function() {
@@ -786,13 +802,14 @@ export function registerModuleDirective(angularModule, controller) {
         throw 'No Directive annotations on class ' + controller
     }
 
-    controller = getPreparedConstructor(controller);
+    var constructor = getPreparedConstructor(controller);
+    if (!constructor) constructor = controller;
 
     var DirectiveAnnotation = annotations[0];
 
     var definition = DirectiveAnnotation.options || {};
     if (!definition.controller) {
-        definition.controller = controller;
+        definition.controller = constructor;
     }
 
     if (!definition.link) {
@@ -806,20 +823,19 @@ export function registerModuleDirective(angularModule, controller) {
 
         definition.link = function(scope, element, attr, ctrl, transclude) {
             var ownController, controllersToPass;
+            // console.log('link', DirectiveAnnotation.name, definition.require, [ctrl]);
             if (angular.isArray(ctrl)) {
-                ownController = ctrl[0];
-                controllersToPass = ctrl;
-                controllersToPass.shift();
+                ownController = ctrl.shift();
             } else {
                 ownController = ctrl;
             }
 
-            if (controllersToPass && 1 === controllersToPass.length) {
-                controllersToPass = controllersToPass[0];
+            if (angular.isArray(ctrl) && 1 === ctrl.length) {
+                ctrl = ctrl[0];
             }
 
             if (ownController && ownController.link) {
-                ownController.link.apply(ownController, [scope, element, attr, controllersToPass, transclude]);
+                ownController.link.apply(ownController, [scope, element, attr, ctrl, transclude]);
             }
         };
     }

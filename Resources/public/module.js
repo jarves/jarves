@@ -7,7 +7,7 @@ import angular from './angular';
 import {registerModuleField, registerModuleDirective, registerModuleFilter, registerModuleLabel} from './utils';
 import {getPreparedConstructor} from './utils';
 
-var jarvesModule = angular.module('jarves', []);
+var jarvesModule = angular.module('jarves', ['ngAnimate']);
 export default jarvesModule;
 
 export function registerField(controller) {
@@ -45,6 +45,8 @@ import JarvesList from './directives/JarvesList';
 import JarvesListItem from './directives/JarvesListItem';
 import JarvesListTemplate from './directives/JarvesListTemplate';
 import JarvesTabs from './directives/JarvesTabs';
+import JarvesTree from './directives/JarvesTree';
+import JarvesTreeItem from './directives/JarvesTreeItem';
 import Layout from './directives/Layout';
 import LayoutCell from './directives/LayoutCell';
 import SelectOption from './directives/SelectOption';
@@ -69,6 +71,8 @@ registerDirective(JarvesList);
 registerDirective(JarvesListItem);
 registerDirective(JarvesListTemplate);
 registerDirective(JarvesTabs);
+registerDirective(JarvesTree);
+registerDirective(JarvesTreeItem);
 registerDirective(Layout);
 registerDirective(LayoutCell);
 registerDirective(SelectOption);
@@ -110,17 +114,20 @@ registerLabel(ObjectLabel);
 registerLabel(SelectLabel);
 
 import ToArray from './filters/ToArray';
+import TranslateFilter from './filters/Translate';
 registerFilter(ToArray);
+registerFilter(TranslateFilter);
 
 jarvesModule.config(function($provide) {
     $provide.decorator("$controller", ['$delegate', ($delegate) => {
         return function(constructor, locals) {
             if (angular.isString(constructor)) {
                 try {
-                    var module = System.get(constructor);
-                    if (module) {
+                    var moduleClass = System.get(constructor);
+                    if (moduleClass) {
+                        var preparedConstructor = getPreparedConstructor(System.get(constructor).default);
                         console.log('es6 module found for ', constructor);
-                        constructor = getPreparedConstructor(System.get(constructor).default);
+                        constructor = preparedConstructor || System.get(constructor).default;
                     }
                 } catch (e){
                 }

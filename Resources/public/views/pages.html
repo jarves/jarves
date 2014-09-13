@@ -1,6 +1,11 @@
 <window-frame>
 
-My List ({{myListSelected}})
+    <jarves-field model="title" type="text" label="Title"></jarves-field>
+
+    selectTreeId: {{selectTreeId}}
+    <jarves-tree entry-point="jarves/node" model="selectTreeId"></jarves-tree>
+
+<!-- My List ({{myListSelected}})
 	<jarves-list model="myListSelected" items="[{title: 'teschd'}, {title: 'another'}]">
 		<jarves-list-template>
 			{{item.title}}
@@ -29,7 +34,7 @@ Category List ({{categoryListSelected}})
         form: {{form.getName()}}<br/>
 
         <button ng-click="form.save()">Save</button>
-    </jarves-form>
+    </jarves-form> -->
 </window-frame>
 
 <window-sidebar>

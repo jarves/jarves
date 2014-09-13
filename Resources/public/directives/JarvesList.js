@@ -13,7 +13,7 @@ export default class JarvesList {
     constructor($scope, $element, $attrs, backend, $q, $parse, $compile, jarves, objectRepository) {
         this.$scope = $scope;
         this.$parse = $parse;
-        this.$scope.controller = this;
+        this.$scope.listController = this;
         this.$element = $element;
         this.backend = backend;
         this.$q = $q;
@@ -28,8 +28,8 @@ export default class JarvesList {
 
         this.itemTemplateElement = null;
 
-        this.template = '<jarves-list-item ng-repeat="item in controller.items" ng-class="{\'selected\': controller.isSelectedIndex($index)}"\
-                         ng-click="controller.selectable && controller.selectIndex($index)"></jarves-list-item>';
+        this.template = '<jarves-list-item ng-repeat="item in listController.items" ng-class="{\'selected\': listController.isSelectedIndex($index)}"\
+                         ng-click="listController.selectable && listController.selectIndex($index)"></jarves-list-item>';
 
         if ($attrs.entryPoint) {
             this.entryPoint = $scope.$parent.$eval($attrs.entryPoint);
@@ -41,17 +41,18 @@ export default class JarvesList {
             $scope.$parent.$watch($attrs.model, (value) => {
                 if ($attrs.entryPoint) {
                     this.selectedPk = value;
+                    this.searchAndSetIndex();
                 } else {
                     this.selected = value;
                 }
             });
 
             if ($attrs.entryPoint) {
-                $scope.$watch('controller.selectedPk', (value) => {
+                $scope.$watch('listController.selectedPk', (value) => {
                     this.$parse(this.$attrs.model).assign(this.$scope.$parent, value);
                 });
             } else {
-                $scope.$watch('controller.selected', (value) => {
+                $scope.$watch('listController.selected', (value) => {
                     this.$parse(this.$attrs.model).assign(this.$scope.$parent, value);
                 });
             }
@@ -226,31 +227,26 @@ export default class JarvesList {
        this.selectedPk = this.jarves.getObjectPk(this.classProperties.object, item);
     
        if (this.$attrs.model) {
-           //var oldModelValue = this.$scope.$parent.$eval(this.$attrs.model);
-           //console.log('compare', angular.equals(oldModelValue, this.selected), oldModelValue, this.selected);
-           //if (!angular.equals(oldModelValue, this.selected)) {
-           //    console.log('select grid', this.selected, this.$attrs.model);
-               this.$parse(this.$attrs.model).assign(this.$scope.$parent, this.selected);
-           //}
+           this.$parse(this.$attrs.model).assign(this.$scope.$parent, this.selected);
        }
     }
 
-    // searchAndSetIndex() {
-    //     if (!this.selectedPk) {
-    //         this.selected = null;
-    //         return;
-    //     }
-    //     if (this.getEntryPoint()) {
-    //         for (let [index, item] of each(this.items)) {
-    //             let pk = this.jarves.getObjectPk(this.classProperties.object, item);
-    //             if (pk === this.selectedPk) {
-    //                 this.selected = index;
-    //                 return;
-    //             }
-    //         }
-    //         this.selected = null;
-    //     }
-    // }
+    searchAndSetIndex() {
+        if (!this.selectedPk) {
+            this.selected = null;
+            return;
+        }
+        if (this.getEntryPoint()) {
+            for (let [index, item] of each(this.items)) {
+                let pk = this.jarves.getObjectPk(this.classProperties.object, item);
+                if (pk === this.selectedPk) {
+                    this.selected = index;
+                    return;
+                }
+            }
+            this.selected = null;
+        }
+    }
 
     selectIndex(index) {
         if (this.getEntryPoint()) {

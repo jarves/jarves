@@ -19,7 +19,7 @@
                 Loading ...
             </div>
             <div ng-if="combineController.classProperties" style="height: 100%;">
-                <div class="jarves-Combine-grid">
+                <div ng-show="combineController.currentView == 1" class="jarves-Combine-grid">
                     <div class="jarves-line-top"></div>
                     <jarves-grid name="listGrid" entry-point="combineController.getEntryPoint()" model="combineController.selected">
                         <button ng-click="combineController.edit(gridController.getPk(item))" icon="#icon-pencil-2" title="Edit"></button>
@@ -35,7 +35,7 @@
                             </layout-cell>
                             <layout-cell class="jarves-Combine-editForm">
                                 <div class="jarves-line-top"></div>
-                                <jarves-form name="editForm" ng-if="combineController.editView == 1 && combineController.selected"
+                                <jarves-form name="editForm" ng-if="combineController.editView == 1 && combineController.editId"
                                              pk="combineController.editId" entry-point="combineController.getEditEntryPoint()" options-entry-point="combineController.getEditEntryPoint()">
                                 </jarves-form>
                                 <jarves-form name="addForm" ng-if="combineController.editView == 2" entry-point="combineController.getAddEntryPoint()"
@@ -46,28 +46,28 @@
                     </jarves-layout>
                 </div>
             </div>
-            <window-dialog show="combineController.showUnsagedDialog">
+            <window-dialog show="combineController.showUnsavedDialog">
                 <p></p>
-                <p>You have unsaved data, which will be lost if you continue. Discard changes?</p>
+                <p>You have unsaved data which will be lost if you continue.<br/>What would you like to do?</p>
 
                 <action-bar>
-                    <button ng-click="combineController.continueUnsagedialog()">Discard changes</button>
-                    <button ng-click="combineController.stopUnsagedDialog()" focus="windowDialog.isOpen" primary>Stay</button>
+                    <button ng-click="combineController.unsaveDialogDiscard()">Discard changes</button>
+                    <button ng-click="combineController.unsavedDialogStay()" focus="windowDialog.isOpen" primary>Keep changes</button>
                 <action-bar>
             </window-dialog>
         </window-content>
     </window-frame>
 
-    <window-sidebar label="'Actions'">
-        <button ng-if="forms.editForm && combineController.editView == 1" ng-click="forms.editForm.save()" icon="#icon-checkmark-6" translate>
-            Save
+    <window-sidebar label="Actions">
+        <button ng-if="forms.editForm && combineController.editView == 1" ng-click="forms.editForm.save()" icon="#icon-checkmark-6">
+            <span translate>Save</span>
             <span ng-if="combineController.formController.hasChanges()">*</span>
         </button>
-        <button ng-if="forms.addForm && combineController.editView == 2" ng-click="forms.addForm.add()" translate>Save</button>
+        <button ng-if="forms.addForm && combineController.editView == 2" ng-click="forms.addForm.add()" icon="#icon-checkmark-6" translate>Save</button>
         <button ng-if="forms.editForm && combineController.editView == 1" ng-click="forms.editForm.remove()" icon="{{combineController.classProperties.removeIcon}}" translate>Remove</button>
         <button ng-if="forms.editForm && combineController.editView == 1" ng-click="forms.editForm.reset()" icon="#icon-escape" translate>Remove</button>
         <window-sidebar-delimiter ng-if="forms.editForm || forms.addForm"></window-sidebar-delimiter>
-        <button ng-click="combineController.showAdd()" translate icon="{{combineController.classProperties.addIcon}}">New</button>
+        <button ng-click="combineController.showAdd()" pressed="combineController.editView == 2" translate icon="{{combineController.classProperties.addIcon}}">New</button>
         <button ng-if="combineController.classProperties.nestedRootAdd" icon="{{combineController.classProperties.nestedRootAddIcon}}" ng-click="combineController.showAdd()" translate>New Domain</button>
     </window-sidebar>
 </div>
