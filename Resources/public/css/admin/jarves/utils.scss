@@ -1,0 +1,21 @@
+@import "../base";
+
+.jarves-line-top {
+    @include line-top;
+}
+
+.jarves-line-bottom {
+    @include line-bottom;
+}
+
+
+.jarves-white {
+    .jarves-line-top {
+        @include white-line-top;
+    }
+
+    .jarves-line-bottom {
+        @include white-line-bottom;
+    }
+}
+

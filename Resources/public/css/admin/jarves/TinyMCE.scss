@@ -1,0 +1,105 @@
+@import "../base";
+
+.jarves_wysiwyg_toolbar > div > div {
+    display: block !important;
+    width: auto !important;
+
+}
+
+.jarves_wysiwyg_toolbar .mce-menubar {
+    width: auto !important;
+    height: auto !important;
+}
+
+.jarves_wysiwyg_toolbar .mce-container {
+    position: relative !important;
+    top: 0 !important;
+    background: transparent;
+    border: 0;
+}
+
+.jarves_wysiwyg_toolbar .mce-container,
+.jarves_wysiwyg_toolbar .mce-container > div,
+.jarves_wysiwyg_toolbar .mce-container > div > div {
+    width: auto !important;
+    height: auto !important;
+    white-space: normal !important;
+    text-align: center;
+    border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    box-shadow: none;
+}
+
+.jarves_wysiwyg_toolbar .mce-btn-group .mce-btn.mce-disabled,
+.jarves_wysiwyg_toolbar .mce-btn-group .mce-btn.mce-disabled:hover,
+.jarves_wysiwyg_toolbar .mce-btn-group .mce-btn.mce-active,
+.jarves_wysiwyg_toolbar .mce-btn-group .mce-btn.mce-active:hover,
+.jarves_wysiwyg_toolbar .mce-btn-group .mce-btn:active,
+.jarves_wysiwyg_toolbar .mce-btn-group .mce-btn:hover,
+.jarves_wysiwyg_toolbar .mce-btn-group .mce-btn:focus,
+.jarves_wysiwyg_toolbar .mce-btn:hover,
+.jarves_wysiwyg_toolbar .mce-btn:focus,
+.jarves_wysiwyg_toolbar .mce-btn {
+    background-image: none;
+    box-shadow: none;
+}
+
+.jarves_wysiwyg_toolbar .mce-btn,
+.jarves_wysiwyg_toolbar .mce-panel {
+    background-color: $mainColor;
+}
+.jarves_wysiwyg_toolbar {
+    .mce-btn i {
+        text-shadow: none;
+    }
+    .mce-btn button,
+    .mce-ico,
+    .mce-menubtn span {
+        color: white;
+    }
+
+    .mce-btn:hover, .mce-btn:focus {
+        color: lighten($mainLinkColor, 60%);
+        background-color: lighten($mainColor, 15%);
+        background-image: none;
+    }
+
+    .mce-btn.mce-active, .mce-btn.mce-active:hover {
+        color: lighten($mainLinkColor, 60%);
+        background-color: lighten($mainColor, 10%);
+        background-image: none;
+    }
+}
+
+
+.jarves-white {
+
+    .jarves_wysiwyg_toolbar .mce-btn,
+    .jarves_wysiwyg_toolbar .mce-panel {
+        background-color: $whiteMainColor;
+    }
+    .jarves_wysiwyg_toolbar {
+        .mce-btn i {
+            text-shadow: none;
+        }
+        .mce-btn button,
+        .mce-ico,
+        .mce-menubtn span {
+            color: black;
+        }
+
+        .mce-btn:hover, .mce-btn:focus {
+            color: lighten($whiteMainLinkColor, 60%);
+            background-color: lighten($whiteMainColor, 15%);
+            background-image: none;
+        }
+
+        .mce-btn.mce-active, .mce-btn.mce-active:hover {
+            color: lighten($whiteMainLinkColor, 60%);
+            background-color: lighten($whiteMainColor, 10%);
+            background-image: none;
+        }
+    }
+
+}

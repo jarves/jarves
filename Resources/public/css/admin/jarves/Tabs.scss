@@ -1,0 +1,47 @@
+jarves-tabs {
+    display: block;
+}
+
+jarves-tabs > button-group {
+    display: block;
+    margin-top: 1px;
+}
+
+.jarves-Tabs-fullsize {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.jarves-Tabs-fullsize > .jarves-Tabs-pane {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+
+    -webkit-overflow-scrolling: touch;
+    overflow: auto;
+}
+
+.jarves-admin {
+    jarves-tabs > button-group > button.pressed
+    jarves-tabs > button-group > button.pressed:hover {
+        background-color: transparent;
+    }
+
+    jarves-tabs > button-group > button {
+        line-height: 26px;
+        height: 26px;
+        font-size: 14px;
+    }
+}
+
+.jarves-white {
+    jarves-tabs > button-group > button.pressed,
+    jarves-tabs > button-group > button.pressed:hover {
+        background-color: transparent;
+    }
+}

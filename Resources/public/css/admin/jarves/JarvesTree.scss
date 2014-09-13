@@ -1,0 +1,17 @@
+jarves-tree {
+    display: block;
+}
+
+jarves-tree-item {
+    display: block;
+}
+
+.jarves-Tree-children > jarves-tree-item {
+    padding-left: 15px;
+}
+
+@for $i from 1 through 1000 {
+    .jarves-Tree-children-#{$i} {
+        padding-left: 15px*$i;
+    }
+}

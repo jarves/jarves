@@ -1,0 +1,56 @@
+@import "../base";
+
+.jarves-Combine-list,
+.jarves-Combine-editForm {
+    @include line-bottom;
+    background-color: #021216;
+}
+
+.jarves-Combine-editForm-line-top {
+    @include line-top;
+}
+
+.jarves-Combine-list {
+}
+
+.jarves-Combine-window-content {
+    border-top: 0;
+    bottom: 40px;
+    overflow: hidden;
+}
+
+.jarves-Combine-grid {
+    @include line-bottom;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.jarves-white {
+    .jarves-Combine-grid {
+        @include white-line-bottom;
+    }
+}
+
+.jarves-Combine-grid { 
+    @include transition(all ease-in-out 0.3s);
+}
+
+.jarves-Combine-view2 {
+    background-color: $whiteMainColor;
+    position: relative;
+    @include transition(all ease-in-out 0.3s);
+    @include transform(translate(0px, 0px));
+}
+
+.jarves-Combine-view2.ng-hide {
+    opacity: 0;
+    @include transform(translate(150px, 0px));
+}
+
+
+.jarves-Combine-grid.ng-hide { 
+    opacity: 0;
+}
