@@ -1,0 +1,15 @@
+<database namespace="Jarves\Model" name="default">
+  <table name="system_user_group" phpName="UserGroup" isCrossRef="true">
+    <column name="user_id" type="INTEGER" primaryKey="true"/>
+    <column name="groups_id" type="INTEGER" primaryKey="true"/>
+    <foreign-key phpName="User" foreignTable="system_user" onDelete="cascade" onUpdate="cascade">
+      <reference local="user_id" foreign="id"/>
+    </foreign-key>
+    <foreign-key phpName="Group" foreignTable="system_group" onDelete="cascade" onUpdate="cascade">
+      <reference local="groups_id" foreign="id"/>
+    </foreign-key>
+    <vendor type="mysql">
+      <parameter name="Charset" value="utf8"/>
+    </vendor>
+  </table>
+</database>

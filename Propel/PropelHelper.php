@@ -154,7 +154,7 @@ class PropelHelper
         $platform = ucfirst($platform) . 'Platform';
 
         $input = new ArrayInput(array(
-            '--input-dir' => $tmp . 'propel/',
+            '--schema-dir' => $tmp . 'propel/',
             '--output-dir' => $tmp . 'propel/build/classes/',
             '--platform' => $platform,
             '--verbose' => 'vvv'
@@ -503,7 +503,7 @@ EOF;
         $platform = ucfirst($platform) . 'Platform';
 
         $input = new ArrayInput(array(
-            '--input-dir' => $tmp . 'propel/',
+            '--schema-dir' => $tmp . 'propel/',
             '--output-dir' => $tmp . 'propel/build/',
             '--platform' => $platform,
             '--verbose' => 'vvv'

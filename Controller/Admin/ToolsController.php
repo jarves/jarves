@@ -46,7 +46,7 @@ class ToolsController
 
         $items = $query
             ->find()
-            ->toArray(null, null, TableMap::TYPE_STUDLYPHPNAME);
+            ->toArray(null, null, TableMap::TYPE_CAMELNAME);
 
         return [
             'items' => $items,
@@ -80,7 +80,7 @@ class ToolsController
 
         $items = $paginate
             ->getResults()
-            ->toArray(null, null, TableMap::TYPE_STUDLYPHPNAME);
+            ->toArray(null, null, TableMap::TYPE_CAMELNAME);
 
         return [
             'items' => $items,

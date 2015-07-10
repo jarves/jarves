@@ -11,8 +11,8 @@ class ApiDocFormatter extends HtmlFormatter {
         return $this->engine->render('JarvesBundle:Admin:ApiDoc/resources.html.twig', array(
             'resources' => $collection,
             'apiName' => 'Jarves cms REST Api Documentation',
-            'css' => file_get_contents(__DIR__ . '/../Resources/public/admin/doc/screen.css'),
-            'js' => file_get_contents(__DIR__ . '/../Resources/public/admin/doc/all.js'),
+            'css' => file_get_contents(__DIR__ . '/../Resources/public/doc/screen.css'),
+            'js' => file_get_contents(__DIR__ . '/../Resources/public/doc/all.js'),
             'bodyFormat' => 'json',
             'defaultRequestFormat' => 'json',
             'requestFormatMethod' => 'json',

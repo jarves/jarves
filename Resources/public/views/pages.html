@@ -1,42 +1,21 @@
-<window-frame>
+<div ng-controller="bundles/jarves/controller/PageController as page">
+    <window-frame>
+        <button ng-click="showTree = true" icon="#icon-tree">Tree</button>
 
-    <jarves-field model="title" type="text" label="Title"></jarves-field>
+        <button-group>
+            <button ng-click="page.currentView = 1" icon="#icon-list-9"></button>
+            <button ng-click="page.currentView = 2" icon="#icon-layout"></button>
+        </button-group>
 
-    selectTreeId: {{selectTreeId}}
-    <jarves-tree entry-point="jarves/node" model="selectTreeId"></jarves-tree>
+        <jarves-field type="language" model="model.language"></jarves-field>
 
-<!-- My List ({{myListSelected}})
-	<jarves-list model="myListSelected" items="[{title: 'teschd'}, {title: 'another'}]">
-		<jarves-list-template>
-			{{item.title}}
-		</jarves-list-template>
-	</jarves-list>
+        <div>
+            <jarves-field type="pagecontents" model="model.contents"></jarves-field>
+        </div>
+    </window-frame>
 
-    My Select ({{mySelect}}):
-
-    <jarves-field type="select" model="mySelect">
-        <select-option>Teschd</select-option>
-        <select-option>Teschd2</select-option>
-    </jarves-field>
-
-    <jarves-field type="text" model="mySelect"></jarves-field>
-
-Category List ({{categoryListSelected}})
-	<jarves-list model="categoryListSelected" entry-point="'object/jarvespublication/newsCategory'">
-	</jarves-list>
-
-    <jarves-form name="main" pk="{id: 2}" object="jarvespublication/newsCategory" entry-point="'object/jarvespublication/newsCategory'">
-        <jarves-field type="text" label="Title" model="model.title"></jarves-field>
-        <jarves-field type="file" label="File" model="model.file"></jarves-field>
-
-        title: <jarves-label type="text" model="model.title"></jarves-label><br />
-        test: {{model.test}}<br/>
-        form: {{form.getName()}}<br/>
-
+    <window-sidebar>
         <button ng-click="form.save()">Save</button>
-    </jarves-form> -->
-</window-frame>
-
-<window-sidebar>
-    Teschd
-</window-sidebar>
+        <button ng-click="form.save()">Remove</button>
+    </window-sidebar>
+</div>

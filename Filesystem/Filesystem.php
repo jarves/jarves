@@ -186,7 +186,7 @@ class Filesystem implements FilesystemInterface
     {
         $array = $fileInfo->toArray();
         $file = new File();
-        $file->fromArray($array, TableMap::TYPE_STUDLYPHPNAME);
+        $file->fromArray($array, TableMap::TYPE_CAMELNAME);
         $file->setHash($this->hash($file->getPath()));
         $file->save();
 

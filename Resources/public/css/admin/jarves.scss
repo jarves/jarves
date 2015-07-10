@@ -5,7 +5,7 @@ html, body {
     padding: 0;
 }
 
-$base-font-size: 13px;
+$base-font-size: 14px;
 
 .jarves-admin, .jarves-normalize {
     font-family: "Open Sans", "Lucida Grande", "DejaVu Sans", "Bitstream Vera Sans", "Segoe UI", "Tahoma", sans-serif;
@@ -18,7 +18,7 @@ $base-font-size: 13px;
     -webkit-font-smoothing: antialiased;
     text-rendering: geometricPrecision;
     font-smooth: never;
-    font-weight: 300;
+    font-weight: 400;
 }
 
 //::-webkit-scrollbar {
@@ -507,6 +507,7 @@ input.jarves-main-menu-actions-search-input {
     window-sidebar {
         color: #222;
     }
+
     .jarves-Window-sidebar-title {
         color: #444;
     }

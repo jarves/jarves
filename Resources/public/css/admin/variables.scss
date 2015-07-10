@@ -20,7 +20,7 @@ $whiteLinkBgColor: darken($whiteMainColor, 10%);
 
 
 $mainTextColor: white;
-$whiteMainTextColor: #222;
+$whiteMainTextColor: #525252;
 
 @function strip-unit($num) {
     @return $num / ($num * 0 + 1);

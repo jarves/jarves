@@ -559,7 +559,7 @@ class Jarves extends Controller
 
     /**
      * @param string $bundleName full className or bundleName or short bundleName
-     * @return string with leading / relative to root folder
+     * @return string with trailing /, relative to root folder
      */
     public function getBundleDir($bundleName)
     {

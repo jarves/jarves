@@ -568,7 +568,7 @@ class Propel extends ORMAbstract
                 }
 
                 if ($sItems instanceof ObjectCollection) {
-                    $newRow[lcfirst($name)] = $sItems->toArray(null, null, TableMap::TYPE_STUDLYPHPNAME) ? : null;
+                    $newRow[lcfirst($name)] = $sItems->toArray(null, null, TableMap::TYPE_CAMELNAME) ? : null;
                 } else if (is_array($sItems) && $sItems) {
                     $newRow[lcfirst($name)] = $sItems;
                 } else {
@@ -1019,7 +1019,7 @@ class Propel extends ORMAbstract
                             if (!$item2) {
                                 $item2 = new $foreignClass();
                             }
-                            $item2->fromArray($foreignItem, TableMap::TYPE_STUDLYPHPNAME);
+                            $item2->fromArray($foreignItem, TableMap::TYPE_CAMELNAME);
                             $coll[] = $item2;
                         }
 

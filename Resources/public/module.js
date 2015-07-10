@@ -103,7 +103,7 @@ import {default as CheckboxLabel} from './labels/Checkbox';
 import {default as DateLabel} from './labels/Date';
 import {default as DatetimeLabel} from './labels/Datetime';
 import {default as ImageLabel} from './labels/Image';
-import {default as ObjectLabel} from './labels/Object';
+import {default as ObjectLabel} from './labels/ObjectLabel';
 import {default as SelectLabel} from './labels/Select';
 registerLabel(TextLabel);
 registerLabel(CheckboxLabel);

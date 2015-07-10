@@ -1,0 +1,40 @@
+<database namespace="Jarves\Model" name="default">
+  <table name="system_node" phpName="Node">
+    <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+    <column name="pid" type="INTEGER"/>
+    <column name="domain_id" type="INTEGER"/>
+    <column name="type" type="INTEGER"/>
+    <column name="title" type="VARCHAR" size="255"/>
+    <column name="alternative_title" type="VARCHAR" size="255"/>
+    <column name="urn" type="VARCHAR" size="255"/>
+    <column name="link" type="VARCHAR" size="255"/>
+    <column name="target" type="VARCHAR" size="255"/>
+    <column name="visible" type="BOOLEAN"/>
+    <column name="access_denied" type="BOOLEAN"/>
+    <column name="meta" type="VARCHAR" size="255"/>
+    <column name="force_https" type="BOOLEAN"/>
+    <column name="access_from" type="BIGINT"/>
+    <column name="access_to" type="BIGINT"/>
+    <column name="access_redirect_to" type="INTEGER"/>
+    <column name="access_nohidenavi" type="BOOLEAN"/>
+    <column name="access_need_via" type="INTEGER"/>
+    <column name="access_from_groups" type="VARCHAR" size="255"/>
+    <column name="search_words" type="VARCHAR" size="255"/>
+    <column name="unsearchable" type="BOOLEAN"/>
+    <column name="layout" type="LONGVARCHAR"/>
+    <column name="theme" type="VARCHAR" size="255"/>
+    <foreign-key phpName="Domain" foreignTable="system_domain" onDelete="cascade" onUpdate="cascade">
+      <reference local="domain_id" foreign="id"/>
+    </foreign-key>
+    <behavior name="nested_set">
+      <parameter name="left_column" value="lft"/>
+      <parameter name="right_column" value="rgt"/>
+      <parameter name="level_column" value="lvl"/>
+      <parameter name="use_scope" value="true"/>
+      <parameter name="scope_column" value="domain_id"/>
+    </behavior>
+    <vendor type="mysql">
+      <parameter name="Charset" value="utf8"/>
+    </vendor>
+  </table>
+</database>

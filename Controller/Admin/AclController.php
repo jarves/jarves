@@ -41,7 +41,7 @@ class AclController extends Controller
             ->filterByTargetId($id+0)
             ->orderByPrio(Criteria::ASC)
             ->find()
-            ->toArray(null, null, TableMap::TYPE_STUDLYPHPNAME);
+            ->toArray(null, null, TableMap::TYPE_CAMELNAME);
     }
 
 

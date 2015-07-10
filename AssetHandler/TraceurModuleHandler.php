@@ -25,7 +25,7 @@ class TraceurModuleHandler extends JsHandler implements CompileHandlerInterface
     protected function compileFiles($files, $output)
     {
         $root = $webDir = realpath($this->jarves->getKernel()->getRootDir().'/../') . '/';
-        $web = $root . '/web';
+        $web = $root . 'web';
 
         chdir($web);
         $traceur = 'traceur'; //todo, make configurable
@@ -44,7 +44,6 @@ class TraceurModuleHandler extends JsHandler implements CompileHandlerInterface
         }
         $md5 = md5(implode('.', $md5));
 
-
         $needsCompilation = false;
 
         if (file_exists($output)) {
@@ -55,6 +54,8 @@ class TraceurModuleHandler extends JsHandler implements CompileHandlerInterface
                 $needsCompilation = $lastLine !== $md5;
                 fclose($fh);
             }
+        } else {
+            $needsCompilation = true;
         }
 
         if ($needsCompilation) {
@@ -62,21 +63,22 @@ class TraceurModuleHandler extends JsHandler implements CompileHandlerInterface
             $process = $builder->getProcess();
             $process->run();
 
-            while ($process->isRunning()) {
-                // waiting for process to finish
-            }
-
-//
-//            var_dump($process->getCommandLine());
-//            var_dump($process->isSuccessful());
 //            var_dump($process->getErrorOutput());
 //            var_dump($process->getOutput());
-//
-//            var_dump($output);
-//            var_dump($files);
+//            echo($process->getCommandLine());
+//            var_dump($process->isSuccessful());
 //            exit;
 
-            if ($process->isSuccessful()) {
+            $isSuccessful = $process->isSuccessful();
+            if ($isSuccessful) {
+                $error = $process->getErrorOutput();
+                if (false !== strpos($error, 'Internal error Error')) {
+                    $isSuccessful = false;
+                }
+            }
+
+            if ($isSuccessful) {
+                $this->jarves->getWebFileSystem()->mkdir(dirname($output));
                 $this->jarves->getWebFileSystem()->move('traceur_compiled.js', $output);
                 $mapName = explode('.', $output);
                 array_pop($mapName);

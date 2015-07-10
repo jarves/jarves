@@ -115,7 +115,7 @@ class Builder
      */
     public function getBuilder($id)
     {
-        return @$this->builder[$id];
+        return $this->builder[$id];
     }
 
     /**

@@ -1,0 +1,39 @@
+<database namespace="Jarves\Model" name="default">
+  <table name="system_content" phpName="Content">
+    <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+    <column name="node_id" type="INTEGER"/>
+    <column name="box_id" type="INTEGER"/>
+    <column name="sort" type="INTEGER"/>
+    <column name="title" type="VARCHAR" size="255"/>
+    <column name="content" type="LONGVARCHAR"/>
+    <column name="template" type="VARCHAR" size="255"/>
+    <column name="type" type="VARCHAR" size="255"/>
+    <column name="hide" type="BOOLEAN"/>
+    <column name="unsearchable" type="VARCHAR" size="255"/>
+    <column name="access_from" type="INTEGER"/>
+    <column name="access_to" type="INTEGER"/>
+    <column name="access_from_groups" type="VARCHAR" size="255"/>
+
+    <index>
+      <index-column name="box_id"/>
+    </index>
+    <index>
+      <index-column name="hide"/>
+    </index>
+    <index>
+      <index-column name="node_id"/>
+    </index>
+    <behavior name="sortable" custom="true">
+      <parameter name="rank_column" value="sort"/>
+      <parameter name="use_scope" value="true"/>
+      <parameter name="scope_column" value="box_id"/>
+    </behavior>
+
+    <foreign-key phpName="Node" foreignTable="system_node" refPhpName="Content" onDelete="cascade" onUpdate="cascade">
+      <reference local="node_id" foreign="id"/>
+    </foreign-key>
+    <vendor type="mysql">
+      <parameter name="Charset" value="utf8"/>
+    </vendor>
+  </table>
+</database>

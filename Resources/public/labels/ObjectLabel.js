@@ -3,7 +3,7 @@ import {Label} from '../annotations';
 import angular from '../angular';
 
 @Label('object')
-export default class Object extends AbstractLabel {
+export default class ObjectLabel extends AbstractLabel {
     link(scope, element, attr) {
         var span = angular.element('<span ng-bind="label"></span>');
         var id = this.getOption('id');
@@ -16,7 +16,7 @@ export default class Object extends AbstractLabel {
 
         var joinChar = this.getOption('join') ? this.getOption('join') || ', ' : ', ';
 
-        scope.$parent.$watch(modelName, function(values) {
+        scope.$parent.$watch(modelName, (values) => {
             if (angular.isArray(values)) {
                 //to-many relation
                 //we join by pField['join'] char, default is ', '
@@ -50,7 +50,7 @@ export default class Object extends AbstractLabel {
                     scope.label = joined;
                 }
             }
-        }.bind(this));
+        });
 
         //span.attr('ng-bind', '$parent.' + attr.data + '.' + this.getOption('id'));
         this.renderTemplate(span);

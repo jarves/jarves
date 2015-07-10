@@ -250,6 +250,10 @@ window-dialog {
         @include white-line-top;
     }
 
+    window-sidebar button {
+        color: $whiteLinkColor;
+    }
+
     window-sidebar 
         @include white-line-bottom;
     }

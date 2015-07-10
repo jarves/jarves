@@ -185,7 +185,7 @@ class BackendController extends Controller
         }
 
         if ($loadKeys == false || in_array('groups', $loadKeys)) {
-            $res['groups'] = GroupQuery::create()->find()->toArray(null, null, TableMap::TYPE_STUDLYPHPNAME);
+            $res['groups'] = GroupQuery::create()->find()->toArray(null, null, TableMap::TYPE_CAMELNAME);
         }
 
         if ($loadKeys == false || in_array('user', $loadKeys)) {
@@ -218,7 +218,7 @@ class BackendController extends Controller
             $tlangs = $query->find()->toArray(
                 null,
                 null,
-                TableMap::TYPE_STUDLYPHPNAME
+                TableMap::TYPE_CAMELNAME
             );
 
             $langs = [];

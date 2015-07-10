@@ -1,0 +1,14 @@
+<database namespace="Jarves\Model" name="default">
+  <table name="system_workspace" phpName="Workspace">
+    <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+    <column name="title" type="VARCHAR" size="255"/>
+    <column name="owner_id" type="INTEGER"/>
+    <column name="created" type="BIGINT"/>
+    <foreign-key phpName="Owner" foreignTable="system_user" onDelete="cascade" onUpdate="cascade">
+      <reference local="owner_id" foreign="id"/>
+    </foreign-key>
+    <vendor type="mysql">
+      <parameter name="Charset" value="utf8"/>
+    </vendor>
+  </table>
+</database>

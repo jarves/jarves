@@ -1,0 +1,43 @@
+<window-frame>
+
+    <jarves-field model="title" type="text" label="Title"></jarves-field>
+
+    selectTreeId: {{selectTreeId}}
+    <jarves-tree object="jarves/node" model="selectTreeId"></jarves-tree>
+
+ My List ({{myListSelected}})
+	<jarves-list model="myListSelected" items="[{title: 'teschd'}, {title: 'another'}]">
+		<jarves-list-template>
+			{{item.title}}
+		</jarves-list-template>
+	</jarves-list>
+
+    My Select ({{mySelect}}):
+
+    <jarves-field type="select" model="mySelect">
+        <select-option>Teschd</select-option>
+        <select-option>Teschd2</select-option>
+    </jarves-field>
+
+    <jarves-field type="text" model="mySelect"></jarves-field>
+
+Category List ({{categoryListSelected}})
+	<jarves-list model="categoryListSelected" entry-point="'object/jarvespublication/newsCategory'">
+	</jarves-list>
+
+    <jarves-form name="main" pk="{id: 2}" object="jarvespublication/newsCategory" entry-point="'object/jarvespublication/newsCategory'">
+        <jarves-field type="text" label="Title" model="model.title"></jarves-field>
+        <jarves-field type="file" label="File" model="model.file"></jarves-field>
+
+        title: <jarves-label type="text" model="model.title"></jarves-label><br />
+        test: {{model.test}}<br/>
+        form: {{form.getName()}}<br/>
+
+        <button ng-click="form.save()">Save</button>
+    </jarves-form>
+</window-frame>
+
+<window-sidebar>
+    <button ng-click="form.save()">Save</button>
+    <button ng-click="form.save()">Remove</button>
+</window-sidebar>

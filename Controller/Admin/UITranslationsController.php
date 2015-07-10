@@ -29,7 +29,7 @@ class UITranslationsController extends Controller
             ->filterByVisible(true)
             ->orderByCode()
             ->find()
-            ->toArray('Code', null, TableMap::TYPE_STUDLYPHPNAME);
+            ->toArray('Code', null, TableMap::TYPE_CAMELNAME);
 
         if (0 === count($languages)) {
             $json = '{"en":{"code":"en","title":"English","langtitle":"English"}}';

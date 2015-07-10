@@ -10,8 +10,24 @@ jarves-tree-item {
     padding-left: 15px;
 }
 
+.jarves-Tree-title {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.jarves-objectTree-item-toggler {
+    position: relative;
+    top: 0px;
+    padding: 0px 8px;
+    font-family: Icomoon;
+    font-size: 11px;
+    color: #808080;
+    display: inline-block;
+    vertical-align: top;
+}
+
 @for $i from 1 through 1000 {
-    .jarves-Tree-children-#{$i} {
+    .jarves-Tree-children-#{$i} .jarves-Tree-title {
         padding-left: 15px*$i;
     }
 }

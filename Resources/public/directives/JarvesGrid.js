@@ -14,7 +14,6 @@ import ObjectRepository from '../services/ObjectRepository';
 })
 @Inject('$scope, $element, $attrs, backend, $q, $parse, jarves, objectRepository')
 export default class JarvesGrid {
-
     constructor($scope, $element, $attrs, backend, $q, $parse, jarves, objectRepository) {
         this.$scope = $scope;
         this.$parse = $parse;

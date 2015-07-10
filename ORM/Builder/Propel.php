@@ -4,14 +4,11 @@ namespace Jarves\ORM\Builder;
 
 use Jarves\Admin\FieldTypes\ColumnDefinitionInterface;
 use Jarves\Admin\FieldTypes\RelationDefinitionInterface;
-use Jarves\Configuration\Bundle;
 use \Jarves\Exceptions\ModelBuildException;
-use Jarves\Configuration\Field;
 use Jarves\Configuration\Object;
 use Jarves\Filesystem\Filesystem;
 use Jarves\Objects;
 use Jarves\ORM\ORMAbstract;
-use Jarves\Propel\PropelHelper;
 use Jarves\Propel\StandardEnglishPluralizer;
 use Jarves\Tools;
 use Propel\Generator\Model\Column;
@@ -35,7 +32,7 @@ class Propel implements BuildInterface
 
     protected $databases = [];
 
-    function __construct(Filesystem $filesystem, Objects $objects, Kernel $kernel)
+    public function __construct(Filesystem $filesystem, Objects $objects, Kernel $kernel)
     {
         $this->filesystem = $filesystem;
         $this->objects = $objects;
@@ -45,76 +42,54 @@ class Propel implements BuildInterface
     /**
      * @param \Jarves\Configuration\Object[] $objects
      * @param OutputInterface $output
+     *
+     * @param bool $overwrite
+     * @throws ModelBuildException
      */
-    public function build(array $objects, OutputInterface $output)
+    public function build(array $objects, OutputInterface $output, $overwrite = false)
     {
         /** @var $jarves \Jarves\Jarves */
         $jarves = $this->kernel->getContainer()->get('jarves');
 
-        $output->writeln('===Propel Build===');
+        $output->writeln('Propel Build');
 
         foreach ($objects as $object) {
             if ('propel' === strtolower($object->getDataModel())) {
+                $output->write('Build object ' . $object->getId() . ' => ' . $object->getTable(). ' ... ');
                 $bundlePath = $jarves->getBundleDir($object->getBundle()->getName());
-                $builtFile = $bundlePath . 'Resources/config/jarves.propel.schema.built.xml';
+                $modelsFile = sprintf('%sResources/config/schema/%s.schema.xml', $bundlePath, strtolower($object->getTable()));
 
-                if (file_exists($builtFile)) {
-                    unlink($builtFile);
-                }
-            }
-        }
-
-        foreach ($objects as $object) {
-            if ('propel' === strtolower($object->getDataModel())) {
-                $bundlePath = $jarves->getBundleDir($object->getBundle()->getName());
-                $modelsFile = $bundlePath . 'Resources/config/jarves.propel.schema.xml';
-
-                $xml = @$this->databases[$object->getBundle()->getBundleName()];
-                if (!$xml) {
-                    if (file_exists($modelsFile)) {
-                        $xml = @simplexml_load_file($modelsFile);
-                        if (false === $xml) {
-                            $errors = libxml_get_errors();
-                            throw new ModelBuildException(sprintf(
-                                'Parse error in %s: %s',
-                                $modelsFile,
-                                json_encode($errors, JSON_PRETTY_PRINT)
-                            ));
-                        }
-                    } else {
-                        $xml = simplexml_load_string('<database></database>');
+                if (!$overwrite && file_exists($modelsFile) && file_get_contents($modelsFile)) {
+                    $xml = @simplexml_load_file($modelsFile);
+                    if (false === $xml) {
+                        $errors = libxml_get_errors();
+                        throw new ModelBuildException(sprintf(
+                            'Parse error in %s: %s',
+                            $modelsFile,
+                            json_encode($errors, JSON_PRETTY_PRINT)
+                        ));
                     }
-
-                    $xml['namespace'] = $object->getBundle()->getNamespace();
-                    $this->databases[$object->getBundle()->getBundleName()] = $xml;
+                } else {
+                    $xml = simplexml_load_string('<database></database>');
                 }
+
+                $xml['namespace'] = $object->getBundle()->getNamespace() . '\\Model';
+                $xml['name'] = 'default';
+
                 $this->declareTable($xml, $object);
+
+                if (!is_dir(dirname($modelsFile))) {
+                    mkdir(dirname($modelsFile));
+                }
+
+                file_put_contents($modelsFile, $this->getFormattedXml($xml));
+                $output->writeln($modelsFile . ' written.');
+                unset($xml);
             }
-        }
-
-        $files = [];
-        foreach ($this->databases as $bundleName => $database) {
-            $xml = $this->getFormattedXml($database);
-            $bundlePath = $jarves->getBundleDir($bundleName);
-            $modelsFile = $bundlePath . 'Resources/config/jarves.propel.schema.built.xml';
-            $files[$modelsFile] = $xml;
-        }
-
-        foreach ($files as $file => $xml) {
-            file_put_contents($file, $xml);
-        }
-
-        $propelHelper = new PropelHelper($jarves);
-        $result = $propelHelper->init();
-
-        $output->writeln($result);
-
-        foreach ($files as $file => $xml) {
-            unlink($file);
         }
     }
 
-    public function getSchema(Object $object)
+    protected function getSchema(Object $object)
     {
         $xml = simplexml_load_string('<database></database>');
         $this->declareTable($xml, $object);
@@ -150,9 +125,8 @@ class Propel implements BuildInterface
         return !file_exists($this->kernel->getCacheDir() . '/propel-classes/');
     }
 
-    public function declareTable(\SimpleXMLElement $database, Object $object)
+    protected function declareTable(\SimpleXMLElement $database, Object $object)
     {
-
         $tables = $database->xpath('table[@name=\'' . $object->getTable() . '\']');
         $xmlTable = $this->getXmlTable($object, @$tables[0]);
         $this->sxml_append($database, $xmlTable);
@@ -172,7 +146,7 @@ class Propel implements BuildInterface
      *
      * @throws \Jarves\Exceptions\ModelBuildException
      */
-    public function getXmlTable(Object $object, \SimpleXMLElement $objectTable = null)
+    protected function getXmlTable(Object $object, \SimpleXMLElement $objectTable = null)
     {
         if (!$objectTable) {
             $objectTable = new \SimpleXMLElement('<table />'); //simplexml_load_string('<database></database>');
@@ -436,7 +410,7 @@ class Propel implements BuildInterface
      * @param string $type
      * @return mixed
      */
-    public function getPropelColumnType($type)
+    protected function getPropelColumnType($type)
     {
         $map = [
             'text' => 'LONGVARCHAR',

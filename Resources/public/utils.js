@@ -641,8 +641,8 @@ export function getPreparedConstructor(controller) {
     constructor.push((...deps) => {
         var args = deps.slice(0, injectsViaInjectCount);
         var instance = new controller(...args);
-        for (let [name, position] of each(propertyMap)) {
-            instance[name] = deps[position];
+        for (let name in propertyMap) {
+            instance[name] = deps[propertyMap[name]];
         }
         return instance;
     });

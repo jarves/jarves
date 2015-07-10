@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<database name="default">
+<database name="default" namespace="Jarves\Model">
     <table name="system_acl" phpName="Acl" idMethod="native">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
         <column name="object" type="VARCHAR" size="64" required="false"/>
@@ -91,22 +91,6 @@
         <vendor type="mysql">
             <parameter name="Charset" value="utf8"/>
         </vendor>
-    </table>
-    <table name="system_content" phpName="Content" idMethod="native">
-        <index>
-            <index-column name="box_id"/>
-        </index>
-        <index>
-            <index-column name="hide"/>
-        </index>
-        <index>
-            <index-column name="node_id"/>
-        </index>
-        <behavior name="sortable" custom="true">
-            <parameter name="rank_column" value="sort"/>
-            <parameter name="use_scope" value="true"/>
-            <parameter name="scope_column" value="box_id"/>
-        </behavior>
     </table>
     <table name="system_log" phpName="Log" idMethod="native">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>

@@ -20,6 +20,16 @@ export default class JarvesTreeItem {
         this.jarves = jarves;
         this.objectRepository = objectRepository;
         this.$timeout = $timeout;
+
+        this.template = 
+            '<div class="jarves-Tree-title">'+
+                '<span class="jarves-objectTree-item-toggler"></span>'+
+                '<span class="jarves-objectTree-item-masks" icon="{{item.icon}}"></span>'+
+                '{{item.title}}'+
+            '</div>'+
+            '<div class="jarves-Tree-children" ng-show="treeController.visibleChildren(item)">'+
+                '<jarves-tree-item ng-if="item._children" ng-repeat="subItem in item._children" item="subItem"></jarves-tree-item>'+
+            '</div>';
     }
 
     link(scope, element, attributes, jarvesTreeController) {
@@ -30,25 +40,25 @@ export default class JarvesTreeItem {
         // console.log('parentDepth', scope, this.parentJarvesTreeItemController.getDepth());
         this.depth = this.parentJarvesTreeItemController ? this.parentJarvesTreeItemController.getDepth() + 1 : 1;
 
+        this.$scope.toggleChildren = this.toggleChildren.bind(this);
+
         if (!JarvesTreeItem.compiled) {
-            console.log('need compile');
-            var template = 
-                '<div>{{item.title}}</div>'+
-                '<div class="jarves-Tree-children">'+
-                    '<jarves-tree-item ng-if="item._children" ng-repeat="subItem in item._children" item="subItem"></jarves-tree-item>'+
-                '</div>';
-            var contents = angular.element(template);
+            var contents = angular.element(this.template);
             JarvesTreeItem.compiled = this.$compile(contents);
         }
 
         JarvesTreeItem.compiled(scope, (clone) => {
             // angular.element(clone[1]).addClass('jarves-Tree-children-' + this.depth);
             element.append(clone);
-        })
+        });
 
         scope.$parent.$watch(attributes.item, (item) => {
             scope.item = item;
         }, true);
+    }
+
+    toggleChildren() {
+
     }
 
     static get compiled() {

@@ -1,0 +1,10 @@
+<database namespace="Jarves\Model" name="default">
+  <table name="system_group" phpName="Group">
+    <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+    <column name="name" type="VARCHAR" size="255"/>
+    <column name="description" type="VARCHAR" size="255"/>
+    <vendor type="mysql">
+      <parameter name="Charset" value="utf8"/>
+    </vendor>
+  </table>
+</database>
