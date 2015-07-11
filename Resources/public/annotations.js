@@ -1,4 +1,4 @@
-import angular from './angular';
+import angular from './angular.js';
 
 export class Directive {
     constructor(name, options){

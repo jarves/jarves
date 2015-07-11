@@ -1,5 +1,5 @@
-import AbstractFieldType from './AbstractFieldType';
-import {Field, InjectAsProperty} from '../annotations';
+import AbstractFieldType from './AbstractFieldType.js';
+import {Field, InjectAsProperty} from '../annotations.js';
 
 @Field('file')
 @InjectAsProperty('objectRepository')
@@ -13,7 +13,7 @@ export default class File extends AbstractFieldType {
     }
 
     link(scope, element, attr, controller, transclude) {
-        super(scope, element, attr, controller, transclude);
+        parent(scope, element, attr, controller, transclude);
 
         this.renderTemplateUrl(
             this.template

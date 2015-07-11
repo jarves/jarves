@@ -1,5 +1,5 @@
-import angular from './angular';
-import jarves from './module';
+import angular from './angular.js';
+import jarves from './module.js';
 
 export default class JarvesApp {
     constructor(container) {

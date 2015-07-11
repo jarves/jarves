@@ -1,0 +1,25 @@
+{
+  "name": "jarves",
+  "version": "1.0.0",
+  "description": "Jarves application framework",
+  "main": "index.js",
+  "dependencies": {
+    "systemjs": "^0.18.4",
+    "traceur": "0.0.90"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "sh Resources/npm/install.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jarves/jarves.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jarves/jarves/issues"
+  },
+  "homepage": "https://github.com/jarves/jarves"
+}

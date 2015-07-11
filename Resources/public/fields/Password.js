@@ -1,12 +1,12 @@
-import AbstractFieldType from './AbstractFieldType';
-import {Field} from '../annotations';
-import {eachValue} from '../utils';
-import Text from './Text';
+import AbstractFieldType from './AbstractFieldType.js';
+import {Field} from '../annotations.js';
+import {eachValue} from '../utils.js';
+import Text from './Text.js';
 
 @Field('password')
 export default class Password extends Text {
     beforeCompile(contents) {
-        super(contents);
+        parent(contents);
         contents.attr('type', 'password');
     }
 }

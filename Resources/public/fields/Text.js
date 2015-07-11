@@ -1,7 +1,7 @@
-import AbstractFieldType from './AbstractFieldType';
-import {Field} from '../annotations';
-import angular from '../angular'
-import {each} from '../utils';
+import AbstractFieldType from './AbstractFieldType.js';
+import {Field} from '../annotations.js';
+import angular from '../angular.js'
+import {each} from '../utils.js';
 
 @Field('text')
 export default class Text extends AbstractFieldType {
@@ -100,13 +100,13 @@ export default class Text extends AbstractFieldType {
     //},
 
     constructor(...deps) {
+        super(...deps);
         this.template = 'bundles/jarves/views/field.text.html',
         this.boundRedirects =  {}
-        super(...deps);
     }
 
     link(scope, element, attr, controller, transclude) {
-        super(scope, element, attr, controller, transclude);
+        parent(scope, element, attr, controller, transclude);
         this.attr = attr;
 
         this.renderTemplateUrl(

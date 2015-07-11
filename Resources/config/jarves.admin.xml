@@ -6,6 +6,13 @@
             </field>
         </fields>
         <adminAssets>
+            <!--<asset priority="2000" src="@JarvesBundle/libraries/systemjs/system-polyfills.js"/>-->
+            <asset priority="2000" src="@JarvesBundle/libraries/traceur/traceur-runtime.js"/>
+            <asset priority="2000" src="@JarvesBundle/libraries/traceur/traceur.js"/>
+            <asset priority="2000" src="@JarvesBundle/libraries/systemjs/system.src.js"/>
+            <asset priority="2000" src="@JarvesBundle/index.js"/>
+        </adminAssets>
+        <xxxadminAssets>
             <asset priority="2000" src="@JarvesBundle/libraries/angular.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/angular-animate.min.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/hammer.min.js"/>
@@ -43,7 +50,7 @@
             <assets src="@JarvesBundle/css/admin/jarves/*.scss"/>
             <assets src="@JarvesBundle/css/admin/jarves/ui/*.css"/>
             <assets src="@JarvesBundle/css/admin/jarves/Field/*"/>
-        </adminAssets>
+        </xxxadminAssets>
         <streams>
             <stream path="load">
                 <class>Jarves\Controller\Admin\DashboardWidgets</class>

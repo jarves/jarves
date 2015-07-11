@@ -1,12 +1,13 @@
-import AbstractFieldType from './AbstractFieldType';
-import {Field, InjectAsProperty} from '../annotations';
-import {each} from '../utils';
-import angular from '../angular'
+import AbstractFieldType from './AbstractFieldType.js';
+import {Field, InjectAsProperty} from '../annotations.js';
+import {each} from '../utils.js';
+import angular from '../angular.js'
 
 @Field('select')
 @InjectAsProperty('objectRepository')
 export default class Select extends AbstractFieldType {
     constructor(...args) {
+        super(...args);
         this.additionalOptionsReferences = ['items'];
         this.chooserOpen = false;
         this.items = {};
@@ -18,11 +19,10 @@ export default class Select extends AbstractFieldType {
         };
         this.objectRepository = null;
         this.template = 'bundles/jarves/views/field.select.html';
-        super(...args);
     }
 
     link(scope, element, attr, controller, transclude) {
-        super(scope, element, attr, controller, transclude);
+        parent(scope, element, attr, controller, transclude);
 
         this.renderTemplateUrl(
             this.template,

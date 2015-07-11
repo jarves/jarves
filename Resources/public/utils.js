@@ -1,5 +1,6 @@
 import {baseUrl, baseRestUrl} from './config';
 import angular from './angular';
+import {Field, Label, Filter, Parser, Directive, Inject, InjectAsProperty} from './annotations';
 
 /**
 * Is true if the current browser has a mobile user agent.
@@ -52,7 +53,7 @@ export function *eachKey(obj) {
 */
 window.applyRootScope = function() {
     angular.element(document).scope().$apply();
-}
+};
 
 export function isDifferent(a, b) {
     var changed;
@@ -602,8 +603,6 @@ export function toQueryString(obj) {
     }
     return parts.join("&");
 }
-
-import {Field, Label, Filter, Parser, Directive, Inject, InjectAsProperty} from './annotations';
 
 /**
  * Prepares a class constructor for angular depency injection.
