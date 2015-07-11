@@ -1,4 +1,4 @@
-import {Inject} from '../annotations';
+import {Inject} from '../angular.js';
 
 @Inject('$rootScope, $scope, backend, translator, jarves, $timeout')
 export default class LoginController {

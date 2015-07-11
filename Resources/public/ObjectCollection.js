@@ -1,7 +1,7 @@
-import {Inject} from './annotations';
-import {normalizeObjectKey, toQueryString} from './utils';
-import angular from './angular';
- 
+import {Inject} from './angular.js';
+import {normalizeObjectKey, toQueryString} from './utils.js';
+import angular from './angular.js';
+
 @Inject('$q, backend, objectRepository')
 export default class ObjectCollection {
     constructor($q, backend, objectRepository) {

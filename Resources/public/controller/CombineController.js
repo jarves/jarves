@@ -1,6 +1,6 @@
-import ListController from './ListController';
-import {getEntryPointPathForRelative} from '../utils';
-import angular from '../angular';
+import ListController from './ListController.js';
+import {getEntryPointPathForRelative} from '../utils.js';
+import angular from '../angular.js';
 
 export default class CombineController extends ListController {
 

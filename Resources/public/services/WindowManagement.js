@@ -1,8 +1,7 @@
-import Jarves from './Jarves';
-import WindowController from '../controller/WindowController';
-import {each, eachValue} from '../utils';
-import {Inject} from '../annotations';
-import angular from '../angular';
+import Jarves from './Jarves.js';
+import WindowController from '../controller/WindowController.js';
+import {each, eachValue} from '../utils.js';
+import {Inject, angular} from '../angular.js';
 
 @Inject('jarves')
 export default class WindowService {

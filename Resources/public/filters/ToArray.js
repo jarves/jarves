@@ -1,4 +1,4 @@
-import {Filter} from '../annotations';
+import {Filter} from '../angular.js';
 
 @Filter('toArray')
 export default class ToArray {

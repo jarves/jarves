@@ -1,4 +1,4 @@
-import {Directive, Inject} from '../annotations';
+import {Directive, Inject} from '../angular.js';
 
 @Directive('jarvesLayout', {
     restrict: 'E'

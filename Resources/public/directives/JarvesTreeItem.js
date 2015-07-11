@@ -1,6 +1,6 @@
-import {Directive, Inject} from '../annotations';
-import {each} from '../utils';
-import angular from '../angular';
+import {Directive, Inject} from '../angular.js';
+import {each} from '../utils.js';
+import angular from '../angular.js';
 
 @Directive('jarvesTreeItem', {
     restrict: 'E',

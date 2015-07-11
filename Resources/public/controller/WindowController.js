@@ -1,5 +1,5 @@
-import {getPublicPath,eachValue} from '../utils';
-import angular from '../angular';
+import {getPublicPath,eachValue} from '../utils.js';
+import angular from '../angular.js';
 
 export default class WindowController {
     constructor($scope, $element, $attrs, windowManagement, jarves) {

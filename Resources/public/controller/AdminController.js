@@ -1,6 +1,5 @@
-import {Inject} from '../annotations';
-import {baseUrl, baseRestUrl} from '../config';
-import angular from '../angular';
+import {Inject, angular} from '../angular.js';
+import {baseUrl, baseRestUrl} from '../config.js';
 
 @Inject('$rootScope, $scope, $q, $http, jarves, windowManagement')
 export default class AdminController {

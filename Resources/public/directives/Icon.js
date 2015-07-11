@@ -1,5 +1,5 @@
-import {Directive} from '../annotations';
-import {baseUrl, baseRestUrl} from '../config';
+import {Directive} from '../angular.js';
+import {baseUrl, baseRestUrl} from '../config.js';
 
 @Directive('icon', {
     restrict: 'A'

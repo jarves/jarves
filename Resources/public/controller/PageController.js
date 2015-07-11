@@ -1,4 +1,4 @@
-import {Inject} from '../annotations';
+import {Inject} from '../angular.js';
 
 @Inject('$scope, $element, $attrs, $q, backend, objectRepository, jarves')
 export default class PageController {

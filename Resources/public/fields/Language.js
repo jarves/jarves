@@ -1,7 +1,7 @@
-import AbstractFieldType from './AbstractFieldType';
-import {Field} from '../annotations';
-import {eachValue} from '../utils';
-import Select from './Select';
+import AbstractFieldType from './AbstractFieldType.js';
+import {Field} from '../angular.js';
+import {eachValue} from '../utils.js';
+import Select from './Select.js';
 
 @Field('language')
 export default class Language extends Select {

@@ -1,4 +1,4 @@
-import {Filter, InjectAsProperty} from '../annotations';
+import {Filter, InjectAsProperty} from '../angular.js';
 
 @Filter('translate')
 @InjectAsProperty('translator')

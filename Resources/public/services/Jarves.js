@@ -1,7 +1,6 @@
-import {each, eachValue, normalizeObjectKey, urlEncode} from '../utils';
-import {Inject} from '../annotations';
-import {baseUrl, baseRestUrl} from '../config';
-import angular from '../angular';
+import {each, eachValue, normalizeObjectKey, urlEncode} from '../utils.js';
+import {Inject, angular} from '../angular.js';
+import {baseUrl, baseRestUrl} from '../config.js';
 
 /**
  * Uses the $rootScope.
@@ -14,7 +13,7 @@ import angular from '../angular';
  * }
  */
 @Inject('$rootScope, backend, $q, $injector, translator')
-export default class Jarves {
+class Jarves {
 
     constructor($rootScope, backend, $q, $injector, translator) {
         this.$rootScope = $rootScope;

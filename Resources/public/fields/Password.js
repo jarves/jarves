@@ -1,5 +1,5 @@
 import AbstractFieldType from './AbstractFieldType.js';
-import {Field} from '../annotations.js';
+import {Field} from '../angular.js';
 import {eachValue} from '../utils.js';
 import Text from './Text.js';
 

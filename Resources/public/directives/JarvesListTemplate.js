@@ -1,5 +1,5 @@
-import {Directive, Inject} from '../annotations';
-import {each} from '../utils';
+import {Directive, Inject} from '../angular.js';
+import {each} from '../utils.js';
 
 @Directive('jarvesListTemplate', {
     restrict: 'E',

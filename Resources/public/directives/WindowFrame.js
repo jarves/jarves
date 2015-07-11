@@ -1,4 +1,4 @@
-import {Directive} from '../annotations';
+import {Directive} from '../angular.js';
 
 @Directive('windowFrame', {
     restrict: 'E',

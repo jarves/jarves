@@ -1,6 +1,6 @@
-import {isDifferent, each} from '../utils';
-import {Directive, Inject} from '../annotations';
-import angular from '../angular';
+import {isDifferent, each} from '../utils.js';
+import {Directive, Inject} from '../angular.js';
+import angular from '../angular.js';
 
 @Directive('jarvesForm', {
     restrict: 'E',

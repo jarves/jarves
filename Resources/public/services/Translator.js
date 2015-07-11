@@ -1,4 +1,4 @@
-import {Inject} from '../annotations';
+import {Inject} from '../angular.js';
 
 @Inject('$rootScope, backend')
 export default class Translator {

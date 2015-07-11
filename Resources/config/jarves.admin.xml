@@ -7,8 +7,8 @@
         </fields>
         <adminAssets>
             <!--<asset priority="2000" src="@JarvesBundle/libraries/systemjs/system-polyfills.js"/>-->
-            <asset priority="2000" src="@JarvesBundle/libraries/traceur/traceur-runtime.js"/>
-            <asset priority="2000" src="@JarvesBundle/libraries/traceur/traceur.js"/>
+            <asset priority="2000" src="@JarvesBundle/libraries/babel-core/browser.min.js"/>
+            <asset priority="2000" src="@JarvesBundle/libraries/babel-core/browser-polyfill.min.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/systemjs/system.src.js"/>
             <asset priority="2000" src="@JarvesBundle/index.js"/>
         </adminAssets>

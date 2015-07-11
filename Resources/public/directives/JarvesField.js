@@ -1,5 +1,5 @@
-import {Directive, Inject} from '../annotations';
-import AbstractFieldType from '../fields/AbstractFieldType';
+import {Directive, Inject} from '../angular.js';
+import AbstractFieldType from '../fields/AbstractFieldType.js';
 
 @Directive('jarvesField', {
     restrict: 'E',

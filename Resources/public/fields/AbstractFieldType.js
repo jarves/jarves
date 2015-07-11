@@ -1,5 +1,5 @@
-import {Inject} from '../annotations';
-import angular from '../angular';
+import {Inject} from '../angular.js';
+import angular from '../angular.js';
 
 @Inject('$scope, $element, $attrs, $compile, $parse, $timeout, $http, $templateCache, $q, $interpolate')
 export default class AbstractFieldType {

@@ -1,6 +1,6 @@
-import {baseUrl, baseRestUrl} from './config';
-import angular from './angular';
-import {Field, Label, Filter, Parser, Directive, Inject, InjectAsProperty} from './annotations';
+import {baseUrl, baseRestUrl} from './config.js';
+import angular from './angular.js';
+import {FieldAnnotation, LabelAnnotation, FilterAnnotation, Parser, DirectiveAnnotation, InjectAnnotation, InjectAsPropertyAnnotation} from './angular.js';
 
 /**
 * Is true if the current browser has a mobile user agent.
@@ -615,7 +615,7 @@ export function toQueryString(obj) {
  */
 export function getPreparedConstructor(controller) {
     var parser = new Parser(controller);
-    var annotations = parser.getAnnotations(Inject).reverse();
+    var annotations = parser.getAnnotations(InjectAnnotation).reverse();
     var $inject = [];
     for (let annotation of annotations) {
         $inject = $inject.concat(annotation.deps);
@@ -623,7 +623,7 @@ export function getPreparedConstructor(controller) {
 
     var injectsViaInjectCount = $inject.length;
 
-    var injectAsProperty = parser.getAnnotations(InjectAsProperty);
+    var injectAsProperty = parser.getAnnotations(InjectAsPropertyAnnotation);
     var propertyMap = {};
 
     if (!injectAsProperty.length && !annotations.length) {
@@ -659,17 +659,17 @@ export function getPreparedConstructor(controller) {
  */
 export function registerModuleField(angularModule, controller) {
     var parser = new Parser(controller);
-    var annotations = parser.getAnnotations(Field);
+    var annotations = parser.getAnnotations(FieldAnnotation);
     if (!annotations.length) {
         throw 'No Field annotations on class ' + controller
     }
-    var FieldAnnotation = annotations[0];
+    var FieldAnnotationInstance = annotations[0];
     var constructor = getPreparedConstructor(controller);
     if (!constructor) constructor = controller;
 
-    var directiveName = 'jarves' + FieldAnnotation.name.ucfirst() + 'Field';
+    var directiveName = 'jarves' + FieldAnnotationInstance.name.ucfirst() + 'Field';
 
-    var options = FieldAnnotation.options || {};
+    var options = FieldAnnotationInstance.options || {};
     options = angular.extend({
         restrict: 'A',
         controller: constructor,
@@ -713,11 +713,11 @@ export function registerModuleField(angularModule, controller) {
 
 export function registerModuleFilter(angularModule, controller) {
     var parser = new Parser(controller);
-    var annotations = parser.getAnnotations(Filter);
+    var annotations = parser.getAnnotations(FilterAnnotation);
     if (!annotations.length) {
         throw 'No Filter annotations on class ' + controller
     }
-    var FilterAnnotation = annotations[annotations.length-1];
+    var filterAnnotationInstance = annotations[annotations.length-1];
 
     var constructor = getPreparedConstructor(controller);
 
@@ -726,7 +726,7 @@ export function registerModuleFilter(angularModule, controller) {
             let instance = new controller();
             return instance.filter;
         }
-        angularModule.filter(FilterAnnotation.name, constructor);
+        angularModule.filter(filterAnnotationInstance.name, constructor);
     } else {
         var diFunction = constructor[constructor.length - 1];
         var overwrittenConstructor = constructor;
@@ -736,7 +736,7 @@ export function registerModuleFilter(angularModule, controller) {
             return instance.filter.bind(instance);
         }
 
-        angularModule.filter(FilterAnnotation.name, overwrittenConstructor);
+        angularModule.filter(filterAnnotationInstance.name, overwrittenConstructor);
     }
 }
 
@@ -750,18 +750,18 @@ export function registerModuleLabel(angularModule, controller) {
 
 
     var parser = new Parser(controller);
-    var annotations = parser.getAnnotations(Label);
+    var annotations = parser.getAnnotations(LabelAnnotation);
     if (!annotations.length) {
         throw 'No Field annotations on class ' + controller
     }
-    var LabelAnnotation = annotations[0];
+    var labelAnnotationInstance = annotations[0];
     var constructor = getPreparedConstructor(controller);
     if (!constructor) constructor = controller;
 
-    var directiveName = 'jarves' + LabelAnnotation.name.ucfirst() + 'Label';
+    var directiveName = 'jarves' + labelAnnotationInstance.name.ucfirst() + 'Label';
 
 
-    var options = LabelAnnotation.options || {};
+    var options = labelAnnotationInstance.options || {};
     options = angular.extend({
         restrict: 'A',
         controller: constructor,
@@ -796,7 +796,7 @@ export function registerModuleLabel(angularModule, controller) {
  */
 export function registerModuleDirective(angularModule, controller) {
     var parser = new Parser(controller);
-    var annotations = parser.getAnnotations(Directive);
+    var annotations = parser.getAnnotations(DirectiveAnnotation);
     if (!annotations.length) {
         throw 'No Directive annotations on class ' + controller
     }
@@ -804,9 +804,9 @@ export function registerModuleDirective(angularModule, controller) {
     var constructor = getPreparedConstructor(controller);
     if (!constructor) constructor = controller;
 
-    var DirectiveAnnotation = annotations[0];
+    var directiveAnnotationInstance = annotations[0];
 
-    var definition = DirectiveAnnotation.options || {};
+    var definition = directiveAnnotationInstance.options || {};
     if (!definition.controller) {
         definition.controller = constructor;
     }
@@ -816,13 +816,13 @@ export function registerModuleDirective(angularModule, controller) {
             definition.require = [definition.require];
         }
 
-        if (angular.isArray(definition.require) && DirectiveAnnotation.name !== definition.require[0]) {
-            definition.require.unshift(DirectiveAnnotation.name);
+        if (angular.isArray(definition.require) && directiveAnnotationInstance.name !== definition.require[0]) {
+            definition.require.unshift(directiveAnnotationInstance.name);
         }
 
         definition.link = function(scope, element, attr, ctrl, transclude) {
             var ownController, controllersToPass;
-            // console.log('link', DirectiveAnnotation.name, definition.require, [ctrl]);
+            // console.log('link', directiveAnnotationInstance.name, definition.require, [ctrl]);
             if (angular.isArray(ctrl)) {
                 ownController = ctrl.shift();
             } else {
@@ -844,7 +844,7 @@ export function registerModuleDirective(angularModule, controller) {
         : function(){ return definition; };
 
     angularModule.directive(
-        DirectiveAnnotation.name,
+        directiveAnnotationInstance.name,
         options
     );
 }

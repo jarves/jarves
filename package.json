@@ -4,6 +4,7 @@
   "description": "Jarves application framework",
   "main": "index.js",
   "dependencies": {
+    "babel-core": "^5.6.17",
     "systemjs": "^0.18.4",
     "traceur": "0.0.90"
   },

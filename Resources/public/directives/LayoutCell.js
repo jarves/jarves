@@ -1,5 +1,5 @@
-import {Directive, InjectAsProperty} from '../annotations';
-import Hammer from '../Hammer';
+import {Directive, InjectAsProperty} from '../angular.js';
+import Hammer from '../Hammer.js';
 
 @Directive('layoutCell', {
     restrict: 'E'

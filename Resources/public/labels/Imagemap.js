@@ -1,5 +1,5 @@
-import AbstractLabel from './AbstractLabel';
-import {Label} from '../annotations';
+import AbstractLabel from './AbstractLabel.js';
+import {Label} from '../angular.js';
 
 @Label('imageMap')
 export default class Imagepmap extends AbstractLabel {

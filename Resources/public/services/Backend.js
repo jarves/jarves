@@ -1,5 +1,5 @@
-import {Inject} from '../annotations';
-import {baseRestUrl} from '../config';
+import {Inject} from '../angular.js';
+import {baseRestUrl} from '../config.js';
 
 @Inject('$rootScope, $http')
 export default class Backend {

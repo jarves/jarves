@@ -1,6 +1,6 @@
-import {Inject} from '../annotations';
-import ObjectCollection from '../ObjectCollection';
-import {getPreparedConstructor, each, normalizeObjectKey} from '../utils';
+import {Inject} from '../angular.js';
+import ObjectCollection from '../ObjectCollection.js';
+import {getPreparedConstructor, each, normalizeObjectKey} from '../utils.js';
 
 @Inject('$rootScope, $q, $injector, $timeout, backend, jarves')
 export default class ObjectRepository {

@@ -1,8 +1,11 @@
 System.config({
     baseURL: './bundles',
-    transpiler: 'traceur',
+    transpiler: 'babel',
     traceurOptions: {
         annotations: true
+    },
+    babelOptions: {
+        stage: 1
     }
 });
 

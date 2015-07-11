@@ -1,10 +1,10 @@
-import {Directive, Inject} from '../annotations';
-import {each} from '../utils';
-import angular from '../angular';
+import {Directive, Inject} from '../angular.js';
+import {each} from '../utils.js';
+import angular from '../angular.js';
 
-import Jarves from '../services/Jarves';
-import WindowManagement from '../services/WindowManagement';
-import ObjectRepository from '../services/ObjectRepository';
+import Jarves from '../services/Jarves.js';
+import WindowManagement from '../services/WindowManagement.js';
+import ObjectRepository from '../services/ObjectRepository.js';
 
 @Directive('jarvesGrid', {
     restrict: 'E',

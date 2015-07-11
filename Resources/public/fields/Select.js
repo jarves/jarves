@@ -1,5 +1,5 @@
 import AbstractFieldType from './AbstractFieldType.js';
-import {Field, InjectAsProperty} from '../annotations.js';
+import {Field, InjectAsProperty} from '../angular.js';
 import {each} from '../utils.js';
 import angular from '../angular.js'
 

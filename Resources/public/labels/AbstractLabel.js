@@ -1,4 +1,4 @@
-import AbstractFieldType from '../fields/AbstractFieldType';
+import AbstractFieldType from '../fields/AbstractFieldType.js';
 
 export default class AbstractLabel extends AbstractFieldType {
     getModelName() {

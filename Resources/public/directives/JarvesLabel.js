@@ -1,5 +1,5 @@
-import {Directive} from '../annotations';
-import {each} from '../utils';
+import {Directive} from '../angular.js';
+import {each} from '../utils.js';
 
 @Directive('jarvesLabel', {
     restrict: 'E',
