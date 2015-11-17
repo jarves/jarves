@@ -38,7 +38,8 @@ class AdminLoginController extends PluginController
 
         $response->setBody("
 <div ng-controller=\"bundles/jarves/controller/AdminController\">
-    <ng-include src=\"'$indexView'\"></ng-include>
+    <jarves-login></jarves-login>
+    <ng-include src=\"'./$indexView'\"></ng-include>
     <ng-include src=\"'$interfaceView'\"></ng-include>
 </div>
         ");

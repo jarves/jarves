@@ -1,43 +1,44 @@
-import {Directive, Inject} from '../angular.js';
-import AbstractFieldType from '../fields/AbstractFieldType.js';
+import {Directive, Inject} from '../angular.ts';
+import AbstractFieldType from '../fields/AbstractFieldType.ts';
 
 @Directive('jarvesField', {
     restrict: 'E',
     priority: 5000,
-    terminal: true
+    terminal: true,
+    //compile: function(element, attributes){
+    //    var children = element.children().remove();
+    //}
 })
 @Inject('$scope, $element, $attrs, $compile, $http, $templateCache, $q')
 export default class JarvesField {
-    constructor($scope, $element, $attrs, $compile, $http, $templateCache, $q) {
-        this.$scope = $scope;
-        this.$element = $element;
-        this.$attrs = $attrs;
-        this.$compile = $compile;
-        this.$http = $http;
-        this.$templateCache = $http;
-        this.$q = $q;
+    private transclude;
+    private controller;
+
+    constructor(private $scope, private $element, private $attrs, private $compile) {
+        //console.info('constructor jarvesField.ts');
     }
 
     link(scope, element, attributes, controller, transclude) {
-        console.info('new jarvesField', !!transclude);
+        //console.info('link jarvesField.ts', !!transclude);
         this.transclude = transclude;
         if (attributes['definition']) {
             this.$scope.$watch(attributes['definition'], (definition) => {
+
+                throw 'invalid value for definition attribute in <jarves-field definition="%s" />'.sprintf(this.$attrs.definition);
                 this.load(definition);
             });
         } else {
+
+            if (!attributes.type) {
+                console.error('no type define in <jarves-field />', attributes);
+            }
             this.load(attributes);
         }
     }
 
     load(definition) {
-        if (!definition) {
-            throw 'invalid value for definition attribute in <jarves-field definition="%s" />'.sprintf(this.$attrs.definition);
-        }
-        if (!definition.type) {
-            console.error('no type define in <jarves-field />', definition);
-        }
         this.$element.attr('jarves-%s-field'.sprintf(definition.type.lcfirst()), '');
+        //console.log('compile jarvesField.ts', 'jarves-%s-field'.sprintf(definition.type.lcfirst()));
         this.$compile(this.$element, null, 5000)(this.$scope);
     }
 

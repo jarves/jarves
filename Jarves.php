@@ -355,10 +355,10 @@ class Jarves extends Controller
                 file_put_contents($cacheFile, $systemConfigHash . "\n" . serialize($this->systemConfig));
             }
 
-            if (!$this->systemConfig->getDatabase()) {
-                $database = $this->container->get('jarves.configuration.database');
-                $this->systemConfig->setDatabase($database);
-            }
+//            if (!$this->systemConfig->getDatabase()) {
+//                $database = $this->container->get('jarves.configuration.database');
+//                $this->systemConfig->setDatabase($database);
+//            }
 
         }
 

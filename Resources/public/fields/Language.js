@@ -1,6 +1,6 @@
 import AbstractFieldType from './AbstractFieldType.js';
-import {Field} from '../angular.js';
-import {eachValue} from '../utils.js';
+import {Field} from '../angular.ts';
+import {eachValue} from '../utils.ts';
 import Select from './Select.js';
 
 @Field('language')

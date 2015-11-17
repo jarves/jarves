@@ -1,6 +1,9 @@
-import {each, eachValue, normalizeObjectKey, urlEncode} from '../utils.js';
-import {Inject, angular} from '../angular.js';
+//import {Test, Inject, Directive} from '../Test.ts';
+import {Inject, Service} from '../angular.ts';
+import {each, eachValue, normalizeObjectKey, urlEncode} from '../utils.ts';
 import {baseUrl, baseRestUrl} from '../config.js';
+
+console.log(Service);
 
 /**
  * Uses the $rootScope.
@@ -12,18 +15,14 @@ import {baseUrl, baseRestUrl} from '../config.js';
  *  '_settings': 'Current system settings'
  * }
  */
-@Inject('$rootScope, backend, $q, $injector, translator')
-class Jarves {
+@Service('jarves')
+export default class Jarves {
+    getObjectLabelByItemTemplates: Object = {};
 
-    constructor($rootScope, backend, $q, $injector, translator) {
-        this.$rootScope = $rootScope;
-        this.backend = backend;
-        this.$q = $q;
-        this.$injector = $injector;
-        this.translator = translator;
+    constructor(private $rootScope, private backend, private $q, private $injector, private translator) {
         this.$rootScope._session = window._session;
         this.$rootScope._settings = {};
-        this.getObjectLabelByItemTemplates = {};
+
         console.log('new Service Jarves');
     }
 

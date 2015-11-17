@@ -1,7 +1,7 @@
-import {Inject, angular} from '../angular.js';
+//import {Inject, angular} from '../angular.ts';
 import {baseUrl, baseRestUrl} from '../config.js';
 
-@Inject('$rootScope, $scope, $q, $http, jarves, windowManagement')
+//@Inject('$rootScope, $scope, $q, $http, jarves, windowManagement')
 export default class AdminController {
     constructor($rootScope, $scope, $q, $http, jarves, windowManagement) {
         this.scope = $scope;

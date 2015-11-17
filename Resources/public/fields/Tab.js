@@ -1,6 +1,6 @@
 import AbstractFieldType from './AbstractFieldType.js';
-import {Field, InjectAsProperty} from '../angular.js';
-import angular from '../angular.js';
+import {Field, InjectAsProperty} from '../angular.ts';
+import angular from '../angular.ts';
 
 @Field('Tab', {
     transclude: true

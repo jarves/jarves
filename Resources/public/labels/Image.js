@@ -1,5 +1,5 @@
 import AbstractLabel from './AbstractLabel.js';
-import {Label} from '../angular.js';
+import {Label} from '../angular.ts';
 
 @Label('image')
 export default class Image extends AbstractLabel {

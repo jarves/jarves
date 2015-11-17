@@ -1,6 +1,6 @@
 import AbstractFieldType from './AbstractFieldType.js';
-import {Field, InjectAsProperty} from '../angular.js';
-import {each} from '../utils.js';
+import {Field, InjectAsProperty} from '../angular.ts';
+import {each} from '../utils.ts';
 import angular from '../angular.js'
 
 @Field('select')

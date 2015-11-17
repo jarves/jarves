@@ -1,4 +1,4 @@
-import {Filter, InjectAsProperty} from '../angular.js';
+import {Filter, InjectAsProperty} from '../angular.ts';
 
 @Filter('translate')
 @InjectAsProperty('translator')

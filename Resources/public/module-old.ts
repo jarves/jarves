@@ -1,20 +1,19 @@
-import Jarves from './services/Jarves.js';
+import Jarves from './services/Jarves.ts';
 import WindowManagement from './services/WindowManagement.js';
 import Translator from './services/Translator.js';
 import ObjectRepository from './services/ObjectRepository.js';
 import Backend from './services/Backend.js';
-import angular from './angular.js';
-import {registerModuleField, registerModuleDirective, registerModuleFilter, registerModuleLabel} from './utils.js';
-import {getPreparedConstructor} from './utils.js';
+import angular from './angular.ts';
+import {getPreparedConstructor, registerModuleField, registerModuleDirective, registerModuleFilter, registerModuleLabel} from './utils.ts';
 
-var jarvesModule = angular.module('jarves', ['ngAnimate']);
+console.log('execute module.ts');
 export default jarvesModule;
 
 export function registerField(controller) {
     registerModuleField(jarvesModule, controller);
 }
 
-export function registerDirective( controller) {
+export function registerDirective(controller) {
     registerModuleDirective(jarvesModule, controller);
 }
 
@@ -25,13 +24,17 @@ export function registerFilter(controller) {
 export function registerLabel(controller) {
     registerModuleLabel(jarvesModule, controller);
 }
-//
+
+export function init() {
+
+var jarvesModule = window.angular.module('jarves', ['ngAnimate']);
+
 //jarvesModule.service('jarves', getPreparedConstructor(Jarves));
 //jarvesModule.service('windowManagement', getPreparedConstructor(WindowManagement));
 //jarvesModule.service('translator', getPreparedConstructor(Translator));
 //jarvesModule.service('objectRepository', getPreparedConstructor(ObjectRepository));
 //jarvesModule.service('backend', getPreparedConstructor(Backend));
-//
+
 import Button from './directives/Button.js';
 import Icon from './directives/Icon.js';
 import InputText from './directives/InputText.js';
@@ -118,23 +121,46 @@ import TranslateFilter from './filters/Translate.js';
 //registerFilter(ToArray);
 //registerFilter(TranslateFilter);
 
-jarvesModule.config(function($provide) {
-    $provide.decorator("$controller", ['$delegate', ($delegate) => {
-        return function(constructor, locals) {
-            if (angular.isString(constructor)) {
-                try {
-                    var moduleClass = System.get(constructor);
-                    if (moduleClass) {
-                        var preparedConstructor = getPreparedConstructor(System.get(constructor).default);
-                        console.log('es6 module found for ', constructor);
-                        constructor = preparedConstructor || System.get(constructor).default;
-                    }
-                } catch (e){
-                }
-            }
-            return $delegate(constructor, locals);
-        };
-    }]);
-});
+
+//jarvesModule.config(function($provide) {
+//    $provide.decorator("$controller", ['$delegate', '$q', ($delegate, $q) => {
+//        return function(constructor, locals) {
+//            if (angular.isString(constructor) && constructor.slice(0, 'bundles/'.length) === 'bundles/') {
+//                constructor = './' + constructor + '.js';
+//                console.log('decorate controller', constructor);
+//                //throw 'penis';
+//
+//                ////return $q(function(resolve, reject) {
+//                //    window.System.import(constructor)
+//                //        .then( function(m){
+//                //            console.log('System.Import done', constructor, '=>', m.default);
+//                //
+//                //            //constructor = m.default;
+//                //            //var moduleClass = System.get(constructor);
+//                //            //console.log('System.get', moduleClass);
+//                //            //if (moduleClass) {
+//                //                var preparedConstructor = getPreparedConstructor(m.default);
+//                //                //console.log('es6 module found for ', constructor);
+//                //                constructor = preparedConstructor || m.default.default;
+//                //            //}
+//                //
+//                //            //resolve($delegate(constructor, locals));
+//                //        });
+//
+//                var placeholderConstructor = class {
+//
+//                };
+//                var result = $delegate(, locals);
+//
+//                console.log('result', result);
+//                return class {
+//
+//                };
+//                //});
+//            }
+//            return $delegate(constructor, locals);
+//        };
+//    }]);
+//});
 
 console.log('init jarves angular module');

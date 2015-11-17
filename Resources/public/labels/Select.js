@@ -1,7 +1,7 @@
 import AbstractLabel from './AbstractLabel.js';
-import {Label, InjectAsProperty} from '../angular.js';
-import {each} from '../utils.js';
-import angular from '../angular.js';
+import {Label, InjectAsProperty} from '../angular.ts';
+import {each} from '../utils.ts';
+import angular from '../angular.ts';
 
 @Label('select')
 @InjectAsProperty('objectRepository')

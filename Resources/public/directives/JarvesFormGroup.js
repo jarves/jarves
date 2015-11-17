@@ -1,5 +1,5 @@
-import {Directive, Inject} from '../angular.js';
-import {each} from '../utils.js';
+import {Directive, Inject} from '../angular.ts';
+import {each} from '../utils.ts';
 
 @Directive('jarvesFormGroup', {
     restrict: 'E',

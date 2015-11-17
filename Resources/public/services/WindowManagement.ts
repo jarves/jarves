@@ -1,10 +1,11 @@
-import Jarves from './Jarves.js';
+//import Jarves from './Jarves.js';
 import WindowController from '../controller/WindowController.js';
-import {each, eachValue} from '../utils.js';
-import {Inject, angular} from '../angular.js';
+import {each, eachValue} from '../utils.ts';
+import {Service, angular} from '../angular.ts';
 
-@Inject('jarves')
-export default class WindowService {
+//@Inject('jarves')
+@Service('windowManagement')
+export default class WindowManagement {
 
     /**
      * @param {Jarves} jarves

@@ -1,6 +1,6 @@
-import {Inject} from './angular.js';
-import {normalizeObjectKey, toQueryString} from './utils.js';
-import angular from './angular.js';
+import {Inject} from './angular.ts';
+import {normalizeObjectKey, toQueryString} from './utils.ts';
+import angular from './angular.ts';
 
 @Inject('$q, backend, objectRepository')
 export default class ObjectCollection {

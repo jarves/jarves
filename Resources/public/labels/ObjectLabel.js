@@ -1,6 +1,6 @@
 import AbstractLabel from './AbstractLabel.js';
-import {Label} from '../angular.js';
-import angular from '../angular.js';
+import {Label} from '../angular.ts';
+import angular from '../angular.ts';
 
 @Label('object')
 export default class ObjectLabel extends AbstractLabel {

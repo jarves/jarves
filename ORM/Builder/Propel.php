@@ -127,7 +127,7 @@ class Propel implements BuildInterface
 
     protected function declareTable(\SimpleXMLElement $database, Object $object)
     {
-        $tables = $database->xpath('table[@name=\'' . $object->getTable() . '\']');
+        $tables = $database->xpath('table[@name=\'' .  . $object->getTable() . '\']');
         $xmlTable = $this->getXmlTable($object, @$tables[0]);
         $this->sxml_append($database, $xmlTable);
     }

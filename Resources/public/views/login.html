@@ -1,23 +1,23 @@
-<div ng-controller="bundles/jarves/controller/LoginController">
-    <div ng-show="loginVisible" class="jarves-login jarves-admin">
+<div ng-controller="bundles/jarves/controller/LoginController as loginController">
+    <div ng-show="loginController.loginVisible" class="jarves-login jarves-admin">
         <div class="jarves-login-middle">
             <div class="jarves-login-middle-top">
                 <img class="jarves-login-logo" src="{{_baseUrl}}/bundles/jarves/images/logo.png">
             </div>
             <form id="loginForm" onsubmit="return false;" class="jarves-login-middle-form">
 
-                <jarves-field type="text" translate inline model="credentials.username" placeholder="Username"></jarves-field>
-                <jarves-field type="password" translate inline model="credentials.password" placeholder="Password"></jarves-field>
+                <jarves-field type="text" translate inline model="loginController.credentials.username" placeholder="Username"></jarves-field>
+                <jarves-field type="password" translate inline model="loginController.credentials.password" placeholder="Password"></jarves-field>
 
-                <jarves-field type="language" inline model="language"></jarves-field>
-                <button ng-click="doLogin()" translate>Login</button>
+                <!--<jarves-field type="language" inline model="loginController.language"></jarves-field>-->
+                <button ng-click="loginController.doLogin()" translate>Login</button>
 
-                <div class="jarves-login-loader-top" ng-class="{'active': inputBlocked}">
-                    <div class="jarves-login-loadingBarInside" style="width: {{progress}}%"></div>
+                <div class="jarves-login-loader-top" ng-class="{'active': loginController.inputBlocked}">
+                    <div class="jarves-login-loadingBarInside" style="width: {{loginController.progress}}%"></div>
                 </div>
-                <div class="jarves-login-loader-bottom" ng-class="{'active': inputBlocked}"></div>
+                <div class="jarves-login-loader-bottom" ng-class="{'active': loginController.inputBlocked}"></div>
             </form>
-            <div class="loginMessage" ng-class="{'red': loginStatus==2}" ng-switch="loginStatus">
+            <div class="loginMessage" ng-class="{'red': loginController.loginStatus==2}" ng-switch="loginController.loginStatus">
                 <span ng-switch-when="1">Log in ...</span>
                 <span ng-switch-when="2">Login failed</span>
                 <span ng-switch-when="3">Loading interface ...</span>

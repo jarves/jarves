@@ -1,10 +1,38 @@
-import AbstractFieldType from './AbstractFieldType.js';
-import {Field} from '../angular.js';
-import angular from '../angular.js'
-import {each} from '../utils.js';
+import AbstractFieldType from './AbstractFieldType.ts';
+import {Field, Directive, angular} from '../angular.ts';
+import {each} from '../utils.ts';
 
-@Field('text')
+@Field('text', {
+    templateUrl: 'bundles/jarves/views/field.text.html',
+    scope: {
+        'placeholder': '@',
+        'model': '='
+    }
+})
 export default class Text extends AbstractFieldType {
+
+    public static options:Object = {
+        label: 'Text input',
+        asModel: true,
+        options: {
+            modifier: {
+                label: 'Value modifier',
+                type: 'text',
+                desc: 'A pipe separated list of modifiers. Example: trim|ucfirst|camelcase.' +
+                'Possible: trim, lower, ucfirst, lcfirst, phpfunction, phpclass, underscore, camelcase, dash, url'
+            },
+            redirectSameValue: {
+                label: 'Redirect this value',
+                desc: 'Redirect this value to another field with the same result as this value. Example: fieldName:modifier1|modifier2,fieldName2:modifier3',
+                type: 'text'
+            },
+            redirectValue: {
+                label: 'Redirect this value always',
+                desc: 'Redirect this value always to another field (and overwrites it always). Example: fieldName:modifier1|modifier2,fieldName2:modifier3',
+                type: 'text'
+            }
+        }
+    };
 
     static trimModifier(v) {
         return v.replace(/^\s+|\s+$/g, "");
@@ -55,8 +83,8 @@ export default class Text extends AbstractFieldType {
 
         // remove accents, swap ñ for n, etc
         var from = "ãàáäâẽèéëêìíïîõòóöôùúüûñç·/_,:;";
-        var to   = "aaaaaeeeeeiiiiooooouuuunc------";
-        for (var i=0, l=from.length ; i<l ; i++) {
+        var to = "aaaaaeeeeeiiiiooooouuuunc------";
+        for (var i = 0, l = from.length; i < l; i++) {
             str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
         }
 
@@ -67,60 +95,45 @@ export default class Text extends AbstractFieldType {
         return str;
     }
 
-    //Statics: {
-    //    label: 'Text input',
-    //    asModel: true,
-    //    options: {
-    //        modifier: {
-    //            label: 'Value modifier',
-    //            type: 'text',
-    //            desc: 'A pipe separated list of modifiers. Exampple: trim|ucfirst|camelcase.' +
-    //            'Possible: trim, lower, ucfirst, lcfirst, phpfunction, phpclass, underscore, camelcase, dash, url'
-    //        }
-    //        redirectSameValue: {
-    //            label: 'Redirect this value',
-    //            desc: 'Redirect this value to another field with the same result as this value. Example: fieldName:modifier1|modifier2,fieldName2:modifier3',
-    //            type: 'text'
-    //        }
-    //        redirectValue: {
-    //            label: 'Redirect this value always',
-    //            desc: 'Redirect this value always to another field (and overwrites it always). Example: fieldName:modifier1|modifier2,fieldName2:modifier3',
-    //            type: 'text'
-    //        }
-    //    }
-    //    modifiers: {
-    //        'trim' (v) {
-    //            return v.replace(/^\s+|\s+$/g, "");
-    //        }
-    //        'lower' (v) {
-    //            return v.toLowerCase();
-    //        }
-    //
-    //    }
-    //},
-
-    constructor(...deps) {
-        super(...deps);
-        this.template = 'bundles/jarves/views/field.text.html',
-        this.boundRedirects =  {}
-    }
+    //constructor(...deps) {
+    //    super(...deps);
+    //    this.template = 'bundles/jarves/views/field.text.html';
+    //    this.boundRedirects =  {}
+    //}
 
     link(scope, element, attr, controller, transclude) {
-        parent(scope, element, attr, controller, transclude);
-        this.attr = attr;
+        super.link(scope, element, attr, controller, transclude);
+        console.log('link Text.ts');
+        //this.attr = attr;
 
-        this.renderTemplateUrl(
-            this.template,
-            this.beforeCompile.bind(this)
-        );
+        //this.renderTemplateUrl(
+        //    this.template,
+        //    this.beforeCompile.bind(this)
+        //);
 
         this.setupRedirects();
         this.setupModifiers();
     }
 
+    //static compile(element, attr) {
+    ////    console.log('compile', element, attr);
+    //    var contents = element.children();
+    //    contents.attr('ng-model', this.getParentModelName());
+    //}
+
+    //beforeCompile(contents) {
+    //    contents.attr('placeholder', this.attr.placeholder);
+    //    contents.attr('translate', this.attr.translate);
+    //    var width;
+    //    if (width = this.getOption('width')) {
+    //        contents.css('width', width);
+    //    }
+    //    contents.attr('ng-trim', false);
+    //}
+
     setupModifiers() {
         if (this.getOption('modifier')) {
-            this.$scope.$watch(this.getModelName(), function(value) {
+            this.$scope.$watch(this.getModelName(), function (value) {
                 var newValue = this.applyModifier(value, this.getOption('modifier'));
                 if (newValue !== value) {
                     this.setModelValue(newValue);
@@ -184,9 +197,9 @@ export default class Text extends AbstractFieldType {
         }
     }
 
-    bindRedirect(targetModelName, modifier, onlySame) {
+    bindRedirect(targetModelName, modifier, onlySame = false) {
 
-        this.$scope.$watch(this.getModelName(), function(value, oldValue) {
+        this.$scope.$watch(this.getModelName(), function (value, oldValue) {
             var currentValue = this.getAnotherModelValue(this.getRelativeModelName(targetModelName)) || '';
             var convertedNew = this.applyModifier(value, modifier);
             var convertedOld = this.applyModifier(oldValue, modifier);
@@ -225,16 +238,5 @@ export default class Text extends AbstractFieldType {
         //    this.addEvent('change', doRedirect);
         //    doRedirect();
         //}
-    }
-
-    beforeCompile(contents) {
-        contents.attr('placeholder', this.attr.placeholder);
-        contents.attr('translate', this.attr.translate);
-        contents.attr('ng-model', this.getParentModelName());
-        var width;
-        if (width = this.getOption('width')) {
-            contents.css('width', width);
-        }
-        contents.attr('ng-trim', false);
     }
 }

@@ -7,17 +7,36 @@
         </fields>
         <adminAssets>
             <!--<asset priority="2000" src="@JarvesBundle/libraries/systemjs/system-polyfills.js"/>-->
-            <asset priority="2000" src="@JarvesBundle/libraries/babel-core/browser.min.js"/>
-            <asset priority="2000" src="@JarvesBundle/libraries/babel-core/browser-polyfill.min.js"/>
-            <asset priority="2000" src="@JarvesBundle/libraries/systemjs/system.src.js"/>
-            <asset priority="2000" src="@JarvesBundle/index.js"/>
-        </adminAssets>
-        <xxxadminAssets>
+            <!--<asset priority="2000" src="@JarvesBundle/libraries/babel-core/browser.min.js"/>-->
+            <!--<asset priority="2000" src="@JarvesBundle/libraries/babel-core/browser-polyfill.min.js"/>-->
+            <!--<asset priority="2000" src="@JarvesBundle/libraries/generator-runtime.js"/>-->
+            <!--<asset priority="2000" src="@JarvesBundle/libraries/typescript/typescriptServices.js"/>-->
+            <assets priority="2000" src="@JarvesBundle/prototypes/String/*"/>
+            <!--<asset priority="2000" src="@JarvesBundle/libraries/bluebird.js"/>-->
             <asset priority="2000" src="@JarvesBundle/libraries/angular.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/angular-animate.min.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/hammer.min.js"/>
+            <asset priority="2000" src="@JarvesBundle/libraries/typescript/typescript.js"/>
+            <asset priority="2000" src="@JarvesBundle/libraries/systemjs/system.src.js"/>
+            <asset priority="2000" src="@JarvesBundle/start.js"/>
+
+            <asset src="@JarvesBundle/fonts/OpenSans/open-sans.css"/>
+            <asset src="@JarvesBundle/fonts/OpenSans/open-sans-condensed.css"/>
+
+            <assets src="@JarvesBundle/css/admin/jarves.scss"/>
+            <!--<assets src="@JarvesBundle/css/admin/jarves-white.scss"/>-->
+            <asset src="@JarvesBundle/css/admin/jarves/Button.scss"/>
+            <asset src="@JarvesBundle/css/admin/jarves/ButtonGroup.scss"/>
+            <assets src="@JarvesBundle/css/admin/lib/*.css"/>
+            <assets src="@JarvesBundle/css/admin/jarves/*.css"/>
+            <assets src="@JarvesBundle/css/admin/jarves/*.scss"/>
+            <assets src="@JarvesBundle/css/admin/jarves/ui/*.css"/>
+            <assets src="@JarvesBundle/css/admin/jarves/Field/*"/>
+        </adminAssets>
+
+        <xxxadminAssets>
             <assets priority="2000" src="@JarvesBundle/prototypes/String/*"/>
-            <asset type="module" src="@JarvesBundle/utils.js"/>
+            <asset type="module" src="@JarvesBundle/utils.ts"/>
             <asset type="module" src="@JarvesBundle/JarvesApp.js"/>
             <assets type="module" src="@JarvesBundle/controller/*"/>
             <assets type="module" src="@JarvesBundle/fields/*"/>

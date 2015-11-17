@@ -1,7 +1,8 @@
-import {Inject} from '../angular.js';
+import {Service} from '../angular.ts';
 import {baseRestUrl} from '../config.js';
 
-@Inject('$rootScope, $http')
+//@Inject('$rootScope, $http')
+@Service('backend')
 export default class Backend {
     constructor($rootScope, $http) {
         this.$rootScope = $rootScope;

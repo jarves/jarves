@@ -1,8 +1,9 @@
-import {Inject} from '../angular.js';
+import {Service} from '../angular.ts';
 import ObjectCollection from '../ObjectCollection.js';
-import {getPreparedConstructor, each, normalizeObjectKey} from '../utils.js';
+import {getPreparedConstructor, each, normalizeObjectKey} from '../utils.ts';
 
-@Inject('$rootScope, $q, $injector, $timeout, backend, jarves')
+//@Inject('$rootScope, $q, $injector, $timeout, backend, jarves')
+@Service('objectRepository')
 export default class ObjectRepository {
     constructor($rootScope, $q, $injector, $timeout, backend, jarves) {
         this.$rootScope = $rootScope;

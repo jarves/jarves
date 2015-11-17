@@ -1,4 +1,4 @@
-import {Directive} from '../angular.js';
+import {Directive} from '../angular.ts';
 import {baseUrl, baseRestUrl} from '../config.js';
 
 @Directive('icon', {

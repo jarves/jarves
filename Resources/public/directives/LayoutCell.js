@@ -1,4 +1,4 @@
-import {Directive, InjectAsProperty} from '../angular.js';
+import {Directive, InjectAsProperty} from '../angular.ts';
 import Hammer from '../Hammer.js';
 
 @Directive('layoutCell', {

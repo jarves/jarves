@@ -1,4 +1,4 @@
-import {Inject} from '../angular.js';
+import {Inject} from '../angular.ts';
 
 @Inject('$scope, $element, $attrs, $q, backend, objectRepository, jarves')
 export default class ListController {

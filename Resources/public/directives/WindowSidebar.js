@@ -1,4 +1,4 @@
-import {Directive} from '../angular.js';
+import {Directive} from '../angular.ts';
 
 @Directive('windowSidebar', {
     restrict: 'E',

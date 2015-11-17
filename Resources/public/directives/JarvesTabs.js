@@ -1,4 +1,4 @@
-import {Directive, Inject} from '../angular.js';
+import {Directive, Inject} from '../angular.ts';
 
 @Directive('jarvesTabs', {
     restrict: 'E',

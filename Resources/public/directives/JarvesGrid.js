@@ -1,6 +1,6 @@
-import {Directive, Inject} from '../angular.js';
-import {each} from '../utils.js';
-import angular from '../angular.js';
+import {Directive, Inject} from '../angular.ts';
+import {each} from '../utils.ts';
+import angular from '../angular.ts';
 
 import Jarves from '../services/Jarves.js';
 import WindowManagement from '../services/WindowManagement.js';

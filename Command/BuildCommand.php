@@ -22,7 +22,7 @@ class BuildCommand extends AbstractCommand
             ->setName('jarves:orm:build:propel')
             ->addArgument('bundle', InputArgument::REQUIRED, 'Bundle name, like JarvesPublicationBundle')
             ->addOption('overwrite', null, InputOption::VALUE_NONE)
-            ->setDescription('Builds all ORM models and updates their backend schema if needed (e.g. SQL tables).')
+            ->setDescription('Builds all ORM model schema files')
         ;
     }
 

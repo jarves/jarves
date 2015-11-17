@@ -1,4 +1,4 @@
-import {Filter} from '../angular.js';
+import {Filter} from '../angular.ts';
 
 @Filter('toArray')
 export default class ToArray {

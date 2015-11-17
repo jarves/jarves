@@ -1,5 +1,5 @@
 import AbstractFieldType from './AbstractFieldType.js';
-import {Field, InjectAsProperty} from '../angular.js';
+import {Field, InjectAsProperty} from '../angular.ts';
 
 @Field('file')
 @InjectAsProperty('objectRepository')

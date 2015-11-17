@@ -4,11 +4,10 @@
   "description": "Jarves application framework",
   "main": "index.js",
   "dependencies": {
-    "babel-core": "^5.6.17",
+    "babel-core": "^5.8.33",
     "systemjs": "^0.18.4",
-    "traceur": "0.0.90"
+    "typescript": "^1.6.2"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "install": "sh Resources/npm/install.sh"
