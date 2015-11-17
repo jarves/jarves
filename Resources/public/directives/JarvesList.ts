@@ -5,31 +5,34 @@ import angular from '../angular.ts';
 @Directive('jarvesList', {
     restrict: 'E',
     scope: true,
+    controllerAs: 'jarvesList'
     // transclude: true,
     // templateUrl: 'bundles/jarves/views/list.html'
 })
 @Inject('$scope, $element, $attrs, backend, $q, $parse, $compile, jarves, objectRepository')
 export default class JarvesList {
-    constructor($scope, $element, $attrs, backend, $q, $parse, $compile, jarves, objectRepository) {
-        this.$scope = $scope;
-        this.$parse = $parse;
-        this.$scope.listController = this;
-        this.$element = $element;
-        this.backend = backend;
-        this.$q = $q;
-        this.$attrs = $attrs;
-        this.$compile = $compile;
-        this.jarves = jarves;
-        this.objectRepository = objectRepository;
+    public classProperties = {};
+    public selectedPk;
+    public selected;
+    public itemTemplateElement;
+    public template;
 
+    public entryPoint;
+    public selectable;
+
+    protected preSelect;
+
+    public items;
+
+    constructor(private $scope, private $element, private $attrs, private backend, private $q, private $parse, private $compile, private jarves, private objectRepository) {
         this.classProperties = {};
         this.selectedPk = null;
         this.selected = null;
 
         this.itemTemplateElement = null;
 
-        this.template = '<jarves-list-item ng-repeat="item in listController.items" ng-class="{\'selected\': listController.isSelectedIndex($index)}"\
-                         ng-click="listController.selectable && listController.selectIndex($index)"></jarves-list-item>';
+        this.template = '<jarves-list-item ng-repeat="item in jarvesList.items" ng-class="{\'selected\': jarvesList.isSelectedIndex($index)}"\
+                         ng-click="jarvesList.selectable && jarvesList.selectIndex($index)"></jarves-list-item>';
 
         if ($attrs.entryPoint) {
             this.entryPoint = $scope.$parent.$eval($attrs.entryPoint);
@@ -48,11 +51,11 @@ export default class JarvesList {
             });
 
             if ($attrs.entryPoint) {
-                $scope.$watch('listController.selectedPk', (value) => {
+                $scope.$watch('jarvesList.selectedPk', (value) => {
                     this.$parse(this.$attrs.model).assign(this.$scope.$parent, value);
                 });
             } else {
-                $scope.$watch('listController.selected', (value) => {
+                $scope.$watch('jarvesList.selected', (value) => {
                     this.$parse(this.$attrs.model).assign(this.$scope.$parent, value);
                 });
             }

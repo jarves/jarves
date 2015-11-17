@@ -4,7 +4,7 @@ import angular from './angular.ts';
 
 @Inject('$q, backend, objectRepository')
 export default class ObjectCollection {
-    constructor($q, backend, objectRepository) {
+    constructor(private $q, private backend, private objectRepository) {
         this.objectKey = '';
         this.selection = [];
         this.order = '';
@@ -15,10 +15,6 @@ export default class ObjectCollection {
 
         this.queryOptions = {};
         this.callbacks = [];
-
-        this.$q = $q;
-        this.backend = backend;
-        this.objectRepository = objectRepository;
     }
 
     setObjectKey(objectKey) {

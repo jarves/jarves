@@ -33,15 +33,12 @@ class AdminLoginController extends PluginController
         $adminAssets->addSessionScripts();
 
         $response = $this->getJarves()->getPageResponse();
-        $indexView = $this->getJarves()->resolvePublicWebPath('@JarvesBundle/views/login.html');
-        $interfaceView = $this->getJarves()->resolvePublicWebPath('@JarvesBundle/views/interface.html');
 
         $response->setBody("
-<div ng-controller=\"bundles/jarves/controller/AdminController\">
+<jarves-admin>
     <jarves-login></jarves-login>
-    <ng-include src=\"'./$indexView'\"></ng-include>
-    <ng-include src=\"'$interfaceView'\"></ng-include>
-</div>
+    <jarves-interface></jarves-interface>
+</jarves-admin>
         ");
 
         $response->setResourceCompression(false);

@@ -1,7 +1,10 @@
-//import {Inject, angular} from '../angular.ts';
-import {baseUrl, baseRestUrl} from '../config.js';
+import {baseUrl, baseRestUrl} from '../../config.js';
+import {Directive} from '../../angular.ts';
 
-//@Inject('$rootScope, $scope, $q, $http, jarves, windowManagement')
+@Directive('jarvesAdmin', {
+    restrict: 'E',
+    controllerAs: 'jarvesAdmin'
+})
 export default class AdminController {
     constructor($rootScope, $scope, $q, $http, jarves, windowManagement) {
         this.scope = $scope;
@@ -110,7 +113,7 @@ export default class AdminController {
             throw new Error('Can not be found entryPoint: ' + entryPoint);
         }
 
-        if (-1 !== ['custom', 'iframe', 'list', 'edit', 'add', 'combine'].indexOf(entryPoint.type)) {
+        if (-1 !== ['custom', 'iframe', 'list', 'edit', 'add', 'combined'].indexOf(entryPoint.type)) {
             return this.loadWindow(entryPoint, options, dependWindowId, inline);
         } else if (entryPoint.type == 'function') {
             //return jarves.entrypoint.exec(entryPoint, options);

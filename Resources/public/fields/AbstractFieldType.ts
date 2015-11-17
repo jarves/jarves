@@ -6,17 +6,17 @@ export default class AbstractFieldType {
 
     public static options:Object = {};
 
-    private options = {};
-    private definition = {};
-    private form;
-    private children = [];
-    private fieldDirective;
-    private parentFieldDirective;
-    private optionsReferences = ['definition'];
-    private additionalOptionsReferences = [];
-    private optionsReferencesMap = {};
+    protected options = {};
+    protected definition;
+    protected form;
+    protected children = [];
+    protected fieldDirective;
+    protected parentFieldDirective;
+    protected optionsReferences = ['definition'];
+    protected additionalOptionsReferences = [];
+    protected optionsReferencesMap = {};
 
-    constructor(private $compile, private $parse, private $timeout, private $http, private $templateCache, private $q, private $interpolate) {
+    constructor(protected $compile, protected $parse, protected $timeout, protected $http, protected $templateCache, protected $q, protected $interpolate) {
         for (let item of this.optionsReferences) {
             this.optionsReferencesMap[item] = true;
         }
@@ -48,7 +48,7 @@ export default class AbstractFieldType {
         return '$parent.' + this.getModelName();
     }
 
-    renderTemplateUrl(url, beforeCompile) {
+    renderTemplateUrl(url, beforeCompile = null) {
         var deferred = this.$q.defer();
         if (!url) {
             throw 'no template url defined';
@@ -90,7 +90,12 @@ export default class AbstractFieldType {
         if (this.options[name]) {
             return this.options[name];
         } else {
-            if (null === this.definition && this.attributes.definition) {
+
+            if (!this.linked) {
+                throw 'Can not AbstractFieldType.getOption(). Field not linked yet.';
+            }
+
+            if (!this.definition && this.attributes.definition) {
                 this.definition = this.scope.$parent.$eval(this.attributes.definition) || {};
                 if (this.definition.options) {
                     this.definition = angular.extend(this.definition, this.definition.options);
@@ -110,6 +115,69 @@ export default class AbstractFieldType {
             }
         }
     }
+
+    protected scope:Object;
+    protected element:Element;
+    protected attributes:Object;
+
+    public label:string;
+    public description:string;
+    protected labelElement:Element;
+    protected descriptionElement:Element;
+    protected fieldContainer:Element;
+    protected childrenContainer:Element;
+    protected childrenContainer:Element;
+
+    protected linked = false;
+
+    /**
+     * Take care, this method can run several times.
+     */
+    link(scope, element, attributes, controller, transclude) {
+        this.scope = scope;
+        this.element = element;
+        this.attributes = attributes;
+        this.linked = true;
+        this.scope.fieldController = this;
+        this.scope.$on('$destroy', () => this.destructor());
+
+        var templateElements = element.children();
+
+        if (this.getOption('inline') || 'inline' in this.attributes) {
+            this.element.addClass('jarves-Field-no-wrapper');
+            transclude(scope, (clone) => {
+                element.append(clone);
+            });
+            return;
+        }
+
+        this.label = this.getOption('label');
+        this.description = this.getOption('description') || this.getOption('desc');
+
+        this.labelElement = angular.element('<div class="jarves-Field-title" ng-bind="fieldController.label"></div>');
+        this.descriptionElement = angular.element('<div class="jarves-Field-description" ng-if="fieldController.description" ng-bind="fieldController.description"></div>');
+        this.fieldContainer = angular.element('<div class="jarves-Field-container"></div>');
+        this.childrenContainer = angular.element('<div class="jarves-Field-children"></div>');
+
+        this.element.prepend(this.descriptionElement);
+        this.element.prepend(this.labelElement);
+        this.descriptionElement.after(this.fieldContainer);
+        this.fieldContainer.after(this.childrenContainer);
+
+        this.fieldContainer.append(templateElements);
+
+        this.$compile(this.labelElement)(this.scope);
+        this.$compile(this.descriptionElement)(this.scope);
+        this.$compile(this.fieldContainer)(this.scope);
+        this.$compile(this.childrenContainer)(this.scope);
+
+        transclude(scope, (clone) => {
+            this.childrenContainer.append(clone);
+        });
+
+        this.setDefaultValue();
+    }
+
 
     isValid(highlight) {
         var valid = true;
@@ -153,64 +221,6 @@ export default class AbstractFieldType {
         var prefix = parts.join('.');
 
         return (prefix ? prefix + '.' : '') + key;
-    }
-
-    private scope:Object;
-    private element:Element;
-    private attributes:Object;
-
-    private label:string;
-    private description:string;
-    private labelElement:Element;
-    private descriptionElement:Element;
-    private fieldContainer:Element;
-    private childrenContainer:Element;
-    private childrenContainer:Element;
-
-
-    /**
-     * Take care, this method can run several times.
-     */
-    link(scope, element, attributes, controller, transclude) {
-        this.scope = scope;
-        this.element = element;
-        this.attributes = attributes;
-        this.scope.fieldController = this;
-        this.scope.$on('$destroy', () => this.destructor());
-
-        //console.log('link AbstractFieldType.ts', this.getOption('inline') , element);
-
-        if (this.getOption('inline') || 'inline' in this.attributes) {
-            this.element.addClass('jarves-Field-no-wrapper');
-            transclude(scope, (clone) => {
-                element.append(clone);
-            });
-            return;
-        }
-
-        this.label = this.getOption('label');
-        this.description = this.getOption('description') || this.getOption('desc');
-
-        this.labelElement = angular.element('<div class="jarves-Field-title" ng-bind="fieldController.label"></div>');
-        this.descriptionElement = angular.element('<div class="jarves-Field-description" ng-if="fieldController.description" ng-bind="fieldController.description"></div>');
-        this.fieldContainer = angular.element('<div class="jarves-Field-container"></div>');
-        this.childrenContainer = angular.element('<div class="jarves-Field-children"></div>');
-
-        this.element.prepend(this.descriptionElement);
-        this.element.prepend(this.labelElement);
-        this.descriptionElement.after(this.fieldContainer);
-        this.fieldContainer.after(this.childrenContainer);
-
-        this.$compile(this.labelElement)(this.scope);
-        this.$compile(this.descriptionElement)(this.scope);
-        this.$compile(this.fieldContainer)(this.scope);
-        this.$compile(this.childrenContainer)(this.scope);
-
-        transclude(scope, (clone) => {
-            this.childrenContainer.append(clone);
-        });
-
-        this.setDefaultValue();
     }
 
     setDefaultValue() {

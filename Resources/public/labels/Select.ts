@@ -1,22 +1,25 @@
-import AbstractLabel from './AbstractLabel.js';
-import {Label, InjectAsProperty} from '../angular.ts';
+import AbstractLabel from './AbstractLabel.ts';
+import {Label} from '../angular.ts';
 import {each} from '../utils.ts';
 import angular from '../angular.ts';
 
 @Label('select')
-@InjectAsProperty('objectRepository')
 export default class Select extends AbstractLabel {
-    constructor(...deps) {
-        super(...deps);
-        this.template = 'bundles/jarves/views/label.select.html';
-        this.objectRepository = null;
-        this.selectedItem = {};
-        this.data = {};
-        this.value = null;
-        this.items = {};
+
+    protected template = 'bundles/jarves/views/label.select.html';
+
+    public selectedItem = {};
+    public data = {};
+    public value = null;
+    public items = {};
+
+    constructor(protected $compile, protected $parse, protected $timeout, protected $http, protected $templateCache,
+                protected $q, protected $interpolate, private objectRepository, private jarves) {
+        super(...arguments);
     }
 
     link(scope, element, attributes) {
+        super.link(...arguments);
         this.renderTemplateUrl(
             this.template
         );

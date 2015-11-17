@@ -15,7 +15,7 @@
       <entryPoint path="pages" type="custom" templateUrl="@JarvesBundle/views/pages.html" icon="#icon-monitor" link="true">
         <label>Pages</label>
       </entryPoint>
-      <entryPoint path="nodes" type="combine" icon="#icon-tree" link="true" multi="true">
+      <entryPoint path="nodes" type="combined" icon="#icon-tree" link="true" multi="true">
         <class>Jarves\Controller\Windows\NodeCrudController</class>
         <label>Nodes</label>
         <children>
@@ -25,7 +25,7 @@
           <entryPoint path="addDomains" type="custom" multi="true">
             <label>Add domains</label>
           </entryPoint>
-          <entryPoint path="root" type="combine">
+          <entryPoint path="root" type="combined">
             <class>Jarves\Controller\Windows\DomainCrudController</class>
             <label>Domain</label>
           </entryPoint>
@@ -110,7 +110,7 @@
       <entryPoint path="user" system="true" link="true">
         <label>User Management</label>
         <children>
-          <entryPoint path="users" type="combine" system="true" icon="#icon-user-9" link="true">
+          <entryPoint path="users" type="combined" system="true" icon="#icon-user-9" link="true">
             <class>Jarves\Controller\Windows\UserCrudController</class>
             <label>Users</label>
             <children>
@@ -128,7 +128,7 @@
               </entryPoint>
             </children>
           </entryPoint>
-          <entryPoint path="groups" type="combine" system="true" icon="#icon-users-2" link="true">
+          <entryPoint path="groups" type="combined" system="true" icon="#icon-users-2" link="true">
             <class>Jarves\Controller\Windows\GroupCrudController</class>
             <label>Groups</label>
           </entryPoint>

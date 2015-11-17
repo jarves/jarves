@@ -1,18 +1,13 @@
 import {Service} from '../angular.ts';
-import ObjectCollection from '../ObjectCollection.js';
-import {getPreparedConstructor, each, normalizeObjectKey} from '../utils.ts';
+import ObjectCollection from '../ObjectCollection.ts';
+import {each, normalizeObjectKey} from '../utils.ts';
 
 //@Inject('$rootScope, $q, $injector, $timeout, backend, jarves')
 @Service('objectRepository')
 export default class ObjectRepository {
-    constructor($rootScope, $q, $injector, $timeout, backend, jarves) {
-        this.$rootScope = $rootScope;
-        this.$q = $q;
-        this.$timeout = $timeout;
-        this.$injector = $injector;
-        this.backend = backend;
-        this.jarves = jarves;
-        this.changesCallback = {};
+    private changesCallback = {};
+
+    constructor(private $rootScope, private $q, private $injector, private $timeout, private backend, private jarves) {
         jarves.fireObjectChange = (objectKey) => {
             this.fireObjectChange(normalizeObjectKey(objectKey));
         };
@@ -44,7 +39,7 @@ export default class ObjectRepository {
     }
 
     newCollection(objectKey) {
-        var collection = this.$injector.instantiate(getPreparedConstructor(ObjectCollection));
+        var collection = this.$injector.instantiate(ObjectCollection);
         collection.setObjectKey(objectKey);
 
         return collection;

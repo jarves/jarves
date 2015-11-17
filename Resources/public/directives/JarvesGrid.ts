@@ -2,32 +2,25 @@ import {Directive, Inject} from '../angular.ts';
 import {each} from '../utils.ts';
 import angular from '../angular.ts';
 
-import Jarves from '../services/Jarves.js';
-import WindowManagement from '../services/WindowManagement.js';
-import ObjectRepository from '../services/ObjectRepository.js';
+import Jarves from '../services/Jarves.ts';
+import WindowManagement from '../services/WindowManagement.ts';
+import ObjectRepository from '../services/ObjectRepository.ts';
 
 @Directive('jarvesGrid', {
     restrict: 'E',
     scope: true,
     transclude: true,
-    templateUrl: 'bundles/jarves/views/grid.html'
+    templateUrl: 'bundles/jarves/views/directives/jarvesGrid.html',
+    controllerAs: 'jarvesGrid'
 })
-@Inject('$scope, $element, $attrs, backend, $q, $parse, jarves, objectRepository')
 export default class JarvesGrid {
-    constructor($scope, $element, $attrs, backend, $q, $parse, jarves, objectRepository) {
-        this.$scope = $scope;
-        this.$parse = $parse;
-        this.$scope.gridController = this;
-        this.element = $element;
-        this.backend = backend;
-        this.q = $q;
-        this.$attrs = $attrs;
-        this.jarves = jarves;
-        this.objectRepository = objectRepository;
 
-        this.classProperties = {};
-        this.selected = null;
+    public classProperties = {};
+    public selected;
 
+    public entryPoint;
+
+    constructor(private $scope, private $element, private $attrs, private backend, private $q, private $parse, private jarves, private objectRepository) {
         this.entryPoint = $scope.$parent.$eval($attrs.entryPoint);
 
         if ($attrs.model) {
@@ -35,11 +28,14 @@ export default class JarvesGrid {
                 this.selected = value;
             });
 
-            $scope.$watch('gridController.selected', (value) => {
+            $scope.$watch('jarvesGrid.selected', (value) => {
                 this.$parse(this.$attrs.model).assign(this.$scope.$parent, value);
             });
         }
     }
+
+    private transclude;
+    private preSelect;
 
     link(scope, element, attributes, controller, transclude) {
         this.transclude = transclude;
@@ -68,8 +64,13 @@ export default class JarvesGrid {
             });
     }
 
-    loadPage(page) {
-        this.currentPage = page || 1;
+    public currentPage;
+    public itemsCount;
+
+    private collection;
+
+    loadPage(page = 1) {
+        this.currentPage = page;
 
         if (!this.itemsCount) {
             this.loadItemCount().then(() => {
@@ -124,7 +125,7 @@ export default class JarvesGrid {
     }
 
     loadItemCount() {
-        var deferred = this.q.defer();
+        var deferred = this.$q.defer();
 
         var query = {};
 

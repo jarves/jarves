@@ -7,18 +7,12 @@ import {each} from '../utils.ts';
     terminal: true
 })
 export default class JarvesLabel {
-    constructor($scope, $element, $attrs, $compile, $interpolate, jarves) {
-        this.$scope = $scope;
-        this.$element = $element;
-        this.$attrs = $attrs;
-        this.$compile = $compile;
-        this.$interpolate = $interpolate;
-        this.jarves = jarves;
+    public object;
+    public data;
+    public column;
+    public id;
 
-        this.object = null;
-        this.data = null;
-        this.column = null;
-        this.id = null;
+    constructor(private $scope, private $element, private $attrs, private $compile, private $interpolate, private jarves) {
     }
 
     link(scope, element, attributes) {

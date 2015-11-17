@@ -4,6 +4,7 @@ namespace Jarves\Controller\Admin;
 
 use Jarves\Formatter\ApiDocFormatter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -23,6 +24,7 @@ class ApiDocController extends Controller
     public function indexAction()
     {
         $commentExtractor = new \Nelmio\ApiDocBundle\Util\DocCommentExtractor;
+        $controllerNameParser = new ControllerNameParser($this->get('kernel'));
 
         $handlers = [
             new \Nelmio\ApiDocBundle\Extractor\Handler\FosRestHandler,
@@ -37,7 +39,9 @@ class ApiDocController extends Controller
             $this->container->get('router'),
             $this->container->get('annotation_reader'),
             $commentExtractor,
-            $handlers
+            $controllerNameParser,
+            $handlers,
+            []
         );
 
         $extractedDoc = $extractor->all();

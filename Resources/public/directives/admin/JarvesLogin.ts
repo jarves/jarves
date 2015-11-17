@@ -1,6 +1,13 @@
-import {Inject} from '../angular.ts';
+import {Directive} from '../../angular.ts';
+import JarvesAdmin from './JarvesAdmin';
 
-export default class LoginController {
+@Directive('jarvesLogin', {
+    restrict: 'E',
+    templateUrl: 'bundles/jarves/views/login.html',
+    controllerAs: 'loginController',
+    require: '^jarvesAdmin'
+})
+export default class JarvesLogin {
     public loginStatus:number = 0;
     public inputBlocked:boolean = false;
     public progress:number = 0;
@@ -10,11 +17,17 @@ export default class LoginController {
         password: ''
     };
 
+    protected jarvesAdmin:JarvesAdmin;
+
     constructor(private $rootScope, private backend, private translator, private jarves, private $timeout) {
         this.jarves.loginController = this;
 
         $rootScope.language = 'en';
         $rootScope.$watch('language', (v) => this.loadLanguage(v));
+    }
+
+    link(scope, element, attributes, controller) {
+        this.jarvesAdmin = controller;
 
         if (this.jarves.isLoggedIn()) {
             this.blockInput();
@@ -65,7 +78,7 @@ export default class LoginController {
     loadInterface() {
         this.loginStatus = 3;
         this.progress = 0;
-        this.getAdminController().loadInterface()
+        this.jarvesAdmin.loadInterface()
             .then(function() {
                 this.loginStatus = 4;
                 this.loginVisible = false;

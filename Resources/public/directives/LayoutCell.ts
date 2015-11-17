@@ -4,9 +4,9 @@ import Hammer from '../Hammer.js';
 @Directive('layoutCell', {
     restrict: 'E'
 })
-@InjectAsProperty('$compile')
-@InjectAsProperty('$interpolate')
-export default class layoutCell {
+export default class LayoutCell {
+    constructor(private $compile, private $interpolate) {}
+
     link(scope, element, attributes) {
         if (attributes.width) {
             var width = this.$interpolate(attributes.width)(scope);

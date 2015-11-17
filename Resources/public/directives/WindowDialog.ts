@@ -5,14 +5,11 @@ import {Directive} from '../angular.ts';
     require: '^jarvesWindow',
     transclude: true,
     scope: true,
+    controllerAs: 'windowDialog',
     template: '<div class="jarves-WindowDialog-overlay"></div><div class="jarves-WindowDialog-container"></div>'
 })
 export default class WindowDialog {
-
-    constructor($scope) {
-        this.isOpen = false;
-        $scope.windowDialog = this;
-    }
+    public isOpen = false;
 
     link(scope, element, attributes, windowController, transclude) {
         if (attributes.show) {
@@ -34,10 +31,10 @@ export default class WindowDialog {
         this.element.detach();
     }
 
-    open(){ 
+    open(){
         if (!this.element.parent().length) {
             this.dialogContainer.append(this.element);
-            this.isOpen = true; 
+            this.isOpen = true;
         }
     }
 

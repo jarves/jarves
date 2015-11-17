@@ -1,5 +1,4 @@
 //import Jarves from './Jarves.js';
-import WindowController from '../controller/WindowController.js';
 import {each, eachValue} from '../utils.ts';
 import {Service, angular} from '../angular.ts';
 

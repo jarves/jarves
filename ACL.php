@@ -207,7 +207,7 @@ class ACL
 
         $query = "
                 SELECT constraint_type, constraint_code, mode, access, sub, fields
-                FROM " . $this->getJarves()->getSystemConfig()->getDatabase()->getPrefix(). "system_acl
+                FROM system_acl
                 WHERE
                 object = ? AND
                 (mode = ? OR mode = 0) AND

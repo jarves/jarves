@@ -70,6 +70,50 @@ export function Service(name) {
     }
 }
 
+export function Filter(name) {
+    return function decoratorFactory(target : Function, decoratedPropertyName? : string) : void {
+        console.log('@Filter', name, target, decoratedPropertyName);
+        var constructor = function() {
+            let instance = new target();
+            return instance.filter;
+        };
+        window.jarvesModule.filter(name, constructor);
+    }
+}
+
+export function Label(name, options = {}) {
+    return function decoratorFactory(target : Function, decoratedPropertyName? : string) : void {
+        console.log('@Label', name, target, decoratedPropertyName);
+
+        var directiveName = 'jarves' + name.ucfirst() + 'Label';
+
+        options = angular.extend({
+            restrict: 'A',
+            controller: target,
+            scope: true,
+            require: [directiveName, '?^jarvesForm'],
+            link: function(scope, element, attr, ctrl, transclude) {
+                var ownController = ctrl[0];
+                var controllersToPass = ctrl;
+                controllersToPass.shift();
+
+                if (controllersToPass && 1 === controllersToPass.length) {
+                    controllersToPass = controllersToPass[0];
+                }
+
+                ownController.link.apply(ownController, [scope, element, attr, controllersToPass, transclude]);
+            }
+        }, options);
+
+        window.jarvesModule.directive(
+            directiveName,
+            function() {
+                return options;
+            }
+        );
+    }
+}
+
 export function Field(name, directiveOptions) {
     return function decoratorFactory(target:Object, decoratedPropertyName?:string):void {
         var directiveName = 'jarves' + name.ucfirst() + 'Field';
@@ -117,7 +161,7 @@ export function Field(name, directiveOptions) {
                                 controllersToPass = controllersToPass[0];
                             }
 
-                            console.log('Link Field angular.ts', directiveName, element, [directiveName, 'jarvesField', '?^jarvesField', '?^jarvesForm'], ctrl);
+                            //console.log('Link Field angular.ts', directiveName, element, [directiveName, 'jarvesField', '?^jarvesField', '?^jarvesForm'], ctrl);
                             ownController.link(...[scope, element, attr, controllersToPass, transclude]);
                         }
                     }
@@ -148,7 +192,7 @@ export function Directive(name, options) {
 
             definition.link = function(scope, element, attr, ctrl, transclude) {
                 var ownController, controllersToPass;
-                //console.log('link @Directive', name, definition.require, [ctrl]);
+                console.log('link @Directive', name, definition.require, [ctrl]);
                 if (angular.isArray(ctrl)) {
                     ownController = ctrl.shift();
                 } else {
@@ -162,11 +206,6 @@ export function Directive(name, options) {
                 if (ownController && ownController.link) {
                     ownController.link.apply(ownController, [scope, element, attr, ctrl, transclude]);
                 }
-            };
-
-            definition.link = {
-                pre: definition.link,
-                post: function(){}
             };
         }
 

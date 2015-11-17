@@ -1,5 +1,5 @@
 import {Directive, Inject} from '../angular.ts';
-import {each} from '../utils.ts';
+import {each, eachValue} from '../utils.ts';
 
 @Directive('jarvesFormGroup', {
     restrict: 'E',
@@ -9,29 +9,25 @@ import {each} from '../utils.ts';
     },
     require: ['jarvesFormGroup'],
 })
-@Inject('$scope, $element, $attrs, $compile, $interpolate')
 export default class JarvesFormGroup {
-    constructor($scope, $element, $attrs, $compile, $interpolate) {
-        this.fields = {};
-        this.editController = null;
-        this.$scope = $scope;
-        this.$element = $element;
-        this.$attrs = $attrs;
-        this.$compile = $compile;
-        this.$interpolate = $interpolate;
+
+    public fields = {};
+    public editController;
+
+    constructor(private $scope, private $element, private $attrs, private $compile, private $interpolate) {
     }
 
     getName() {
-        return this.$attrs.name ? this.$interpolate(this.$attributes.attrs)(this.$scope) : '';
+        return this.$attrs.name ? this.$interpolate(this.$attrs.attrs)(this.$scope) : '';
     }
 
     isValid(highlight) {
         var valid = true;
-        Object.each(this.fields, function(field) {
+        for (let field of eachValue(this.fields)) {
             if (!field.isValid(highlight)) {
                 valid = false;
             }
-        });
+        }
 
         return valid;
     }
@@ -53,10 +49,8 @@ export default class JarvesFormGroup {
         });
     }
 
-    buildXml(fields, parentModelName, depth) {
+    buildXml(fields, parentModelName, depth = 0) {
         var xml = [];
-
-        depth = depth || 0;
 
         var spacing = ' '.repeat(depth * 4);
 

@@ -1,43 +1,52 @@
-import ListController from './ListController.js';
-import {getEntryPointPathForRelative} from '../utils.ts';
+import {Directive} from '../angular.ts';
+import {getPublicPath,eachValue} from '../utils.ts';
 import angular from '../angular.ts';
+import ListController from './ListController.ts';
+import {getEntryPointPathForRelative} from '../utils.ts';
+import WindowList from './WindowList.ts'
 
-export default class CombineController extends ListController {
+@Directive('windowCombined', {
+    restrict: 'E',
+    //templateUrl: 'bundles/jarves/views/window.combine.html',
+    controllerAs: 'windowCombined'
+})
+export default class WindowCombined extends WindowList {
+    public options = {};
+    public classProperties;
+    public error;
 
-    constructor($scope, $element, $attrs, $q, backend, objectRepository, jarves, $timeout) {
-        this.scope = $scope;
-        this.scope.combineController = this;
-        this.element = $element;
-        this.backend = backend;
-        this.objectRepository = objectRepository;
-        this.q = $q;
-        this.jarves = jarves;
-        this.$timeout = $timeout;
-        this.scope.listController = this;
-        this.options = {};
+    public currentView = 1;
+    public editView = 1;
+    public selected;
+    public switchToEditView;
+    
+    public editId;
 
+    public unsavedDialogOldValue;
+    public showUnsavedDialog;
+
+    constructor(private $scope, private $element, private $attrs, private $q, private backend, private objectRepository, private jarves, private $timeout) {
+        super($scope, $element, $attrs, $q, backend, objectRepository, jarves);
+
+        console.log('init WindowCombined');
         this.jarves.loadEntryPointOptions(this.getEntryPoint()).success((response) => {
             this.classProperties = response.data;
         }).error((response) => {
             this.error = 'Failed to load entry point definition for %s'.sprintf(this.getEntryPoint());
         });
 
-        this.currentView = 1;
-        this.editView = 1;
-        this.selected = null;
-
         $scope.forms = {};
 
-        $scope.$watch('combineController.selected', function(value, oldValue) {
+        $scope.$watch('windowCombined.selected', (value, oldValue) => {
             if (!angular.equals(this.editId, value)) {
-                console.log('selected change', this.scope.forms.addForm, this.scope.forms.addForm ? this.scope.forms.addForm.getChangedData(): null);
-                if (this.scope.forms.addForm && this.scope.forms.addForm.hasChanges()) {
+                console.log('selected change', this.$scope.forms.addForm, this.$scope.forms.addForm ? this.$scope.forms.addForm.getChangedData() : null);
+                if (this.$scope.forms.addForm && this.$scope.forms.addForm.hasChanges()) {
                     this.unsavedDialogOldValue = oldValue;
                     this.showUnsavedDialog = true;
                     // this.switchBackToEditView = 2;
                     return;
                 }
-                if (this.scope.forms.editForm && this.scope.forms.editForm.hasChanges()) {
+                if (this.$scope.forms.editForm && this.$scope.forms.editForm.hasChanges()) {
                     this.unsavedDialogOldValue = oldValue;
                     this.showUnsavedDialog = true;
                     // this.switchBackToEditView = this.editView;
@@ -49,33 +58,33 @@ export default class CombineController extends ListController {
 
             if (this.switchToEditView) {
                 this.editView = this.switchToEditView;
-                delete this.switchToEditView;
+                this.switchToEditView = null;
             } else if (this.editId) {
                 this.currentView = 2;
                 this.editView = 1;
             }
-        }.bind(this));
+        });
     }
 
 
     unsavedDialogStay() {
         this.selected = this.unsavedDialogOldValue;
-        delete this.unsavedDialogOldValue;
+        this.unsavedDialogOldValue = null;
         // this.editView = this.switchBackToEditView;
         this.showUnsavedDialog = false;
         // delete this.switchBackToEditView;
-        delete this.switchToEditView;
+        this.switchToEditView = null;
     }
 
     unsaveDialogDiscard() {
         console.log('switch back to ', this.selected, this.switchToEditView, this.switchBackToEditView);
         this.editId = this.selected;
-        delete this.unsavedDialogOldValue;
+        this.unsavedDialogOldValue = null;
         this.showUnsavedDialog = false;
 
         if (this.switchToEditView) {
             this.editView = this.switchToEditView;
-            delete this.switchToEditView;
+            this.switchToEditView = null;
         } else if (this.editId) {
             this.currentView = 2;
             this.editView = 1;

@@ -23,8 +23,9 @@ export default class JarvesField {
         this.transclude = transclude;
         if (attributes['definition']) {
             this.$scope.$watch(attributes['definition'], (definition) => {
-
-                throw 'invalid value for definition attribute in <jarves-field definition="%s" />'.sprintf(this.$attrs.definition);
+                if (!definition) {
+                    throw 'invalid value for definition attribute in <jarves-field definition="%s" />'.sprintf(this.$attrs.definition);
+                }
                 this.load(definition);
             });
         } else {

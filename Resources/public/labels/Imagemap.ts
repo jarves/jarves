@@ -1,9 +1,10 @@
-import AbstractLabel from './AbstractLabel.js';
+import AbstractLabel from './AbstractLabel.ts';
 import {Label} from '../angular.ts';
 
 @Label('imageMap')
 export default class Imagepmap extends AbstractLabel {
     link(scope, element, attr) {
+        super.link(...arguments);
         // var value = values[this.fieldId] || '', image;
 
         // if (this.options.imageMap) {

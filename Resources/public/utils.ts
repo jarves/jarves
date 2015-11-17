@@ -1,62 +1,71 @@
-
 import {baseUrl, baseRestUrl} from './config.js';
 import angular from './angular.ts';
 
 import {FieldAnnotation, LabelAnnotation, FilterAnnotation, Parser, DirectiveAnnotation, InjectAnnotation, InjectAsPropertyAnnotation} from './angular.ts';
 
 /**
-* Is true if the current browser has a mobile user agent.
-* @return {Boolean}
-*/
+ * Is true if the current browser has a mobile user agent.
+ * @return {Boolean}
+ */
 export function isMobile() {
     return navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/BlackBerry/i) || navigator.userAgent.match(/Windows Phone/i);
 }
 
 /**
- * Generator to iterate over array and object key,value pairs.
+ * Function to iterate over array and object key,value pairs.
  *
  * Use it like:
  *
  * for (let [key, value] of each(myObject)) {
  * }
- * 
+ *
  */
-export function *each(obj) {
-    throw 'dont use it';
-    for(let key in obj) {
+export function each(obj) {
+    var result = [];
+
+    for (let key in obj) {
         if (Object.prototype.hasOwnProperty.call(obj, key)) {
             //yield [key, obj[key]];
+            result.push([key, obj[key]]);
         }
     }
+
+    return result;
 }
 
 /**
- * Generator to iterate over array and object values.
+ * Function to iterate over array and object values.
  */
-export function *eachValue(obj) {
-    throw 'dont use it';
-    for(let key in obj) {
+export function eachValue(obj) {
+    var result = [];
+    for (let key in obj) {
         if (Object.prototype.hasOwnProperty.call(obj, key)) {
             //yield obj[key];
+            result.push(obj[key]);
         }
     }
+
+    return result;
 }
 /**
- * Generator to iterate over array and object keys.
+ * Function to iterate over array and object keys.
  */
-export function *eachKey(obj) {
-    throw 'dont use it';
-    for(let key in obj) {
+export function eachKey(obj) {
+    var result = [];
+    for (let key in obj) {
         if (Object.prototype.hasOwnProperty.call(obj, key)) {
             //yield key;
+            result.push(key);
         }
     }
+
+    return result;
 }
 
 /**
-* Just for console hacking.
-*/
-window.applyRootScope = function() {
+ * Just for console hacking.
+ */
+window.applyRootScope = function () {
     angular.element(document).scope().$apply();
 };
 
@@ -123,18 +132,18 @@ export function logger(...args) {
 // }
 
 /**
-*
-* @param path
-*/
+ *
+ * @param path
+ */
 export function getPublicPath(path) {
     var matches = path.match(/@([a-zA-Z_]*)\/(.*)/);
     if (matches && matches[1]) {
-        path = 'bundles/'+getShortBundleName(matches[1]) + '/' + matches[2];
+        path = 'bundles/' + getShortBundleName(matches[1]) + '/' + matches[2];
     }
     return baseUrl + path;
 }
 
-window.countWatchers = function() {
+window.countWatchers = function () {
     var root = angular.element(document);
     var watchers = [];
 
@@ -156,27 +165,27 @@ window.countWatchers = function() {
 }
 
 /**
-* Adds a prefix to the keys of pFields.
-* Good to group some values of fields of jarves.FieldForm.
-*
-* Example:
-*
-*   fields = {
+ * Adds a prefix to the keys of pFields.
+ * Good to group some values of fields of jarves.FieldForm.
+ *
+ * Example:
+ *
+ *   fields = {
 *      field1: {type: 'text', label: 'Field 1'},
 *      field2: {type: 'checkbox', label: 'Field 2'}
 *   }
-*
-*   prefix = 'options'
-*
-*   fields will be changed to:
-*   {
+ *
+ *   prefix = 'options'
+ *
+ *   fields will be changed to:
+ *   {
 *      'options[field1]': {type: 'text', label: 'Field 1'},
 *      'options[field2]': {type: 'checkbox', label: 'Field 2'}
 *   }
-*
-* @param {Array} fields Reference to object.
-* @param {String} prefix
-*/
+ *
+ * @param {Array} fields Reference to object.
+ * @param {String} prefix
+ */
 export function addFieldKeyPrefix(fields, prefix) {
     for (let [key, field] of each(fields)) {
         fields[prefix + '[' + key + ']'] = field;
@@ -188,11 +197,11 @@ export function addFieldKeyPrefix(fields, prefix) {
 }
 
 /**
-* Resolve path notations and returns the appropriate class.
-*
-* @param {String} classPath
-* @return {Class|Function}
-*/
+ * Resolve path notations and returns the appropriate class.
+ *
+ * @param {String} classPath
+ * @return {Class|Function}
+ */
 export function getClass(classPath) {
     classPath = classPath.replace('[\'', '.');
     classPath = classPath.replace('\']', '.');
@@ -200,7 +209,7 @@ export function getClass(classPath) {
     if (classPath.indexOf('.') > 0) {
         var path = classPath.split('.');
         var clazz = null;
-        Array.each(path, function(item) {
+        Array.each(path, function (item) {
             clazz = clazz ? clazz[item] : window[item];
         });
         return clazz;
@@ -210,27 +219,27 @@ export function getClass(classPath) {
 }
 
 /**
-* Encodes a value from url usage.
-* If Array, it encodes the whole array an implodes it with comma.
-* If Object, it encodes the whole object and implodes the <key>=<value> pairs with a comma.
-*
-* @param {String} value
-*
-* @return {String}
-*/
+ * Encodes a value from url usage.
+ * If Array, it encodes the whole array an implodes it with comma.
+ * If Object, it encodes the whole object and implodes the <key>=<value> pairs with a comma.
+ *
+ * @param {String} value
+ *
+ * @return {String}
+ */
 export function urlEncode(value) {
-	var result;
+    var result;
     if (angular.isString(value)) {
         return encodeURIComponent(value).replace(/\%2F/g, '%252F'); //fix apache default setting
     } else if (angular.isArray(value)) {
         result = '';
-        Array.each(value, function(item) {
+        Array.each(value, function (item) {
             result += urlEncode(item) + ',';
         });
         return result.substr(0, result.length - 1);
     } else if (angular.isObject(value)) {
         result = '';
-        Array.each(value, function(item, key) {
+        Array.each(value, function (item, key) {
             result += key + '=' + urlEncode(item) + ',';
         });
         return result.substr(0, result.length - 1);
@@ -240,12 +249,12 @@ export function urlEncode(value) {
 }
 
 /**
-* Decodes a value for url usage.
-*
-* @param {String} value
-*
-* @return {String}
-*/
+ * Decodes a value for url usage.
+ *
+ * @param {String} value
+ *
+ * @return {String}
+ */
 export function urlDecode(value) {
     if (!angular.isString(value)) {
         return value;
@@ -259,12 +268,12 @@ export function urlDecode(value) {
 }
 
 /**
-* Normalizes a objectKey.
-*
-* @param {String} objectKey
-*
-* @returns {String|Null}
-*/
+ * Normalizes a objectKey.
+ *
+ * @param {String} objectKey
+ *
+ * @returns {String|Null}
+ */
 export function normalizeObjectKey(objectKey) {
     objectKey = objectKey.replace('\\', '/').replace('.', '/').replace(':', '/');
     var bundleName = objectKey.split('/')[0].toLowerCase().replace(/bundle$/, '');
@@ -278,18 +287,18 @@ export function normalizeObjectKey(objectKey) {
 }
 
 /**
-* Normalizes a entryPoint path.
-*
-* Example
-*
-*   JarvesBundle/entry/point/path
-*   => jarves/entry/point/path
-*
-*
-* @param {String} path
-*
-* @returns {String}
-*/
+ * Normalizes a entryPoint path.
+ *
+ * Example
+ *
+ *   JarvesBundle/entry/point/path
+ *   => jarves/entry/point/path
+ *
+ *
+ * @param {String} path
+ *
+ * @returns {String}
+ */
 export function normalizeEntryPointPath(path) {
     var slash = path.indexOf('/');
 
@@ -297,15 +306,15 @@ export function normalizeEntryPointPath(path) {
 }
 
 /**
-* Returns a absolute path.
-* If path begins with # it returns path
-* if path is not a string it returns path
-* if path contains http:// on the beginning it returns path
-*
-* @param {String} path
-*
-* @return {String}
-*/
+ * Returns a absolute path.
+ * If path begins with # it returns path
+ * if path is not a string it returns path
+ * if path contains http:// on the beginning it returns path
+ *
+ * @param {String} path
+ *
+ * @return {String}
+ */
 export function mediaPath(path) {
 
     if (!angular.isString(path)) {
@@ -326,25 +335,25 @@ export function mediaPath(path) {
 }
 
 /**
-* Just converts arguments into a new string :
-*
-*    object://<objectKey>/<id>
-*
-* @param {String} objectKey
-* @param {String} id        Has to be urlEncoded (use urlEncode or jarves.getObjectUrlId)
-* @return {String}
-*/
+ * Just converts arguments into a new string :
+ *
+ *    object://<objectKey>/<id>
+ *
+ * @param {String} objectKey
+ * @param {String} id        Has to be urlEncoded (use urlEncode or jarves.getObjectUrlId)
+ * @return {String}
+ */
 export function getObjectUrl(objectKey, id) {
     return 'object://' + normalizeObjectKey(objectKey) + '/' + id;
 }
 
 /**
-* This just cuts off object://<objectName>/ and returns the raw primary key part.
-*
-* @param {String} url
-*
-* @return {String}
-*/
+ * This just cuts off object://<objectName>/ and returns the raw primary key part.
+ *
+ * @param {String} url
+ *
+ * @return {String}
+ */
 export function getCroppedObjectId(url) {
     if (!angular.isString(url)) {
         return url;
@@ -368,16 +377,16 @@ export function compare(a, b) {
 }
 
 /**
-* This just cut anything but the full raw objectKey.
-*
-* Example:
-*
-*    jarves/file/3 => jarves/file
-*
-* @param {String} url Internal url
-*
-* @return {String} the objectKey
-*/
+ * This just cut anything but the full raw objectKey.
+ *
+ * Example:
+ *
+ *    jarves/file/3 => jarves/file
+ *
+ * @param {String} url Internal url
+ *
+ * @return {String} the objectKey
+ */
 export function getCroppedObjectKey(url) {
     if (!angular.isString(url)) {
         return url;
@@ -396,10 +405,10 @@ export function getCroppedObjectKey(url) {
 }
 
 /**
-*
-* @param {Number} bytes
-* @returns {String}
-*/
+ *
+ * @param {Number} bytes
+ * @returns {String}
+ */
 export function bytesToSize(bytes) {
     var sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
     if (!bytes) {
@@ -413,11 +422,11 @@ export function bytesToSize(bytes) {
 }
 
 /**
-*
-* @param {Number} seconds
-*
-* @return {String}
-*/
+ *
+ * @param {Number} seconds
+ *
+ * @return {String}
+ */
 export function dateTime(seconds) {
     var date = new Date(seconds * 1000);
     var nowSeconds = new Date().getTime();
@@ -433,23 +442,23 @@ export function dateTime(seconds) {
 }
 
 /**
-* Returns the short bundleName.
-*
-* @param {String} bundleName
-*
-* @returns {string}
-*/
+ * Returns the short bundleName.
+ *
+ * @param {String} bundleName
+ *
+ * @returns {string}
+ */
 export function getShortBundleName(bundleName) {
     return getBundleName(bundleName).toLowerCase().replace(/bundle$/, '');
 }
 
 /**
-* Returns a absolute path based on a relative one.
-*
-* @param {String} current
-* @param {String} relativePath
-* @returns {String}
-*/
+ * Returns a absolute path based on a relative one.
+ *
+ * @param {String} current
+ * @param {String} relativePath
+ * @returns {String}
+ */
 export function getEntryPointPathForRelative(current, relativePath) {
     if (!angular.isString(relativePath) || !relativePath) {
         return current;
@@ -477,23 +486,23 @@ export function simpleClone(value) {
 }
 
 /**
-* Returns the bundle name from a PHP FQ class name.
-*
-* Jarves\JarvesBundle => JarvesBundle
-*
-* @param {String} bundleClass
-* @return {String} returns only the base bundle name
-*/
+ * Returns the bundle name from a PHP FQ class name.
+ *
+ * Jarves\JarvesBundle => JarvesBundle
+ *
+ * @param {String} bundleClass
+ * @return {String} returns only the base bundle name
+ */
 export function getBundleName(bundleClass) {
-	var split = bundleClass.split('\\');
-	return split[split.length -1];
+    var split = bundleClass.split('\\');
+    return split[split.length - 1];
 }
 
 /**
-* Returns the default caching definition for jarves.Fields.
-*
-* @returns {Object}
-*/
+ * Returns the default caching definition for jarves.Fields.
+ *
+ * @returns {Object}
+ */
 export function getFieldCaching() {
     return {
         'cache_type': {
@@ -541,12 +550,12 @@ export function getFieldCaching() {
 }
 
 /**
-* Quotes string to be used in a regEx.
-*
-* @param string
-*
-* @returns {String}
-*/
+ * Quotes string to be used in a regEx.
+ *
+ * @param string
+ *
+ * @returns {String}
+ */
 export function pregQuote(string) {
     // http://kevin.vanzonneveld.net
     // +   original by: booeyOH
@@ -564,11 +573,11 @@ export function pregQuote(string) {
 }
 
 /**
-* Generates little noise at element background.
-*
-* @param {Element} element
-* @param {Number} opacity
-*/
+ * Generates little noise at element background.
+ *
+ * @param {Element} element
+ * @param {Number} opacity
+ */
 export function generateNoise(element, opacity) {
     if (!"getContent" in document.createElement('canvas')) {
         return false;

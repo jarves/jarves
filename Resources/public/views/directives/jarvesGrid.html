@@ -1,0 +1,23 @@
+<div ng-if="!jarvesGrid.classProperties">
+    Loading ...
+</div>
+<div ng-if="jarvesGrid.error">
+    {{jarvesGrid.error}}
+</div>
+<table width="100%" ng-if="jarvesGrid.classProperties">
+    <thead>
+    <tr>
+        <th ng-repeat="column in jarvesGrid.classProperties.columns | toArray" width="{{column.width}}" align="{{column.align}}">{{column.label}}</th>
+        <th width="15"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-class="{'selected': jarvesGrid.isSelected(item)}" ng-repeat="item in jarvesGrid.items">
+        <td ng-dblclick="jarvesGrid.selected = jarvesGrid.getPk(item)" ng-repeat="column in jarvesGrid.classProperties.columns | toArray">
+            <jarves-label data="$parent.item" definition="column" type="{{column.type}}" id="{{column.$key}}"></jarves-label>
+        </td>
+        <td jarves-grid-actions>
+        </td>
+    </tr>
+    </tbody>
+</table>

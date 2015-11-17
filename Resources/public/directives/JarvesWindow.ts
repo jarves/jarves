@@ -1,8 +1,44 @@
+import {Directive} from '../angular.ts';
 import {getPublicPath,eachValue} from '../utils.ts';
 import angular from '../angular.ts';
 
-export default class WindowController {
-    constructor($scope, $element, $attrs, windowManagement, jarves) {
+@Directive('jarvesWindow', {
+    restrict: 'E',
+    priority: -1,
+    //scope: {
+    //    'windowInfo': '=',
+    //    'windowId': '=',
+    //    'isInline': '=',
+    //    'parentWindowId': '=',
+    //    'parameters': '='
+    //},
+    templateUrl: 'bundles/jarves/views/window.html'
+})
+export default class JarvesWindow {
+    private element;
+    private scope;
+    private attributes;
+    private windowManagement;
+    private jarves;
+    private entryPoint;
+    private id;
+    private parentId;
+    private inline:Boolean;
+    private parameters;
+    private originParameters;
+
+    private active;
+    private title;
+    private titlePath;
+    private sidebar;
+    private content;
+    private view;
+    private frame;
+
+    private dialogContainer;
+    private contentContainer;
+
+    constructor($scope, $element, $attrs, windowManagement, jarves, private $templateCache, private $http, private $compile) {
         this.scope = $scope;
         this.scope.forms = {};
         this.element = $element;
@@ -22,18 +58,17 @@ export default class WindowController {
         this.sidebar = null;
         this.content = null;
         this.frame = null;
-        this.view = 'bundles/jarves/views/window.content.default.html';
+        this.view = 'bundles/jarves/views/window.default.html';
 
         if (this.entryPoint.templateUrl) {
             this.view = getPublicPath(this.entryPoint.templateUrl);
         } else {
             if ('custom' !== this.entryPoint.type && this.entryPoint.type) {
-                this.view = 'bundles/jarves/views/window.content.' + this.entryPoint.type.toLowerCase() + '.html';
+                this.view = 'bundles/jarves/views/window.' + this.entryPoint.type.toLowerCase() + '.html';
             }
         }
 
         console.log('new JarvesWindowController', this.entryPoint, this.view);
-
 
         this.scope.windowInfo.window = this;
         this.scope.window = this;
@@ -41,12 +76,77 @@ export default class WindowController {
         this.setTitle(this.entryPoint.label);
 
         if (this.parentId) {
-            if (typeOf(this.parentId) == 'number' && windowManagement.getWindow(this.parentId)) {
+            if (typeof this.parentId == 'number' && windowManagement.getWindow(this.parentId)) {
                 windowManagement.getWindow(this.parentId).setChildren(this);
             }
         }
+    }
+
+
+    /**
+     * angular link method
+     */
+    link() {
+        if (this.dialogContainer) {
+            return;
+        }
+
+        this.element.addClass('jarves-Window-border');
+
+        //this.contentContainer = angular.element('<div class="jarves-Window-content-container"></div>');
+        //this.element.append(this.contentContainer);
+
+        this.dialogContainer = angular.element('<div class="jarves-Window-dialog-container"></div>');
+        this.element.append(this.dialogContainer);
 
         this.loadContent();
+    }
+
+    loadContent() {
+        this.windowManagement.toFront(this);
+
+        if (!this.entryPoint.multi) {
+            var win = this.windowManagement.checkOpen(this.getEntryPoint(), this.id);
+            if (win) {
+                if (win.softOpen) {
+                    win.softOpen(this.params);
+                }
+                win.toFront();
+                this.close(true);
+                return;
+            }
+        }
+
+        //this.$http.get(this.view, {cache: this.$templateCache})
+        //    .success((response)  => {
+        //        var element = angular.element(response);
+        //        this.contentContainer.append(element);
+        //        this.$compile(this.contentContainer)(this.scope);
+        //    });
+
+//        if (this.entryPointDefinition.type == 'iframe') {
+//            this.content.empty();
+//            this.iframe = new IFrame('iframe_kwindow_' + this.id, {
+//                'class': 'jarves-Window-iframe',
+//                frameborder: 0
+//            }).addEvent('load', function () {
+//                    this.iframe.contentWindow.win = this;
+//                    this.iframe.contentWindow.jarves = jarves;
+//                    this.iframe.contentWindow.wm = jarves.wm;
+//                    this.iframe.contentWindow.fireEvent('kload');
+//                }.bind(this)).inject(this.content);
+//            this.iframe.set('src', _path + this.entryPointDefinition.src);
+//        } else if (this.entryPointDefinition.type == 'custom') {
+//            this.renderCustom();
+//        } else if (this.entryPointDefinition.type == 'combine') {
+//            this.renderCombine();
+//        } else if (this.entryPointDefinition.type == 'list') {
+//            this.renderList();
+//        } else if (this.entryPointDefinition.type == 'add') {
+//            this.renderAdd();
+//        } else if (this.entryPointDefinition.type == 'edit') {
+//            this.renderEdit();
+//        }
     }
 
     setActive(active) {
@@ -154,7 +254,7 @@ export default class WindowController {
 
         titlePath.push(title);
 
-        var path = this.getEntryPointDefinition()._path || []; //todo, _path is empty 
+        var path = this.getEntryPointDefinition()._path || []; //todo, _path is empty
         path.pop();
         for (let label of path) {
             titlePath.push(label);
@@ -172,16 +272,6 @@ export default class WindowController {
         return this.inline;
     }
 
-    /**
-     * angular link method
-     */
-    link() {
-        this.element.addClass('jarves-Window-border');
-
-        this.dialogContainer = angular.element('<div class="jarves-Window-dialog-container"></div>');
-        this.element.append(this.dialogContainer);
-    }
-
     getDialogContainer() {
         return this.dialogContainer;
     }
@@ -195,49 +285,8 @@ export default class WindowController {
         return this.id;
     }
 
-    close() {
+    close(force) {
         this.windowManagement.unregister(this.getId());
-    }
-
-    loadContent() {
-        this.windowManagement.toFront(this);
-
-        if (!this.entryPoint.multi) {
-            var win = this.windowManagement.checkOpen(this.getEntryPoint(), this.id);
-            if (win) {
-                if (win.softOpen) {
-                    win.softOpen(this.params);
-                }
-                win.toFront();
-                this.close(true);
-                return;
-            }
-        }
-
-//        if (this.entryPointDefinition.type == 'iframe') {
-//            this.content.empty();
-//            this.iframe = new IFrame('iframe_kwindow_' + this.id, {
-//                'class': 'jarves-Window-iframe',
-//                frameborder: 0
-//            }).addEvent('load', function () {
-//                    this.iframe.contentWindow.win = this;
-//                    this.iframe.contentWindow.jarves = jarves;
-//                    this.iframe.contentWindow.wm = jarves.wm;
-//                    this.iframe.contentWindow.fireEvent('kload');
-//                }.bind(this)).inject(this.content);
-//            this.iframe.set('src', _path + this.entryPointDefinition.src);
-//        } else if (this.entryPointDefinition.type == 'custom') {
-//            this.renderCustom();
-//        } else if (this.entryPointDefinition.type == 'combine') {
-//            this.renderCombine();
-//        } else if (this.entryPointDefinition.type == 'list') {
-//            this.renderList();
-//        } else if (this.entryPointDefinition.type == 'add') {
-//            this.renderAdd();
-//        } else if (this.entryPointDefinition.type == 'edit') {
-//            this.renderEdit();
-//        }
-
     }
 
 }

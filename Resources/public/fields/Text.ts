@@ -103,7 +103,7 @@ export default class Text extends AbstractFieldType {
 
     link(scope, element, attr, controller, transclude) {
         super.link(scope, element, attr, controller, transclude);
-        console.log('link Text.ts');
+        //console.log('link Text.ts');
         //this.attr = attr;
 
         //this.renderTemplateUrl(

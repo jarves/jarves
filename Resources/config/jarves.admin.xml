@@ -22,6 +22,7 @@
 
             <asset src="@JarvesBundle/fonts/OpenSans/open-sans.css"/>
             <asset src="@JarvesBundle/fonts/OpenSans/open-sans-condensed.css"/>
+            <asset src="@JarvesBundle/fonts/icons/style.css"/>
 
             <assets src="@JarvesBundle/css/admin/jarves.scss"/>
             <!--<assets src="@JarvesBundle/css/admin/jarves-white.scss"/>-->

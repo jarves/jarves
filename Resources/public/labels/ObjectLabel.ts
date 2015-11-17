@@ -1,10 +1,11 @@
-import AbstractLabel from './AbstractLabel.js';
+import AbstractLabel from './AbstractLabel.ts';
 import {Label} from '../angular.ts';
 import angular from '../angular.ts';
 
 @Label('object')
 export default class ObjectLabel extends AbstractLabel {
     link(scope, element, attr) {
+        super.link(...arguments);
         var span = angular.element('<span ng-bind="label"></span>');
         var id = this.getOption('id');
         var label, relation, tempValue, joined;

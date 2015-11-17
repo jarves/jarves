@@ -399,7 +399,7 @@ class Propel extends ORMAbstract
 
         $query->setPrimaryTableName(constant($tableMap . '::TABLE_NAME'));
 
-        $query->externalBasePreSelect($con);
+//        $query->find($con);
 
         if ($condition) {
             $query->where($id . ' = ' . $id);

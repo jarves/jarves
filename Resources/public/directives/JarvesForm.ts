@@ -5,14 +5,14 @@ import angular from '../angular.ts';
 @Directive('jarvesForm', {
     restrict: 'E',
     scope: true,
-    transclude: true
+    transclude: true,
+    controllerAs: 'jarvesForm'
 })
 @Inject('$scope, $element, $attrs, backend, $q, jarves, objectRepository, $interpolate, $compile')
 export default class JarvesForm {
     constructor($scope, $element, $attrs, backend, $q, jarves, objectRepository, $interpolate, $compile) {
         this.$scope = $scope;
         this.$scope.model = {title: 'empty', test: 'a'};
-        this.$scope.controller = this;
         this.element = $element;
         this.backend = backend;
         this.$attrs = $attrs;
@@ -42,7 +42,7 @@ export default class JarvesForm {
             }
         });
 
-        this.template = '<jarves-form-group ng-if="controller.options.fields" fields="controller.options.fields" model="model"></jarves-form-group>';
+        this.template = '<jarves-form-group ng-if="jarvesForm.options.fields" fields="jarvesForm.options.fields" model="model"></jarves-form-group>';
     }
 
     link(scope, element, attributes, controllers, transclude) {

@@ -6,9 +6,9 @@ import {Directive} from '../angular.ts';
 })
 export default class JarvesGridActions {
 
-    link(scope, element, attributes, gridController, transclude) {
+    link(scope, element, attributes, jarvesGrid, transclude) {
 
-        gridController.transclude(scope, (clone) => {
+        jarvesGrid.transclude(scope, (clone) => {
             element.prepend(clone);
         });
     }
