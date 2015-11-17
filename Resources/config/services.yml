@@ -73,8 +73,8 @@ services:
          class: %jarves.content.render.class%
          arguments: ["@jarves", "@jarves.stopwatch"]
 #
-     jarves.configuration:
-         class: %jarves.configuration.class%
+#     jarves.configuration:
+#         class: %jarves.configuration.class%
 #         calls:
 #            - [setDatabase, ["@jarves.configuration.database"]]
 #            - [setJarves, ["@jarves"]]

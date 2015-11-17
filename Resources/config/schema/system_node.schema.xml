@@ -32,6 +32,26 @@
       <parameter name="level_column" value="lvl"/>
       <parameter name="use_scope" value="true"/>
       <parameter name="scope_column" value="domain_id"/>
+      <parameter name="left_column" value="lft"/>
+      <parameter name="right_column" value="rgt"/>
+      <parameter name="level_column" value="lvl"/>
+      <parameter name="use_scope" value="true"/>
+      <parameter name="scope_column" value="domain_id"/>
+      <parameter name="left_column" value="lft"/>
+      <parameter name="right_column" value="rgt"/>
+      <parameter name="level_column" value="lvl"/>
+      <parameter name="use_scope" value="true"/>
+      <parameter name="scope_column" value="domain_id"/>
+      <parameter name="left_column" value="lft"/>
+      <parameter name="right_column" value="rgt"/>
+      <parameter name="level_column" value="lvl"/>
+      <parameter name="use_scope" value="true"/>
+      <parameter name="scope_column" value="domain_id"/>
+      <parameter name="left_column" value="lft"/>
+      <parameter name="right_column" value="rgt"/>
+      <parameter name="level_column" value="lvl"/>
+      <parameter name="use_scope" value="true"/>
+      <parameter name="scope_column" value="domain_id"/>
     </behavior>
     <vendor type="mysql">
       <parameter name="Charset" value="utf8"/>

@@ -108,6 +108,7 @@ class Database extends Model
      */
     public function getPrefix()
     {
+        throw new \Exception('Deprecated');
         return $this->prefix;
     }
 }

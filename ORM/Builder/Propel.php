@@ -55,19 +55,26 @@ class Propel implements BuildInterface
 
         foreach ($objects as $object) {
             if ('propel' === strtolower($object->getDataModel())) {
-                $output->write('Build object ' . $object->getId() . ' => ' . $object->getTable(). ' ... ');
+                $output->write('Build object ' . $object->getId() . ' => ' . $object->getTable() . ' ... ');
+
                 $bundlePath = $jarves->getBundleDir($object->getBundle()->getName());
-                $modelsFile = sprintf('%sResources/config/schema/%s.schema.xml', $bundlePath, strtolower($object->getTable()));
+                $modelsFile = sprintf(
+                    '%sResources/config/schema/%s.schema.xml',
+                    $bundlePath,
+                    strtolower($object->getTable())
+                );
 
                 if (!$overwrite && file_exists($modelsFile) && file_get_contents($modelsFile)) {
                     $xml = @simplexml_load_file($modelsFile);
                     if (false === $xml) {
                         $errors = libxml_get_errors();
-                        throw new ModelBuildException(sprintf(
-                            'Parse error in %s: %s',
-                            $modelsFile,
-                            json_encode($errors, JSON_PRETTY_PRINT)
-                        ));
+                        throw new ModelBuildException(
+                            sprintf(
+                                'Parse error in %s: %s',
+                                $modelsFile,
+                                json_encode($errors, JSON_PRETTY_PRINT)
+                            )
+                        );
                     }
                 } else {
                     $xml = simplexml_load_string('<database></database>');
@@ -127,12 +134,17 @@ class Propel implements BuildInterface
 
     protected function declareTable(\SimpleXMLElement $database, Object $object)
     {
-        $tables = $database->xpath('table[@name=\'' .  . $object->getTable() . '\']');
+
+        $tables = $database->xpath('table');
         $xmlTable = $this->getXmlTable($object, @$tables[0]);
+        for ($i = 1; $i < count($tables); $i++) {
+            unset($tables[$i][0]);
+        }
         $this->sxml_append($database, $xmlTable);
     }
 
-    protected function sxml_append(\SimpleXMLElement $to, \SimpleXMLElement $from) {
+    protected function sxml_append(\SimpleXMLElement $to, \SimpleXMLElement $from)
+    {
         $toDom = dom_import_simplexml($to);
         $fromDom = dom_import_simplexml($from);
         $toDom->appendChild($toDom->ownerDocument->importNode($fromDom, true));
@@ -155,7 +167,6 @@ class Propel implements BuildInterface
         if (!$object->getTable()) {
             throw new ModelBuildException(sprintf('The object `%s` has no table defined', $object->getId()));
         }
-
         $objectTable['name'] = $object->getTable();
         $objectTable['phpName'] = ucfirst($object->getId());
 
@@ -305,30 +316,36 @@ class Propel implements BuildInterface
         $foreignObject = $this->objects->getDefinition($relation->getForeignObjectKey());
 
         if (!$foreignObject) {
-            throw new ModelBuildException(sprintf(
-                'Foreign object `%s` does not exist in relation `%s`',
-                $relation->getForeignObjectKey(),
-                $relation->getName()
-            ));
+            throw new ModelBuildException(
+                sprintf(
+                    'Foreign object `%s` does not exist in relation `%s`',
+                    $relation->getForeignObjectKey(),
+                    $relation->getName()
+                )
+            );
         }
 
         if ('propel' !== strtolower($foreignObject->getDataModel())) {
-            throw new ModelBuildException(sprintf(
-                'Can not create a relation between two different dataModels. Got `%s` but propel is needed.',
-                $foreignObject->getDataModel()
-            ));
+            throw new ModelBuildException(
+                sprintf(
+                    'Can not create a relation between two different dataModels. Got `%s` but propel is needed.',
+                    $foreignObject->getDataModel()
+                )
+            );
         }
 
-        $foreigns = $xmlTable->xpath('foreign-key[@phpName=\'' . ucfirst($relationName) . '\']');
+        $pluralizer = new StandardEnglishPluralizer();
+        $foreignPhpName = ucfirst($pluralizer->getSingularForm(lcfirst($relationName)));
+
+        $foreigns = $xmlTable->xpath('foreign-key[@phpName=\'' . $foreignPhpName . '\']');
         if ($foreigns) {
             $foreignKey = current($foreigns);
         } else {
             $foreignKey = $xmlTable->addChild('foreign-key');
         }
 
-        $pluralizer = new StandardEnglishPluralizer();
 
-        $foreignKey['phpName'] = ucfirst($pluralizer->getSingularForm(lcfirst($relationName)));
+        $foreignKey['phpName'] = $foreignPhpName;
         $foreignKey['foreignTable'] = $foreignObject->getTable();
 
         if ($refName = $relation->getRefName()) {
@@ -416,7 +433,7 @@ class Propel implements BuildInterface
             'text' => 'LONGVARCHAR',
         ];
 
-        return @$map[strtolower($type)] ? : $type;
+        return @$map[strtolower($type)] ?: $type;
     }
 
 }

@@ -26,7 +26,7 @@ class JarvesUsers extends ClientAbstract
 
         $sql = "
             SELECT id, password, password_salt
-            FROM " . $this->getJarves()->getSystemConfig()->getDatabase()->getPrefix() . "system_user
+            FROM system_user
             WHERE
                 id > 0
                 AND $userColumn = ?

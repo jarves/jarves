@@ -13,22 +13,6 @@
     <column name="access_from" type="INTEGER"/>
     <column name="access_to" type="INTEGER"/>
     <column name="access_from_groups" type="VARCHAR" size="255"/>
-
-    <index>
-      <index-column name="box_id"/>
-    </index>
-    <index>
-      <index-column name="hide"/>
-    </index>
-    <index>
-      <index-column name="node_id"/>
-    </index>
-    <behavior name="sortable" custom="true">
-      <parameter name="rank_column" value="sort"/>
-      <parameter name="use_scope" value="true"/>
-      <parameter name="scope_column" value="box_id"/>
-    </behavior>
-
     <foreign-key phpName="Node" foreignTable="system_node" refPhpName="Content" onDelete="cascade" onUpdate="cascade">
       <reference local="node_id" foreign="id"/>
     </foreign-key>
