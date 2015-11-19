@@ -1671,7 +1671,7 @@ SystemJSLoader.prototype.config = function(cfg) {
 
       return new Promise(function(resolve, reject) {
         var s = document.createElement('script');
-        //s.async = true;
+        s.async = true;
 
         function complete(evt) {
           if (s.readyState && s.readyState != 'loaded' && s.readyState != 'complete')

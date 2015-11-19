@@ -72,6 +72,12 @@
     button[primary] {
         background-color: lighten($mainColor, 15%);
     }
+
+    .button-with-ladda {
+        &:before {
+            opacity: 0;
+        }
+    }
 }
 
 .jarves-white {

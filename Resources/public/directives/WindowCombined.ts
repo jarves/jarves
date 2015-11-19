@@ -35,24 +35,22 @@ export default class WindowCombined extends WindowList {
             this.error = 'Failed to load entry point definition for %s'.sprintf(this.getEntryPoint());
         });
 
-        $scope.forms = {};
-
         $scope.$watch('windowCombined.selected', (value, oldValue) => {
-            if (!angular.equals(this.editId, value)) {
-                console.log('selected change', this.$scope.forms.addForm, this.$scope.forms.addForm ? this.$scope.forms.addForm.getChangedData() : null);
-                if (this.$scope.forms.addForm && this.$scope.forms.addForm.hasChanges()) {
-                    this.unsavedDialogOldValue = oldValue;
-                    this.showUnsavedDialog = true;
-                    // this.switchBackToEditView = 2;
-                    return;
-                }
-                if (this.$scope.forms.editForm && this.$scope.forms.editForm.hasChanges()) {
-                    this.unsavedDialogOldValue = oldValue;
-                    this.showUnsavedDialog = true;
-                    // this.switchBackToEditView = this.editView;
-                    return;
-                }
-            }
+            //if (!angular.equals(this.editId, value)) {
+            //    console.log('selected change', this.$scope.forms.addForm, this.$scope.forms.addForm ? this.$scope.forms.addForm.getChangedData() : null);
+            //    if (this.$scope.forms.addForm && this.$scope.forms.addForm.hasChanges()) {
+            //        this.unsavedDialogOldValue = oldValue;
+            //        this.showUnsavedDialog = true;
+            //         //this.switchBackToEditView = 2;
+            //        return;
+            //    }
+            //    if (this.$scope.forms.editForm && this.$scope.forms.editForm.hasChanges()) {
+            //        this.unsavedDialogOldValue = oldValue;
+            //        this.showUnsavedDialog = true;
+            //         //this.switchBackToEditView = this.editView;
+            //        return;
+            //    }
+            //}
 
             this.editId = value;
 
@@ -66,6 +64,13 @@ export default class WindowCombined extends WindowList {
         });
     }
 
+    getEditForm(){
+        return this.$scope.$eval($this.attribtues['formEdit']);
+    }
+
+    getAddForm(){
+        return this.$scope.$eval($this.attribtues['formEdit']);
+    }
 
     unsavedDialogStay() {
         this.selected = this.unsavedDialogOldValue;

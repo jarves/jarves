@@ -8,42 +8,49 @@ import angular from '../angular.ts';
     transclude: true,
     controllerAs: 'jarvesForm'
 })
-@Inject('$scope, $element, $attrs, backend, $q, jarves, objectRepository, $interpolate, $compile')
+@Inject('$scope, $element, $attrs, backend, $q, jarves, objectRepository, $interpolate, $compile, $parse')
 export default class JarvesForm {
-    constructor($scope, $element, $attrs, backend, $q, jarves, objectRepository, $interpolate, $compile) {
-        this.$scope = $scope;
-        this.$scope.model = {title: 'empty', test: 'a'};
-        this.element = $element;
-        this.backend = backend;
-        this.$attrs = $attrs;
-        this.$q = $q;
-        this.jarves = jarves;
-        this.objectRepository = objectRepository;
-        this.$interpolate = $interpolate;
-        this.$compile = $compile;
+    public pk = null;
+    public entryPoint = null;
+    public fields = [];
 
-        this.pk = null;
-        this.entryPoint = null;
-        this.fields = [];
-        this.optionsEntryPoint = '';
-        this.noDataChanged = false;
-        this.originalData = {};
-        this.itemLoaded = false;
+    /**
+     * Is true when jarves-form is in save process.
+     * @type {boolean}
+     */
+    public saving = false;
 
-        this.options = {
-            fields: null,
-                object: null,
-                objectKey: null
-        };
+    protected optionsEntryPoint = '';
+    protected noDataChanged = false;
+    protected originalData = {};
+    protected itemLoaded = false;
+
+    protected options = {
+        fields: null,
+        object: null,
+        objectKey: null
+    };
+
+    public error;
+
+    protected template = '<jarves-form-group ng-if="jarvesForm.options.fields" fields="jarvesForm.options.fields" model="model"></jarves-form-group>';
+
+    constructor(private $scope, private $element, private $attrs, private backend,
+                private $q, private jarves, private objectRepository, private $interpolate, private $compile,
+                private $parse
+    ) {
+        this.$scope.model = {};
 
         $scope.$on("$destroy", () => {
             if (this.getName()) {
                 delete $scope.parentForms[this.getName()];
             }
         });
-
-        this.template = '<jarves-form-group ng-if="jarvesForm.options.fields" fields="jarvesForm.options.fields" model="model"></jarves-form-group>';
     }
+
+    protected lastLoadedClassPropertiesPath;
+    protected formGroup;
+    protected name;
 
     link(scope, element, attributes, controllers, transclude) {
         scope.parentForms = scope.forms;
@@ -52,17 +59,21 @@ export default class JarvesForm {
             element.append(clone);
         });
 
-        if (this.getName()) {
-            if (!scope.forms) {
-                throw 'jarves-form has a name defined but is in no scope that provides a "forms" object.';
-            }
-            scope.parentForms[this.getName()] = this;
+        //if (this.getName()) {
+        //    if (!scope.forms) {
+        //        throw 'jarves-form has a name defined but is in no scope that provides a "forms" object.';
+        //    }
+        //    scope.parentForms[this.getName()] = this;
+        //}
+        //
+        //scope.form = this;
+        //
+        //scope.forms = {};
+        //this.forms = scope.forms;
+
+        if ('bind' in attributes) {
+            this.$parse(attributes.bind).assign(scope, this);
         }
-
-        scope.form = this;
-
-        scope.forms = {};
-        this.forms = scope.forms;
 
         for (let [key, value] of each(this.options)) {
             if (this.$attrs[key]) {
@@ -183,6 +194,8 @@ export default class JarvesForm {
     save() {
         this.noDataChanged = false;
 
+        this.saving = true;
+
         this.callSave().then(() => {
             var data = this.getChangedData();
             var id = this.jarves.getObjectUrlId(this.getObjectKey(), this.originalData);
@@ -261,6 +274,8 @@ export default class JarvesForm {
     }
 
     handleSaveResponse(response) {
+        this.saving = false;
+
         this.originalData = angular.copy(this.$scope.model);
         if (true === response.data) {
             this.objectRepository.fireObjectChange(this.getObjectKey());

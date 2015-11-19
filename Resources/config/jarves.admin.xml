@@ -18,7 +18,13 @@
             <asset priority="2000" src="@JarvesBundle/libraries/hammer.min.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/typescript/typescript.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/systemjs/system.src.js"/>
+
+            <assets src="@JarvesBundle/libraries/ladda/spin.min.js"/>
+            <assets src="@JarvesBundle/libraries/ladda/ladda.min.js"/>
+            <assets src="@JarvesBundle/libraries/ladda/ladda.min.css"/>
+
             <asset priority="2000" src="@JarvesBundle/start.js"/>
+
 
             <asset src="@JarvesBundle/fonts/OpenSans/open-sans.css"/>
             <asset src="@JarvesBundle/fonts/OpenSans/open-sans-condensed.css"/>
@@ -33,6 +39,7 @@
             <assets src="@JarvesBundle/css/admin/jarves/*.scss"/>
             <assets src="@JarvesBundle/css/admin/jarves/ui/*.css"/>
             <assets src="@JarvesBundle/css/admin/jarves/Field/*"/>
+
         </adminAssets>
 
         <xxxadminAssets>

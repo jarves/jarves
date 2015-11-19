@@ -135,11 +135,23 @@ export default class AbstractFieldType {
      */
     link(scope, element, attributes, controller, transclude) {
         this.scope = scope;
+        this.scope.model = null;
         this.element = element;
         this.attributes = attributes;
         this.linked = true;
-        this.scope.fieldController = this;
+        //this.scope.fieldController = this;
         this.scope.$on('$destroy', () => this.destructor());
+
+
+
+        // setup bi-directional model update
+        var modelName = this.getModelName();
+        this.scope.$parent.$watch(modelName, (value) => {
+            this.$parse('model').assign(this.scope, value);
+        });
+        this.scope.$watch('model', (value) => {
+            this.$parse(modelName).assign(this.scope.$parent, value);
+        });
 
         var templateElements = element.children();
 
@@ -154,8 +166,8 @@ export default class AbstractFieldType {
         this.label = this.getOption('label');
         this.description = this.getOption('description') || this.getOption('desc');
 
-        this.labelElement = angular.element('<div class="jarves-Field-title" ng-bind="fieldController.label"></div>');
-        this.descriptionElement = angular.element('<div class="jarves-Field-description" ng-if="fieldController.description" ng-bind="fieldController.description"></div>');
+        this.labelElement = angular.element('<div class="jarves-Field-title" ng-bind="jarvesField.label"></div>');
+        this.descriptionElement = angular.element('<div class="jarves-Field-description" ng-if="jarvesField.description" ng-bind="jarvesField.description"></div>');
         this.fieldContainer = angular.element('<div class="jarves-Field-container"></div>');
         this.childrenContainer = angular.element('<div class="jarves-Field-children"></div>');
 
@@ -208,10 +220,6 @@ export default class AbstractFieldType {
     getAnotherModelValue(modelName) {
         return this.scope.$parent.$eval(modelName);
     }
-
-    // getModelName() {
-    //    return this.getOption('model') || '$parent.model.' + this.getOption('id');
-    // }
 
     getRelativeModelName(key) {
         var myModelName = this.getModelName();

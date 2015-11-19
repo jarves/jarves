@@ -2,6 +2,7 @@
 
 rm -rf Resources/public/libraries/systemjs; cp -r node_modules/systemjs/dist Resources/public/libraries/systemjs
 rm -rf Resources/public/libraries/typescript; cp -r node_modules/typescript/lib Resources/public/libraries/typescript
+rm -rf Resources/public/libraries/ladda; cp -r node_modules/ladda/dist Resources/public/libraries/ladda
 
 
 

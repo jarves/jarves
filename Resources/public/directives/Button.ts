@@ -14,6 +14,22 @@ export default class Button {
             });
         }
 
+        if (attributes.loading) {
+
+            var l = Ladda.create(element[0]);
+            element.addClass('button-with-ladda');
+            scope.$watch(attributes.loading, (value) => {
+                if (value) {
+                    l.start();
+                    if (typeof value === 'number') {
+                        l.ladda( 'setProgress', value);
+                    }
+                } else {
+                    l.stop();
+                }
+            });
+        }
+
         if (attributes['pressed']) {
             scope.$watch(attributes['pressed'], (pressed) => {
                 if (pressed) {

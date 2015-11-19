@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "Jarves application framework",
   "main": "index.js",
-  "dependencies": {
+  "devDependencies": {
     "babel-core": "^5.8.33",
     "systemjs": "^0.18.4",
-    "typescript": "^1.6.2"
+    "typescript": "^1.6.2",
+    "ladda": "^0.9.8"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

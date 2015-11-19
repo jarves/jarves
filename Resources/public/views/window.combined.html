@@ -1,4 +1,4 @@
-<window-combined>
+<window-combined form-edit="windowCombined.editForm" form-add="windowCombined.addForm">
     <window-frame>
         <window-toolbar>
             <button-group>
@@ -21,7 +21,7 @@
             <div ng-if="windowCombined.classProperties" style="height: 100%;">
                 <div ng-show="windowCombined.currentView == 1" class="jarves-Combine-grid">
                     <div class="jarves-line-top"></div>
-                    <jarves-grid name="listGrid" entry-point="windowCombined.getEntryPoint()" model="windowCombined.selected">
+                    <jarves-grid entry-point="windowCombined.getEntryPoint()" model="windowCombined.selected">
                         <button ng-click="windowCombined.edit(jarvesGrid.getPk(item))" icon="#icon-pencil-2" title="Edit"></button>
                         <button ng-click="windowCombined.remove(jarvesGrid.getPk(item))" icon="#icon-minus-5" title="Delete"></button>
                     </jarves-grid>
@@ -35,10 +35,10 @@
                             </layout-cell>
                             <layout-cell class="jarves-Combine-editForm">
                                 <div class="jarves-line-top"></div>
-                                <jarves-form name="editForm" ng-if="windowCombined.editView == 1 && windowCombined.editId"
+                                <jarves-form bind="windowCombined.editForm" ng-if="windowCombined.editView == 1 && windowCombined.editId"
                                              pk="windowCombined.editId" entry-point="windowCombined.getEditEntryPoint()" options-entry-point="windowCombined.getEditEntryPoint()">
                                 </jarves-form>
-                                <jarves-form name="addForm" ng-if="windowCombined.editView == 2" entry-point="windowCombined.getAddEntryPoint()"
+                                <jarves-form bind="windowCombined.addForm" ng-if="windowCombined.editView == 2" entry-point="windowCombined.getAddEntryPoint()"
                                              options-entry-point="windowCombined.getAddEntryPoint()">
                                 </jarves-form>
                             </layout-cell>
@@ -59,14 +59,15 @@
     </window-frame>
 
     <window-sidebar label="Actions">
-        <button ng-if="forms.editForm && windowCombined.editView == 1" ng-click="forms.editForm.save()" icon="#icon-checkmark-6">
+        <button ng-if="windowCombined.editForm && windowCombined.editView == 1" loading="windowCombined.editForm.saving" ng-click="windowCombined.editForm.save()" icon="#icon-checkmark-6">
             <span translate>Save</span>
-            <span ng-if="windowCombined.formController.hasChanges()">*</span>
+            <span ng-if="windowCombined.editForm.hasChanges()">*</span>
         </button>
-        <button ng-if="forms.addForm && windowCombined.editView == 2" ng-click="forms.addForm.add()" icon="#icon-checkmark-6" translate>Save</button>
-        <button ng-if="forms.editForm && windowCombined.editView == 1" ng-click="forms.editForm.remove()" icon="{{windowCombined.classProperties.removeIcon}}" translate>Remove</button>
-        <button ng-if="forms.editForm && windowCombined.editView == 1" ng-click="forms.editForm.reset()" icon="#icon-escape" translate>Remove</button>
-        <window-sidebar-delimiter ng-if="forms.editForm || forms.addForm"></window-sidebar-delimiter>
+
+        <button ng-if="windowCombined.addForm && windowCombined.editView == 2" ng-click="forms.addForm.add()" icon="#icon-checkmark-6" translate>Save</button>
+        <button ng-if="windowCombined.editForm && windowCombined.editView == 1" ng-click="forms.editForm.remove()" icon="{{windowCombined.classProperties.removeIcon}}" translate>Remove</button>
+        <button ng-if="windowCombined.editForm && windowCombined.editView == 1" ng-click="forms.editForm.reset()" icon="#icon-escape" translate>Remove</button>
+        <window-sidebar-delimiter ng-if="windowCombined.editForm || windowCombined.addForm"></window-sidebar-delimiter>
         <button ng-click="windowCombined.showAdd()" pressed="windowCombined.editView == 2" translate icon="{{windowCombined.classProperties.addIcon}}">New</button>
         <button ng-if="windowCombined.classProperties.nestedRootAdd" icon="{{windowCombined.classProperties.nestedRootAddIcon}}" ng-click="windowCombined.showAdd()" translate>New Domain</button>
     </window-sidebar>

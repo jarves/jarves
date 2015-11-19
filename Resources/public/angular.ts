@@ -127,6 +127,7 @@ export function Field(name, directiveOptions) {
                 //return {
                     restrict: 'A',
                     controller: target,
+                    controllerAs: 'jarvesField',
                     scope: true,
                     transclude: true,
                     require: [directiveName, 'jarvesField', '?^jarvesField', '?^jarvesForm'],
