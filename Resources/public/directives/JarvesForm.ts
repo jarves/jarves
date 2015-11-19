@@ -37,8 +37,7 @@ export default class JarvesForm {
 
     constructor(private $scope, private $element, private $attrs, private backend,
                 private $q, private jarves, private objectRepository, private $interpolate, private $compile,
-                private $parse
-    ) {
+                private $parse) {
         this.$scope.model = {};
 
         $scope.$on("$destroy", () => {
@@ -55,7 +54,7 @@ export default class JarvesForm {
     link(scope, element, attributes, controllers, transclude) {
         scope.parentForms = scope.forms;
 
-        transclude(scope, function(clone) {
+        transclude(scope, function (clone) {
             element.append(clone);
         });
 
@@ -182,7 +181,7 @@ export default class JarvesForm {
     }
 
     getObjectKey() {
-        var objectKey = this.options['object'] || this.options['objectKey'];
+        var objectKey = this.options['object'] || this.options['objectKey'];
 
         if (!objectKey) {
             throw new Error('object-key or object not defined in <jarves-form> nor in options-entry-point="" result.');
@@ -197,12 +196,20 @@ export default class JarvesForm {
         this.saving = true;
 
         this.callSave().then(() => {
-            var data = this.getChangedData();
-            var id = this.jarves.getObjectUrlId(this.getObjectKey(), this.originalData);
+                var data = this.getChangedData();
+                var id = this.jarves.getObjectUrlId(this.getObjectKey(), this.originalData);
 
-            this.backend.patch(this.getEntryPoint() + '/' + id, data)
-                .success((response) => this.handleSaveResponse(response));
-        });
+                //this.saving = true;
+                this.backend.patch(this.getEntryPoint() + '/' + id, data)
+                    .success((response) => this.handleSaveResponse(response));
+            },
+            (e) => {
+                console.error(e);
+            },
+            (progress) => {
+                this.saving = (progress.count/progress.total) / 2
+            }
+        );
     }
 
     add() {
@@ -238,7 +245,7 @@ export default class JarvesForm {
             try {
                 var promise = field.save();
                 if (angular.isObject(promise) && promise.then) {
-                    promise.then(function done(){
+                    promise.then(function done() {
                         setDone(idx);
                     }, function error(message) {
                         deferred.reject(message);

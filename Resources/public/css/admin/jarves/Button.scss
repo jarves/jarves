@@ -74,10 +74,65 @@
     }
 
     .button-with-ladda {
-        &:before {
+
+        &[data-loading]:before {
             opacity: 0;
         }
+
+        &[data-loading] .ladda-progress {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .ladda-label {
+             position: relative;
+             z-index: 3;
+        }
+
+        .ladda-progress {
+            position: absolute;
+            width: 0;
+            height: 100%;
+            left: 0;
+            top: 0;
+            background: rgba(0,0,0,0.2);
+            visibility: hidden;
+            opacity: 0;
+            -webkit-transition: 0.1s linear all !important;
+            -moz-transition: 0.1s linear all !important;
+            -ms-transition: 0.1s linear all !important;
+            -o-transition: 0.1s linear all !important;
+            transition: 0.1s linear all !important;
+        }
+        .ladda-spinner {
+            position: absolute;
+            z-index: 2;
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            top: 50%;
+            left: 15px;
+            margin-top: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+        [data-loading] .ladda-spinner {
+            opacity: 1;
+        }
     }
+
+    .button-with-ladda, .button-with-ladda .ladda-spinner, .button-with-ladda .ladda-label {
+        -webkit-transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) all !important;
+        -moz-transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) all !important;
+        -ms-transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) all !important;
+        -o-transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) all !important;
+        transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) all !important;
+    }
+    //.button-with-ladda {
+    //    &:before {
+    //        opacity: 0;
+    //    }
+    //}
 }
 
 .jarves-white {

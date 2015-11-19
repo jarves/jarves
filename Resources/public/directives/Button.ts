@@ -18,6 +18,7 @@ export default class Button {
 
             var l = Ladda.create(element[0]);
             element.addClass('button-with-ladda');
+
             scope.$watch(attributes.loading, (value) => {
                 if (value) {
                     l.start();
