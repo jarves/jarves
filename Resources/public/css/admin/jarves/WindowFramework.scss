@@ -10,7 +10,10 @@
     @include line-top;
 }
 
+.jarves-Combine-editForm,
 .jarves-Combine-list {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .jarves-Combine-window-content {

@@ -15,11 +15,11 @@ jarves-tabs > button-group {
     bottom: 0;
 }
 
-.jarves-Tabs-fullsize > .jarves-Tabs-pane {
+.jarves-Tabs-fullsize > .jarves-Tabs-panes {
     position: absolute;
     left: 0;
     right: 0;
-    top: 0;
+    top: 27px;
     bottom: 0;
 
     -webkit-overflow-scrolling: touch;

@@ -4,7 +4,7 @@ import {eachValue} from '../utils.ts';
 import Text from './Text.ts';
 
 @Field('password', {
-    templateUrl: 'bundles/jarves/views/field.text.html',
+    templateUrl: 'bundles/jarves/views/fields/text.html',
     scope: {
         'placeholder': '@',
         'model': '='

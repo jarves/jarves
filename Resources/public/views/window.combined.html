@@ -64,9 +64,9 @@
             <span ng-if="windowCombined.editForm.hasChanges()">*</span>
         </button>
 
-        <button ng-if="windowCombined.addForm && windowCombined.editView == 2" ng-click="forms.addForm.add()" icon="#icon-checkmark-6" translate>Save</button>
-        <button ng-if="windowCombined.editForm && windowCombined.editView == 1" ng-click="forms.editForm.remove()" icon="{{windowCombined.classProperties.removeIcon}}" translate>Remove</button>
-        <button ng-if="windowCombined.editForm && windowCombined.editView == 1" ng-click="forms.editForm.reset()" icon="#icon-escape" translate>Remove</button>
+        <button ng-if="windowCombined.addForm && windowCombined.editView == 2" ng-click="windowCombined.addForm.add()" icon="#icon-checkmark-6" translate>Save</button>
+        <button ng-if="windowCombined.editForm && windowCombined.editView == 1" ng-click="windowCombined.editForm.remove()" icon="{{windowCombined.classProperties.removeIcon}}" translate>Remove</button>
+        <button ng-if="windowCombined.editForm && windowCombined.editView == 1" ng-click="windowCombined.editForm.reset()" icon="#icon-escape" translate>Reset</button>
         <window-sidebar-delimiter ng-if="windowCombined.editForm || windowCombined.addForm"></window-sidebar-delimiter>
         <button ng-click="windowCombined.showAdd()" pressed="windowCombined.editView == 2" translate icon="{{windowCombined.classProperties.addIcon}}">New</button>
         <button ng-if="windowCombined.classProperties.nestedRootAdd" icon="{{windowCombined.classProperties.nestedRootAddIcon}}" ng-click="windowCombined.showAdd()" translate>New Domain</button>

@@ -1,33 +1,34 @@
-import AbstractFieldType from './AbstractFieldType.js';
-import {Field, InjectAsProperty} from '../angular.ts';
+import AbstractFieldType from './AbstractFieldType.ts';
+import {Field} from '../angular.ts';
 import {each} from '../utils.ts';
-import angular from '../angular.js'
+import angular from '../angular.ts'
 
-@Field('select')
-@InjectAsProperty('objectRepository')
+@Field('select', {
+    templateUrl: 'bundles/jarves/views/fields/select.html',
+    controllerAs: 'selectController'
+})
 export default class Select extends AbstractFieldType {
-    constructor(...args) {
-        super(...args);
-        this.additionalOptionsReferences = ['items'];
-        this.chooserOpen = false;
-        this.items = {};
-        this.selected = {};
-        this.selectedItem = {
-            icon: null,
-            label: '',
-            id: null
-        };
-        this.objectRepository = null;
-        this.template = 'bundles/jarves/views/field.select.html';
+    protected chooserOpen = false;
+    protected items = {};
+
+    protected additionalOptionsReferences = ['items'];
+
+    public selected = {};
+    public selectedItem = {
+        icon: null,
+        label: '',
+        id: null
+    };
+
+    public value = null;
+
+    constructor(protected $compile, protected $parse, protected $timeout, protected $http,
+                protected $templateCache, protected $q, protected $interpolate, protected objectRepository) {
+        super(...arguments);
     }
 
     link(scope, element, attr, controller, transclude) {
-        parent(scope, element, attr, controller, transclude);
-
-        this.renderTemplateUrl(
-            this.template,
-            () => this.beforeCompile()
-        );
+        super.link(...arguments);
 
         this.onModelValueChange((value) => {
             this.value = value;

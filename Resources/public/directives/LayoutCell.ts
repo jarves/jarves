@@ -2,7 +2,9 @@ import {Directive, InjectAsProperty} from '../angular.ts';
 import Hammer from '../Hammer.js';
 
 @Directive('layoutCell', {
-    restrict: 'E'
+    restrict: 'E',
+    transclude: true,
+    template: '<div class="jarves-layout-cell-container" ng-transclude></div>'
 })
 export default class LayoutCell {
     constructor(private $compile, private $interpolate) {}

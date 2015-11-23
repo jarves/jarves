@@ -1,9 +1,12 @@
-import AbstractFieldType from './AbstractFieldType.js';
+import AbstractFieldType from './AbstractFieldType.t';
 import {Field} from '../angular.ts';
 import {eachValue} from '../utils.ts';
-import Select from './Select.js';
+import Select from './Select.ts';
 
-@Field('language')
+@Field('language', {
+    templateUrl: 'bundles/jarves/views/fields/select.html',
+    controllerAs: 'selectController'
+})
 export default class Language extends Select {
 
     setupItems() {

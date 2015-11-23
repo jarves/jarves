@@ -85,6 +85,7 @@ class UserCrudController extends WindowController
         '__account__' => array(
             'type' => 'tab',
             'label' => '[[Account]]',
+            'options' => ['full' => true],
             'children' => array(
                 'username' => array(
                     'label' => 'Username',
@@ -118,6 +119,7 @@ class UserCrudController extends WindowController
         '__Person__' => array(
             'type' => 'tab',
             'label' => '[[Person]]',
+            'options' => ['full' => true],
             'children' => array(
                 'firstName' => array(
                     'label' => 'First name',

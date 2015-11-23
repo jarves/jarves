@@ -3,7 +3,7 @@ import {Field, Directive, angular} from '../angular.ts';
 import {each} from '../utils.ts';
 
 @Field('text', {
-    templateUrl: 'bundles/jarves/views/field.text.html',
+    templateUrl: 'bundles/jarves/views/fields/text.html',
     scope: {
         'placeholder': '@',
         'model': '='

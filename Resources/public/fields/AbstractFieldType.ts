@@ -16,7 +16,8 @@ export default class AbstractFieldType {
     protected additionalOptionsReferences = [];
     protected optionsReferencesMap = {};
 
-    constructor(protected $compile, protected $parse, protected $timeout, protected $http, protected $templateCache, protected $q, protected $interpolate) {
+    constructor(protected $compile, protected $parse, protected $timeout, protected $http, protected $templateCache,
+                protected $q, protected $interpolate) {
         for (let item of this.optionsReferences) {
             this.optionsReferencesMap[item] = true;
         }
@@ -131,18 +132,16 @@ export default class AbstractFieldType {
     protected linked = false;
 
     /**
-     * Take care, this method can run several times.
+     *
      */
-    link(scope, element, attributes, controller, transclude) {
+    baseLink(scope, element, attributes) {
         this.scope = scope;
-        this.scope.model = null;
         this.element = element;
         this.attributes = attributes;
         this.linked = true;
+        //this.scope.model = null;
         //this.scope.fieldController = this;
         this.scope.$on('$destroy', () => this.destructor());
-
-
 
         // setup bi-directional model update
         var modelName = this.getModelName();
@@ -152,7 +151,13 @@ export default class AbstractFieldType {
         this.scope.$watch('model', (value) => {
             this.$parse(modelName).assign(this.scope.$parent, value);
         });
+    }
 
+    /**
+     * Take care, this method can run several times.
+     */
+    link(scope, element, attributes, controller, transclude) {
+        this.baseLink(scope, element, attributes);
         var templateElements = element.children();
 
         if (this.getOption('inline') || 'inline' in this.attributes) {
