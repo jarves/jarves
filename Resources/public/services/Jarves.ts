@@ -3,8 +3,6 @@ import {Inject, Service} from '../angular.ts';
 import {each, eachValue, normalizeObjectKey, urlEncode} from '../utils.ts';
 import {baseUrl, baseRestUrl} from '../config.js';
 
-console.log(Service);
-
 /**
  * Uses the $rootScope.
  *

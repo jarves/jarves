@@ -1,36 +1,20 @@
-//import {registerField, registerDirective, registerFilter, registerLabel} from './module.ts';
-
-
 export default window.angular;
 
 export var angular = window.angular;
 
+var angularModule = '';
 
-//export function Service(name) {
-//    return function decoratorFactory(target : Object, decoratedPropertyName? : string) : void {
-//        console.log('@Service', target, decoratedPropertyName);
-//        window.jarvesModule.service(name, target);
-//    }
-//}
+export function setModule(module){
+    angularModule = module;
+}
 
+function getModule() {
+    if (!angularModule && !window.angularDecoratorModule){
+        throw new Error('Can not use angular typescript decorator: No Angular module defined. Use angular.ts::setModule() first.');
+    }
 
-//export function registerAnnotation(constructor, annotation) {
-//    if (!('annotations' in constructor)) {
-//        constructor.annotations = [];
-//    }
-//
-//    constructor.annotations.push(annotation);
-//}
-
-//export var InjectAnnotation = class {
-//    deps: Array;
-//
-//    constructor(...deps) {
-//        for (let dep of deps) {
-//            this.deps = this.deps.concat(dep.replace(/\s+/g, '').split(','));
-//        }
-//    }
-//};
+    return angularModule || window.angularDecoratorModule;
+}
 
 export function Inject(...dependencies) {
     return function decoratorFactory(target : Object, decoratedPropertyName? : string) : void {
@@ -41,49 +25,168 @@ export function Inject(...dependencies) {
 
         var $inject = target.$inject = [];
         $inject = $inject.concat(normalizedDependencies);
-
-        //
-        //Object.defineProperty(target.prototype, "$inject", {
-        //    get: function () {
-        //        return this._$inject;
-        //    },
-        //    set: function (v) {
-        //        this._$inject = v;
-        //    },
-        //    enumerable: false,
-        //    configurable: true
-        //});
-
-        //target.constructor.prototype.$inject = $inject;
         target.prototype.$inject = $inject;
         target.$inject = $inject;
-
-        //target.$inject = target.$inject.concat(normalizedDependencies);
-        console.log('@Inject', $inject, target, decoratedPropertyName);
     }
 }
 
 export function Service(name) {
     return function decoratorFactory(target : Object, decoratedPropertyName? : string) : void {
-        console.log('@Service', name, target, decoratedPropertyName);
-        window.jarvesModule.service(name, target);
+        getModule().service(name, target);
     }
 }
 
 export function Filter(name) {
     return function decoratorFactory(target : Function, decoratedPropertyName? : string) : void {
-        console.log('@Filter', name, target, decoratedPropertyName);
         var constructor = function() {
             let instance = new target();
             return instance.filter;
         };
-        window.jarvesModule.filter(name, constructor);
+        getModule().filter(name, constructor);
     }
 }
 
+export function Directive(name, options) {
+    return function decoratorFactory(target : Object, decoratedPropertyName? : string) : void {
+        //console.log('@Directive', name, options, target, decoratedPropertyName);
+
+        var definition = options || {};
+        if (!definition.controller) {
+            definition.controller = target;
+        }
+
+        if (!definition.link) {
+            if (angular.isString(definition.require)) {
+                definition.require = [definition.require];
+            }
+
+            if (angular.isArray(definition.require) && name !== definition.require[0]) {
+                definition.require.unshift(name);
+            }
+
+            definition.link = function(scope, element, attr, ctrl, transclude) {
+                var ownController, controllersToPass;
+                //console.log('link @Directive', name, definition.require, [ctrl]);
+                if (angular.isArray(ctrl)) {
+                    ownController = ctrl.shift();
+                } else {
+                    ownController = ctrl;
+                }
+
+                if (angular.isArray(ctrl) && 1 === ctrl.length) {
+                    ctrl = ctrl[0];
+                }
+
+                if (ownController && ownController.link) {
+                    ownController.link.apply(ownController, [scope, element, attr, ctrl, transclude]);
+                }
+            };
+        }
+
+        var compile:Function = definition.compile || function(){};
+        definition.compile = function(...args) {
+            var link = compile(...args);
+            return link || definition.link;
+        };
+
+        options = angular.isFunction(definition) || angular.isArray(definition)
+            ? definition
+            : function(){ return definition; };
+
+        getModule().directive(
+            name,
+            options
+        );
+    }
+}
+
+var loadedController = {};
+
+export function registerControllerDecorator() {
+    getModule().directive('ngController', function ($compile) {
+            return {
+                priority: 1600,
+                terminal: true, //stops the element from being compiled, even before the origin ng-controller directives
+                controller: function(){},
+                compile: function(el) {
+                    var children = el.children().remove();
+
+                    return function (scope, iElement, iAttrs, controller, transcludeFn) {
+                        var constructor = iAttrs['ngController'];
+
+                        if (angular.isString(constructor) && constructor.slice(0, 'bundles/'.length) === 'bundles/') {
+
+                            var controllerName = constructor;
+                            if (-1 !== controllerName.indexOf(' as ')) {
+                                controllerName = controllerName.substr(0, controllerName.indexOf(' as '));
+                            }
+
+                            var fileToLoad = './' + controllerName + '.ts';
+
+                            // load the actual controller file with all depedencies and compile the element finally
+                            window.System.import(fileToLoad).then(function (m) {
+                                loadedController[controllerName] = m.default;
+                                iElement.append(children);
+                                $compile(iElement, null, 1500)(scope);
+                            });
+                        }
+                    };
+                }
+            }
+        }
+    );
+
+    //when the directive compiles the ng-controller statement we need to make sure $controller is able to find our self-loaded
+    //controller
+    getModule().config(function($provide) {
+        $provide.decorator("$controller", ['$delegate', '$q', ($delegate, $q) => {
+            return function(...args) {
+                var [constructor] = args;
+
+                if (angular.isString(constructor)) {
+                    var controllerName = constructor;
+                    var controllerAs = '';
+                    if (-1 !== controllerName.indexOf(' as ')) {
+                        controllerAs = controllerName.substr(controllerName.indexOf(' as ') + 4);
+                        controllerName = controllerName.substr(0, controllerName.indexOf(' as '));
+                    }
+                    if (loadedController[controllerName]) {
+                        args[0] = loadedController[controllerName];
+                        args[3] = controllerAs;
+                        return $delegate(...args);
+                    }
+                }
+
+                return $delegate(...args);
+            };
+        }]);
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export function Label(name, options = {}) {
     return function decoratorFactory(target : Function, decoratedPropertyName? : string) : void {
-        console.log('@Label', name, target, decoratedPropertyName);
+        //console.log('@Label', name, target, decoratedPropertyName);
 
         var directiveName = 'jarves' + name.ucfirst() + 'Label';
 
@@ -105,7 +208,7 @@ export function Label(name, options = {}) {
             }
         }, options);
 
-        window.jarvesModule.directive(
+        getModule().directive(
             directiveName,
             function() {
                 return options;
@@ -118,11 +221,11 @@ export function Field(name, directiveOptions) {
     return function decoratorFactory(target:Object, decoratedPropertyName?:string):void {
         var directiveName = 'jarves' + name.ucfirst() + 'Field';
 
-        console.log('@Field', name, directiveName);
-        window.jarvesModule.directive(
+        //console.log('@Field', name, directiveName);
+        getModule().directive(
             directiveName,
             function () {
-                console.log('call ', name, directiveName);
+                //console.log('call ', name, directiveName);
                 return angular.extend({
                 //return {
                     restrict: 'A',
@@ -172,162 +275,3 @@ export function Field(name, directiveOptions) {
         );
     }
 }
-
-export function Directive(name, options) {
-    return function decoratorFactory(target : Object, decoratedPropertyName? : string) : void {
-        console.log('@Directive', name, options, target, decoratedPropertyName);
-
-        var definition = options || {};
-        if (!definition.controller) {
-            definition.controller = target;
-        }
-
-        if (!definition.link) {
-            if (angular.isString(definition.require)) {
-                definition.require = [definition.require];
-            }
-
-            if (angular.isArray(definition.require) && name !== definition.require[0]) {
-                definition.require.unshift(name);
-            }
-
-            definition.link = function(scope, element, attr, ctrl, transclude) {
-                var ownController, controllersToPass;
-                console.log('link @Directive', name, definition.require, [ctrl]);
-                if (angular.isArray(ctrl)) {
-                    ownController = ctrl.shift();
-                } else {
-                    ownController = ctrl;
-                }
-
-                if (angular.isArray(ctrl) && 1 === ctrl.length) {
-                    ctrl = ctrl[0];
-                }
-
-                if (ownController && ownController.link) {
-                    ownController.link.apply(ownController, [scope, element, attr, ctrl, transclude]);
-                }
-            };
-        }
-
-        var compile:Function = definition.compile || function(){};
-        definition.compile = function(...args) {
-            var link = compile(...args);
-            return link || definition.link;
-        };
-
-        options = angular.isFunction(definition) || angular.isArray(definition)
-            ? definition
-            : function(){ return definition; };
-
-        window.jarvesModule.directive(
-            name,
-            options
-        );
-    }
-}
-
-
-//export class InjectAsPropertyAnnotation {
-//    name: string;
-//    propertyName: string;
-//
-//    constructor(name, propertyName = null) {
-//        this.name = name;
-//        this.propertyName = propertyName || name;
-//    }
-//}
-////
-//export class DirectiveAnnotation {
-//    constructor(name, options){
-//        this.name = name;
-//        this.options = options;
-//    }
-//}
-//
-//export class FilterAnnotation {
-//    constructor(name) {
-//        this.name = name;
-//    }
-//}
-//
-//export class FieldAnnotation {
-//    constructor(name, options){
-//        this.name = name;
-//        this.options = options;
-//    }
-//}
-//
-//export class LabelAnnotation {
-//    constructor(name, options){
-//        this.name = name;
-//        this.options = options;
-//    }
-//}
-//
-//export function InjectAsProperty(name, propertyName) {
-//    return function(constructor) {
-//        registerAnnotation(constructor, new InjectAsPropertyAnnotation(name, propertyName));
-//    }
-//}
-//
-//export function Directive(name, options){
-//    return function(constructor) {
-//        registerAnnotation(constructor, new DirectiveAnnotation(name, options));
-//        registerDirective(constructor);
-//    }
-//}
-//
-////export function Filter(name) {
-////    return function(constructor) {
-////        registerAnnotation(constructor, new FilterAnnotation(name));
-////        registerFilter(constructor);
-////    }
-////}
-////
-////export function Field(name, options) {
-////    return function(constructor) {
-////        registerAnnotation(constructor, new FieldAnnotation(name, options));
-////        registerField(constructor);
-////    }
-////}
-////
-////export function Label(name, options) {
-////    return function(constructor) {
-////        registerAnnotation(constructor, new LabelAnnotation(name, options));
-////        registerLabel(constructor);
-////
-////    }
-////}
-////
-//export class Parser {
-//
-//    constructor(constructor) {
-//        this.constructor = constructor;
-//    }
-//
-//    getAllAnnotations() {
-//        return this.annotations || (this.annotations = this.extractAnnotations(this.constructor));
-//    }
-//
-//    getAnnotations(annotationConstructor) {
-//        var annotations = this.getAllAnnotations();
-//        var result = [];
-//        for (let annotation of annotations) {
-//            if (annotation instanceof annotationConstructor) {
-//                result.push(annotation);
-//            }
-//        }
-//        return result;
-//    }
-//
-//    extractAnnotations(constructor) {
-//        var annotations = constructor.annotations || [];
-//        var parent = Object.getPrototypeOf(constructor);
-//        if (angular.isFunction(parent)) {
-//            annotations = annotations.concat(this.extractAnnotations(parent));
-//        }
-//        return annotations;
-//    }
-//
-//}

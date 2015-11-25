@@ -14,7 +14,16 @@ System.config({
     }
 });
 
-window.jarvesModule = window.angular.module('jarves', ['ng', 'ngAnimate']);
+window.angularDecoratorModule = window.jarvesModule = window.angular.module('jarves', ['ng', 'ngAnimate']);
+
+window.jarvesModule.config( ['$provide', function ($provide){
+    $provide.decorator('$browser', ['$delegate', function ($delegate) {
+        $delegate.onUrlChange = function () {};
+        $delegate.url = function () { return ""};
+        return $delegate;
+    }]);
+}]);
+
 
 System.import('jarves/index.ts').then(function(m) {
     //load all bundles /index.ts's.

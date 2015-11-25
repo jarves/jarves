@@ -30,7 +30,7 @@
     </div>
     <div class="jarves-app-container">
         <div class="jarves-desktop">
-            <jarves-window ng-repeat="windowInfo in windowService.activeEntryPoints" window-info="windowInfo"
+            <jarves-window ng-repeat="windowInfo in windowService.activeWindowList" window-info="windowInfo"
                            ng-class="{'jarves-Window-inFront': windowInfo.window.active}"
                            parameters="windowInfo.params"
                            parent-id="windowInfo.window.parentId" is-inline="windowInfo.isInline">

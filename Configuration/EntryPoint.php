@@ -215,7 +215,7 @@ class EntryPoint extends Model
 
     public function isFrameworkWindow()
     {
-        return in_array($this->type, ['combine', 'list', 'edit', 'add']);
+        return in_array($this->type, ['combined', 'list', 'edit', 'add']);
     }
 
     /**
