@@ -85,8 +85,8 @@ class AdminAssets
 
         $response->addJs(
             '
-        var _path = window._baseUrl = ' . json_encode($request->getBasePath() . '/') . '
-        var _pathAdmin = ' . json_encode($request->getBaseUrl() . '/' . $prefix . '/')
+        var _baseUrl = ' . json_encode($request->getBasePath() . '/') . '
+        var _baseUrlApi = ' . json_encode($request->getBaseUrl() . '/')
         );
 
         if ($this->getJarves()->getKernel()->isDebug()) {

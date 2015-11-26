@@ -1,5 +1,5 @@
 import {Service} from '../angular.ts';
-import {baseRestUrl} from '../config.js';
+import {baseUrlApi} from '../config.js';
 
 //@Inject('$rootScope, $http')
 @Service('backend')
@@ -18,7 +18,7 @@ export default class Backend {
         if (!url) {
             throw new 'No url defined';
         }
-        return baseRestUrl + url;
+        return baseUrlApi + url;
     }
 
     preparePromise(httpPromise) {

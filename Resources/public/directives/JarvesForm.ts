@@ -91,7 +91,7 @@ export default class JarvesForm {
                 this.$compile(this.formGroup)(scope);
                 this.loadClassProperties(this.optionsEntryPoint);
             } else {
-                if (this.entryPoint) {
+                if (this.entryPoint && this.pk) {
                     this.loadData();
                 }
             }
@@ -274,9 +274,9 @@ export default class JarvesForm {
         return diff;
     }
 
-    hasChanges() {
+    public hasChanges():boolean {
         var diff = this.getChangedData();
-        console.log('haschanges', diff);
+        console.log('haschanges', diff, !angular.equals({}, diff));
         return !angular.equals({}, diff);
     }
 

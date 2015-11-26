@@ -111,7 +111,7 @@
         <label>User Management</label>
         <children>
           <entryPoint path="users" type="combined" system="true" icon="#icon-user-9" link="true">
-            <class>Jarves\Controller\Windows\UserCrudController</class>
+            <object>jarves/user</object>
             <label>Users</label>
             <children>
               <entryPoint path="editMe">
@@ -129,7 +129,7 @@
             </children>
           </entryPoint>
           <entryPoint path="groups" type="combined" system="true" icon="#icon-users-2" link="true">
-            <class>Jarves\Controller\Windows\GroupCrudController</class>
+            <object>jarves/group</object>
             <label>Groups</label>
           </entryPoint>
           <entryPoint path="acl" type="custom" system="true" icon="#icon-key-4" link="true">

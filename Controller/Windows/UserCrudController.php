@@ -95,7 +95,7 @@ class UserCrudController extends WindowController
                 ),
                 'password' => array( //it's a virtual field from the user model
                     'label' => 'Password',
-                    'type' => 'userPassword',
+                    'type' => 'password',
                     'desc' => 'Leave empty to change nothing',
                     'startEmpty' => true,
                     'saveOnlyFilled' => true

@@ -18,7 +18,7 @@ export default class Translator {
 
         //Asset.javascript(_pathAdmin + 'admin/ui/language-plural?lang=' + this.currentLanguage);
 
-        this.backend.get('admin/ui/language?lang=' + this.currentLanguage, {})
+        this.backend.get('jarves/admin/ui/language?lang=' + this.currentLanguage, {})
             .success(function(response){
                 this.rootScope.jarvesTranslation = response.data || {};
             }.bind(this));

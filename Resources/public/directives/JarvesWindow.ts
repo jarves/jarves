@@ -1,10 +1,12 @@
 import {Directive} from '../angular.ts';
 import {getPublicPath,eachValue} from '../utils.ts';
 import angular from '../angular.ts';
+import {WindowInfo, EntryPoint} from '../services/WindowManagement.ts';
 
 @Directive('jarvesWindow', {
     restrict: 'E',
     priority: -1,
+    scope: true,
     //scope: {
     //    'windowInfo': '=',
     //    'windowId': '=',
@@ -12,24 +14,14 @@ import angular from '../angular.ts';
     //    'parentWindowId': '=',
     //    'parameters': '='
     //},
-    templateUrl: 'bundles/jarves/views/window.html'
+    templateUrl: 'bundles/jarves/views/window.html',
+    controllerAs: 'jarvesWindow'
 })
 export default class JarvesWindow {
-    private element;
-    private scope;
-    private attributes;
-    private windowManagement;
-    private jarves;
-    private entryPoint;
-    private id;
-    private parentId;
-    private inline:Boolean;
-    private parameters;
     private originParameters;
 
-    private active;
     private title;
-    private titlePath;
+    public titlePath;
     private sidebar;
     private content;
     private view;
@@ -38,48 +30,63 @@ export default class JarvesWindow {
     private dialogContainer;
     private contentContainer;
 
-    constructor($scope, $element, $attrs, windowManagement, jarves, private $templateCache, private $http, private $compile) {
-        this.scope = $scope;
-        this.scope.forms = {};
-        this.element = $element;
-        this.attributes = $attrs;
-        this.windowManagement = windowManagement;
-        this.jarves = jarves;
-        this.entryPoint = this.scope.windowInfo.entryPoint;
-        this.id = this.scope.windowInfo.id;
-        this.parentId = this.scope.parentWindowId;
-        this.inline = !!this.scope.isInline;
-        this.parameters = this.scope.parameters;
-        this.originParameters = angular.fromJson(angular.toJson(this.scope.parameters));
+    public childrenWindow:JarvesWindow;
 
-        this.active = false;
-        this.title = '';
-        this.titlePath = [];
-        this.sidebar = null;
-        this.content = null;
-        this.frame = null;
+    public error:string;
+
+    constructor(protected $scope, protected $element, protected $attrs, protected windowManagement, protected jarves,
+                private $templateCache, private $http, private $compile) {
+
+        this.originParameters = angular.fromJson(angular.toJson(this.getParameters()));
+
         this.view = 'bundles/jarves/views/window.default.html';
 
-        if (this.entryPoint.templateUrl) {
-            this.view = getPublicPath(this.entryPoint.templateUrl);
+        if (this.getEntryPoint().templateUrl) {
+            this.view = getPublicPath(this.getEntryPoint().templateUrl);
         } else {
-            if ('custom' !== this.entryPoint.type && this.entryPoint.type) {
-                this.view = 'bundles/jarves/views/window.' + this.entryPoint.type.toLowerCase() + '.html';
+            if ('custom' !== this.getEntryPoint().type && this.getEntryPoint().type) {
+                if (!this.getEntryPoint().hasClass && !this.getEntryPoint().object) {
+                    this.error = '`object` not defined at entry point. Did you forget to set it? If you have a own api controller define `class` instead at the entry point.';
+                } else {
+                    this.view = 'bundles/jarves/views/window.' + this.getEntryPoint().type.toLowerCase() + '.html';
+                }
             }
         }
 
-        console.log('new JarvesWindowController', this.entryPoint, this.view);
+        console.log('new JarvesWindowController', this.getEntryPointPath(), this.view);
 
-        this.scope.windowInfo.window = this;
-        this.scope.window = this;
+        windowManagement.setWindow(this.getId(), this);
+        this.setTitle(this.getEntryPoint().label);
 
-        this.setTitle(this.entryPoint.label);
-
-        if (this.parentId) {
-            if (typeof this.parentId == 'number' && windowManagement.getWindow(this.parentId)) {
-                windowManagement.getWindow(this.parentId).setChildren(this);
+        if (this.getParentId()) {
+            if (typeof this.getParentId() == 'number' && windowManagement.getWindow(this.getParentId())) {
+                windowManagement.getWindow(this.getParentId()).setChildren(this);
             }
         }
+    }
+
+    getTitle() {
+        return this.title;
+    }
+
+    getId():number {
+        return this.getWindowInfo().id;
+    }
+
+    getParentId():number {
+        return this.getWindowInfo().parentWindowId;
+    }
+
+    isInline():boolean {
+        return this.getWindowInfo().isInline;
+    }
+
+    getParameters():Object {
+        return this.getWindowInfo().parameters;
+    }
+
+    getWindowInfo():WindowInfo {
+        return this.$scope.$eval(this.$attrs['windowInfo']);
     }
 
 
@@ -91,25 +98,25 @@ export default class JarvesWindow {
             return;
         }
 
-        this.element.addClass('jarves-Window-border');
+        this.$element.addClass('jarves-Window-border');
 
         //this.contentContainer = angular.element('<div class="jarves-Window-content-container"></div>');
         //this.element.append(this.contentContainer);
 
         this.dialogContainer = angular.element('<div class="jarves-Window-dialog-container"></div>');
-        this.element.append(this.dialogContainer);
+        this.$element.append(this.dialogContainer);
 
         this.loadContent();
     }
 
     loadContent() {
-        this.windowManagement.toFront(this);
+        this.windowManagement.toFront(this.getId());
 
-        if (!this.entryPoint.multi) {
-            var win = this.windowManagement.checkOpen(this.getEntryPoint(), this.id);
+        if (!this.getEntryPoint().multi) {
+            var win = this.windowManagement.checkOpen(this.getEntryPointPath(), this.getId());
             if (win) {
                 if (win.softOpen) {
-                    win.softOpen(this.params);
+                    win.softOpen(this.getParameters());
                 }
                 win.toFront();
                 this.close(true);
@@ -149,47 +156,25 @@ export default class JarvesWindow {
 //        }
     }
 
-    setActive(active) {
-        this.active = active;
-    }
-
-    /**
-     * @param {jqLite} element
-     */
-    setSidebar(element) {
+    setSidebar(element:Element) {
         this.sidebar = element;
         if (this.getFrame()) {
             this.getFrame().attr('with-sidebar', true);
         }
     }
 
-    /**
-     *
-     * @returns {jqLite|null}
-     */
-    getSidebar() {
+    getSidebar():Element {
         return this.sidebar;
     }
 
-    /**
-     * @param {jqLite} element
-     */
-    setContent(element) {
+    setContent(element:Element) {
         this.content = element;
     }
 
-    /**
-     *
-     * @returns {jqLite|null}
-     */
-    getContent() {
+    getContent():Element {
         return this.content;
     }
 
-
-    /**
-     * @param {jqLite} element
-     */
     setFrame(element) {
         this.frame = element;
         if (this.sidebar) {
@@ -197,52 +182,35 @@ export default class JarvesWindow {
         }
     }
 
-    /**
-     *
-     * @returns {jqLite|null}
-     */
-    getFrame() {
+    getFrame():Element {
         return this.frame;
     }
 
-    /**
-     * @param {String} title
-     */
-    setTitle(title) {
+    setTitle(title:string) {
         this.title = title;
         this.generateTitlePath();
     }
 
-    getOriginParameters() {
+    getOriginParameters():Object {
         return this.originParameters;
     }
 
-    /**
-     *
-     * @returns {String|undefined}
-     */
-    getBundleName() {
-        if (this.getEntryPoint().indexOf('/') > 0) {
-            return this.getEntryPoint().substr(0, this.getEntryPoint().indexOf('/'));
+    getBundleName():string|undefined {
+        if (this.getEntryPointPath().indexOf('/') > 0) {
+            return this.getEntryPointPath().substr(0, this.getEntryPointPath().indexOf('/'));
         }
     }
 
-    setChildren(window) {
+    setChildren(window:JarvesWindow) {
         this.childrenWindow = window;
     }
 
-    /**
-     * @returns {String}
-     */
-    getEntryPoint () {
-        return this.entryPoint.fullPath;
+    getEntryPointPath():string {
+        return this.getEntryPoint().fullPath;
     }
 
-    /**
-     * @returns {Object}
-     */
-    getEntryPointDefinition () {
-        return this.entryPoint;
+    getEntryPoint():EntryPoint {
+        return this.getWindowInfo().entryPoint;
     }
 
     /**
@@ -250,42 +218,25 @@ export default class JarvesWindow {
      */
     generateTitlePath() {
         var titlePath = [];
-        var title = this.jarves.getConfig( this.getBundleName() )['label'] || this.jarves.getConfig( this.getBundleName() )['name'];
+        var title = this.jarves.getConfig(this.getBundleName())['label'] || this.jarves.getConfig(this.getBundleName())['name'];
 
         titlePath.push(title);
 
-        var path = this.getEntryPointDefinition()._path || []; //todo, _path is empty
+        var path = this.getEntryPoint().fullPath.split('/') || []; //todo, path is a string
         path.pop();
         for (let label of path) {
             titlePath.push(label);
         }
 
-        titlePath.push(this.scope.title);
+        titlePath.push(this.$scope.title);
         this.titlePath = titlePath;
     }
 
-    /**
-     *
-     * @returns {Boolean}
-     */
-    isInline() {
-        return this.inline;
-    }
-
-    getDialogContainer() {
+    getDialogContainer():Element {
         return this.dialogContainer;
     }
 
-    /**
-     * Returns the internal window id.
-     *
-     * @returns {Number}
-     */
-    getId() {
-        return this.id;
-    }
-
-    close(force) {
+    close(force:boolean = false) {
         this.windowManagement.unregister(this.getId());
     }
 

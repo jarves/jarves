@@ -4,7 +4,7 @@
       <object id="File" crossRef="false">
         <label>File</label>
         <table>system_file</table>
-        <class>Jarves\ORM\ObjectFile</class>
+        <storageClass>Jarves\ORM\ObjectFile</storageClass>
         <labelField>name</labelField>
         <dataModel>custom</dataModel>
         <fieldLabel>path</fieldLabel>
@@ -210,7 +210,7 @@
       <object id="Language">
         <label>Language</label>
         <table>system_langs</table>
-        <class>Jarves\ORM\ObjectLanguage</class>
+        <storagClass>Jarves\ORM\ObjectLanguage</storagClass>
         <labelField>title</labelField>
         <labelTemplate>{{title}} ({{langtitle}}, {{code}})</labelTemplate>
         <defaultSelection>title, langtitle, code</defaultSelection>
@@ -241,7 +241,7 @@
       </object>
       <object id="EntryPoint" crossRef="false">
         <label>EntryPoint</label>
-        <class>Jarves\ORM\ObjectEntryPoint</class>
+        <storageClass>Jarves\ORM\ObjectEntryPoint</storageClass>
         <labelField>title</labelField>
         <dataModel>custom</dataModel>
         <nested>true</nested>
@@ -283,7 +283,7 @@
       <object id="View">
         <label>Template View</label>
         <desc>Template views</desc>
-        <class>Jarves\ORM\ObjectView</class>
+        <storageClass>Jarves\ORM\ObjectView</storageClass>
         <labelField>name</labelField>
         <dataModel>custom</dataModel>
         <nested>true</nested>
@@ -300,6 +300,7 @@
         <label>Users</label>
         <table>system_user</table>
         <labelField>username</labelField>
+        <apiController>@JarvesBundle/Controller/Windows/UserCrudController.php</apiController>
         <blacklistSelection>passwd, passwdSalt</blacklistSelection>
         <fields>
           <field id="id" type="number" primaryKey="true" autoIncrement="true">
@@ -347,6 +348,7 @@
         <label>Groups</label>
         <table>system_group</table>
         <labelField>name</labelField>
+        <apiController>@JarvesBundle/Controller/Windows/GroupCrudController.php</apiController>
         <defaultSelection>name, description</defaultSelection>
         <fields>
           <field id="id" type="number" primaryKey="true" autoIncrement="true">

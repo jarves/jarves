@@ -4,11 +4,13 @@ import angular from '../angular.ts';
 import ListController from './ListController.ts';
 import {getEntryPointPathForRelative} from '../utils.ts';
 import WindowList from './WindowList.ts'
+import Jarves from '../services/Jarves.ts'
 
 @Directive('windowCombined', {
     restrict: 'E',
     //templateUrl: 'bundles/jarves/views/window.combine.html',
-    controllerAs: 'windowCombined'
+    controllerAs: 'windowCombined',
+    require: '^jarvesWindow'
 })
 export default class WindowCombined extends WindowList {
     public options = {};
@@ -25,17 +27,16 @@ export default class WindowCombined extends WindowList {
     public unsavedDialogOldValue;
     public showUnsavedDialog;
 
-    constructor(private $scope, private $element, private $attrs, private $q, private backend, private objectRepository, private jarves, private $timeout) {
+    constructor(private $scope, private $element, private $attrs, private $q, private backend, private objectRepository, private jarves:Jarves, private $timeout) {
         super($scope, $element, $attrs, $q, backend, objectRepository, jarves);
+    }
 
-        console.log('init WindowCombined');
-        this.jarves.loadEntryPointOptions(this.getEntryPoint()).success((response) => {
-            this.classProperties = response.data;
-        }).error((response) => {
-            this.error = 'Failed to load entry point definition for %s'.sprintf(this.getEntryPoint());
-        });
+    postLink() {
+        if (this.jarvesWindow.getWindowInfo().parameters['pk']) {
+            this.selected = this.jarves.getObjectPkFromUrlId(this.classProperties.object, this.jarvesWindow.getWindowInfo().parameters['pk']);
+        }
 
-        $scope.$watch('windowCombined.selected', (value, oldValue) => {
+        this.$scope.$watch('windowCombined.selected', (value) => {
             //if (!angular.equals(this.editId, value)) {
             //    console.log('selected change', this.$scope.forms.addForm, this.$scope.forms.addForm ? this.$scope.forms.addForm.getChangedData() : null);
             //    if (this.$scope.forms.addForm && this.$scope.forms.addForm.hasChanges()) {
@@ -52,7 +53,14 @@ export default class WindowCombined extends WindowList {
             //    }
             //}
 
+            if (value) {
+                this.jarvesWindow.getWindowInfo().parameters['pk'] = this.jarves.getObjectUrlId(this.classProperties.object, value);
+            } else {
+                delete this.jarvesWindow.getWindowInfo().parameters['pk'];
+            }
+
             this.editId = value;
+            console.log('windowCombined.selected', value);
 
             if (this.switchToEditView) {
                 this.editView = this.switchToEditView;
@@ -64,12 +72,16 @@ export default class WindowCombined extends WindowList {
         });
     }
 
+    getObjectKey():string {
+        return this.classProperties.object;
+    }
+
     getEditForm(){
-        return this.$scope.$eval($this.attribtues['formEdit']);
+        return this.$scope.$eval(this.$attrs['formEdit']);
     }
 
     getAddForm(){
-        return this.$scope.$eval($this.attribtues['formEdit']);
+        return this.$scope.$eval(this.$attrs['formEdit']);
     }
 
     unsavedDialogStay() {

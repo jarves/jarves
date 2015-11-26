@@ -2,15 +2,16 @@
 import {each, eachValue} from '../utils.ts';
 import {Service, angular} from '../angular.ts';
 import JarvesWindow from '../directives/JarvesWindow.ts';
+import Jarves from '../services/Jarves.ts';
 
-enum EntryPointType {
+export enum EntryPointType {
     List = 'list',
     Combined = 'combined',
     Edit = 'edit',
     Add = 'add'
 }
 
-interface EntryPoint {
+export interface EntryPoint {
     fullPath: string,
     path: string,
     icon: string,
@@ -18,41 +19,87 @@ interface EntryPoint {
     level: number,
     system: boolean,
     templateUrl?: string,
-    type: EntryPointType
+    type: string,
+    multi: boolean,
+    hasClass: boolean,
+    object?: string,
 }
 
-interface WindowInfo {
+export interface WindowInfo {
     id: number,
     entryPoint: EntryPoint,
     options: Object,
     parentWindowId: number,
     isInline: boolean,
     parameters: Object,
-    window?: JarvesWindow
+    inFront: boolean
 }
 
-interface WindowList {
+export interface WindowList {
     [windowId: number]: WindowInfo
+}
+
+export interface JarvesWindowList {
+    [windowId: number]: JarvesWindow
 }
 
 @Service('windowManagement')
 export default class WindowManagement {
 
-    public activeWindowList : WindowList = {};
+    public activeWindowList:WindowList = {};
     public activeWindowId = -1;
     public currentWindowIndex = 0;
-    public activeWindow = null;
+    public activeWindow:JarvesWindow = null;
+    public jarvesWindows:JarvesWindowList = {};
 
-    /**
-     * @param {Jarves} jarves
-     */
-    constructor(protected jarves) {
+    constructor(protected jarves:Jarves, protected $rootScope) {
         this.activeWindowList = {};
         this.activeWindowId = -1;
         this.currentWindowIndex = 0;
     }
 
-    public newWindow(entryPoint:EntryPoint, options = {}, parentWindowId = 0, isInline = false, parameters = {}) {
+    public restoreWindows() {
+        //jarves#!users/users?parameter1=bla&parameter2=dummy
+        var hash = window.location.hash.substr(1);
+        if (!hash) {
+            return;
+        }
+        var items = hash.split(',');
+        var activeWindowsList:WindowList = {};
+        for (let item of items) {
+            let entryPoint = item.split('?')[0];
+            let potentialParameters = item.split('?')[1];
+            let parameters = {};
+            if (potentialParameters) {
+                let parametersArray = potentialParameters.split('&');
+                for (let valuePair of parametersArray) {
+                    var splitted = valuePair.split('=');
+                    parameters[splitted[0]] = decodeURIComponent(splitted[1]);
+                }
+            }
+            var newId = ++this.currentWindowIndex;
+
+            let inFront = false;
+            if ('!' === entryPoint[0]) {
+                entryPoint = entryPoint.substr(1);
+                inFront = true;
+            }
+            activeWindowsList[newId] = {
+                id: newId,
+                entryPoint: this.jarves.getEntryPoint(entryPoint),
+                options: {},
+                parameters: parameters,
+                isInline: false,
+                inFront: inFront,
+                parentWindowId: 0
+            };
+        }
+
+        console.log('recovered windows', activeWindowsList);
+        this.activeWindowList = activeWindowsList;
+    }
+
+    public newWindow(entryPoint:EntryPoint, options:Object = {}, parentWindowId:number = 0, isInline:boolean = false, parameters:Object = {}) {
         var newId = ++this.currentWindowIndex;
         this.activeWindowList[newId] = {
             entryPoint: entryPoint,
@@ -60,9 +107,9 @@ export default class WindowManagement {
             parentWindowId: parentWindowId,
             isInline: isInline,
             id: newId,
+            inFront: false,
             parameters: {}
         };
-        this.updateUrlHash();
     }
 
     /**
@@ -71,22 +118,26 @@ export default class WindowManagement {
      * @returns {JarvesWindow}
      */
     getWindow(id) {
-        return this.activeWindowList[id].window;
+        return this.jarvesWindows[id];
+    }
+
+    setWindow(id, instance:JarvesWindow) {
+        this.jarvesWindows[id] = instance;
     }
 
     /**
      * Rebuilds the url hash after #.
      */
-    protected updateUrlHash() : void {
+    public updateUrlHash():void {
         var hash = [];
         for (let win of eachValue(this.activeWindowList)) {
-            if (!win.parentWindowId) {
+            if (!win.parentWindowId && !win.isInline) {
                 let parameters = [];
                 for (let [k, v] of each(win.parameters)) {
                     parameters.push(k + '=' + encodeURIComponent(v));
                 }
                 var part = win.entryPoint.fullPath + '?' + parameters.join('&');
-                if (this.isActive(win.id)) {
+                if (win.inFront) {
                     part = '!' + part;
                 }
                 hash.push(part);
@@ -100,13 +151,12 @@ export default class WindowManagement {
     /**
      * Close a window.
      */
-    public close(id:number) : void {
+    public close(id:number):void {
         this.getWindow(id).close();
-        this.updateUrlHash();
     }
 
-    public isActive(windowId:number) : boolean {
-        return windowId === this.activeWindowId;
+    public isActive(id:number):boolean {
+        return this.getWindow(id).getWindowInfo().inFront;
     }
 
     /**
@@ -118,7 +168,7 @@ export default class WindowManagement {
      *
      * @returns {Boolean}
      */
-    public checkOpen(entryPoint:object, instanceId, params) {
+    public checkOpen(entryPoint:Object, instanceId, params) {
         var opened = false;
         for (let info of eachValue(this.activeWindowList)) {
             var win = info.window;
@@ -127,7 +177,7 @@ export default class WindowManagement {
                     return;
                 }
                 if (params) {
-                    if (JSON.encode(win.getOriginParameters()) != JSON.encode(params)){
+                    if (JSON.encode(win.getOriginParameters()) != JSON.encode(params)) {
                         return;
                     }
                 }
@@ -148,22 +198,16 @@ export default class WindowManagement {
         delete this.activeWindowList[id];
     }
 
-    /**
-     *
-     * @param {Number|jarves.Controller.WindowController} window
-     */
-    toFront(window) {
-        if (angular.isNumber(window)) {
-            window = this.getWindow(window);
-        }
+    toFront(id:number) {
+        var window = this.getWindow(id);
 
         if (this.activeWindow && this.activeWindow != window) {
-            this.activeWindow.setActive(false);
+            this.activeWindow.getWindowInfo().inFront = false;
         }
 
         this.activeWindowId = window.getId();
         this.activeWindow = window;
-        this.activeWindow.setActive(true);
+        this.activeWindow.getWindowInfo().inFront = true;
     }
 
 //    /**

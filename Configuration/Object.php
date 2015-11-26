@@ -40,18 +40,29 @@ class Object extends Model
     protected $table;
 
     /**
-     * The class that handles the actual data storage (to a file e.g) of the object interface. Needs 'dataModel'=true.
+     * The storage/persistent class that handles the actual data storage/retrievement (to a file e.g) of the object interface.
+     * Needs 'dataModel'='custom' to have any effect. This class is used by $controller (Jarves\Admin\ObjectCrud class)
      *
      * @var string
      */
-    protected $class;
+    protected $storageClass;
 
     /**
-     * The controller php class or service id to use as controller. (Used between Jarves\Objects and your $class/ORM-class)
+     * The controller php class or service id to use as controller which is used in jarves and external bundles to modify actual objects.
      *
      * @var string
      */
-    protected $controller;
+    protected $repositoryClass;
+
+    /**
+     * Controller which builds the external API (Symfony routes for the REST API). Per default one of Jarves\Controller\*ObjectCrudController.
+     * If you overwrite this, make sure to extend from one of those classes there.
+     *
+     * Example: @BundleName/Controller/MySuperCustomAPIController.php
+     *
+     * @var string
+     */
+    protected $apiController;
 
     /**
      * Which field (the value of it) shall be used as default label for the object.
@@ -576,35 +587,51 @@ class Object extends Model
     }
 
     /**
-     * @param string $class
+     * @param string $storageClass
      */
-    public function setClass($class)
+    public function setStorageClass($storageClass)
     {
-        $this->class = $class;
+        $this->storageClass = $storageClass;
     }
 
     /**
      * @return string
      */
-    public function getClass()
+    public function getStorageClass()
     {
-        return $this->class;
+        return $this->storageClass;
     }
 
     /**
-     * @param string $controller
+     * @param string $repositoryClass
      */
-    public function setController($controller)
+    public function setRepositoryClass($repositoryClass)
     {
-        $this->controller = $controller;
+        $this->repositoryClass = $repositoryClass;
     }
 
     /**
      * @return string
      */
-    public function getController()
+    public function getRepositoryClass()
     {
-        return $this->controller;
+        return $this->repositoryClass;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiController()
+    {
+        return $this->apiController;
+    }
+
+    /**
+     * @param string $apiController
+     */
+    public function setApiController($apiController)
+    {
+        $this->apiController = $apiController;
     }
 
     /**

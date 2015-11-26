@@ -1,8 +1,14 @@
 
 <div class="jarves-Window-title">
     <span class="jarves-Window-titlePath">
-        <span ng-repeat="item in window.titlePath" class="icon-arrow-right-5 icon-arrow-19">{{item}}</span>
+        <span ng-repeat="item in jarvesWindow.titlePath" ng-class="{'icon-arrow-19': $index > 0}">{{item}}</span>
     </span>
 </div>
 
-<ng-include src="window.view"></ng-include>
+<div ng-if="jarvesWindow.error">
+    <window-content>
+        {{jarvesWindow.error}}
+    </window-content>
+</div>
+
+<ng-include ng-if="!jarvesWindow.error" src="jarvesWindow.view"></ng-include>

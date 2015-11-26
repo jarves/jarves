@@ -56,7 +56,7 @@ export default class ObjectRepository {
     //
     //    var queryString = Object.toQueryString(options);
     //
-    //    this.backend.get('object/' + jarves.normalizeObjectKey(objectKey) + '/?' + queryString).success(function(response) {
+    //    this.backend.get('jarves/object/' + jarves.normalizeObjectKey(objectKey) + '/?' + queryString).success(function(response) {
     //        this.mapData(objectKey, response.data);
     //        deferred.resolve(this.instancePool[objectKey]);
     //    }.bind(this));

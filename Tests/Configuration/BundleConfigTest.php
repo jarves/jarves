@@ -477,7 +477,7 @@ class BundleConfigTest extends KernelAwareTestCase
         $object->setLabelField('name');
         $object->setDataModel('custom');
         $object->setNested(true);
-        $object->setClass('\Admin\ObjectView');
+        $object->setStorageClass('\Admin\ObjectView');
 
         $treeIconMapping = new TreeIconMapping(null, $this->getJarves());
         $treeIconMapping->setOption('dir', '#icon-folder-4');
@@ -541,7 +541,7 @@ class BundleConfigTest extends KernelAwareTestCase
         $object->setLabelField('name');
         $object->setDataModel('custom');
         $object->setNested(true);
-        $object->setClass('\Admin\ObjectView');
+        $object->setStorageClass('\Admin\ObjectView');
 
         $field1 = new Field(null, $this->getJarves());
         $field1->setId('path');

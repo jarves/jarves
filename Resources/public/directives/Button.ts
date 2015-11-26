@@ -4,6 +4,9 @@ import {Directive} from '../angular.ts';
     restrict: 'E'
 })
 export default class Button {
+    constructor(protected $compile){
+
+    }
     link(scope, element, attributes) {
 
         if (attributes.focus) {
@@ -58,5 +61,7 @@ export default class Button {
             element.removeClass('focus');
             clicked = false;
         });
+
+        this.$compile(element.children())(scope);
     }
 }

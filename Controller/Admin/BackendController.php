@@ -468,7 +468,7 @@ class BackendController extends Controller
 
         foreach ($this->getJarves()->getConfigs() as $bundleName => $bundleConfig) {
             foreach ($bundleConfig->getAllEntryPoints() as $subEntryPoint) {
-                $path = $bundleConfig->getName() . '/' . $subEntryPoint->getFullPath(true);
+                $path = $subEntryPoint->getFullPath();
 
                 if (substr_count($path, '/') <= 3) {
                     if ($subEntryPoint->isLink()) {

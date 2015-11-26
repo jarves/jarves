@@ -61,7 +61,7 @@
     <window-sidebar label="Actions">
         <button ng-if="windowCombined.editForm && windowCombined.editView == 1" loading="windowCombined.editForm.saving" ng-click="windowCombined.editForm.save()" icon="#icon-checkmark-6">
             <span translate>Save</span>
-            <span ng-if="windowCombined.editForm.hasChanges()">*</span>
+            <span ng-show="windowCombined.editForm.hasChanges()">*</span>
         </button>
 
         <button ng-if="windowCombined.addForm && windowCombined.editView == 2" ng-click="windowCombined.addForm.add()" icon="#icon-checkmark-6" translate>Save</button>

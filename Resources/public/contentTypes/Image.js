@@ -113,7 +113,7 @@ jarves.ContentTypes.Image = new Class({
         } else if (this.value.file) {
             if (this.currentImageFile !== this.value.file) {
                 this.main.empty();
-                var url = baseRestUrl + 'admin/file/image?' + Object.toQueryString({
+                var url = baseUrlApi + 'admin/file/image?' + Object.toQueryString({
                     path: this.value.file
                 });
                 this.image = new Element('img', {

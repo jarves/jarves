@@ -1,5 +1,5 @@
 import {Directive} from '../angular.ts';
-import {baseUrl, baseRestUrl} from '../config.js';
+import {baseUrl, baseUrlApi} from '../config.js';
 
 @Directive('icon', {
     restrict: 'A'

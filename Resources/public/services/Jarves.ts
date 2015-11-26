@@ -1,7 +1,7 @@
 //import {Test, Inject, Directive} from '../Test.ts';
 import {Inject, Service} from '../angular.ts';
-import {each, eachValue, normalizeObjectKey, urlEncode} from '../utils.ts';
-import {baseUrl, baseRestUrl} from '../config.js';
+import {each, eachValue, normalizeObjectKey, urlEncode, urlDecode} from '../utils.ts';
+import {baseUrl, baseUrlApi} from '../config.js';
 
 /**
  * Uses the $rootScope.
@@ -15,7 +15,7 @@ import {baseUrl, baseRestUrl} from '../config.js';
  */
 @Service('jarves')
 export default class Jarves {
-    getObjectLabelByItemTemplates: Object = {};
+    getObjectLabelByItemTemplates:Object = {};
 
     constructor(private $rootScope, private backend, private $q, private $injector, private translator) {
         this.$rootScope._session = window._session;
@@ -67,7 +67,7 @@ export default class Jarves {
     loadMenu() {
         var deferred = this.$q.defer();
 
-        this.backend.get('admin/backend/menus')
+        this.backend.get('jarves/admin/backend/menus')
             .success((response) => {
                 this.setMenus(response.data);
                 deferred.resolve();
@@ -122,7 +122,7 @@ export default class Jarves {
     setSettings(settings) {
         for (let [key, val] of each(settings)) {
             this.$rootScope._settings[key] = val;
-        };
+        }
 
         this.$rootScope._settings['images'] = ['jpg', 'jpeg', 'bmp', 'png', 'gif', 'psd'];
 
@@ -152,16 +152,13 @@ export default class Jarves {
 
     /**
      * Loads settings from the backend to application.
-     *
-     * @param {Array} keyLimitation
-     * @returns {promise}
      */
-    loadSettings(keyLimitation){
+    loadSettings(keyLimitation:Array = []):Promise {
         var deferred = this.$q.defer();
 
         var query = {lang: this.translator.getLanguage(), keys: keyLimitation};
 
-        this.backend.get('admin/backend/settings', {params: query})
+        this.backend.get('jarves/admin/backend/settings', {params: query})
             .success((response) => {
                 this.setSettings(response.data);
                 deferred.resolve();
@@ -201,9 +198,9 @@ export default class Jarves {
         if (!bundleName) return;
 
         return this.getSettings().configs[bundleName]
-        || this.getSettings().configs[bundleName.toLowerCase()]
-        || this.getSettings().configsAlias[bundleName]
-        || this.getSettings().configsAlias[bundleName.toLowerCase()];
+            || this.getSettings().configs[bundleName.toLowerCase()]
+            || this.getSettings().configsAlias[bundleName]
+            || this.getSettings().configsAlias[bundleName.toLowerCase()];
     }
 
     /**
@@ -241,7 +238,7 @@ export default class Jarves {
             throw 'Config not found for bundleName: ' + bundleName;
         }
 
-        var tempEntry = config.entryPoints[splitted.shift()]
+        var tempEntry = config.entryPoints[splitted.shift()];
         if (!tempEntry) {
             return null;
         }
@@ -323,7 +320,7 @@ export default class Jarves {
      *
      * @return {Object}
      */
-    getObjectPk(objectKey, item) {
+    getObjectPk(objectKey:string, item:Object):Object {
         var pks = this.getObjectPrimaryList(objectKey);
         var result = {};
         for (let pk of pks) {
@@ -379,20 +376,29 @@ export default class Jarves {
      *
      * @param {String} objectKey
      * @param {String} urlId
-     * @returns {String|Object}
+     * @returns {Object}
      */
-    getObjectPkFromUrlId(objectKey, urlId) {
+    getObjectPkFromUrlId(objectKey:string, urlId:string):Object {
         var pks = this.getObjectPrimaryList(objectKey);
 
-        if (1 < pks.length) {
-            var values = jarves.urlDecode(urlId.split('/'));
-            var result = {};
-            for (let [idx, pk] of each(pks)) {
-                result[pk] = values[idx];
+        var def = this.getObjectDefinition(objectKey);
+
+        var res = [];
+        var values = urlDecode(urlId.split('/'));
+        var result = {};
+        var idx = 0;
+        for (let [key, field] of each(def.fields)) {
+            if (field.primaryKey) {
+                let value = values[idx];
+                if ('number' == field.type) {
+                    value = value * 1;
+                }
+                result[key] = value;
+                idx++;
             }
         }
 
-        return jarves.urlDecode(urlId);
+        return result;
     }
 
     /**
@@ -408,7 +414,7 @@ export default class Jarves {
 
         if (1 < pks.length) {
             var values = [];
-            for (let pk of pks){ 
+            for (let pk of pks) {
                 values = urlEncode(item[pk]);
             }
             return values.join('/');
@@ -619,7 +625,7 @@ export default class Jarves {
         var label = definition.treeLabel ? definition.treeLabel : definition.labelField;
 
         if (overwriteDefinition) {
-            ['fieldTemplate', 'fieldLabel', 'treeTemplate', 'treeLabel'].each(function(map) {
+            ['fieldTemplate', 'fieldLabel', 'treeTemplate', 'treeLabel'].each(function (map) {
                 if (map in overwriteDefinition) {
                     definition[map] = overwriteDefinition[map];
                 }
@@ -673,7 +679,8 @@ export default class Jarves {
             }
 
             data[dataKey] = this.getObjectFieldLabel(item, field, fieldId, objectKey, relationsAsArray);
-        };
+        }
+        ;
 
         return data;
     }
@@ -706,7 +713,7 @@ export default class Jarves {
 
         var showAsField = Object.clone(field || oriField);
         if (!showAsField.type) {
-            for (let[i, v] of each(oriFields)) {
+            for (let [i, v] of each(oriFields)) {
                 if (!showAsField[i]) {
                     showAsField[i] = v;
                 }

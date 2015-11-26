@@ -1,4 +1,4 @@
-import {baseUrl, baseRestUrl} from './config.js';
+import {baseUrl, baseUrlApi} from './config.js';
 import angular from './angular.ts';
 
 import {FieldAnnotation, LabelAnnotation, FilterAnnotation, Parser, DirectiveAnnotation, InjectAnnotation, InjectAsPropertyAnnotation} from './angular.ts';
@@ -71,6 +71,9 @@ window.applyRootScope = function () {
 
 export function isDifferent(a, b) {
     var changed;
+    if (typeof a === 'undefined' && typeof b !== 'undefined') return true;
+    if (typeof a !== 'undefined' && typeof b === 'undefined') return true;
+
     if (angular.isObject(a)) {
         changed = false;
         if (Object.keys(a).length !== Object.keys(b).length) {

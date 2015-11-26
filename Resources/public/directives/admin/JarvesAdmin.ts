@@ -1,43 +1,40 @@
-import {baseUrl, baseRestUrl} from '../../config.js';
+import {baseUrl, baseUrlApi} from '../../config.js';
 import {Directive} from '../../angular.ts';
+import WindowManagement from '../../services/WindowManagement.ts';
+import Jarves from '../../services/Jarves.ts';
 
 @Directive('jarvesAdmin', {
     restrict: 'E',
     controllerAs: 'jarvesAdmin'
 })
 export default class AdminController {
-    constructor($rootScope, $scope, $q, $http, jarves, windowManagement) {
-        this.scope = $scope;
-        $rootScope.jarves = jarves;
+    public menuHidden:Object = {};
+    public interfaceVisible:boolean = false;
 
-        this.q = $q;
-        this.http = $http;
-        this.jarves = jarves;
-        this.windowService = windowManagement;
-
-        this.scope._baseUrl = baseUrl;
-        this.scope._baseRestUrl = baseRestUrl;
-        this.scope.windowService = windowManagement;
-        this.scope.menuHidden = {};
-        this.scope.loadInterface = (...args) => this.loadInterface(...args);
-        this.scope.openEntryPoint = (...args) => this.openEntryPoint(...args);
-        this.scope.logout = (...args) => this.logout(...args);
-
-        this.scope.interfaceVisible = false;
-        this.scope._session = window._session;
+    constructor(public $rootScope, public $scope, protected $q, public $http, public jarves:Jarves, public windowManagement:WindowManagement) {
+        this.$rootScope._baseUrl = baseUrl;
+        this.$rootScope._baseUrlApi = baseUrlApi;
+        this.$rootScope._session = window._session;
     }
 
     showInterface() {
-        this.scope.interfaceVisible = true;
+        this.windowManagement.restoreWindows();
+        this.interfaceVisible = true;
+
+        this.$rootScope.$watch(() => {
+            return this.windowManagement.activeWindowList
+        }, () => {
+            this.windowManagement.updateUrlHash();
+        }, true);
     }
 
     logout() {
-        this.scope.interfaceVisible = false;
+        this.interfaceVisible = false;
         this.jarves.logout();
     }
 
     loadInterface() {
-        var deferred = this.q.defer();
+        var deferred = this.$q.defer();
 
         deferred.notify(25);
         this.jarves.loadSettings()
@@ -54,38 +51,18 @@ export default class AdminController {
         return deferred.promise;
     }
 
-    /**
-     * @returns {jarves.Window}
-     */
-    getActiveWindow() {
-        return this.scope.lastWindow;
-    }
-
-    setFrontWindow(pWindow) {
-        Object.each(this.scopes.windows, function (win, winId) {
-            if (win && pWindow.id != winId) {
-                win.toBack();
-            }
-        });
-        this.scope.lastWindow = pWindow;
-    }
-
     loadWindow(entryPoint, options, parentWindowId, isInline) {
 
         if (!isInline && window.event && window.event.which === 2) {
             //open new tab.
-            top.open(location.pathname + '#' + entryPointPath, '_blank');
+            top.open(location.pathname + '#' + entryPoint.fullPath, '_blank');
             return;
         }
 
-        this.windowService.newWindow(entryPoint, options, parentWindowId, isInline);
+        this.windowManagement.newWindow(entryPoint, options, parentWindowId, isInline);
     }
 
-    /**
-     *
-     * @returns {jarves.Services.Jarves}
-     */
-    getJarves() {
+    getJarves():Jarves {
         return this.jarves;
     }
 
@@ -103,12 +80,13 @@ export default class AdminController {
      * @param {Number} [dependWindowId]
      *
      *
-     * @return {undefined|Number|*} Number when a new View has been loaded or mixed when custom function has been called
+     * @return {Number|*} Number when a new View has been loaded or mixed when custom function has been called
      * @throws Error when entryPoint is not found
      */
     openEntryPoint(entryPoint, options, inline, dependWindowId) {
         entryPoint = angular.isObject(entryPoint) ? entryPoint : this.getJarves().getEntryPoint(entryPoint);
 
+        console.log('openEntryPoint', entryPoint);
         if (!entryPoint) {
             throw new Error('Can not be found entryPoint: ' + entryPoint);
         }

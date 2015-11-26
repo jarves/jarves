@@ -29,6 +29,14 @@ class EntryPoint extends Model
     protected $class;
 
     /**
+     * Object key. (example: jarves/user)
+     * Necessary if you haven't defined any $class and use a framework $type (combined, list, edit, add)
+     *
+     * @var string
+     */
+    protected $object;
+
+    /**
      * @var string
      */
     protected $icon;
@@ -144,6 +152,7 @@ class EntryPoint extends Model
     {
         $result = parent::toArray($element);
         $result['fullPath'] = $this->getFullPath();
+        $result['hasClass'] = !!$this->getClass();
         return $result;
     }
 
@@ -161,6 +170,7 @@ class EntryPoint extends Model
                 }
                 array_unshift($path, $instance->getPath());
             }
+            array_unshift($path, $this->getBundle()->getName());
             $this->fullPath = implode('/', $path);
         }
 
@@ -317,6 +327,22 @@ class EntryPoint extends Model
     public function getClass()
     {
         return $this->class;
+    }
+
+    /**
+     * @return string
+     */
+    public function getObject()
+    {
+        return $this->object;
+    }
+
+    /**
+     * @param string $object
+     */
+    public function setObject($object)
+    {
+        $this->object = $object;
     }
 
     /**

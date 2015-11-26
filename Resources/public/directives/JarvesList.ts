@@ -145,8 +145,11 @@ export default class JarvesList {
         return this.entryPoint;
     }
 
-    loadPage(page) {
-        this.currentPage = page || 1;
+    public currentPage:number;
+    public itemsCount:number;
+
+    loadPage(page:number = 1) {
+        this.currentPage = page;
 
         if (!this.itemsCount) {
             this.loadItemCount().then(() => {
