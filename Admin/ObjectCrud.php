@@ -694,23 +694,25 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
             $oField = $this->objectDefinition->getField($objectName);
             if ($oField) {
-                if (!isset($field['type'])) {
-                    $field['type'] = 'predefined';
-                }
-                if (strtolower($field['type']) == 'predefined' && !isset($field['object'])) {
-                    $field['object'] = $this->getObject();
-                }
-                if (strtolower($field['type']) == 'predefined' && !isset($field['field'])) {
-                    $field['field'] = $fieldName;
-                }
-
-                if (!isset($field['label'])) {
-                    $field['label'] = $oField->getLabel();
-                }
-
-                if (!isset($field['desc']) && $oField->getDesc()) {
-                    $field['desc'] = $oField->getDesc();
-                }
+                $field = array_merge($oField->toArray(), $field);
+//
+//                if (!isset($field['type'])) {
+//                    $field['type'] = 'predefined';
+//                }
+//                if (strtolower($field['type']) == 'predefined' && !isset($field['object'])) {
+//                    $field['object'] = $this->getObject();
+//                }
+//                if (strtolower($field['type']) == 'predefined' && !isset($field['field'])) {
+//                    $field['field'] = $fieldName;
+//                }
+//
+//                if (!isset($field['label'])) {
+//                    $field['label'] = $oField->getLabel();
+//                }
+//
+//                if (!isset($field['desc']) && $oField->getDesc()) {
+//                    $field['desc'] = $oField->getDesc();
+//                }
 
                 if (!isset($field['label'])) {
                     $field['label'] = $key;

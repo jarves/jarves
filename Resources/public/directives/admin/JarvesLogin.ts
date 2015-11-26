@@ -63,7 +63,7 @@ export default class JarvesLogin {
     doLogin() {
         this.blockInput();
         this.loginStatus = 1;
-        this.backend.post('admin/login', this.credentials)
+        this.backend.post('jarves/admin/login', this.credentials)
             .success((response) => this.success(response))
             .error((response) => this.error(response));
     }

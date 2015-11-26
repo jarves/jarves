@@ -217,6 +217,7 @@ export function Label(name, options = {}) {
     }
 }
 
+import AbstractFieldType from './fields/AbstractFieldType.ts';
 export function Field(name, directiveOptions) {
     return function decoratorFactory(target:Object, decoratedPropertyName?:string):void {
         var directiveName = 'jarves' + name.ucfirst() + 'Field';
@@ -233,7 +234,7 @@ export function Field(name, directiveOptions) {
                     controllerAs: 'jarvesField',
                     scope: true,
                     transclude: true,
-                    require: [directiveName, 'jarvesField', '?^jarvesField', '?^jarvesForm'],
+                    require: [directiveName, 'jarvesField', '?^jarvesField', '?^jarvesForm', '?^jarvesWindow'],
                     compile: function(...args) {
                         if (target.compile) {
                             var linkMethod = target.compile(...args);
@@ -243,10 +244,11 @@ export function Field(name, directiveOptions) {
                         }
 
                         return function (scope, element, attr, ctrl, transclude) {
-                            var ownController = ctrl[0];
+                            var ownController:AbstractFieldType = ctrl[0];
                             var fieldController = ctrl[1];
                             var parentFieldController = ctrl[2];
                             var jarvesFormController = ctrl[3];
+                            var jarvesWindowController = ctrl[4];
                             var controllersToPass = ctrl;
                             controllersToPass.shift();
 
@@ -259,6 +261,9 @@ export function Field(name, directiveOptions) {
 
                             if (jarvesFormController) {
                                 jarvesFormController.addField(ownController);
+                            }
+                            if (jarvesWindowController) {
+                                ownController.setJarvesWindow(jarvesWindowController);
                             }
 
                             if (controllersToPass && 1 === controllersToPass.length) {

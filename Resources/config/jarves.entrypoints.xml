@@ -4,7 +4,7 @@
       <entryPoint path="backend">
         <label>Backend</label>
         <children>
-          <entryPoint path="chooser" type="custom">
+          <entryPoint path="chooser" type="custom" templateUrl="@JarvesBundle/views/chooser.html">
             <label>Chooser</label>
           </entryPoint>
         </children>

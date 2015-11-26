@@ -2,6 +2,7 @@
 import {Inject, Service} from '../angular.ts';
 import {each, eachValue, normalizeObjectKey, urlEncode, urlDecode} from '../utils.ts';
 import {baseUrl, baseUrlApi} from '../config.js';
+import {EntryPoint} from "./WindowManagement";
 
 /**
  * Uses the $rootScope.
@@ -178,7 +179,7 @@ export default class Jarves {
      *
      * @return {String|null} Null if the module does not exist/its not activated.
      */
-    getBundleTitle(key) {
+    getBundleTitle(key:string):string {
         var config = this.getConfig(key);
         if (!config) {
             return key;
@@ -194,7 +195,7 @@ export default class Jarves {
      * @param {String} bundleName
      * @returns {Object|undefined}
      */
-    getConfig(bundleName) {
+    getConfig(bundleName:string):Object {
         if (!bundleName) return;
 
         return this.getSettings().configs[bundleName]
@@ -207,17 +208,14 @@ export default class Jarves {
      *
      * @returns {Object}
      */
-    getSettings() {
+    getSettings():Object {
         return this.$rootScope._settings;
     }
 
     /**
      * Returns the definition of a entry point.
-     *
-     * @param {String} path
-     * @returns {Object}
      */
-    getEntryPoint(path) {
+    getEntryPoint(path:string):EntryPoint {
         if (!angular.isString(path)) {
             return;
         }
@@ -235,7 +233,7 @@ export default class Jarves {
         config = this.getConfig(bundleName);
 
         if (!config) {
-            throw 'Config not found for bundleName: ' + bundleName;
+            throw 'getEntryPoint: Config not found for bundleName: ' + bundleName;
         }
 
         var tempEntry = config.entryPoints[splitted.shift()];

@@ -99,6 +99,24 @@ export default class WindowManagement {
         this.activeWindowList = activeWindowsList;
     }
 
+    public openWindow(entryPointPath:string, options:Object = {}, parameters:Object = {}) {
+        var entryPoint = this.jarves.getEntryPoint(entryPointPath);
+        if (!entryPoint) {
+            throw 'EntryPoint not found for ' + entryPointPath;
+        }
+
+        this.newWindow(entryPoint, options, this.activeWindowId, false, parameters);
+    }
+
+    public openDialog(entryPointPath:string, options:Object = {}, parameters:Object = {}) {
+        var entryPoint = this.jarves.getEntryPoint(entryPointPath);
+        if (!entryPoint) {
+            throw 'EntryPoint not found for ' + entryPointPath;
+        }
+
+        this.newWindow(entryPoint, options, this.activeWindowId, true, parameters);
+    }
+
     public newWindow(entryPoint:EntryPoint, options:Object = {}, parentWindowId:number = 0, isInline:boolean = false, parameters:Object = {}) {
         var newId = ++this.currentWindowIndex;
         this.activeWindowList[newId] = {

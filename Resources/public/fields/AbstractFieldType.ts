@@ -1,5 +1,7 @@
 import {Inject} from '../angular.ts';
 import angular from '../angular.ts';
+import JarvesWindow from '../directives/JarvesWindow.ts';
+import JarvesForm from '../directives/JarvesForm.ts';
 
 @Inject('$compile, $parse, $timeout, $http, $templateCache, $q, $interpolate')
 export default class AbstractFieldType {
@@ -16,6 +18,8 @@ export default class AbstractFieldType {
     protected additionalOptionsReferences = [];
     protected optionsReferencesMap = {};
 
+    protected jarvesWindow:JarvesWindow;
+
     constructor(protected $compile, protected $parse, protected $timeout, protected $http, protected $templateCache,
                 protected $q, protected $interpolate) {
         for (let item of this.optionsReferences) {
@@ -30,26 +34,31 @@ export default class AbstractFieldType {
     destructor():void {
     }
 
-    /**
-     * @param {jarves.Directives.JarvesForm} form
-     */
-    setForm(form) {
+    setForm(form:JarvesForm) {
         this.form = form;
     }
 
-    getId() {
+    setJarvesWindow(jarvesWindow:JarvesWindow) {
+        this.jarvesWindow = jarvesWindow;
+    }
+
+    getJarvesWindow():JarvesWindow {
+        return this.jarvesWindow;
+    }
+
+    getId():string {
         return this.getOption('id');
     }
 
-    getModelName() {
+    getModelName():string {
         return this.getOption('model') || 'model.' + this.getOption('id');
     }
 
-    getParentModelName() {
+    getParentModelName():string {
         return '$parent.' + this.getModelName();
     }
 
-    renderTemplateUrl(url, beforeCompile = null) {
+    renderTemplateUrl(url:string, beforeCompile:Function = null) {
         var deferred = this.$q.defer();
         if (!url) {
             throw 'no template url defined';

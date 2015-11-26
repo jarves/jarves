@@ -45,6 +45,7 @@ import './directives/Translate.ts';
 
 import './fields/File.ts';
 import './fields/Language.ts';
+import './fields/Object.ts';
 import './fields/Password.ts';
 import './fields/Select.ts';
 import './fields/Tab.ts';

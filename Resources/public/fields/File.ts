@@ -2,8 +2,7 @@ import AbstractFieldType from './AbstractFieldType.ts';
 import {Field} from '../angular.ts';
 
 @Field('file', {
-    templateUrl: 'bundles/jarves/admin/js/views/fields/file.html',
-    controllerAs: 'fileController'
+    templateUrl: 'bundles/jarves/views/fields/file.html'
 })
 export default class File extends AbstractFieldType {
     public path = '';

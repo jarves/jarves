@@ -146,7 +146,7 @@ export default class JarvesForm {
             return;
         }
 
-        console.log('loadData', this.options);
+        //console.log('loadData', this.options);
 
         var id = this.jarves.getObjectUrlId(this.getObjectKey(), this.getPrimaryKey());
 
@@ -154,7 +154,7 @@ export default class JarvesForm {
             .success((response) => {
                 this.originalData = angular.copy(response.data);
                 this.$scope.model = response.data;
-                console.log('loaded', this.$scope.model);
+                //console.log('loaded', this.$scope.model);
                 this.itemLoaded = true;
             })
             .error((response) => {
@@ -276,7 +276,7 @@ export default class JarvesForm {
 
     public hasChanges():boolean {
         var diff = this.getChangedData();
-        console.log('haschanges', diff, !angular.equals({}, diff));
+        //console.log('haschanges', diff, !angular.equals({}, diff));
         return !angular.equals({}, diff);
     }
 
