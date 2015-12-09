@@ -14,7 +14,7 @@ System.config({
     }
 });
 
-window.angularDecoratorModule = window.jarvesModule = window.angular.module('jarves', ['ng', 'ngAnimate']);
+window.angularDecoratorModule = window.jarvesModule = window.angular.module('jarves', ['ng', 'ngAnimate', 'ui.tinymce', 'ui.codemirror']);
 
 window.jarvesModule.config( ['$provide', function ($provide){
     $provide.decorator('$browser', ['$delegate', function ($delegate) {

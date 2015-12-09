@@ -13,18 +13,25 @@
             <!--<asset priority="2000" src="@JarvesBundle/libraries/typescript/typescriptServices.js"/>-->
             <assets priority="2000" src="@JarvesBundle/prototypes/String/*"/>
             <!--<asset priority="2000" src="@JarvesBundle/libraries/bluebird.js"/>-->
+
+
             <asset priority="2000" src="@JarvesBundle/libraries/angular.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/angular-animate.min.js"/>
+            <asset priority="2000" src="@JarvesBundle/libraries/angular-tinymce/tinymce.js"/>
+            <asset priority="2000" src="@JarvesBundle/libraries/angular-codemirror/ui-codemirror.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/hammer.min.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/typescript/typescript.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/systemjs/system.src.js"/>
+
+            <assets src="@JarvesBundle/libraries/tinymce/tinymce.min.js"/>
+            <assets src="@JarvesBundle/libraries/codemirror/lib/codemirror.js"/>
+            <assets src="@JarvesBundle/libraries/codemirror/lib/codemirror.css"/>
 
             <assets src="@JarvesBundle/libraries/ladda/spin.min.js"/>
             <assets src="@JarvesBundle/libraries/ladda/ladda.min.js"/>
             <assets src="@JarvesBundle/libraries/ladda/ladda.min.css"/>
 
             <asset priority="2000" src="@JarvesBundle/start.js"/>
-
 
             <asset src="@JarvesBundle/fonts/OpenSans/open-sans.css"/>
             <asset src="@JarvesBundle/fonts/OpenSans/open-sans-condensed.css"/>

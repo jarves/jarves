@@ -10,30 +10,6 @@ import {each} from '../utils.ts';
     }
 })
 export default class Text extends AbstractFieldType {
-
-    public static options:Object = {
-        label: 'Text input',
-        asModel: true,
-        options: {
-            modifier: {
-                label: 'Value modifier',
-                type: 'text',
-                desc: 'A pipe separated list of modifiers. Example: trim|ucfirst|camelcase.' +
-                'Possible: trim, lower, ucfirst, lcfirst, phpfunction, phpclass, underscore, camelcase, dash, url'
-            },
-            redirectSameValue: {
-                label: 'Redirect this value',
-                desc: 'Redirect this value to another field with the same result as this value. Example: fieldName:modifier1|modifier2,fieldName2:modifier3',
-                type: 'text'
-            },
-            redirectValue: {
-                label: 'Redirect this value always',
-                desc: 'Redirect this value always to another field (and overwrites it always). Example: fieldName:modifier1|modifier2,fieldName2:modifier3',
-                type: 'text'
-            }
-        }
-    };
-
     static trimModifier(v) {
         return v.replace(/^\s+|\s+$/g, "");
     }

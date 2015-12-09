@@ -1,0 +1,25 @@
+<window-frame ng-controller="bundles/jarves/controller/FieldController as fieldController">
+    <jarves-layout>
+        <layout-row>
+            <layout-cell width="350" resizer="right">
+                <h3>Definition:</h3>
+                <ui-codemirror style="height: 100%" ui-codemirror-opts="fieldController.editorOptions"  ng-model="fieldController.json"></ui-codemirror>
+                <h3>Value:</h3>
+                <div ng-if="fieldController.invalidValue" style="color: red; margin: 5px;">
+                    Invalid value!
+                </div>
+                <ui-codemirror style="height: 100%" ui-codemirror-opts="fieldController.editorOptions"  ng-model="fieldController.prettyValue"></ui-codemirror>
+            </layout-cell>
+            <layout-cell>
+                <div ng-if="!fieldController.definition">
+                    <h3>Fehler:</h3>
+                    {{fieldController.error}}
+                </div>
+                <div ng-if="fieldController.definition">
+                    <h3>Ergebnis:</h3>
+                    <jarves-field definition="fieldController.definition" model="fieldController.value"></jarves-field>
+                </div>
+            </layout-cell>
+        </layout-row>
+    </jarves-layout>
+</window-frame>

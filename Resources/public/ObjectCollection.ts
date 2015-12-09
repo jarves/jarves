@@ -1,10 +1,28 @@
 import {Inject} from './angular.ts';
 import {normalizeObjectKey, toQueryString} from './utils.ts';
 import angular from './angular.ts';
+import Jarves from "./services/Jarves";
+import ObjectRepository from "./services/ObjectRepository";
 
-@Inject('$q, backend, objectRepository')
+@Inject('$q, backend, jarves, objectRepository')
 export default class ObjectCollection {
-    constructor(private $q, private backend, private objectRepository) {
+
+    protected objectKey:string = '';
+    protected selection:Array = [];
+    protected order:string = '';
+    protected orderDirection:string = 'asc';
+    protected entryPoint:string = '';
+    protected customEntryPoint:boolean = false;
+    protected repositoryMapping:boolean = true;
+    protected queryOptions:Object = {};
+    protected lastQueryOptions:Object = {};
+    protected callbacks:Array = [];
+
+    public items:Array = [];
+
+    protected primaryKeys:Array = [];
+
+    constructor(private $q, private backend, private jarves:Jarves, private objectRepository:ObjectRepository) {
         this.objectKey = '';
         this.selection = [];
         this.order = '';
@@ -17,11 +35,13 @@ export default class ObjectCollection {
         this.callbacks = [];
     }
 
-    setObjectKey(objectKey) {
+    public setObjectKey(objectKey:string) {
         this.objectKey = objectKey;
+
         if (!this.customEntryPoint) {
             this.entryPoint = 'object/' + normalizeObjectKey(objectKey);
         }
+
         this.objectRepository.offObjectChange(() => this.reload());
         this.objectRepository.onObjectChange(this.objectKey, () => this.reload());
     }
@@ -50,16 +70,32 @@ export default class ObjectCollection {
         this.setRepositoryMapping = active;
     }
 
-    change(fn) {
+    /**
+     * Filter by primaryKeys.
+     */
+    setPrimaryKeys(primaryKeys:Array) {
+        this.primaryKeys = primaryKeys;
+    }
+
+    public onChange(fn:Function) {
         this.callbacks.push(fn);
     }
 
-    load(queryOptions) {
+    load(queryOptions:Object = {}) {
         this.lastQueryOptions = angular.copy(queryOptions);
         queryOptions = queryOptions || {};
         queryOptions = angular.extend(this.queryOptions, queryOptions);
 
         queryOptions.fields = this.selection.join(',');
+
+        //var primaryKeys = null;
+        //if (this.primaryKeys) {
+        //    for (let primaryKey in this.primaryKeys) {
+        //        jarves.getObjectId()primaryKey
+        //    }
+        //}
+
+        queryOptions.primaryKeys = this.primaryKeys;
         queryOptions.order = {};
         queryOptions.order[this.order] = this.orderDirection;
 

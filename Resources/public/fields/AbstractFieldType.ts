@@ -5,7 +5,6 @@ import JarvesForm from '../directives/JarvesForm.ts';
 
 @Inject('$compile, $parse, $timeout, $http, $templateCache, $q, $interpolate')
 export default class AbstractFieldType {
-
     public static options:Object = {};
 
     protected options = {};
@@ -32,6 +31,7 @@ export default class AbstractFieldType {
     }
 
     destructor():void {
+        console.log('destruct');
     }
 
     setForm(form:JarvesForm) {

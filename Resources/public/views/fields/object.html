@@ -1,1 +1,12 @@
-<input type="text" class="jarves-Input-text" disabled ng-model="model" ng-trim="false" /><button ng-click="objectController.openChooser()" translate>Choose</button>
+<div>
+    <div ng-if="!jarvesField.isMultiple()">
+        <input type="text" class="jarves-Input-text" disabled ng-model="model" ng-trim="false"/>
+        <button ng-click="jarvesField.openChooser()" translate>Choose</button>
+    </div>
+    <div ng-if="jarvesField.isMultiple()">
+        <ul class="type-object-list">
+            <li ng-repeat="item in jarvesField.items">>{{label}}</li>
+        </ul>
+        <button ng-click="jarvesField.openChooser()" translate>Add</button>
+    </div>
+</div>

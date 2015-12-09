@@ -100,7 +100,7 @@
               <entryPoint path="database" type="custom" system="true" icon="#icon-database" link="true" multi="true">
                 <label>Database</label>
               </entryPoint>
-              <entryPoint path="fields" type="custom" system="true" icon="#icon-console" link="true">
+              <entryPoint path="fields" type="custom" templateUrl="@JarvesBundle/views/development/fields.html" system="true" icon="#icon-console" link="true">
                 <label>Fields</label>
               </entryPoint>
             </children>

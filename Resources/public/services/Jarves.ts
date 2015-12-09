@@ -1,6 +1,6 @@
 //import {Test, Inject, Directive} from '../Test.ts';
 import {Inject, Service} from '../angular.ts';
-import {each, eachValue, normalizeObjectKey, urlEncode, urlDecode} from '../utils.ts';
+import {each, eachValue, normalizeObjectKey, urlEncode, urlDecode, getCroppedObjectKey, getCroppedObjectId} from '../utils.ts';
 import {baseUrl, baseUrlApi} from '../config.js';
 import {EntryPoint} from "./WindowManagement";
 
@@ -348,7 +348,6 @@ export default class Jarves {
         return res;
     }
 
-
     /**
      * Returns the primaryKey name.
      *
@@ -360,7 +359,6 @@ export default class Jarves {
         var pks = this.getObjectPrimaryList(objectKey);
         return pks[0];
     }
-
 
     /**
      *
@@ -478,15 +476,15 @@ export default class Jarves {
      * @return {String} encoded id
      */
     getObjectIdFromUrl(url) {
-        var pks = this.getObjectPrimaryList(jarves.getCroppedObjectKey(url));
+        var pks = this.getObjectPrimaryList(getCroppedObjectKey(url));
 
-        var pkString = jarves.getCroppedObjectId(url);
+        var pkString = getCroppedObjectId(url);
 
         //    if (1 < pks.length) {
         //        return pkString; //already correct formatted
         //    }
 
-        return jarves.urlDecode(pkString);
+        return urlDecode(pkString);
     }
 
     ///**
@@ -678,7 +676,6 @@ export default class Jarves {
 
             data[dataKey] = this.getObjectFieldLabel(item, field, fieldId, objectKey, relationsAsArray);
         }
-        ;
 
         return data;
     }

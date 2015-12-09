@@ -22,5 +22,9 @@
   "bugs": {
     "url": "https://github.com/jarves/jarves/issues"
   },
-  "homepage": "https://github.com/jarves/jarves"
+  "homepage": "https://github.com/jarves/jarves",
+  "dependencies": {
+    "angular-ui-codemirror": "^0.3.0",
+    "angular-ui-tinymce": "0.0.5"
+  }
 }

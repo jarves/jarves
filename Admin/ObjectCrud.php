@@ -896,7 +896,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
     }
 
     /**
-     *
      * $pk is an array with the primary key values.
      *
      * If one primary key:
@@ -976,7 +975,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      *       'pages' => $maxPages
      *   );
      *
-     * @param Request $request
      * @param array $filter
      * @param integer $limit
      * @param integer $offset
@@ -984,7 +982,13 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      * @param string $fields
      * @param array $orderBy
      *
+     * @param bool $withAcl
+     * @param array $primaryKeys
+     *
      * @return array
+     * @throws ObjectNotFoundException
+     * @throws \Exception
+     * @internal param Request $request
      */
     public function getItems(
         $filter = null,
@@ -993,7 +997,8 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         $query = '',
         $fields = null,
         $orderBy = [],
-        $withAcl = false
+        $withAcl = false,
+        array $primaryKeys = []
     ) {
         $options = array();
 
@@ -1040,6 +1045,18 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
             if ($queryCondition = $this->getQueryCondition($query, $options['fields'])) {
                 $condition->mergeAnd($queryCondition);
             }
+        }
+
+        if ($primaryKeys) {
+            $primaryKeyCondition = Condition::create();
+            foreach ($primaryKeys as $pk) {
+                foreach ($this->getObjectDefinition()->getPrimaryKeys() as $primaryKeyName) {
+                    $primaryKeyCondition->addOr([
+                        $primaryKeyName, '=', $pk[$primaryKeyName]
+                    ]);
+                }
+            }
+            $condition->mergeAndBegin($primaryKeyCondition);
         }
 
         if ($this->getPermissionCheck() && $aclCondition = $this->getJarves()->getACL()->getListingCondition($this->getObject())) {
@@ -1297,7 +1314,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         $offset = null,
         $withAcl = false
     ) {
-
         $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
 
         if (null !== $pk) {
@@ -1397,7 +1413,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         }
 
         return $storageController->getBranchChildrenCount($pk, $condition, $scope);
-
     }
 
     /**

@@ -1,6 +1,7 @@
 import {Service} from '../angular.ts';
 import ObjectCollection from '../ObjectCollection.ts';
-import {each, normalizeObjectKey} from '../utils.ts';
+import {each, normalizeObjectKey, toQueryString} from '../utils.ts';
+import ObjectCollection from "../ObjectCollection";
 
 //@Inject('$rootScope, $q, $injector, $timeout, backend, jarves')
 @Service('objectRepository')
@@ -38,7 +39,7 @@ export default class ObjectRepository {
         }
     }
 
-    newCollection(objectKey) {
+    newCollection(objectKey:string) : ObjectCollection {
         var collection = this.$injector.instantiate(ObjectCollection);
         collection.setObjectKey(objectKey);
 
@@ -67,7 +68,7 @@ export default class ObjectRepository {
     loadItems(objectKey, entryPoint, queryOptions) {
         var deferred = this.$q.defer();
 
-        this.backend.get(entryPoint + '/?' + Object.toQueryString(queryOptions))
+        this.backend.get(entryPoint + '/?' + toQueryString(queryOptions))
             .success(function(response) {
                 //this.mapData(objectKey, response.data);
                 //deferred.resolve(this.instancePool[objectKey]);

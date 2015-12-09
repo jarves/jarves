@@ -177,7 +177,7 @@ export default class JarvesList {
         this.collection.setQueryOption('withAcl', true);
         //this.collection.setRepositoryMapping(this.classProperties.objectRepositoryMapping);
         this.collection.setSelection(this.getSelection());
-        this.collection.change((items) => {
+        this.collection.onChange((items) => {
             this.items = items;
         });
 
