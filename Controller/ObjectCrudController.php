@@ -137,6 +137,7 @@ abstract class ObjectCrudController extends ObjectCrud
      * @Rest\QueryParam(name="limit", requirements="[0-9]+", description="Limits the result")
      * @Rest\QueryParam(name="offset", requirements="[0-9]+", description="Offsets the result")
      * @Rest\QueryParam(name="order", array=true, requirements=".+", description="Ordering. ?order[title]=asc")
+     * @Rest\QueryParam(name="primaryKeys", description="PrimaryKey to filter as array")
      * @Rest\QueryParam(name="q", requirements=".+", description="Search query")
      * @Rest\QueryParam(name="withAcl", default=false, requirements=".+", description="With ACL information")
      * @Rest\QueryParam(name="lang", requirements=".+", description="Language id to filter if multiLanguage")
@@ -163,7 +164,8 @@ abstract class ObjectCrudController extends ObjectCrud
             $paramFetcher->get('q'),
             $paramFetcher->get('fields'),
             $paramFetcher->get('order'),
-            $paramFetcher->get('withAcl')
+            $paramFetcher->get('withAcl'),
+            $paramFetcher->get('primaryKeys') ?: []
         );
     }
 

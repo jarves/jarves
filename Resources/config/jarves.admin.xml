@@ -15,6 +15,7 @@
             <!--<asset priority="2000" src="@JarvesBundle/libraries/bluebird.js"/>-->
 
 
+            <asset priority="2000" src="@JarvesBundle/libraries/jquery-2.1.4.min.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/angular.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/angular-animate.min.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/angular-tinymce/tinymce.js"/>

@@ -612,6 +612,8 @@ export function generateNoise(element, opacity) {
 }
 
 export function toQueryString(obj) {
+    return window.$.param(obj);
+
     var parts = [];
     for (var i in obj) {
         if (obj.hasOwnProperty(i)) {

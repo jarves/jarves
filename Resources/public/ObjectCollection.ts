@@ -96,8 +96,10 @@ export default class ObjectCollection {
         //}
 
         queryOptions.primaryKeys = this.primaryKeys;
-        queryOptions.order = {};
-        queryOptions.order[this.order] = this.orderDirection;
+        if (this.order) {
+            queryOptions.order = {};
+            queryOptions.order[this.order] = this.orderDirection;
+        }
 
         this.backend.get(this.entryPoint + '/?' + toQueryString(queryOptions))
             .success((response) => this.handleLoadResponse(response));

@@ -145,6 +145,10 @@ class  Condition extends Model
 
     private function normalizeToArray($condition)
     {
+        if (!$condition) {
+            return [];
+        }
+
         if ($condition instanceof Condition) {
             return $condition->getRules();
         } else {
@@ -277,7 +281,7 @@ class  Condition extends Model
         if (!$tableName && $objectKey) {
             $def = $this->getJarves()->getObjects()->getDefinition($objectKey);
             if ($def) {
-                $tableName = $this->getJarves()->getSystemConfig()->getDatabase()->getPrefix() . $def->getTable();
+                $tableName = $def->getTable();
             }
         }
 

@@ -988,7 +988,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      * @return array
      * @throws ObjectNotFoundException
      * @throws \Exception
-     * @internal param Request $request
      */
     public function getItems(
         $filter = null,
@@ -1050,11 +1049,16 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         if ($primaryKeys) {
             $primaryKeyCondition = Condition::create();
             foreach ($primaryKeys as $pk) {
-                foreach ($this->getObjectDefinition()->getPrimaryKeys() as $primaryKeyName) {
-                    $primaryKeyCondition->addOr([
+                $primaryKeyConditionItem = Condition::create();
+                foreach ($this->getObjectDefinition()->getPrimaryKeyNames() as $primaryKeyName) {
+                    if (!isset($pk[$primaryKeyName])) {
+                        throw new \LogicException(sprintf('Field %s not found in primaryKey parameter (%s)', $primaryKeyName, json_encode($pk)));
+                    }
+                    $primaryKeyConditionItem->addAnd([
                         $primaryKeyName, '=', $pk[$primaryKeyName]
                     ]);
                 }
+                $primaryKeyCondition->mergeOr($primaryKeyConditionItem);
             }
             $condition->mergeAndBegin($primaryKeyCondition);
         }
