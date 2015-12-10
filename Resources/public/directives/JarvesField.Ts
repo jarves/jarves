@@ -14,6 +14,8 @@ export default class JarvesField {
     private transclude;
     private controller;
 
+    private lastType:string;
+
     constructor(private $scope, private $element, private $attrs, private $compile) {
         //console.info('constructor jarvesField.ts');
     }
@@ -21,8 +23,16 @@ export default class JarvesField {
     link(scope, element, attributes, controller, transclude) {
         //console.info('link jarvesField.ts', !!transclude);
         this.transclude = transclude;
+
         if (attributes['definition']) {
+            scope.penis = 1;
             this.$scope.$watch(attributes['definition'], (definition) => {
+                if (this.lastType) {
+                    element.removeAttr(this.lastType);
+                    scope.$broadcast('$destroy');
+                    element.children().remove();
+                }
+
                 if (!definition) {
                     throw 'invalid value for definition attribute in <jarves-field definition="%s" />'.sprintf(this.$attrs.definition);
                 }
@@ -38,7 +48,12 @@ export default class JarvesField {
     }
 
     load(definition) {
-        this.$element.attr('jarves-%s-field'.sprintf(definition.type.lcfirst()), '');
+        if (!definition.type) {
+            throw 'type for jarves-field not defined';
+        }
+
+        this.lastType = 'jarves-%s-field'.sprintf(definition.type.lcfirst());
+        this.$element.attr(this.lastType, '');
         //console.log('compile jarvesField.ts', 'jarves-%s-field'.sprintf(definition.type.lcfirst()));
         this.$compile(this.$element, null, 5000)(this.$scope);
     }

@@ -34,6 +34,7 @@ import './directives/JarvesLabel.ts';
 import './directives/JarvesList.ts';
 import './directives/JarvesListItem.ts';
 import './directives/JarvesListTemplate.ts';
+import './directives/JarvesObjectLabel.ts';
 import './directives/JarvesTabs.ts';
 import './directives/JarvesTree.ts';
 import './directives/JarvesTreeItem.ts';

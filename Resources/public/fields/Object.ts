@@ -28,7 +28,6 @@ export default class Object extends AbstractFieldType {
         if (!this.getOption('object')) {
             throw 'object not defined for object field';
         }
-        scope.muschi = 1;
 
         this.collection = this.objectRepository.newCollection(this.getOption('object'));
         this.collection.onChange((items) => {
@@ -40,7 +39,7 @@ export default class Object extends AbstractFieldType {
             this.value = value;
             console.log('object value changed', value);
 
-            if (scope.multiple) {
+            if (this.isMultiple()) {
                 //this.value is an array
                 this.collection.setPrimaryKeys(value);
                 this.collection.load();
@@ -48,6 +47,18 @@ export default class Object extends AbstractFieldType {
         });
 
         console.log('link Object', this.getOption('type'), this.definition);
+    }
+
+    public getTemplate():string {
+        return this.getOption('labelTemplate');
+    }
+
+    public getLabelField():string {
+        return this.getOption('labelField');
+    }
+
+    public getObject():string {
+        return this.getOption('object');
     }
 
     destructor(){

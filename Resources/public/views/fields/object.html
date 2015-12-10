@@ -5,7 +5,13 @@
     </div>
     <div ng-if="jarvesField.isMultiple()">
         <ul class="type-object-list">
-            <li ng-repeat="item in jarvesField.items">>{{label}}</li>
+            <li ng-repeat="item in jarvesField.items">
+                <jarves-object-label item="item"
+                                     object="jarvesField.getObject()"
+                                     label-field="jarvesField.getLabelField()"
+                                     template="jarvesField.getTemplate()"
+                ></jarves-object-label>
+            </li>
         </ul>
         <button ng-click="jarvesField.openChooser()" translate>Add</button>
     </div>

@@ -39,7 +39,7 @@ export default class ObjectCollection {
         this.objectKey = objectKey;
 
         if (!this.customEntryPoint) {
-            this.entryPoint = 'object/' + normalizeObjectKey(objectKey);
+            this.entryPoint = 'jarves/object/' + normalizeObjectKey(objectKey);
         }
 
         this.objectRepository.offObjectChange(() => this.reload());
