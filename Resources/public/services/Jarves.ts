@@ -51,27 +51,34 @@ export default class Jarves {
         window.console.log(...args);
     }
 
-    /**
-     *
-     * @param {String} entryPoint
-     * @returns {HttpPromise}
-     */
-    loadEntryPointOptions(entryPoint) {
-        return this.backend.post(entryPoint + '/?_method=options');
+    protected entryPointOptionsCache = {};
+
+    public loadEntryPointOptions(entryPoint:string) : Promise {
+        var deferred = this.$q.defer();
+
+        if (this.entryPointOptionsCache[entryPoint]) {
+            deferred.resolve(this.entryPointOptionsCache[entryPoint]);
+        } else {
+            var httpPromise = this.backend.post(entryPoint + '/?_method=options');
+            httpPromise.success((response) => {
+                this.entryPointOptionsCache[entryPoint] = response.data;
+                deferred.resolve(response.data);
+            });
+        }
+
+        return deferred.promise;
     }
 
     /**
      * Loads all menu items from the backend.
-     *
-     * @returns {promise}
      */
-    loadMenu() {
+    loadMenu() : Promise {
         var deferred = this.$q.defer();
 
         this.backend.get('jarves/admin/backend/menus')
             .success((response) => {
                 this.setMenus(response.data);
-                deferred.resolve();
+                deferred.resolve(response.data);
             })
             .error(() => {
                 deferred.reject();

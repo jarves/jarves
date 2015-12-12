@@ -3,6 +3,7 @@
 namespace Jarves\Controller;
 
 use Jarves\Admin\AdminAssets;
+use Jarves\PageResponse;
 use Jarves\PluginController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -31,6 +32,7 @@ class AdminLoginController extends PluginController
         $adminAssets->addMainResources();
         $adminAssets->addLanguageResources();
         $adminAssets->addSessionScripts();
+        $adminAssets->appendAngularTemplates();
 
         $response = $this->getJarves()->getPageResponse();
 

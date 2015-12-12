@@ -39,8 +39,8 @@ export default class JarvesGrid {
 
     link(scope, element, attributes, controller, transclude) {
         this.transclude = transclude;
-        this.jarves.loadEntryPointOptions(this.getEntryPoint()).success((response) => {
-            this.classProperties = response.data;
+        this.jarves.loadEntryPointOptions(this.getEntryPoint()).then((options) => {
+            this.classProperties = options;
             if (this.classProperties.object && this.preSelect) {
                 this.select(this.preSelect);
                 delete this.preSelect;
@@ -54,7 +54,7 @@ export default class JarvesGrid {
     }
 
     loadClassProperties() {
-        this.backend.post(this.getEntryPoint()+'/?_method=options')
+        this.backend.post(this.getEntryPoint() + '/?_method=options')
             .success((response) => {
                 this.classProperties = response.data;
             })
@@ -93,7 +93,7 @@ export default class JarvesGrid {
         //}
 
         this.collection = this.objectRepository.newCollection(this.classProperties.object);
-        this.collection.setOrder('title');
+        this.collection.setOrder(this.classProperties.order);
         this.collection.setEntryPoint(this.getEntryPoint());
         this.collection.setQueryOption('withAcl', true);
         //this.collection.setRepositoryMapping(this.classProperties.objectRepositoryMapping);
@@ -130,7 +130,7 @@ export default class JarvesGrid {
         var query = {};
 
         this.backend.get(this.getEntryPoint() + '/:count', query)
-            .success((response)=>{
+            .success((response)=> {
                 this.itemsCount = response.data;
                 deferred.resolve();
             });
@@ -143,25 +143,25 @@ export default class JarvesGrid {
     }
 
     /**
-    *
-    * @param {Object} item
-    */
+     *
+     * @param {Object} item
+     */
     select(item) {
-       if (!this.classProperties.object) {
-           this.preSelect = item;
-           return;
-       }
-    
-       this.selected = this.jarves.getObjectPk(this.classProperties.object, item);
-    
-       if (this.$attrs.model) {
-           //var oldModelValue = this.$scope.$parent.$eval(this.$attrs.model);
-           //console.log('compare', angular.equals(oldModelValue, this.selected), oldModelValue, this.selected);
-           //if (!angular.equals(oldModelValue, this.selected)) {
-           //    console.log('select grid', this.selected, this.$attrs.model);
-               this.$parse(this.$attrs.model).assign(this.$scope.$parent, this.selected);
-           //}
-       }
+        if (!this.classProperties.object) {
+            this.preSelect = item;
+            return;
+        }
+
+        this.selected = this.jarves.getObjectPk(this.classProperties.object, item);
+
+        if (this.$attrs.model) {
+            //var oldModelValue = this.$scope.$parent.$eval(this.$attrs.model);
+            //console.log('compare', angular.equals(oldModelValue, this.selected), oldModelValue, this.selected);
+            //if (!angular.equals(oldModelValue, this.selected)) {
+            //    console.log('select grid', this.selected, this.$attrs.model);
+            this.$parse(this.$attrs.model).assign(this.$scope.$parent, this.selected);
+            //}
+        }
     }
 
     isSelected(item) {

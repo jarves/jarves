@@ -35,6 +35,23 @@ class AdminAssets
         return $this->jarves;
     }
 
+    public function appendAngularTemplates()
+    {
+        $response = $this->getJarves()->getPageResponse();
+
+        foreach ($this->getJarves()->getConfigs() as $bundle) {
+            $templates = $bundle->getAdminAngularTemplatesInfo();
+            foreach ($templates as $template) {
+                $publicPath = $this->getJarves()->resolvePublicWebPath($template->getPath());
+                $localPath = $this->getJarves()->resolveInternalPublicPath($template->getPath());
+
+                $content = file_get_contents($localPath);
+                $content = str_replace('</script>', '', $content);
+                $response->addHeader('<script type="text/ng-template" id="' . $publicPath. '">' . $content . '</script>');
+            }
+        }
+    }
+
     public function addSessionScripts()
     {
         $response = $this->getJarves()->getPageResponse();
@@ -85,11 +102,12 @@ class AdminAssets
 
         $response->addJs(
             '
-        var _baseUrl = ' . json_encode($request->getBasePath() . '/') . '
-        var _baseUrlApi = ' . json_encode($request->getBaseUrl() . '/')
+        window._baseUrl = ' . json_encode($request->getBasePath() . '/') . '
+        window._baseUrlApi = ' . json_encode($request->getBaseUrl() . '/'),
+            3000
         );
 
-        if ($this->getJarves()->getKernel()->isDebug()) {
+        if (false && $this->getJarves()->getKernel()->isDebug()) {
             foreach ($this->getJarves()->getConfigs() as $bundleConfig) {
                 foreach ($bundleConfig->getAdminAssetsInfo() as $assetInfo) {
                     if ($options['noJs'] && $assetInfo->isJavaScript()) {
@@ -102,7 +120,7 @@ class AdminAssets
         } else {
             $response->addCssFile($prefix . '/admin/backend/css');
             if (!$options['noJs']) {
-                $response->addJsFile($prefix . '/admin/backend/script');
+                $response->addJsFile($prefix . '/admin/backend/script', 3000);
             }
 
             foreach ($this->getJarves()->getConfigs() as $bundleConfig) {
@@ -127,7 +145,7 @@ class AdminAssets
                         continue;
                     }
 
-                    if (!$assetInfo->getAllowCompression()) {
+                    if (!$assetInfo->isCompressionAllowed()) {
                         $response->addAsset($assetInfo);
                     }
                 }

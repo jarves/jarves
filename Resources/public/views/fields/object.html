@@ -4,15 +4,20 @@
         <button ng-click="jarvesField.openChooser()" translate>Choose</button>
     </div>
     <div ng-if="jarvesField.isMultiple()">
-        <ul class="type-object-list">
-            <li ng-repeat="item in jarvesField.items">
-                <jarves-object-label item="item"
-                                     object="jarvesField.getObject()"
-                                     label-field="jarvesField.getLabelField()"
-                                     template="jarvesField.getTemplate()"
-                ></jarves-object-label>
-            </li>
-        </ul>
+        <table class="jarves-field-object-list">
+            <tr ng-repeat="item in jarvesField.items">
+                <td>
+                    <jarves-object-label item="item"
+                                         object="jarvesField.getObject()"
+                                         label-field="jarvesField.getLabelField()"
+                                         template="jarvesField.getTemplate()"
+                    ></jarves-object-label>
+                </td>
+                <td width="30">
+                    <button ng-click="jarvesField.removeItem($index)" icon="#icon-minus-5"></button>
+                </td>
+            </tr>
+        </table>
         <button ng-click="jarvesField.openChooser()" translate>Add</button>
     </div>
 </div>

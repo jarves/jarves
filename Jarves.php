@@ -817,7 +817,7 @@ class Jarves extends Controller
 
     /**
      *
-     * ('@JarvesBundle/admin/js/test.js') => web/bundles/jarves/admin/js/test.js
+     * ('@JarvesBundle/admin/js/test.js') => bundles/jarves/admin/js/test.js
      *
      * ('images/test.png') => images/webtest.png
      *

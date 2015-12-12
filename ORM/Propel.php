@@ -69,9 +69,13 @@ class Propel extends ORMAbstract
         $sub->addSelfJoin('parent', '%table%.lft BETWEEN parent.lft+1 AND parent.rgt-1');
         $sub->setRules($condition->getRules());
 
-        $result->addAnd([
-            'lft', 'IN', $sub
-        ]);
+        $result->addAnd(
+            [
+                'lft',
+                'IN',
+                $sub
+            ]
+        );
 
         return $result;
     }
@@ -129,7 +133,9 @@ class Propel extends ORMAbstract
 
                     $cols = $relation->getRightTable()->getColumns();
                     foreach ($cols as $col) {
-                        if ($relation->getType() == RelationMap::ONE_TO_ONE || $relation->getType() == RelationMap::MANY_TO_ONE) {
+                        if ($relation->getType() == RelationMap::ONE_TO_ONE || $relation->getType(
+                            ) == RelationMap::MANY_TO_ONE
+                        ) {
                             $fields2[$relationName . '.' . $col->getPhpName()] = $col;
                         } else {
                             $relationFields[ucfirst($relationName)][] = $col->getPhpName();
@@ -138,68 +144,70 @@ class Propel extends ORMAbstract
                 }
             }
 
-        } else if (is_array($fields)) {
+        } else {
+            if (is_array($fields)) {
 
-            $fields = $this->extractSelection($fields);
+                $fields = $this->extractSelection($fields);
 
-            foreach ($fields as $field) {
+                foreach ($fields as $field) {
 
-                $relationFieldSelection = [];
-                $relationName = '';
+                    $relationFieldSelection = [];
+                    $relationName = '';
 
-                if (($pos = strpos($field, '.')) !== false) {
-                    $relationName = ucfirst(substr($field, 0, $pos));
-                    $relationFieldSelection = explode(',', str_replace(' ', '', ucfirst(substr($field, $pos + 1))));
+                    if (($pos = strpos($field, '.')) !== false) {
+                        $relationName = ucfirst(substr($field, 0, $pos));
+                        $relationFieldSelection = explode(',', str_replace(' ', '', ucfirst(substr($field, $pos + 1))));
 
-                } else {
-                    $relationName = ucfirst($field);
-                }
-
-                $originalRelationName = $relationName;
-                $relationName = $pluralizer->getSingularForm($relationName);
-
-                if ($relationName && $tableMap->hasRelation($relationName)) {
-//                    $relationName = $pluralizer->getSingularForm($relationName);
-                    $relation = $tableMap->getRelation($relationName);
-
-                    //select at least all pks of the foreign table
-                    $pks = $relation->getRightTable()->getPrimaryKeys();
-                    foreach ($pks as $pk) {
-                        $relationFields[ucfirst($originalRelationName)][] = $pk->getPhpName();
-                    }
-
-                    if (isset($relationFieldSelection[0]) && '*' === $relationFieldSelection[0]) {
-                        foreach ($relation->getRightTable()->getColumns() as $col) {
-                            if (!$col->isPrimaryKey()) {
-                                $relationFields[ucfirst($originalRelationName)][] = $col->getPhpName();
-                            }
-                        }
                     } else {
-                        foreach ($relationFieldSelection as $relationField) {
-                            //check if $relationField exists in the foreign table
-                            if (!$relation->getRightTable()->hasColumnByPhpName($relationField)) {
-                                continue;
+                        $relationName = ucfirst($field);
+                    }
+
+                    $originalRelationName = $relationName;
+                    $relationName = $pluralizer->getSingularForm($relationName);
+
+                    if ($relationName && $tableMap->hasRelation($relationName)) {
+//                    $relationName = $pluralizer->getSingularForm($relationName);
+                        $relation = $tableMap->getRelation($relationName);
+
+                        //select at least all pks of the foreign table
+                        $pks = $relation->getRightTable()->getPrimaryKeys();
+                        foreach ($pks as $pk) {
+                            $relationFields[ucfirst($originalRelationName)][] = $pk->getPhpName();
+                        }
+
+                        if (isset($relationFieldSelection[0]) && '*' === $relationFieldSelection[0]) {
+                            foreach ($relation->getRightTable()->getColumns() as $col) {
+                                if (!$col->isPrimaryKey()) {
+                                    $relationFields[ucfirst($originalRelationName)][] = $col->getPhpName();
+                                }
                             }
-                            $relationFields[ucfirst($originalRelationName)][] = $relationField;
+                        } else {
+                            foreach ($relationFieldSelection as $relationField) {
+                                //check if $relationField exists in the foreign table
+                                if (!$relation->getRightTable()->hasColumnByPhpName($relationField)) {
+                                    continue;
+                                }
+                                $relationFields[ucfirst($originalRelationName)][] = $relationField;
+                            }
                         }
+
+                        $relations[ucfirst($originalRelationName)] = $relation;
+
+                        //add foreignKeys in main table.
+                        if ($localColumns = $relation->getLeftColumns()) {
+                            foreach ($localColumns as $col) {
+                                $fields2[$col->getPhpName()] = $col;
+                            }
+                        }
+
+                        continue;
                     }
 
-                    $relations[ucfirst($originalRelationName)] = $relation;
-
-                    //add foreignKeys in main table.
-                    if ($localColumns = $relation->getLeftColumns()) {
-                        foreach ($localColumns as $col) {
-                            $fields2[$col->getPhpName()] = $col;
-                        }
+                    if ($tableMap->hasColumnByPhpName(ucfirst($field)) &&
+                        $column = $tableMap->getColumnByPhpName(ucfirst($field))
+                    ) {
+                        $fields2[$column->getPhpName()] = $column;
                     }
-
-                    continue;
-                }
-
-                if ($tableMap->hasColumnByPhpName(ucfirst($field)) &&
-                    $column = $tableMap->getColumnByPhpName(ucfirst($field))
-                ) {
-                    $fields2[$column->getPhpName()] = $column;
                 }
             }
         }
@@ -263,6 +271,7 @@ class Propel extends ORMAbstract
                 }
             }
         }
+
         return $fields;
     }
 
@@ -296,7 +305,11 @@ class Propel extends ORMAbstract
     public function getPhpName($objectName = null)
     {
         $clazz = Objects::normalizeObjectKey($objectName ?: $this->getObjectKey());
-        $clazz = ucfirst($this->getJarves()->getObjects()->getNamespace($clazz) . '\\Model\\' . $this->getJarves()->getObjects()->getName($clazz));
+        $clazz = ucfirst(
+            $this->getJarves()->getObjects()->getNamespace($clazz) . '\\Model\\' . $this->getJarves()->getObjects(
+            )->getName($clazz)
+        );
+
         return $clazz;
     }
 
@@ -355,14 +368,15 @@ class Propel extends ORMAbstract
                     $relationName = ucfirst(substr($field, 0, $pos));
                     $fieldName = ucfirst(substr($field, $pos + 1));
                     if (!$relation = $this->tableMap->getRelation($relationName)) {
-                        throw new FileNotFoundException(sprintf('Relation `%s` in object `%s` not found', $relationName, $this->getObjectKey()));
+                        throw new FileNotFoundException(
+                            sprintf('Relation `%s` in object `%s` not found', $relationName, $this->getObjectKey())
+                        );
                     }
                     $tableMap = $relation->getForeignTable();
                 }
 
-                if (!$tableMap->hasColumnByPhpName(ucfirst($fieldName))) {
-                    throw new FileNotFoundException(sprintf('Field `%s` in object `%s` not found', $fieldName, $tableMap->getPhpName()));
-                } else {
+
+                if ($tableMap->hasColumnByPhpName(ucfirst($fieldName))) {
                     $column = $this->tableMap->getColumnByPhpName(ucfirst($fieldName));
 
                     $query->orderBy($column->getName(), $direction);
@@ -443,7 +457,7 @@ class Propel extends ORMAbstract
         if ($relations) {
             foreach ($relations as $name => $relation) {
                 if ($relation->getType() != RelationMap::MANY_TO_MANY && $relation->getType(
-                ) != RelationMap::ONE_TO_MANY
+                    ) != RelationMap::ONE_TO_MANY
                 ) {
 
                     $query->{'join' . $name}($name);
@@ -568,11 +582,13 @@ class Propel extends ORMAbstract
                 }
 
                 if ($sItems instanceof ObjectCollection) {
-                    $newRow[lcfirst($name)] = $sItems->toArray(null, null, TableMap::TYPE_CAMELNAME) ? : null;
-                } else if (is_array($sItems) && $sItems) {
-                    $newRow[lcfirst($name)] = $sItems;
+                    $newRow[lcfirst($name)] = $sItems->toArray(null, null, TableMap::TYPE_CAMELNAME) ?: null;
                 } else {
-                    $newRow[lcfirst($name)] = null;
+                    if (is_array($sItems) && $sItems) {
+                        $newRow[lcfirst($name)] = $sItems;
+                    } else {
+                        $newRow[lcfirst($name)] = null;
+                    }
                 }
             }
         }
@@ -626,7 +642,8 @@ class Propel extends ORMAbstract
      * @param mixed $query
      * @param array $filter
      */
-    public function mapFilter($query, $filter) {
+    public function mapFilter($query, $filter)
+    {
         foreach ((array)$filter as $key => $value) {
 
             $field = $this->getDefinition()->getField($key);
@@ -961,7 +978,7 @@ class Propel extends ORMAbstract
     {
         $setted = [];
 
-        $applyColumn = function($name) use (&$item, &$values, &$setted, &$ignoreNotExistingValues) {
+        $applyColumn = function ($name) use (&$item, &$values, &$setted, &$ignoreNotExistingValues) {
             $fieldName = lcfirst($name);
             $setted[] = $fieldName;
             $fieldValue = @$values[$fieldName];
@@ -985,7 +1002,14 @@ class Propel extends ORMAbstract
         /**
          * @param RelationDefinition $relation
          */
-        $applyRelation = function($relation) use ($self, $pluralizer, &$item, &$values, &$setted, &$ignoreNotExistingValues) {
+        $applyRelation = function ($relation) use (
+            $self,
+            $pluralizer,
+            &$item,
+            &$values,
+            &$setted,
+            &$ignoreNotExistingValues
+        ) {
             $fieldName = lcfirst($relation->getName());
             $fieldValue = @$values[$fieldName];
 
@@ -995,14 +1019,18 @@ class Propel extends ORMAbstract
 
             if ($relation->getType() == ORMAbstract::MANY_TO_MANY || $relation->getType() == ORMAbstract::ONE_TO_MANY) {
 
-                $name = $pluralizer->getPluralForm($pluralizer->getSingularForm(Tools::underscore2Camelcase($fieldName)));
+                $name = $pluralizer->getPluralForm(
+                    $pluralizer->getSingularForm(Tools::underscore2Camelcase($fieldName))
+                );
                 $setItems = 'set' . $name;
                 $clearItems = 'clear' . $name;
 
                 if ($fieldValue) {
                     $foreignQuery = $self->getQueryClass($relation->getForeignObjectKey());
                     $foreignClass = $self->getPhpName($relation->getForeignObjectKey());
-                    $foreignObjClass = $self->getJarves()->getObjects()->getStorageController($relation->getForeignObjectKey());
+                    $foreignObjClass = $self->getJarves()->getObjects()->getStorageController(
+                        $relation->getForeignObjectKey()
+                    );
 
                     if ($relation->getType() == ORMAbstract::ONE_TO_MANY) {
 
@@ -1010,7 +1038,10 @@ class Propel extends ORMAbstract
                         $coll->setModel(ucfirst($foreignClass));
 
                         foreach ($fieldValue as $foreignItem) {
-                            $pk = $self->getJarves()->getObjects()->getObjectPk($relation->getForeignObjectKey(), $foreignItem);
+                            $pk = $self->getJarves()->getObjects()->getObjectPk(
+                                $relation->getForeignObjectKey(),
+                                $foreignItem
+                            );
                             $item2 = null;
                             if ($pk) {
                                 $pk = $self->getPropelPk($pk, $relation->getForeignObjectKey());
@@ -1050,7 +1081,14 @@ class Propel extends ORMAbstract
             if ($relation->getType() == ORMAbstract::MANY_TO_ONE || $relation->getType() == ORMAbstract::ONE_TO_ONE) {
 
                 if (!$self->tableMap->hasRelation(ucfirst($fieldName))) {
-                    throw new \Exception(sprintf('Relation %s not found in propel object %s (%s)', ucfirst($fieldName), $self->getObjectKey(), $self->getPhpName()));
+                    throw new \Exception(
+                        sprintf(
+                            'Relation %s not found in propel object %s (%s)',
+                            ucfirst($fieldName),
+                            $self->getObjectKey(),
+                            $self->getPhpName()
+                        )
+                    );
                 }
 
                 $propelRelation = $self->tableMap->getRelation(ucfirst($fieldName));
@@ -1176,7 +1214,9 @@ class Propel extends ORMAbstract
         $query = $this->getQueryClass();
         if (!$pk) {
             if ($scope === null && $this->definition['nestedRootAsObject']) {
-                throw new \InvalidArgumentException('Argument `scope` is missing. Since this object is a nested set with different roots, we need a `scope` to get the first level.');
+                throw new \InvalidArgumentException(
+                    'Argument `scope` is missing. Since this object is a nested set with different roots, we need a `scope` to get the first level.'
+                );
             }
             $parent = $query->findRoot($scope);
         } else {
@@ -1380,6 +1420,7 @@ class Propel extends ORMAbstract
             $relationFields,
             $options['permissionCheck']
         );
+
         return $item;
 
     }

@@ -26,10 +26,10 @@ export default class WindowList {
 
     link(scope, element, attributes, controller) {
         this.jarvesWindow = controller;
-        this.jarves.loadEntryPointOptions(this.getEntryPoint()).success((response) => {
-            this.classProperties = response.data;
+        this.jarves.loadEntryPointOptions(this.getEntryPoint()).then((options) => {
+            this.classProperties = options;
             this.postLink();
-        }).error((response) => {
+        }, (error) => {
             this.error = 'Failed to load entry point definition for %s'.sprintf(this.getEntryPoint());
         });
     }

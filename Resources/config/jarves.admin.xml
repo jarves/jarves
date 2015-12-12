@@ -22,7 +22,7 @@
             <asset priority="2000" src="@JarvesBundle/libraries/angular-codemirror/ui-codemirror.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/hammer.min.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/typescript/typescript.js"/>
-            <asset priority="2000" src="@JarvesBundle/libraries/systemjs/system.src.js"/>
+            <asset priority="4000" src="@JarvesBundle/libraries/systemjs/system.src.js"/>
 
             <assets src="@JarvesBundle/libraries/tinymce/tinymce.min.js"/>
             <assets src="@JarvesBundle/libraries/codemirror/lib/codemirror.js"/>
@@ -30,13 +30,13 @@
 
             <assets src="@JarvesBundle/libraries/ladda/spin.min.js"/>
             <assets src="@JarvesBundle/libraries/ladda/ladda.min.js"/>
+
+            <asset compression="false" priority="2000" src="@JarvesBundle/start.js"/>
+
             <assets src="@JarvesBundle/libraries/ladda/ladda.min.css"/>
-
-            <asset priority="2000" src="@JarvesBundle/start.js"/>
-
-            <asset src="@JarvesBundle/fonts/OpenSans/open-sans.css"/>
-            <asset src="@JarvesBundle/fonts/OpenSans/open-sans-condensed.css"/>
-            <asset src="@JarvesBundle/fonts/icons/style.css"/>
+            <asset compression="false" src="@JarvesBundle/fonts/OpenSans/open-sans.css"/>
+            <asset compression="false" src="@JarvesBundle/fonts/OpenSans/open-sans-condensed.css"/>
+            <asset compression="false" src="@JarvesBundle/fonts/icons/style.css"/>
 
             <assets src="@JarvesBundle/css/admin/jarves.scss"/>
             <!--<assets src="@JarvesBundle/css/admin/jarves-white.scss"/>-->
@@ -46,46 +46,22 @@
             <assets src="@JarvesBundle/css/admin/jarves/*.css"/>
             <assets src="@JarvesBundle/css/admin/jarves/*.scss"/>
             <assets src="@JarvesBundle/css/admin/jarves/ui/*.css"/>
-            <assets src="@JarvesBundle/css/admin/jarves/Field/*"/>
-
+            <assets src="@JarvesBundle/css/admin/jarves/field/*"/>
         </adminAssets>
+        <adminAngularTemplates>
+            <assets src="@JarvesBundle/views/*.html"/>
+            <assets src="@JarvesBundle/views/fields/*.html"/>
+            <assets src="@JarvesBundle/views/directives/*.html"/>
+        </adminAngularTemplates>
+        <adminPreloadTypescriptModules>
+            <assets src="@JarvesBundle/directives/*.ts"/>
+            <assets src="@JarvesBundle/directives/admin/*.ts"/>
+            <assets src="@JarvesBundle/fields/*.ts"/>
+            <assets src="@JarvesBundle/filters/*.ts"/>
+            <assets src="@JarvesBundle/labels/*.ts"/>
+            <assets src="@JarvesBundle/services/*.ts"/>
+        </adminPreloadTypescriptModules>
 
-        <xxxadminAssets>
-            <assets priority="2000" src="@JarvesBundle/prototypes/String/*"/>
-            <asset type="module" src="@JarvesBundle/utils.ts"/>
-            <asset type="module" src="@JarvesBundle/JarvesApp.js"/>
-            <assets type="module" src="@JarvesBundle/controller/*"/>
-            <assets type="module" src="@JarvesBundle/fields/*"/>
-            <assets type="module" src="@JarvesBundle/filters/*"/>
-            <assets type="module" src="@JarvesBundle/labels/*"/>
-            <assets type="module" src="@JarvesBundle/services/*"/>
-            <assets type="module" src="@JarvesBundle/directives/*"/>
-            <assets type="module" src="@JarvesBundle/directives/*"/>
-            <asset src="@JarvesBundle/fonts/icons/style.css"/>
-
-            <asset type="module" src="@JarvesBundle/ObjectCollection.js"/>
-            <asset type="module" src="@JarvesBundle/annotations.js"/>
-            <asset type="module" src="@JarvesBundle/module.js"/>
-            <asset type="module" priority="-1000" src="@JarvesBundle/bootstrap.js"/>
-
-            <!--<asset src="@JarvesBundle/codemirror/lib/codemirror.js />-->
-            <!--<asset src="@JarvesBundle/codemirror/addon/mode/loadmode.js />-->
-            <!--<asset src="@JarvesBundle/codemirror/addon/selection/active-line.js />-->
-            <!--<asset src="@JarvesBundle/codemirror/lib/codemirror.css"/>-->
-
-            <asset src="@JarvesBundle/fonts/OpenSans/open-sans.css"/>
-            <asset src="@JarvesBundle/fonts/OpenSans/open-sans-condensed.css"/>
-
-            <assets src="@JarvesBundle/css/admin/jarves.scss"/>
-            <!--<assets src="@JarvesBundle/css/admin/jarves-white.scss"/>-->
-            <asset src="@JarvesBundle/css/admin/jarves/Button.scss"/>
-            <asset src="@JarvesBundle/css/admin/jarves/ButtonGroup.scss"/>
-            <assets src="@JarvesBundle/css/admin/lib/*.css"/>
-            <assets src="@JarvesBundle/css/admin/jarves/*.css"/>
-            <assets src="@JarvesBundle/css/admin/jarves/*.scss"/>
-            <assets src="@JarvesBundle/css/admin/jarves/ui/*.css"/>
-            <assets src="@JarvesBundle/css/admin/jarves/Field/*"/>
-        </xxxadminAssets>
         <streams>
             <stream path="load">
                 <class>Jarves\Controller\Admin\DashboardWidgets</class>

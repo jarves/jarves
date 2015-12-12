@@ -166,7 +166,26 @@ class AssetInfo
     }
 
     /**
-     * Returns true fi this is a stylesheet asset.
+     * Returns true if this is a typescript asset.
+     *
+     * @return bool
+     */
+    public function isTypeScript()
+    {
+        if ($this->getContentType()) {
+            return 'text/typescript' === strtolower($this->getContentType());
+        }
+
+        if ($this->getPath()) {
+            $exploded = explode('.', $this->getPath());
+            return 'ts' === strtolower(array_pop($exploded));
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns true if this is a stylesheet asset.
      *
      * @return bool
      */
@@ -180,6 +199,27 @@ class AssetInfo
             $exploded = explode('.', $this->getPath());
             return 'css' === strtolower(array_pop($exploded));
         }
+
+        return false;
+    }
+
+    /**
+     * Returns true if this is a stylesheet asset.
+     *
+     * @return bool
+     */
+    public function isScss()
+    {
+        if ($this->getContentType()) {
+            return 'text/scss' === strtolower($this->getContentType());
+        }
+
+        if ($this->getPath()) {
+            $exploded = explode('.', $this->getPath());
+            return 'scss' === strtolower(array_pop($exploded));
+        }
+
+        return false;
     }
 
     /**

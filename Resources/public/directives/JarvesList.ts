@@ -64,8 +64,8 @@ export default class JarvesList {
 
     link(scope, element, attributes, controller, transclude) {
         if (this.getEntryPoint()) {
-            this.jarves.loadEntryPointOptions(this.getEntryPoint()).success((response) => {
-                this.classProperties = response.data;
+            this.jarves.loadEntryPointOptions(this.getEntryPoint()).then((options) => {
+                this.classProperties = options;
                 if (this.classProperties.object && this.preSelect) {
                     this.select(this.preSelect);
                     delete this.preSelect;
@@ -86,7 +86,7 @@ export default class JarvesList {
         }
     }
 
-    renderTemplate(){
+    renderTemplate() {
         var template = angular.element(this.template);
         template.append(this.getItemTemplateElement());
 
@@ -107,7 +107,7 @@ export default class JarvesList {
 
             var objectDefinition = this.jarves.getObjectDefinition(this.classProperties.object);
             if (objectDefinition.labelField) {
-                return angular.element('<b>{{item.' + objectDefinition.labelField + '}}');
+                return angular.element('<b ng-bind="item.' + objectDefinition.labelField + '"></b>');
             }
 
             if (!this.classProperties.columns) {
@@ -133,14 +133,14 @@ export default class JarvesList {
                 }
 
                 if (title) {
-                    return angular.element('<b>{{item.' + title + '}}</b>');
+                    return angular.element('<b ng-bind="item.' + title + '"></b>');
                 }
             }
         }
 
         return this.itemTemplateElement;
     }
- 
+
     getEntryPoint() {
         return this.entryPoint;
     }
@@ -172,12 +172,12 @@ export default class JarvesList {
         //}
 
         this.collection = this.objectRepository.newCollection(this.classProperties.object);
-        this.collection.setOrder('title');
+        this.collection.setOrder(this.classProperties.order);
         this.collection.setEntryPoint(this.getEntryPoint());
         this.collection.setQueryOption('withAcl', true);
         //this.collection.setRepositoryMapping(this.classProperties.objectRepositoryMapping);
         this.collection.setSelection(this.getSelection());
-        this.collection.onChange((items) => {
+        this.collection.onChange((items) => {
             this.items = items;
         });
 
@@ -221,20 +221,20 @@ export default class JarvesList {
     }
 
     /**
-    *
-    * @param {Object} item
-    */
+     *
+     * @param {Object} item
+     */
     select(item) {
-       if (!this.classProperties.object) {
-           this.preSelect = item;
-           return;
-       }
-    
-       this.selectedPk = this.jarves.getObjectPk(this.classProperties.object, item);
-    
-       if (this.$attrs.model) {
-           this.$parse(this.$attrs.model).assign(this.$scope.$parent, this.selected);
-       }
+        if (!this.classProperties.object) {
+            this.preSelect = item;
+            return;
+        }
+
+        this.selectedPk = this.jarves.getObjectPk(this.classProperties.object, item);
+
+        if (this.$attrs.model) {
+            this.$parse(this.$attrs.model).assign(this.$scope.$parent, this.selected);
+        }
     }
 
     searchAndSetIndex() {
@@ -267,7 +267,7 @@ export default class JarvesList {
             return angular.equals(this.selectedPk, pk);
         }
 
-        return this.selected === index; 
+        return this.selected === index;
     }
 
     getPk(item) {

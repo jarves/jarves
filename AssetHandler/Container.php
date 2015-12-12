@@ -117,6 +117,34 @@ class Container
     }
 
     /**
+     * @param AssetInfo $assetInfo
+     *
+     * @return AssetInfo[]
+     */
+    public function compileAsset(AssetInfo $assetInfo)
+    {
+        $compiler = $this->getCompileHandlerByContentType($assetInfo->getContentType());
+        if (!$compiler) {
+            $compiler = $this->getCompileHandlerByFileExtension($assetInfo->getPath());
+        }
+
+        if (!$compiler) {
+            return [$assetInfo]; //no compiler found, so ok
+        }
+
+        if ($compiledAssetInfoResult = $compiler->compileFile($assetInfo)) {
+            if (is_array($compiledAssetInfoResult)) {
+                return $compiledAssetInfoResult;
+            } else {
+                if ($compiledAssetInfoResult instanceof AssetInfo) {
+                   return [$compiledAssetInfoResult];
+                }
+            }
+        }
+        return [];
+    }
+
+    /**
      * @param string $filePath
      * @return LoaderHandlerInterface
      */

@@ -9,7 +9,7 @@ export default class ObjectCollection {
 
     protected objectKey:string = '';
     protected selection:Array = [];
-    protected order:string = '';
+    protected order:Object = {};
     protected orderDirection:string = 'asc';
     protected entryPoint:string = '';
     protected customEntryPoint:boolean = false;
@@ -25,7 +25,6 @@ export default class ObjectCollection {
     constructor(private $q, private backend, private jarves:Jarves, private objectRepository:ObjectRepository) {
         this.objectKey = '';
         this.selection = [];
-        this.order = '';
         this.orderDirection = 'asc';
         this.entryPoint = '';
         this.customEntryPoint = false;
@@ -96,10 +95,7 @@ export default class ObjectCollection {
         //}
 
         queryOptions.primaryKeys = this.primaryKeys;
-        if (this.order) {
-            queryOptions.order = {};
-            queryOptions.order[this.order] = this.orderDirection;
-        }
+        queryOptions.order = this.order;
 
         this.backend.get(this.entryPoint + '/?' + toQueryString(queryOptions))
             .success((response) => this.handleLoadResponse(response));

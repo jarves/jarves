@@ -67,6 +67,16 @@ class Bundle extends Model
     protected $adminAssets;
 
     /**
+     * @var Asset[]
+     */
+    protected $adminAngularTemplates;
+
+    /**
+     * @var Asset[]
+     */
+    protected $adminPreloadTypescriptModules;
+
+    /**
      * @var string
      */
     protected $bundleName;
@@ -530,14 +540,65 @@ class Bundle extends Model
     }
 
     /**
-     * @return AssetInfo[]
+     * @return \Jarves\AssetHandler\AssetInfo[]
      */
-    public function collectAdminAssetsInfo()
+    public function getAdminAngularTemplatesInfo()
+    {
+        return $this->collectAssets($this->adminAngularTemplates);
+    }
+
+    /**
+     * @return Asset[]|Assets[]
+     */
+    public function getAdminAngularTemplates()
+    {
+        return $this->adminAngularTemplates;
+    }
+
+    /**
+     * @param Asset[]|Assets[] $adminAngularTemplates
+     */
+    public function setAdminAngularTemplates(array $adminAngularTemplates = null)
+    {
+        $this->adminAngularTemplates = $adminAngularTemplates;
+    }
+
+    /**
+     * @return \Jarves\AssetHandler\AssetInfo[]
+     */
+    public function getAdminPreloadTypescriptModulesInfo()
+    {
+        return $this->collectAssets($this->adminPreloadTypescriptModules);
+    }
+
+    /**
+     * @return Asset[]
+     */
+    public function getAdminPreloadTypescriptModules()
+    {
+        return $this->adminPreloadTypescriptModules;
+    }
+
+    /**
+     * @param Asset[]|Assets[] $adminPreloadTypescriptModules
+     */
+    public function setAdminPreloadTypescriptModules(array $adminPreloadTypescriptModules = null)
+    {
+        $this->adminPreloadTypescriptModules = $adminPreloadTypescriptModules;
+    }
+
+    /**
+     *
+     * @param Asset[]|Assets[] $assets
+     *
+     * @return \Jarves\AssetHandler\AssetInfo[]
+     */
+    public function collectAssets(array $assets = null)
     {
         $assetsInfo = array();
 
-        if ($this->getAdminAssets()) {
-            foreach ($this->getAdminAssets() as $asset) {
+        if ($assets) {
+            foreach ($assets as $asset) {
                 if ($asset instanceof Asset) {
                     $assetsInfo[] = $asset->getAssetInfo();
                 } else {
@@ -558,7 +619,7 @@ class Bundle extends Model
      */
     public function getAdminAssetsInfo()
     {
-        return $this->collectAdminAssetsInfo();
+        return $this->collectAssets($this->getAdminAssets());
 //
 //
 //        $assets = $this->collectAdminAssetsInfo();

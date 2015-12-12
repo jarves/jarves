@@ -1,4 +1,4 @@
-import {Directive} from '../angular.ts';
+import {Directive, angular} from '../angular.ts';
 import {baseUrl, baseUrlApi} from '../config.js';
 
 @Directive('icon', {
@@ -23,7 +23,7 @@ export default class Icon {
             this.element.removeClass(this.oldClass);
         }
         if (this.oldImg) {
-            this.oldImg.destroy();
+            this.oldImg.remove();
         }
 
         if (!this.value) return;
@@ -31,9 +31,9 @@ export default class Icon {
             this.element.addClass(this.value.substr(1));
             this.oldClass = this.value.substr(1);
         } else {
-            this.oldImg = new Element('img', {
-                src: baseUrl + this.value
-            }).inject(this.element[0], 'top');
+            this.oldImg = angular.element('<img/>');
+            this.oldImg.attr('src', baseUrl + this.value);
+            this.element.append(this.oldImg);
         }
 
         if (!this.attributes.ngBind && !this.element.text()) {

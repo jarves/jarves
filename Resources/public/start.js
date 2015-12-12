@@ -25,10 +25,12 @@ window.jarvesModule.config( ['$provide', function ($provide){
 }]);
 
 
-System.import('jarves/index.ts').then(function(m) {
-    //load all bundles /index.ts's.
-    console.log('!BOOTSTRAP ANGULAR!');
-    angular.bootstrap(document, ['jarves']);
-});
+//System.import(window._baseUrlApi + 'jarves/admin/backend/typescript-modules.ts').then(function(m) {
+    System.import('jarves/index.ts').then(function(m) {
+        //load all bundles /index.ts's.
+        console.log('!BOOTSTRAP ANGULAR!');
+        angular.bootstrap(window.document, ['jarves']);
+    });
+//});
 
 
