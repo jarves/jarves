@@ -46,7 +46,7 @@ export default class FieldController {
         $scope.$watch(() => { return this.value; }, (value) => {
             this.prettyValue = angular.toJson(value);
             window.localStorage.setItem('jarvesbundle_system_dev_fields_value', this.prettyValue);
-        });
+        }, true);
         $scope.$watch(() => { return this.prettyValue; }, (value) => {
             try {
                 this.value = angular.fromJson(value);

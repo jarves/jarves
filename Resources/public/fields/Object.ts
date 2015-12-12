@@ -66,12 +66,13 @@ export default class Object extends AbstractFieldType {
             let currentPk = this.jarves.getObjectPk(this.getOption('object'), currentItem);
 
             if (angular.equals(currentPk, pkToRemove)) {
-                this.items.splice(index, 1);
+                this.items.splice(i, 1);
                 this.value.splice(index, 1);
+
+                this.setModelValue(this.value);
+                return;
             }
         }
-
-        this.setModelValue(this.value);
     }
 
     public getTemplate():string {
