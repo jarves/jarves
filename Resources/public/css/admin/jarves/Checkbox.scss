@@ -76,4 +76,20 @@
     .jarves-Checkbox-on .jarves-Checkbox-knob {
         left: 27px;
     }
+
+    &.jarves-white {
+        .jarves-Checkbox-knob {
+            background-color: white;
+        }
+
+        .jarves-Checkbox-on,
+        .jarves-Checkbox-on:hover {
+            background-color: #4EA060;
+        }
+
+        .jarves-Checkbox-off,
+        .jarves-Checkbox-off:hover {
+            background-color: #CECECE;
+        }
+    }
 }
