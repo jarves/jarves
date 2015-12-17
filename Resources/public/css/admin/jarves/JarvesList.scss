@@ -27,7 +27,7 @@ jarves-list-delimiter {
     float: right;
 }
 
-jarves-list-item {
+a.jarves-list-item {
     display: block;
     border-bottom: 1px solid lighten($mainColor, 10%);
     cursor: pointer;
@@ -41,7 +41,15 @@ jarves-list-item {
     transition-duration: .3s;
 }
 
-jarves-list-item h2 {
+jarves-list-item-split {
+    display: block;
+    padding: 3px 6px;
+    @include line-bottom;
+    background-color: rgba(184, 184, 184, 0.3);
+    text-transform: uppercase;
+}
+
+a.jarves-list-item h2 {
     padding: 0px;
     margin: 1px 0px 4px 0px;
     font-size: 13px;
@@ -49,16 +57,16 @@ jarves-list-item h2 {
     font-weight: normal;
 }
 
-jarves-list-item .sub {
+a.jarves-list-item .sub {
     color: #ccc;
 }
 
-jarves-list-item:hover {
+a.jarves-list-item:hover {
     background-color: lighten($mainColor, 2%);
 }
 
-jarves-list-item.selected,
-jarves-list-item.selected:hover {
+jarves-list-item.selected a.jarves-list-item,
+jarves-list-item.selected a.jarves-list-item:hover {
     background-color: lighten($mainColor, 4%);
 }
 
@@ -70,23 +78,27 @@ jarves-list-item.selected:hover {
         color: #666;
     }
 
-    jarves-list-item:hover,
-    jarves-list-item.selected,
-    jarves-list-item.selected:hover {
+    a.jarves-list-item:hover,
+    jarves-list-item.selected a.jarves-list-item,
+    jarves-list-item.selected a.jarves-list-item:hover {
         background-color: #DFDFDF;
         border-bottom: 1px solid #c1c1c1;
         color: #444;
     }
 
-    jarves-list-item {
+    .jarves-list-item {
         border-bottom: 1px solid #d1d1d1;
     }
 
-    jarves-list-item .sub {
+    .jarves-list-item .sub {
         color: #555;
     }
 
     .jarves-list-top {
+        @include white-line-bottom;
+    }
+
+    jarves-list-item-split {
         @include white-line-bottom;
     }
 }
