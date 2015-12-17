@@ -37,10 +37,14 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
         if ($needsCompilation) {
             $options = [
             ];
-            $parser = new \SassParser($options);
-            $compiled = $parser->toCss($localPath);
 
-            $compiled = $this->replaceRelativePaths($publicPath, $targetPath, $compiled);
+//            $localPath = realpath($localPath);
+            $compiler = new \Leafo\ScssPhp\Compiler();
+            $compiler->setImportPaths(dirname($localPath));
+
+            $compiled = $compiler->compile(file_get_contents($localPath), $localPath);
+
+//            $compiled = $this->replaceRelativePaths($publicPath, $targetPath, $compiled);
             $compiled = "/* compiled at $sourceMTime */\n".$compiled;
             $this->getJarves()->getWebFileSystem()->write($targetPath, $compiled);
         }

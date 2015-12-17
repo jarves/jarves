@@ -4,29 +4,28 @@ table {
 //    table-layout: fixed;
 }
 
-th,
-td {
-    padding: 5px;
-    cursor: default;
-    line-height: 18px;
-    border-bottom: 1px solid lighten($mainColor, 2%);
-    color: $mainTextColor;
-}
+table.highlight {
+    th,
+    td {
+        padding: 5px;
+        cursor: default;
+        line-height: 18px;
+        border-bottom: 1px solid lighten($mainColor, 2%);
+        color: $mainTextColor;
+    }
 
-th {
-    font-weight: 200;
-}
-
-table tr:nth-child(odd) td {
-    background-color: rgba($mainColor, 0.05);
-}
-
-table tr:hover td {
-    background-color: lighten($mainColor, 3%);
-}
-
-table tr.selected td {
-    background-color: lighten($mainColor, 12%);
+    th {
+        font-weight: 200;
+    }
+    tr:nth-child(odd) td {
+        background-color: rgba($mainColor, 0.05);
+    }
+    tr:hover td {
+        background-color: lighten($mainColor, 3%);
+    }
+    tr.selected td {
+        background-color: lighten($mainColor, 12%);
+    }
 }
 
 td[jarves-grid-actions] {
@@ -47,17 +46,18 @@ td[jarves-grid-actions] button:hover {
 }
 
 .jarves-white {
-    th,
-    td {
-        border-bottom: 1px solid darken($whiteMainColor, 5%);
-        color: $whiteMainTextColor;
+    table.highlight {
+        th,
+        td {
+            border-bottom: 1px solid darken($whiteMainColor, 5%);
+            color: $whiteMainTextColor;
+        }
+        tr:nth-child(odd) td {
+            background-color: rgba(darken($whiteMainColor, 10%), 0.05);
+        }
     }
 
-    table tr:nth-child(odd) td {
-        background-color: rgba(darken($whiteMainColor, 10%), 0.05);
-    }
-
-    table tr:hover td {
+    table.hover tr:hover td {
         background-color: darken($whiteMainColor, 3%);
     }
 

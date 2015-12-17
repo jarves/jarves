@@ -2,6 +2,7 @@ import AbstractFieldType from './AbstractFieldType.ts';
 import {Field} from '../angular.ts';
 import {each} from '../utils.ts';
 import angular from '../angular.ts'
+import JarvesSelectChooser from "../directives/fields/JarvesSelectChooser";
 
 @Field('select', {
     templateUrl: 'bundles/jarves/views/fields/select.html',
@@ -10,8 +11,6 @@ import angular from '../angular.ts'
 export default class Select extends AbstractFieldType {
     protected chooserOpen = false;
     protected items = {};
-
-    protected additionalOptionsReferences = ['items'];
 
     public selected = {};
     public selectedItem = {
@@ -22,9 +21,15 @@ export default class Select extends AbstractFieldType {
 
     public value = null;
 
+    protected jarvesSelectChooser:JarvesSelectChooser;
+
     constructor(protected $compile, protected $parse, protected $timeout, protected $http,
                 protected $templateCache, protected $q, protected $interpolate, protected objectRepository) {
         super(...arguments);
+    }
+
+    public setJarvesSelectChooser(jarvesSelectChooser:JarvesSelectChooser) {
+        this.jarvesSelectChooser = jarvesSelectChooser;
     }
 
     link(scope, element, attr, controller, transclude) {
@@ -43,13 +48,16 @@ export default class Select extends AbstractFieldType {
             //todo change to objectcollection
             this.objectRepository.getItems(this.getOption('object')).then((...args) => this.prepareItems(...args));
         } else {
-            this.prepareItems(this.getOption('items'));
+            this.scope.$watch(this.attributes['items'], (items) => {
+                this.prepareItems(items);
+            });
         }
     }
 
     prepareItems(items) {
         var newItems = [], id;
 
+        console.log('prepareItems', items);
         if (angular.isArray(items)) {
             for (let [idx, item] of each(items)) {
                 id = this.getOption('idField') && angular.isObject(item)
@@ -93,7 +101,7 @@ export default class Select extends AbstractFieldType {
      * @param {*} id
      */
     select(id) {
-        this.chooserOpen = false;
+        this.closeChooser();
         if ('null' === this.items[id]) {
             return;
         }
@@ -128,11 +136,26 @@ export default class Select extends AbstractFieldType {
 
     }
 
-    openChooser() {
-        this.chooserOpen = true;
+    public getOffset():Object {
+        return this.element.offset();
     }
 
-    toggle() {
+    public getHeight():Number {
+        return this.element.height();
+    }
+
+    public openChooser() {
+        this.chooserOpen = true;
+        this.jarvesSelectChooser.show();
+    }
+
+    public closeChooser() {
+        this.chooserOpen = false;
+        this.jarvesSelectChooser.hide();
+    }
+
+    public toggle() {
         this.chooserOpen = !this.chooserOpen;
+        this.chooserOpen ? this.openChooser() : this.closeChooser();
     }
 }

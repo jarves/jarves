@@ -1,5 +1,13 @@
 .jarvesTabs-pane {
     display: none;
+
+    jarves-field:first-child {
+        margin-top: 10px;
+    }
+
+    jarves-field {
+        margin-left: 10px;
+    }
 }
 
 .jarvesTabs-pane.visible {

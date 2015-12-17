@@ -4,7 +4,7 @@
 <div ng-if="jarvesGrid.error">
     {{jarvesGrid.error}}
 </div>
-<table width="100%" ng-if="jarvesGrid.classProperties">
+<table class="highlight hover" width="100%" ng-if="jarvesGrid.classProperties">
     <thead>
     <tr>
         <th ng-repeat="column in jarvesGrid.classProperties.columns | toArray" width="{{column.width}}" align="{{column.align}}">{{column.label}}</th>

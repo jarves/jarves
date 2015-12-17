@@ -1,13 +1,13 @@
 import {Directive, Inject} from '../angular.ts';
-import {each} from '../utils.ts';
+import {each, eachValue} from '../utils.ts';
 import angular from '../angular.ts';
 
 @Directive('jarvesList', {
     restrict: 'E',
     scope: true,
-    controllerAs: 'jarvesList'
+    controllerAs: 'jarvesList',
+    templateUrl: 'bundles/jarves/views/directives/jarvesList.html'
     // transclude: true,
-    // templateUrl: 'bundles/jarves/views/list.html'
 })
 @Inject('$scope, $element, $attrs, backend, $q, $parse, $compile, jarves, objectRepository')
 export default class JarvesList {
@@ -23,6 +23,7 @@ export default class JarvesList {
     protected preSelect;
 
     public items;
+    public sortItems:Object;
 
     constructor(private $scope, private $element, private $attrs, private backend, private $q, private $parse, private $compile, private jarves, private objectRepository) {
         this.classProperties = {};
@@ -68,9 +69,9 @@ export default class JarvesList {
                 this.classProperties = options;
                 if (this.classProperties.object && this.preSelect) {
                     this.select(this.preSelect);
-                    delete this.preSelect;
+                    this.preSelect = false;
                 }
-                this.renderTemplate();
+                this.setupOrder();
                 this.loadPage();
             });
         }
@@ -80,19 +81,14 @@ export default class JarvesList {
                 this.items = items;
             })
         }
-
-        if (!this.getEntryPoint()) {
-            this.renderTemplate();
-        }
     }
 
-    renderTemplate() {
-        var template = angular.element(this.template);
-        template.append(this.getItemTemplateElement());
-
-        this.$compile(template)(this.$scope, (clone) => {
-            this.$element.append(clone);
-        });
+    protected setupOrder() {
+        this.sortItems = {};
+        for (let [id, column] of each(this.classProperties.columns)) {
+            this.sortItems['asc_' + id] = [column.label, '#icon-triangle-3'];
+            this.sortItems['desc_' + id] = [column.label, '#icon-triangle-2'];
+        }
     }
 
     setItemTemplateElement(itemTemplateElement) {
@@ -104,20 +100,16 @@ export default class JarvesList {
             if (!this.getEntryPoint()) {
                 throw '<jarves-list> does not contain a <jarves-list-template> element nor e entry-point defined.';
             }
-
-            var objectDefinition = this.jarves.getObjectDefinition(this.classProperties.object);
-            if (objectDefinition.labelField) {
-                return angular.element('<b ng-bind="item.' + objectDefinition.labelField + '"></b>');
-            }
-
             if (!this.classProperties.columns) {
                 throw '<jarves-list>\' entry-point with object %s has no columns nor a label field defined.'.sprintf(this.classProperties.object);
             }
 
+            var objectDefinition = this.jarves.getObjectDefinition(this.classProperties.object);
+
             if (this.classProperties.itemLayout) {
                 return angular.element(this.classProperties.itemLayout);
             } else {
-                var titleNames = ['title', 'name', 'label'];
+                var titleNames = [objectDefinition.labelField, 'title', 'name', 'label'];
                 var title;
                 for (let titleName of titleNames) {
                     if (!title && titleName in this.classProperties.columns) {

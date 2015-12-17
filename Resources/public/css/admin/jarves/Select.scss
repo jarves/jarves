@@ -1,40 +1,72 @@
 @import "../base";
 
-.jarves-Select-wrapper {
-    display: inline-block;
-    position: relative;
-}
+.jarves-admin {
 
-.jarves-Select-wrapper > .jarves-Select-box {
-    position: absolute;
-    left: 0;
-    right: 0;
-}
+    .jarves-Select-wrapper {
+        display: inline-block;
+        position: relative;
+    }
 
-a.jarves-Select-box,
-a.jarves-Select-box:link {
-    cursor: default;
-    position: relative;
+    .jarves-Select-wrapper > .jarves-Select-box {
+        position: absolute;
+        left: 0;
+        right: 0;
+    }
 
-    overflow: hidden;
-    display: inline-block;
-    line-height: 24px;
-    height: 28px;
+    .jarves-Select-box {
+        cursor: default;
+        position: relative;
 
-    vertical-align: top;
-    min-width: 40px;
-    margin: 0 4px;
+        overflow: hidden;
+        display: inline-block;
+        line-height: 24px;
+        height: 28px;
 
-    text-align: left;
+        vertical-align: top;
+        min-width: 40px;
+        margin: 0 4px;
+        padding-right: 25px;
 
-    max-width: 100%;
+        text-align: left;
 
-    @include simple-button();
-    @include box-sizing(border-box);
+        max-width: 100%;
+
+        @include simple-button();
+        @include box-sizing(border-box);
+    }
+
+    .jarves-Select-arrow {
+        position: absolute;
+        right: 0px;
+        top: 4px;
+    }
+
+    // this container is placed inside document.body, so relative to <body>
+    jarves-select-chooser {
+        position: fixed;
+
+        background-color: $buttonColor;
+
+        a, a:link {
+            display: block;
+            padding: 3px 5px;
+            color: $mainTextColor;
+        }
+
+        a:hover {
+            background-color: darken($buttonColor, 20%);
+        }
+    }
 }
 
 .jarves-white {
-    a.jarves-Select-box, a.jarves-Select-box:link {
+    .jarves-Select-box {
         @include white-simple-button();
+    }
+
+    jarves-select-chooser {
+        a, a:link {
+            color: $whiteMainTextColor;
+        }
     }
 }

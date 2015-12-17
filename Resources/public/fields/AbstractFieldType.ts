@@ -194,7 +194,7 @@ export default class AbstractFieldType {
 
         this.$compile(this.labelElement)(this.scope);
         this.$compile(this.descriptionElement)(this.scope);
-        this.$compile(this.fieldContainer)(this.scope);
+        //this.$compile(this.fieldContainer)(this.scope); //this triggers a second compilation of its inner html
         this.$compile(this.childrenContainer)(this.scope);
 
         transclude(scope, (clone) => {

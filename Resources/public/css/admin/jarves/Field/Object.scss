@@ -1,7 +1,15 @@
 .jarves-field-object-list {
-    background-color: #fafafa;
-    border: 1px solid #dadada;
-    border-radius: 2px;
-    padding: 2px;
     width: 100%;
+    margin-bottom: 5px;
+    margin-top: 10px;
+
+    tr:first-child td {
+        border-top: 1px solid #dfdfdf;
+    }
+
+    td {
+        border-bottom: 1px solid #dfdfdf;
+        padding: 5px 0;
+        line-height: 200%;
+    }
 }

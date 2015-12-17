@@ -25,7 +25,6 @@ export default class JarvesField {
         this.transclude = transclude;
 
         if (attributes['definition']) {
-            scope.penis = 1;
             this.$scope.$watch(attributes['definition'], (definition) => {
                 if (this.lastType) {
                     element.removeAttr(this.lastType);

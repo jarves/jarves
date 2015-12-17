@@ -25,6 +25,7 @@ import './directives/Button.ts';
 import './directives/Icon.ts';
 import './directives/InputText.ts';
 
+import './directives/fields/JarvesSelectChooser.ts';
 import './directives/JarvesField.ts';
 import './directives/JarvesForm.ts';
 import './directives/JarvesFormGroup.ts';
@@ -45,6 +46,7 @@ import './directives/ThFixed.ts';
 import './directives/Translate.ts';
 
 import './fields/File.ts';
+import './fields/Checkbox.ts';
 import './fields/Language.ts';
 import './fields/Object.ts';
 import './fields/Password.ts';

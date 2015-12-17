@@ -1,0 +1,10 @@
+<div class="jarves-list-top">
+    <div class="jarves-list-count">{{jarvesList.items.length}} of {{jarvesList.itemsCount}}</div>
+    <div class="jarves-list-sort">
+        <jarves-field type="select" inline="true" items="jarvesList.sortItems"/>
+    </div>
+</div>
+<div class="jarves-list-items">
+    <jarves-list-item ng-repeat="item in jarvesList.items" ng-class="{'selected': jarvesList.isSelectedIndex($index)}"
+                  ng-click="jarvesList.selectable && jarvesList.selectIndex($index)"></jarves-list-item>
+</div>

@@ -107,7 +107,7 @@ class AdminAssets
             3000
         );
 
-        if (false && $this->getJarves()->getKernel()->isDebug()) {
+        if ($this->getJarves()->getKernel()->isDebug()) {
             foreach ($this->getJarves()->getConfigs() as $bundleConfig) {
                 foreach ($bundleConfig->getAdminAssetsInfo() as $assetInfo) {
                     if ($options['noJs'] && $assetInfo->isJavaScript()) {

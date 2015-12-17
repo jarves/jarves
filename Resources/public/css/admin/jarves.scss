@@ -1,24 +1,32 @@
 @import "base";
+// Core variables and mixins
+@import "lib/bootstrap/bootstrap/variables";
+@import "lib/bootstrap/bootstrap/mixins";
+
+@import "lib/bootstrap/bootstrap/utilities";
+@import "lib/bootstrap/bootstrap/utilities";
+@import "lib/bootstrap/bootstrap/labels";
+@import "lib/bootstrap/bootstrap/type";
 
 html, body {
     margin: 0;
     padding: 0;
 }
 
-$base-font-size: 14px;
+$base-font-size: 13px;
 
 .jarves-admin, .jarves-normalize {
     font-family: "Open Sans", "Lucida Grande", "DejaVu Sans", "Bitstream Vera Sans", "Segoe UI", "Tahoma", sans-serif;
     font-size: $base-font-size;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
     color: white;
     line-height: normal;
     text-align: left;
     -webkit-font-smoothing: antialiased;
     text-rendering: geometricPrecision;
     font-smooth: never;
-    font-weight: 400;
+    font-weight: 300;
 }
 
 //::-webkit-scrollbar {
@@ -82,8 +90,8 @@ button::-moz-focus-inner {
         font-weight: 300;
     }
 
-    stylesheetstrong, b {
-        font-weight: 400;
+    strong, b {
+        font-weight: 600;
     }
 
     .jarves-clear {

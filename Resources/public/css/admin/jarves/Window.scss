@@ -254,7 +254,7 @@ window-dialog {
         color: $whiteLinkColor;
     }
 
-    window-sidebar 
+    window-sidebar {
         @include white-line-bottom;
     }
 

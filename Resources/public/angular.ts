@@ -222,11 +222,9 @@ export function Field(name, directiveOptions) {
     return function decoratorFactory(target:Object, decoratedPropertyName?:string):void {
         var directiveName = 'jarves' + name.ucfirst() + 'Field';
 
-        //console.log('@Field', name, directiveName);
         getModule().directive(
             directiveName,
             function () {
-                //console.log('call ', name, directiveName);
                 return angular.extend({
                 //return {
                     restrict: 'A',

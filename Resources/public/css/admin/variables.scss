@@ -1,12 +1,12 @@
 
-$mainColor = #041114;
+$mainColor: #041114;
 $whiteMainColor: #f0f0f0;
 
-$mainLinkColor = #CCEBF7;
+$mainLinkColor: #CCEBF7;
 $whiteMainLinkColor: $mainColor;
 
-$buttonColor = #f8f8f8;
-$buttonColorPrimary = $mainColor;
+$buttonColor: #f8f8f8;
+$buttonColorPrimary: $mainColor;
 
 $linkHoverColor: lighten($mainLinkColor, 60%);
 $linkHoverBgColor: lighten($mainColor, 15%);

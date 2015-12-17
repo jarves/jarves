@@ -1,6 +1,6 @@
 //@import "bourbon";
 @import "bourbon/addons/prefixer";
-//
+
 // CSS3 Mixins
 @import "bourbon/css3/animation";
 @import "bourbon/css3/appearance";
@@ -24,9 +24,9 @@
 @import "bourbon/css3/transition";
 @import "bourbon/css3/user-select";
 @import "bourbon/css3/placeholder";
+@import "bourbon/addons/clearfix";
 
 @import "variables";
-
 
 @mixin simple-button {
     background-color: $linkBgColor;

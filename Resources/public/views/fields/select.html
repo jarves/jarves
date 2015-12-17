@@ -1,8 +1,8 @@
-<a href="javascript:;" class="jarves-normalize jarves-Select-box" ng-click="selectController.toggle()">
+<button href="javascript:;" class="jarves-normalize jarves-Select-box" ng-click="selectController.toggle()">
     <span class="jarves-Select-box-title" icon="{{selectController.selectedItem.icon}}">{{selectController.selectedItem.label}}</span>
     <span class="jarves-Select-arrow icon-arrow-17"></span>
-    <div ng-if="selectController.chooserOpen">
-        <a ng-repeat="item in selectController.items | toArray" ng-click="selectController.select(item.$key)" icon="{{item.icon}}"
-           href="javascript:;">{{item.label}}</a>
-    </div>
-</a>
+    <jarves-select-chooser>
+        <a ng-repeat="item in selectController.items | toArray" ng-click="selectController.select(item.$key)"
+           icon="{{item.icon}}" href="javascript:;">{{item.label}}</a>
+    </jarves-select-chooser>
+</button>
