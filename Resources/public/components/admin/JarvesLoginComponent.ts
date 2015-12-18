@@ -1,13 +1,15 @@
-import {Directive} from '../../angular.ts';
-import JarvesAdmin from './JarvesAdmin';
+import {Component} from 'angular2/core';
+import Jarves from "../../services/Jarves";
+import Translator from "../../services/Translator";
+import Backend from "../../services/Backend";
 
-@Directive('jarvesLogin', {
-    restrict: 'E',
+@Component({
+    selector: 'jarves-login',
     templateUrl: 'bundles/jarves/views/login.html',
-    controllerAs: 'loginController',
-    require: '^jarvesAdmin'
+    //controllerAs: 'loginController',
+    //require: '^jarvesAdmin'
 })
-export default class JarvesLogin {
+export default class JarvesLoginComponent {
     public loginStatus:number = 0;
     public inputBlocked:boolean = false;
     public progress:number = 0;
@@ -17,13 +19,11 @@ export default class JarvesLogin {
         password: ''
     };
 
-    protected jarvesAdmin:JarvesAdmin;
+    constructor(private backend:Backend, private translator:Translator, private jarves:Jarves) {
+        //this.jarves.loginController = this;
 
-    constructor(private $rootScope, private backend, private translator, private jarves, private $timeout) {
-        this.jarves.loginController = this;
-
-        $rootScope.language = 'en';
-        $rootScope.$watch('language', (v) => this.loadLanguage(v));
+        //jarves.language = 'en';
+        //$rootScope.$watch('language', (v) => this.loadLanguage(v));
     }
 
     link(scope, element, attributes, controller) {

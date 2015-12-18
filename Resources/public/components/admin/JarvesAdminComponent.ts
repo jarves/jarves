@@ -1,20 +1,30 @@
-import {baseUrl, baseUrlApi} from '../../config.js';
-import {Directive} from '../../angular.ts';
-import WindowManagement from '../../services/WindowManagement.ts';
-import Jarves from '../../services/Jarves.ts';
+import {baseUrl, baseUrlApi} from '../../config';
+import {Component} from 'angular2/core';
+import WindowManagement from '../../services/WindowManagement';
+import Jarves from '../../services/Jarves';
+import JarvesLoginComponent from "./JarvesLoginComponent";
 
-@Directive('jarvesAdmin', {
-    restrict: 'E',
-    controllerAs: 'jarvesAdmin'
+@Component({
+    selector: 'jarves-admin',
+    providers: [Jarves, WindowManagement],
+    directives: [JarvesLoginComponent],
+    template: `
+    <jarves-login></jarves-login>
+    <jarves-interface></jarves-interface>
+    `
 })
-export default class AdminController {
+export class JarvesAdminComponent {
     public menuHidden:Object = {};
     public interfaceVisible:boolean = false;
 
-    constructor(public $rootScope, public $scope, protected $q, public $http, public jarves:Jarves, public windowManagement:WindowManagement) {
-        this.$rootScope._baseUrl = baseUrl;
-        this.$rootScope._baseUrlApi = baseUrlApi;
-        this.$rootScope._session = window._session;
+    public _baseUrl:string;
+    public _baseUrlApi:string;
+    public _session:Object;
+
+    constructor(public jarves:Jarves, public windowManagement:WindowManagement) {
+        this._baseUrl = baseUrl;
+        this._baseUrlApi = baseUrlApi;
+        this._session = window._session;
     }
 
     showInterface() {

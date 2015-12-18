@@ -1,8 +1,9 @@
 //import Jarves from './Jarves.js';
 import {each, eachValue} from '../utils.ts';
-import {Service, angular} from '../angular.ts';
+import {angular} from '../angular.ts';
 import JarvesWindow from '../directives/JarvesWindow.ts';
 import Jarves from '../services/Jarves.ts';
+import {Injectable} from "angular2/core";
 
 export enum EntryPointType {
     List = 'list',
@@ -43,7 +44,7 @@ export interface JarvesWindowList {
     [windowId: number]: JarvesWindow
 }
 
-@Service('windowManagement')
+@Injectable()
 export default class WindowManagement {
 
     public activeWindowList:WindowList = {};
@@ -52,7 +53,7 @@ export default class WindowManagement {
     public activeWindow:JarvesWindow = null;
     public jarvesWindows:JarvesWindowList = {};
 
-    constructor(protected jarves:Jarves, protected $rootScope) {
+    constructor(protected jarves:Jarves) {
         this.activeWindowList = {};
         this.activeWindowId = -1;
         this.currentWindowIndex = 0;

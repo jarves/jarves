@@ -1,5 +1,5 @@
-import {baseUrl, baseUrlApi} from './config.js';
-import angular from './angular.ts';
+import {baseUrl, baseUrlApi} from './config';
+import angular from './angular';
 
 import {FieldAnnotation, LabelAnnotation, FilterAnnotation, Parser, DirectiveAnnotation, InjectAnnotation, InjectAsPropertyAnnotation} from './angular.ts';
 

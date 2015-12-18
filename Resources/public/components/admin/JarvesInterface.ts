@@ -1,5 +1,4 @@
-import {baseUrl, baseUrlApi} from '../../config.js';
-import {Directive} from '../../angular.ts';
+import {baseUrl, baseUrlApi} from '../../config';
 
 @Directive('jarvesInterface', {
     restrict: 'E',

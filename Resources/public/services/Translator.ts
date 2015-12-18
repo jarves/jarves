@@ -1,6 +1,6 @@
-import {Service} from '../angular.ts';
+import {Injectable} from "angular2/core";
 
-@Service('translator')
+@Injectable()
 export default class Translator {
     constructor($rootScope, backend) {
         this.rootScope = $rootScope;

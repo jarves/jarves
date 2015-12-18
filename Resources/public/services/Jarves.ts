@@ -1,29 +1,15 @@
 //import {Test, Inject, Directive} from '../Test.ts';
-import {Inject, Service} from '../angular.ts';
 import {each, eachValue, normalizeObjectKey, urlEncode, urlDecode, getCroppedObjectKey, getCroppedObjectId} from '../utils.ts';
-import {baseUrl, baseUrlApi} from '../config.js';
+import {baseUrl, baseUrlApi} from '../config';
 import {EntryPoint} from "./WindowManagement";
+import {Injectable} from "angular2/core";
 
-/**
- * Uses the $rootScope.
- *
- * @service jarves
- * @scope {
- *  '_menus': 'Administration main menu items',
- *  '_session': 'Current session information',
- *  '_settings': 'Current system settings'
- * }
- */
-@Service('jarves')
+@Injectable()
 export default class Jarves {
     getObjectLabelByItemTemplates:Object = {};
 
-    constructor(private $rootScope, private backend, private $q, private $injector, private translator) {
-        this.$rootScope._session = window._session;
-        this.$rootScope._settings = {};
-
-        console.log('new Service Jarves');
-    }
+    //constructor(private backend, private $q, private $injector, private translator) {
+    //}
 
     /**
      * Sets current session.

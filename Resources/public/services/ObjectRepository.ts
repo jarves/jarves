@@ -2,9 +2,9 @@ import {Service} from '../angular.ts';
 import ObjectCollection from '../ObjectCollection.ts';
 import {each, normalizeObjectKey, toQueryString} from '../utils.ts';
 import ObjectCollection from "../ObjectCollection";
+import {Injectable} from "angular2/core";
 
-//@Inject('$rootScope, $q, $injector, $timeout, backend, jarves')
-@Service('objectRepository')
+@Injectable()
 export default class ObjectRepository {
     private changesCallback = {};
 

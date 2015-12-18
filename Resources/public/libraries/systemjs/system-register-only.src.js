@@ -1,5 +1,5 @@
 /*
- * SystemJS v0.18.17
+ * SystemJS v0.19.6
  */
 (function(__global) {
 
@@ -835,19 +835,14 @@ function logloads(loads) {
       if (typeof obj != 'object')
         throw new TypeError('Expected object');
 
-      // we do this to be able to tell if a module is a module privately in ES5
-      // by doing m instanceof Module
       var m = new Module();
 
-      var pNames;
-      if (Object.getOwnPropertyNames && obj != null) {
+      var pNames = [];
+      if (Object.getOwnPropertyNames && obj != null)
         pNames = Object.getOwnPropertyNames(obj);
-      }
-      else {
-        pNames = [];
+      else
         for (var key in obj)
           pNames.push(key);
-      }
 
       for (var i = 0; i < pNames.length; i++) (function(key) {
         defineProperty(m, key, {
@@ -858,9 +853,6 @@ function logloads(loads) {
           }
         });
       })(pNames[i]);
-
-      if (Object.preventExtensions)
-        Object.preventExtensions(m);
 
       return m;
     },
@@ -957,7 +949,7 @@ function SystemLoader() {
 // NB no specification provided for System.paths, used ideas discussed in https://github.com/jorendorff/js-loaders/issues/25
 function applyPaths(paths, name) {
   // most specific (most number of slashes in path) match wins
-  var pathMatch = '', wildcard, maxSlashCount = 0;
+  var pathMatch = '', wildcard, maxWildcardPrefixLen = 0;
 
   // check to see if we have a paths entry
   for (var p in paths) {
@@ -974,11 +966,11 @@ function applyPaths(paths, name) {
     }
     // wildcard path match
     else {
-      var slashCount = p.split('/').length;
-      if (slashCount >= maxSlashCount &&
+      var wildcardPrefixLen = pathParts[0].length;
+      if (wildcardPrefixLen >= maxWildcardPrefixLen &&
           name.substr(0, pathParts[0].length) == pathParts[0] &&
           name.substr(name.length - pathParts[1].length) == pathParts[1]) {
-            maxSlashCount = slashCount;
+            maxWildcardPrefixLen = wildcardPrefixLen;
             pathMatch = p;
             wildcard = name.substr(pathParts[0].length, name.length - pathParts[1].length - pathParts[0].length);
           }
@@ -1052,11 +1044,12 @@ function SystemJSLoader() {
 function SystemProto() {};
 SystemProto.prototype = SystemLoader.prototype;
 SystemJSLoader.prototype = new SystemProto();
+SystemJSLoader.prototype.constructor = SystemJSLoader;
 
 var systemJSConstructor;
 
 function hook(name, hook) {
-  SystemJSLoader.prototype[name] = hook(SystemJSLoader.prototype[name]);
+  SystemJSLoader.prototype[name] = hook(SystemJSLoader.prototype[name] || function() {});
 }
 function hookConstructor(hook) {
   systemJSConstructor = hook(systemJSConstructor || function() {});
@@ -1128,6 +1121,9 @@ function extend(a, b, prepend) {
   return a;
 }
 
+// package configuration options
+var packageProperties = ['main', 'format', 'defaultExtension', 'modules', 'map', 'basePath', 'depCache'];
+
 // meta first-level extends where:
 // array + array appends
 // object + object extends
@@ -1144,6 +1140,11 @@ function extendMeta(a, b, prepend) {
     else if (!prepend)
       a[p] = val;
   }
+}
+
+function warn(msg) {
+  if (this.warnings && typeof console != 'undefined' && console.warn)
+    console.warn(msg);
 }/*
  * Script tag fetch
  *
@@ -1154,29 +1155,89 @@ function extendMeta(a, b, prepend) {
   if (typeof document != 'undefined')
     var head = document.getElementsByTagName('head')[0];
 
-  // call this functione everytime a wrapper executes
   var curSystem;
-  // System clobbering protection for Traceur
-  SystemJSLoader.prototype.onScriptLoad = function() {
-    __global.System = curSystem;
-  };
+
+  // if doing worker executing, this is set to the load record being executed
+  var workerLoad = null;
+  
+  // interactive mode handling method courtesy RequireJS
+  var ieEvents = head && (function() {
+    var s = document.createElement('script');
+    var isOpera = typeof opera !== 'undefined' && opera.toString() === '[object Opera]';
+    return s.attachEvent && !(s.attachEvent.toString && s.attachEvent.toString().indexOf('[native code') < 0) && !isOpera;
+  })();
+
+  // IE interactive-only part
+  // we store loading scripts array as { script: <script>, load: {...} }
+  var interactiveLoadingScripts = [];
+  var interactiveScript;
+  function getInteractiveScriptLoad() {
+    if (interactiveScript && interactiveScript.script.readyState === 'interactive')
+      return interactiveScript.load;
+
+    for (var i = 0; i < interactiveLoadingScripts.length; i++)
+      if (interactiveLoadingScripts[i].script.readyState == 'interactive') {
+        interactiveScript = interactiveLoadingScripts[i];
+        return interactiveScript.load;
+      }
+  }
+  
+  // System.register, System.registerDynamic, AMD define pipeline
+  // this is called by the above methods when they execute
+  // we then run the reduceRegister_ collection function either immediately
+  // if we are in IE and know the currently executing script (interactive)
+  // or later if we need to wait for the synchronous load callback to know the script
+  var loadingCnt = 0;
+  var registerQueue = [];
+  hook('pushRegister_', function(pushRegister) {
+    return function(register) {
+      // if using eval-execution then skip
+      if (pushRegister.call(this, register))
+        return false;
+
+      // if using worker execution, then we're done
+      if (workerLoad)
+        this.reduceRegister_(workerLoad, register);
+
+      // detect if we know the currently executing load (IE)
+      // if so, immediately call reduceRegister
+      else if (ieEvents)
+        this.reduceRegister_(getInteractiveScriptLoad(), register);
+
+      // otherwise, add to our execution queue
+      // to call reduceRegister on sync script load event
+      else if (loadingCnt)
+        registerQueue.push(register);
+
+      // if we're not currently loading anything though
+      // then do the reduction against a null load
+      // (out of band named define or named register)
+      // note even in non-script environments, this catch is used
+      else
+        this.reduceRegister_(null, register);
+
+      return true;
+    };
+  });
 
   function webWorkerImport(loader, load) {
     return new Promise(function(resolve, reject) {
       if (load.metadata.integrity)
         reject(new Error('Subresource integrity checking is not supported in web workers.'));
 
+      workerLoad = load;
       try {
         importScripts(load.address);
       }
       catch(e) {
+        workerLoad = null;
         reject(e);
       }
+      workerLoad = null;
 
-      loader.onScriptLoad(load);
       // if nothing registered, then something went wrong
-      if (!load.metadata.registered)
-        reject(load.address + ' did not call System.register or AMD define');
+      if (!load.metadata.entry)
+        reject(new Error(load.address + ' did not call System.register or AMD define'));
 
       resolve('');
     });
@@ -1195,21 +1256,53 @@ function extendMeta(a, b, prepend) {
 
       return new Promise(function(resolve, reject) {
         var s = document.createElement('script');
+        
         s.async = true;
+        
+        if (load.metadata.integrity)
+          s.setAttribute('integrity', load.metadata.integrity);
+
+        if (ieEvents) {
+          s.attachEvent('onreadystatechange', complete);
+          interactiveLoadingScripts.push({
+            script: s,
+            load: load
+          });
+        }
+        else {
+          s.addEventListener('load', complete, false);
+          s.addEventListener('error', error, false);
+        }
+
+        loadingCnt++;
+
+        curSystem = __global.System;
+
+        s.src = load.address;
+        head.appendChild(s);
 
         function complete(evt) {
           if (s.readyState && s.readyState != 'loaded' && s.readyState != 'complete')
             return;
+
+          loadingCnt--;
+
+          // complete call is sync on execution finish
+          // (in ie already done reductions)
+          if (!load.metadata.entry && !registerQueue.length) {
+            loader.reduceRegister_(load);
+          }
+          else if (!ieEvents) {
+            for (var i = 0; i < registerQueue.length; i++)
+              loader.reduceRegister_(load, registerQueue[i]);
+            registerQueue = [];
+          }
+
           cleanup();
 
-          // this runs synchronously after execution
-          // we now need to tell the wrapper handlers that
-          // this load record has just executed
-          loader.onScriptLoad(load);
-
           // if nothing registered, then something went wrong
-          if (!load.metadata.registered)
-            reject(load.address + ' did not call System.register or AMD define');
+          if (!load.metadata.entry && !load.metadata.bundle)
+            reject(new Error(load.name + ' did not call System.register or AMD define'));
 
           resolve('');
         }
@@ -1219,30 +1312,23 @@ function extendMeta(a, b, prepend) {
           reject(new Error('Unable to load script ' + load.address));
         }
 
-        if (s.attachEvent) {
-          s.attachEvent('onreadystatechange', complete);
-        }
-        else {
-          s.addEventListener('load', complete, false);
-          s.addEventListener('error', error, false);
-        }
-
-        curSystem = __global.System;
-        __global.System = loader;
-        s.src = load.address;
-
-        if (load.metadata.integrity)
-          s.setAttribute('integrity', load.metadata.integrity);
-
-        head.appendChild(s);
-
         function cleanup() {
-          if (s.detachEvent)
+          __global.System = curSystem;
+
+          if (s.detachEvent) {
             s.detachEvent('onreadystatechange', complete);
+            for (var i = 0; i < interactiveLoadingScripts.length; i++)
+              if (interactiveLoadingScripts[i].script == s) {
+                if (interactiveScript && interactiveScript.script == s)
+                  interactiveScript = null;
+                interactiveLoadingScripts.splice(i, 1);
+              }
+          }
           else {
             s.removeEventListener('load', complete, false);
             s.removeEventListener('error', error, false);
           }
+
           head.removeChild(s);
         }
       });
@@ -1250,41 +1336,6 @@ function extendMeta(a, b, prepend) {
   });
 })();
 /*
- * Script-only addition used for production loader
- *
- */
-hook('fetch', function(fetch) {
-  return function(load) {
-    load.metadata.scriptLoad = true;
-    // prepare amd define
-    if (this.has('@@amd-helpers'))
-      this.get('@@amd-helpers').createDefine(this);
-    return fetch.call(this, load);
-  };
-});
-
-// AMD support
-// script injection mode calls this function synchronously on load
-hook('onScriptLoad', function(onScriptLoad) {
-  return function(load) {
-    onScriptLoad.call(this, load);
-
-    if (this.has('@@amd-helpers')) {
-      var lastModule = this.get('@@amd-helpers').lastModule;
-      if (lastModule.anonDefine || lastModule.isBundle) {
-        load.metadata.format = 'defined';
-        load.metadata.registered = true;
-        lastModule.isBundle = false;
-      }
-
-      if (lastModule.anonDefine) {
-        load.metadata.deps = load.metadata.deps ? load.metadata.deps.concat(lastModule.anonDefine.deps) : lastModule.anonDefine.deps;
-        load.metadata.execute = lastModule.anonDefine.execute;
-        lastModule.anonDefine = null;
-      }
-    }
-  };
-});/*
  * Instantiate registry extension
  *
  * Supports Traceur System.register 'instantiate' output for loading ES6 as ES5.
@@ -1300,6 +1351,59 @@ hook('onScriptLoad', function(onScriptLoad) {
  * and CommonJS, identically to the actual ES6 loader.
  *
  */
+
+
+/*
+ * Registry side table entries in loader.defined
+ * Registry Entry Contains:
+ *    - name
+ *    - deps 
+ *    - declare for declarative modules
+ *    - execute for dynamic modules, different to declarative execute on module
+ *    - executingRequire indicates require drives execution for circularity of dynamic modules
+ *    - declarative optional boolean indicating which of the above
+ *
+ * Can preload modules directly on System.defined['my/module'] = { deps, execute, executingRequire }
+ *
+ * Then the entry gets populated with derived information during processing:
+ *    - normalizedDeps derived from deps, created in instantiate
+ *    - groupIndex used by group linking algorithm
+ *    - evaluated indicating whether evaluation has happend
+ *    - module the module record object, containing:
+ *      - exports actual module exports
+ *
+ *    For dynamic we track the es module with:
+ *    - esModule actual es module value
+ *    - esmExports whether to extend the esModule with named exports
+ *      
+ *    Then for declarative only we track dynamic bindings with the 'module' records:
+ *      - name
+ *      - exports
+ *      - setters declarative setter functions
+ *      - dependencies, module records of dependencies
+ *      - importers, module records of dependents
+ *
+ * After linked and evaluated, entries are removed, declarative module records remain in separate
+ * module binding table
+ *
+ */
+function createEntry() {
+  return {
+    name: null,
+    deps: null,
+    declare: null,
+    execute: null,
+    executingRequire: false,
+    declarative: false,
+    normalizedDeps: null,
+    groupIndex: null,
+    evaluated: false,
+    module: null,
+    esModule: null,
+    esmExports: false
+  };
+}
+
 (function() {
 
   /*
@@ -1314,28 +1418,6 @@ hook('onScriptLoad', function(onScriptLoad) {
    * allowing compiled ES6 circular references to work alongside AMD and CJS circular references.
    *
    */
-  var anonRegister;
-  var calledRegister = false;
-  function doRegister(loader, name, register) {
-    calledRegister = true;
-
-    // named register
-    if (name) {
-      // ideally wouldn't apply map config to bundle names but 
-      // dependencies go through map regardless so we can't restrict
-      // could reconsider in shift to new spec
-      name = (loader.normalizeSync || loader.normalize).call(loader, name);
-      register.name = name;
-      if (!(name in loader.defined))
-        loader.defined[name] = register; 
-    }
-    // anonymous register
-    else {
-      if (anonRegister)
-        throw new TypeError('Invalid anonymous System.register module load. If loading a single module, ensure anonymous System.register is loaded via System.import. If loading a bundle, ensure all the System.register calls are named.');
-      anonRegister = register;
-    }
-  }
   SystemJSLoader.prototype.register = function(name, deps, declare) {
     if (typeof name != 'string') {
       declare = deps;
@@ -1348,10 +1430,18 @@ hook('onScriptLoad', function(onScriptLoad) {
     if (typeof declare == 'boolean')
       return this.registerDynamic.apply(this, arguments);
 
-    doRegister(this, name, {
-      declarative: true,
-      deps: deps,
-      declare: declare
+    var entry = createEntry();
+    // ideally wouldn't apply map config to bundle names but 
+    // dependencies go through map regardless so we can't restrict
+    // could reconsider in shift to new spec
+    entry.name = name && (this.normalizeSync || this.normalize).call(this, name);
+    entry.declarative = true;
+    entry.deps = deps;
+    entry.declare = declare;
+
+    this.pushRegister_({
+      amd: false,
+      entry: entry
     });
   };
   SystemJSLoader.prototype.registerDynamic = function(name, deps, declare, execute) {
@@ -1363,71 +1453,56 @@ hook('onScriptLoad', function(onScriptLoad) {
     }
 
     // dynamic
-    doRegister(this, name, {
-      declarative: false,
-      deps: deps,
-      execute: execute,
-      executingRequire: declare
+    var entry = createEntry();
+    entry.name = name && (this.normalizeSync || this.normalize).call(this, name);
+    entry.deps = deps;
+    entry.execute = execute;
+    entry.executingRequire = declare;
+
+    this.pushRegister_({
+      amd: false,
+      entry: entry
     });
   };
-  /*
-   * Registry side table - loader.defined
-   * Registry Entry Contains:
-   *    - name
-   *    - deps 
-   *    - declare for declarative modules
-   *    - execute for dynamic modules, different to declarative execute on module
-   *    - executingRequire indicates require drives execution for circularity of dynamic modules
-   *    - declarative optional boolean indicating which of the above
-   *
-   * Can preload modules directly on System.defined['my/module'] = { deps, execute, executingRequire }
-   *
-   * Then the entry gets populated with derived information during processing:
-   *    - normalizedDeps derived from deps, created in instantiate
-   *    - groupIndex used by group linking algorithm
-   *    - evaluated indicating whether evaluation has happend
-   *    - module the module record object, containing:
-   *      - exports actual module exports
-   *
-   *    For dynamic we track the es module with:
-   *    - esModule actual es module value
-   *    - esmExports whether to extend the esModule with named exports
-   *      
-   *    Then for declarative only we track dynamic bindings with the 'module' records:
-   *      - name
-   *      - exports
-   *      - setters declarative setter functions
-   *      - dependencies, module records of dependencies
-   *      - importers, module records of dependents
-   *
-   * After linked and evaluated, entries are removed, declarative module records remain in separate
-   * module binding table
-   *
-   */
+  hook('reduceRegister_', function() {
+    return function(load, register) {
+      if (!register)
+        return;
+
+      var entry = register.entry;
+      var curMeta = load && load.metadata;
+
+      // named register
+      if (entry.name) {
+        if (!(entry.name in this.defined))
+          this.defined[entry.name] = entry;
+
+        if (curMeta)
+          curMeta.bundle = true;
+      }
+      // anonymous register
+      if (!entry.name || load && entry.name == load.name) {
+        if (!curMeta)
+          throw new TypeError('Unexpected anonymous System.register call.');
+        if (curMeta.entry) {
+          if (curMeta.format == 'register')
+            throw new Error('Multiple anonymous System.register calls in module ' + load.name + '. If loading a bundle, ensure all the System.register calls are named.');
+          else
+            throw new Error('Module ' + load.name + ' interpreted as ' + curMeta.format + ' module format, but called System.register.');
+        }
+        if (!curMeta.format)
+          curMeta.format = 'register';
+        curMeta.entry = entry;
+      }
+    };
+  });
+
   hookConstructor(function(constructor) {
     return function() {
       constructor.call(this);
 
       this.defined = {};
       this._loader.moduleRecords = {};
-    };
-  });
-
-  // script injection mode calls this function synchronously on load
-  hook('onScriptLoad', function(onScriptLoad) {
-    return function(load) {
-      onScriptLoad.call(this, load);
-
-      if (calledRegister) {
-        // anonymous define
-        if (anonRegister)
-          load.metadata.entry = anonRegister;
-
-        load.metadata.format = load.metadata.format || 'defined';
-        load.metadata.registered = true;
-        calledRegister = false;
-        anonRegister = null;
-      }
     };
   });
 
@@ -1451,15 +1526,15 @@ hook('onScriptLoad', function(onScriptLoad) {
       var depGroupIndex = entry.groupIndex + (depEntry.declarative != entry.declarative);
 
       // the group index of an entry is always the maximum
-      if (depEntry.groupIndex === undefined || depEntry.groupIndex < depGroupIndex) {
+      if (depEntry.groupIndex === null || depEntry.groupIndex < depGroupIndex) {
         
         // if already in a group, remove from the old group
-        if (depEntry.groupIndex !== undefined) {
+        if (depEntry.groupIndex !== null) {
           groups[depEntry.groupIndex].splice(indexOf.call(groups[depEntry.groupIndex], depEntry), 1);
 
           // if the old group is empty, then we have a mixed depndency cycle
           if (groups[depEntry.groupIndex].length == 0)
-            throw new TypeError("Mixed dependency cycle detected");
+            throw new Error("Mixed dependency cycle detected");
         }
 
         depEntry.groupIndex = depGroupIndex;
@@ -1655,7 +1730,7 @@ hook('onScriptLoad', function(onScriptLoad) {
           continue;
         return getModule(entry.normalizedDeps[i], loader);
       }
-      throw new TypeError('Module ' + name + ' not declared as a dependency.');
+      throw new Error('Module ' + name + ' not declared as a dependency.');
     }, exports, module);
     
     if (output)
@@ -1668,7 +1743,7 @@ hook('onScriptLoad', function(onScriptLoad) {
     if (exports && exports.__esModule)
       entry.esModule = exports;
     // set module as 'default' export, then fake named exports by iterating properties
-    else if (entry.esmExports)
+    else if (entry.esmExports && exports !== __global)
       entry.esModule = getESModule(exports);
     // just use the 'default' export
     else
@@ -1721,7 +1796,11 @@ hook('onScriptLoad', function(onScriptLoad) {
     };
   });
 
-  var registerRegEx = /^\s*(\/\*[^\*]*(\*(?!\/)[^\*]*)*\*\/|\s*\/\/[^\n]*|\s*"[^"]+"\s*;?|\s*'[^']+'\s*;?)*\s*System\.register(Dynamic)?\s*\(/;
+  var leadingCommentAndMetaRegEx = /^\s*(\/\*[^\*]*(\*(?!\/)[^\*]*)*\*\/|\s*\/\/[^\n]*|\s*"[^"]+"\s*;?|\s*'[^']+'\s*;?)*\s*/;
+  function detectRegisterFormat(source) {
+    var leadingCommentAndMeta = source.match(leadingCommentAndMetaRegEx);
+    return leadingCommentAndMeta && source.substr(leadingCommentAndMeta[0].length, 15) == 'System.register';
+  }
 
   hook('fetch', function(fetch) {
     return function(load) {
@@ -1730,14 +1809,9 @@ hook('onScriptLoad', function(onScriptLoad) {
         return '';
       }
       
-      // this is the synchronous chain for onScriptLoad
-      anonRegister = null;
-      calledRegister = false;
-      
-      if (load.metadata.format == 'register')
+      if (load.metadata.format == 'register' && !load.metadata.authorization && load.metadata.scriptLoad !== false)
         load.metadata.scriptLoad = true;
 
-      // NB remove when "deps " is deprecated
       load.metadata.deps = load.metadata.deps || [];
       
       return fetch.call(this, load);
@@ -1747,14 +1821,10 @@ hook('onScriptLoad', function(onScriptLoad) {
   hook('translate', function(translate) {
     // we run the meta detection here (register is after meta)
     return function(load) {
+      load.metadata.deps = load.metadata.deps || [];
       return Promise.resolve(translate.call(this, load)).then(function(source) {
-
-        if (typeof load.metadata.deps === 'string')
-          load.metadata.deps = load.metadata.deps.split(',');
-        load.metadata.deps = load.metadata.deps || [];
-
         // run detection for register format
-        if (load.metadata.format == 'register' || load.metadata.bundle || !load.metadata.format && load.source.match(registerRegEx))
+        if (load.metadata.format == 'register' || !load.metadata.format && detectRegisterFormat(load.source))
           load.metadata.format = 'register';
         return source;
       });
@@ -1773,52 +1843,37 @@ hook('onScriptLoad', function(onScriptLoad) {
         entry.deps = entry.deps.concat(load.metadata.deps);
       }
 
-      // picked up already by a script injection
-      else if (load.metadata.entry)
+      // picked up already by an anonymous System.register script injection
+      // or via the dynamic formats
+      else if (load.metadata.entry) {
         entry = load.metadata.entry;
-
-      // otherwise check if it is dynamic
-      else if (load.metadata.execute) {
-        entry = {
-          declarative: false,
-          deps: load.metadata.deps || [],
-          execute: load.metadata.execute,
-          executingRequire: load.metadata.executingRequire // NodeJS-style requires or not
-        };
+        entry.deps = entry.deps.concat(load.metadata.deps);
       }
 
       // Contains System.register calls
-      else if (load.metadata.format == 'register' || load.metadata.format == 'esm' || load.metadata.format == 'es6') {
-        anonRegister = null;
-        calledRegister = false;
-
+      // (dont run bundles in the builder)
+      else if (!(loader.builder && load.metadata.bundle) 
+          && (load.metadata.format == 'register' || load.metadata.format == 'esm' || load.metadata.format == 'es6')) {
+        
         if (typeof __exec != 'undefined')
           __exec.call(loader, load);
 
-        if (!calledRegister && !load.metadata.registered)
-          throw new TypeError(load.name + ' detected as System.register but didn\'t execute.');
+        if (!load.metadata.entry && !load.metadata.bundle)
+          throw new Error(load.name + ' detected as ' + load.metadata.format + ' but didn\'t execute.');
 
-        if (anonRegister)
-          entry = anonRegister;
-        else
-          load.metadata.bundle = true;
+        entry = load.metadata.entry;
 
-        if (!entry && loader.defined[load.name])
-          entry = loader.defined[load.name];
-
-        anonRegister = null;
-        calledRegister = false;
+        // support metadata deps for System.register
+        if (entry && load.metadata.deps)
+          entry.deps = entry.deps.concat(load.metadata.deps);
       }
 
       // named bundles are just an empty module
-      if (!entry)
-        entry = {
-          declarative: false,
-          deps: load.metadata.deps,
-          execute: function() {
-            return loader.newModule({});
-          }
-        };
+      if (!entry) {
+        entry = createEntry();
+        entry.deps = load.metadata.deps;
+        entry.execute = function() {};
+      }
 
       // place this module onto defined for circular references
       loader.defined[load.name] = entry;
@@ -1860,8 +1915,97 @@ hook('onScriptLoad', function(onScriptLoad) {
     };
   });
 })();
-System = new SystemJSLoader();
-System.constructor = SystemJSLoader;  // -- exporting --
+/*
+  System bundles
+
+  Allows a bundle module to be specified which will be dynamically 
+  loaded before trying to load a given module.
+
+  For example:
+  System.bundles['mybundle'] = ['jquery', 'bootstrap/js/bootstrap']
+
+  Will result in a load to "mybundle" whenever a load to "jquery"
+  or "bootstrap/js/bootstrap" is made.
+
+  In this way, the bundle becomes the request that provides the module
+*/
+function getBundleFor(loader, name) {
+  // check if it is in an already-loaded bundle
+  for (var b in loader.loadedBundles_)
+    if (indexOf.call(loader.bundles[b], name) != -1)
+      return Promise.resolve(b);
+
+  // check if it is a new bundle
+  for (var b in loader.bundles)
+    if (indexOf.call(loader.bundles[b], name) != -1)
+      return loader.normalize(b)
+      .then(function(normalized) {
+        loader.bundles[normalized] = loader.bundles[b];
+        loader.loadedBundles_[normalized] = true;
+        return normalized;
+      });
+
+  return Promise.resolve();
+}
+
+(function() {
+  // bundles support (just like RequireJS)
+  // bundle name is module name of bundle itself
+  // bundle is array of modules defined by the bundle
+  // when a module in the bundle is requested, the bundle is loaded instead
+  // of the form System.bundles['mybundle'] = ['jquery', 'bootstrap/js/bootstrap']
+  hookConstructor(function(constructor) {
+    return function() {
+      constructor.call(this);
+      this.bundles = {};
+      this.loadedBundles_ = {};
+    };
+  });
+
+  // assign bundle metadata for bundle loads
+  hook('locate', function(locate) {
+    return function(load) {
+      var loader = this;
+      if (load.name in loader.loadedBundles_ || load.name in loader.bundles)
+        load.metadata.bundle = true;
+
+      // if not already defined, check if we need to load a bundle
+      if (!(load.name in loader.defined))
+        return getBundleFor(loader, load.name)
+        .then(function(bundleName) {
+          if (bundleName)
+            return loader.load(bundleName);
+        })
+        .then(function() {
+          return locate.call(loader, load);
+        });
+
+      return locate.call(this, load);
+    };
+  });
+})();
+/*
+ * Script-only addition used for production loader
+ *
+ */
+hookConstructor(function(constructor) {
+  return function() {
+    constructor.apply(this, arguments);
+
+    // prepare amd define
+    if (this.has('@@amd-helpers'))
+      this.get('@@amd-helpers').createDefine();
+  };
+});
+
+hook('fetch', function(fetch) {
+  return function(load) {
+    load.metadata.scriptLoad = true;
+    return fetch.call(this, load);
+  };
+});System = new SystemJSLoader();
+System.version = '0.19.6 Register Only';
+  // -- exporting --
 
   if (typeof exports === 'object')
     module.exports = Loader;

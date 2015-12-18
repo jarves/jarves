@@ -5,7 +5,8 @@
   "main": "index.js",
   "devDependencies": {
     "babel-core": "^5.8.33",
-    "systemjs": "^0.18.4",
+    "angular2": "2.0.0-beta.0",
+    "systemjs": "0.19.6",
     "typescript": "^1.6.2",
     "ladda": "^0.9.8"
   },
@@ -22,9 +23,5 @@
   "bugs": {
     "url": "https://github.com/jarves/jarves/issues"
   },
-  "homepage": "https://github.com/jarves/jarves",
-  "dependencies": {
-    "angular-ui-codemirror": "^0.3.0",
-    "angular-ui-tinymce": "0.0.5"
-  }
+  "homepage": "https://github.com/jarves/jarves"
 }

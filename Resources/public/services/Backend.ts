@@ -1,11 +1,9 @@
-import {Service} from '../angular.ts';
-import {baseUrlApi} from '../config.js';
+import {baseUrlApi} from '../config';
+import {Injectable} from "angular2/core";
 
-//@Inject('$rootScope, $http')
-@Service('backend')
+@Injectable()
 export default class Backend {
-    constructor($rootScope, $http) {
-        this.$rootScope = $rootScope;
+    constructor($http) {
         this.$http = $http;
     }
 

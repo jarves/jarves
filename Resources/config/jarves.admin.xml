@@ -16,13 +16,17 @@
 
 
             <asset priority="2000" src="@JarvesBundle/libraries/jquery-2.1.4.min.js"/>
-            <asset priority="2000" src="@JarvesBundle/libraries/angular.js"/>
-            <asset priority="2000" src="@JarvesBundle/libraries/angular-animate.min.js"/>
-            <asset priority="2000" src="@JarvesBundle/libraries/angular-tinymce/tinymce.js"/>
-            <asset priority="2000" src="@JarvesBundle/libraries/angular-codemirror/ui-codemirror.js"/>
+            <asset priority="2000" src="@JarvesBundle/libraries/angular2/angular2-polyfills.js"/>
+            <asset priority="2000" src="@JarvesBundle/libraries/rxjs/Rx.js"/>
+            <asset priority="2000" src="@JarvesBundle/libraries/angular2/angular2.dev.js"/>
+
+            <!--<asset priority="2000" src="@JarvesBundle/libraries/angular-animate.min.js"/>-->
+            <!--<asset priority="2000" src="@JarvesBundle/libraries/angular-tinymce/tinymce.js"/>-->
+            <!--<asset priority="2000" src="@JarvesBundle/libraries/angular-codemirror/ui-codemirror.js"/>-->
             <asset priority="2000" src="@JarvesBundle/libraries/hammer.min.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/typescript/typescript.js"/>
             <asset priority="4000" src="@JarvesBundle/libraries/systemjs/system.src.js"/>
+            <asset priority="4000" src="@JarvesBundle/system.js"/>
 
             <assets src="@JarvesBundle/libraries/tinymce/tinymce.min.js"/>
             <assets src="@JarvesBundle/libraries/codemirror/lib/codemirror.js"/>

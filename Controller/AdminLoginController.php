@@ -37,10 +37,7 @@ class AdminLoginController extends PluginController
         $response = $this->getJarves()->getPageResponse();
 
         $response->setBody("
-<jarves-admin>
-    <jarves-login></jarves-login>
-    <jarves-interface></jarves-interface>
-</jarves-admin>
+<jarves-admin></jarves-admin>
         ");
 
         $response->setResourceCompression(false);
