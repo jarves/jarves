@@ -13,20 +13,24 @@ export default class AbstractFieldType {
     protected children = [];
     protected fieldDirective;
     protected parentFieldDirective;
-    protected optionsReferences = ['definition'];
+
+    /**
+     * A list of options which are only attributes and thus converted to string "{{value}}/"
+     *
+     * @type {Array}
+     */
+    public attributeOptions = ['id', 'model', 'label', 'desc', 'description'];
+
+
     protected additionalOptionsReferences = [];
-    protected optionsReferencesMap = {};
+    protected attributeOptionsMap = {};
 
     protected jarvesWindow:JarvesWindow;
 
     constructor(protected $compile, protected $parse, protected $timeout, protected $http, protected $templateCache,
                 protected $q, protected $interpolate) {
-        for (let item of this.optionsReferences) {
-            this.optionsReferencesMap[item] = true;
-        }
-
-        for (let item of this.additionalOptionsReferences) {
-            this.optionsReferencesMap[item] = true;
+        for (let item of this.attributeOptions) {
+            this.attributeOptionsMap[item] = true;
         }
     }
 
@@ -115,13 +119,19 @@ export default class AbstractFieldType {
                 return this.options[name] = this.definition[name];
             }
 
+            var attributeName = name;
             if (!this.attributes[name]) {
-                return null;
+                if (this.attributes['option' + name.ucfirst()]) {
+                    attributeName = 'option' + name.ucfirst();
+                } else {
+                    return null;
+                }
             }
-            if (name in this.optionsReferencesMap) {
-                return this.options[name] = this.scope.$parent.$eval(this.attributes[name]);
+
+            if (name in this.attributeOptionsMap) {
+                return this.options[name] = this.$interpolate(this.attributes[attributeName])(this.scope.$parent);
             } else {
-                return this.options[name] = this.$interpolate(this.attributes[name])(this.scope.$parent);
+                return this.options[name] = this.scope.$parent.$eval(this.attributes[attributeName]);
             }
         }
     }

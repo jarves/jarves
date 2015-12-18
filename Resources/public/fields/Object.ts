@@ -54,8 +54,6 @@ export default class Object extends AbstractFieldType {
                 this.collection.load();
             }
         });
-
-        console.log('link Object', this.getOption('type'), this.definition);
     }
 
     public removeItem(index:number) {

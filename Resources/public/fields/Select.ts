@@ -1,6 +1,6 @@
 import AbstractFieldType from './AbstractFieldType.ts';
 import {Field} from '../angular.ts';
-import {each} from '../utils.ts';
+import {each, eachKey} from '../utils.ts';
 import angular from '../angular.ts'
 import JarvesSelectChooser from "../directives/fields/JarvesSelectChooser";
 
@@ -40,7 +40,30 @@ export default class Select extends AbstractFieldType {
             this.updateSelected();
         });
 
+        if (this.selectFirstItem()) {
+            console.log('select First');
+            scope.$watch('selectController.items', (items) => {
+                if (this.value) {
+                    //we have already selected something, no need to force-select the first.
+                    return;
+                }
+
+                var firstKey = null;
+                for (let i of eachKey(items)) {
+                    firstKey = i;
+                    break;
+                }
+                if (firstKey) {
+                    this.select(firstKey);
+                }
+            });
+        }
+
         this.setupItems();
+    }
+
+    selectFirstItem():boolean {
+        return this.getOption('selectFirst') || this.getOption('required');
     }
 
     setupItems() {
@@ -57,7 +80,6 @@ export default class Select extends AbstractFieldType {
     prepareItems(items) {
         var newItems = [], id;
 
-        console.log('prepareItems', items);
         if (angular.isArray(items)) {
             for (let [idx, item] of each(items)) {
                 id = this.getOption('idField') && angular.isObject(item)
@@ -109,6 +131,7 @@ export default class Select extends AbstractFieldType {
         this.selectedItem = this.items[id];
         this.setModelValue(id);
     }
+
     /**
      * @param {Object|String} item
      * @return {String}

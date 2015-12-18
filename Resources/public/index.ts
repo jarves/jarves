@@ -47,6 +47,7 @@ import './directives/Translate.ts';
 
 import './fields/File.ts';
 import './fields/Checkbox.ts';
+import './fields/Contents.ts';
 import './fields/Language.ts';
 import './fields/Object.ts';
 import './fields/Password.ts';

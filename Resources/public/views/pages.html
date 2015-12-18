@@ -1,16 +1,16 @@
 <div ng-controller="bundles/jarves/controller/PageController as page">
     <window-frame>
-        <button ng-click="showTree = true" icon="#icon-tree">Tree</button>
+        <button ng-click="page.showTree = !page.showTree" pressed="page.showTree" icon="#icon-tree">Tree</button>
 
         <button-group>
-            <button ng-click="page.currentView = 1" icon="#icon-list-9"></button>
-            <button ng-click="page.currentView = 2" icon="#icon-layout"></button>
+            <button ng-click="page.currentView = 1" pressed="page.currentView == 1" icon="#icon-list-9"></button>
+            <button ng-click="page.currentView = 2" pressed="page.currentView == 2" icon="#icon-layout"></button>
         </button-group>
 
-        <jarves-field type="language" model="model.language"></jarves-field>
+        <jarves-field inline type="language" option-select-first="true" model="page.model.language"></jarves-field>
 
         <div>
-            <jarves-field type="pagecontents" model="model.contents"></jarves-field>
+            <jarves-field inline type="contents" model="page.model.contents"></jarves-field>
         </div>
     </window-frame>
 
