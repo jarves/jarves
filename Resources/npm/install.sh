@@ -6,10 +6,11 @@ rm -rf Resources/public/libraries/ladda; cp -r node_modules/ladda/dist Resources
 
 rm -rf Resources/public/libraries/angular2;
 mkdir Resources/public/libraries/angular2;
+
 cp -r node_modules/angular2/bundles/angular2.dev.js Resources/public/libraries/angular2/;
 cp -r node_modules/angular2/bundles/angular2.js Resources/public/libraries/angular2/;
 cp -r node_modules/angular2/bundles/angular2-polyfills.js Resources/public/libraries/angular2/;
-
+cp -r node_modules/angular2/bundles/http.dev.js Resources/public/libraries/angular2/;
 
 rm -rf Resources/public/libraries/rxjs;
 mkdir Resources/public/libraries/rxjs;

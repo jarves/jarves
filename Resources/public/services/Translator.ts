@@ -1,31 +1,20 @@
 import {Injectable} from "angular2/core";
+import Backend from "./Backend";
+import JarvesSession from "./JarvesSession";
 
 @Injectable()
 export default class Translator {
-    constructor($rootScope, backend) {
-        this.rootScope = $rootScope;
-        this.backend = backend;
-        this.translations = {};
-        this.currentLanguage = 'en';
+    protected translations = null;
+    protected translationsLoaded = {};
+
+    constructor(protected backend:Backend, protected jarvesSession:JarvesSession) {
     }
 
-    watch(cb) {
-        this.rootScope.$watch('jarvesTranslation', cb);
-    }
-
-    setLanguage(language) {
-        this.currentLanguage = language;
-
-        //Asset.javascript(_pathAdmin + 'admin/ui/language-plural?lang=' + this.currentLanguage);
-
-        this.backend.get('jarves/admin/ui/language?lang=' + this.currentLanguage, {})
-            .success(function(response){
-                this.rootScope.jarvesTranslation = response.data || {};
-            }.bind(this));
-    }
-
-    getLanguage() {
-        return this.currentLanguage;
+    public loadTranslations() {
+        this.backend.get('jarves/admin/ui/language?lang=' + this.jarvesSession.getLanguage(), {})
+            .success((response) => {
+                this.translations = response.data || {};
+            });
     }
 
     /**
@@ -35,28 +24,30 @@ export default class Translator {
      * @param {String} plural  Message id plural (msgid_plural)
      * @param {Number} count   the count for plural
      * @param {String} context the message id of the context (msgctxt)
-     *
-     * @return {String}
      */
-    translate(message, plural, count, context) {
+    translate(message:string, plural:string, count:number, context?:string): string {
+        if (!this.translationsLoaded[this.jarvesSession.getLanguage()]) {
+            this.loadTranslations();
+        }
+
         var id = (!context) ? message : context + "\u0004" + message;
 
-        if (this.rootScope.jarvesTranslation && this.rootScope.jarvesTranslation[id]) {
-            if (typeOf(this.rootScope.jarvesTranslation[id]) == 'array') {
+        if (this.translations && this.translations[id]) {
+            if (Array.isArray(this.translations[id])) {
                 if (count) {
-                    var fn = 'gettext_plural_fn_' + this.rootScope.jarvesTranslation['__lang'];
-                    pluralId = window[fn](count) + 0;
+                    var fn = 'gettext_plural_fn_' + this.translations['__lang'];
+                    var pluralId = window[fn](count) + 0;
 
-                    if (count && this.rootScope.jarvesTranslation[id][pluralId]) {
-                        return this.rootScope.jarvesTranslation[id][pluralId].replace('%d', count);
+                    if (count && this.translations[id][pluralId]) {
+                        return this.translations[id][pluralId].replace('%d', count);
                     } else {
                         return ((count === null || count === false || count === 1) ? message : plural);
                     }
                 } else {
-                    return this.rootScope.jarvesTranslation[id][0];
+                    return this.translations[id][0];
                 }
             } else {
-                return this.rootScope.jarvesTranslation[id];
+                return this.translations[id];
             }
         } else {
             return ((!count || count === 1) && count !== 0) ? message : plural;
@@ -66,12 +57,11 @@ export default class Translator {
     /**
      * sprintf for translations.
      *
-     * @return {String}
      */
-    tf() {
-        var args = Array.from(arguments);
-        var text = args.shift();
-        if (typeOf(text) != 'string') {
+    tf():string {
+        var args:Array = Array.from(arguments);
+        var text:string = args.shift();
+        if (typeof text !== 'string') {
             throw 'First argument has to be a string.';
         }
 
@@ -80,11 +70,8 @@ export default class Translator {
 
     /**
      * Return a translated message within a context.
-     *
-     * @param {String} context the message id of the context
-     * @param {String} message message id
      */
-    tc(context, message) {
+    tc(context:string, message:string) {
         return this.translate(message, null, null, context);
     }
 

@@ -1,15 +1,21 @@
 import AbstractFieldType from './AbstractFieldType.ts';
-import {Field, Directive, angular} from '../angular.ts';
+import {Component, Input} from 'angular2/core';
 import {each} from '../utils.ts';
 
-@Field('text', {
-    templateUrl: 'bundles/jarves/views/fields/text.html',
-    scope: {
-        'placeholder': '@',
-        'model': '='
-    }
+@Component({
+    selector: 'jarves-text',
+    template: '<input type="text" class="jarves-Input-text" [(ngModel)]="model" [placeholder]="placeholder" />'
 })
-export default class Text extends AbstractFieldType {
+export default class JarvesTextComponent {
+
+    @Input public model;
+    @Input public placeholder;
+
+    ngAfterContentInit(){
+        //this.setupRedirects();
+        //this.setupModifiers();
+    }
+
     static trimModifier(v) {
         return v.replace(/^\s+|\s+$/g, "");
     }
@@ -71,26 +77,6 @@ export default class Text extends AbstractFieldType {
         return str;
     }
 
-    //constructor(...deps) {
-    //    super(...deps);
-    //    this.template = 'bundles/jarves/views/field.text.html';
-    //    this.boundRedirects =  {}
-    //}
-
-    link(scope, element, attr, controller, transclude) {
-        super.link(scope, element, attr, controller, transclude);
-        //console.log('link Text.ts');
-        //this.attr = attr;
-
-        //this.renderTemplateUrl(
-        //    this.template,
-        //    this.beforeCompile.bind(this)
-        //);
-
-        this.setupRedirects();
-        this.setupModifiers();
-    }
-
     //static compile(element, attr) {
     ////    console.log('compile', element, attr);
     //    var contents = element.children();
@@ -150,6 +136,7 @@ export default class Text extends AbstractFieldType {
         return redirects;
     }
 
+    protected boundRedirects;
     setupRedirects() {
         var redirects;
 

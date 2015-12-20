@@ -19,6 +19,7 @@
             <asset priority="2000" src="@JarvesBundle/libraries/angular2/angular2-polyfills.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/rxjs/Rx.js"/>
             <asset priority="2000" src="@JarvesBundle/libraries/angular2/angular2.dev.js"/>
+            <asset priority="2000" src="@JarvesBundle/libraries/angular2/http.dev.js"/>
 
             <!--<asset priority="2000" src="@JarvesBundle/libraries/angular-animate.min.js"/>-->
             <!--<asset priority="2000" src="@JarvesBundle/libraries/angular-tinymce/tinymce.js"/>-->

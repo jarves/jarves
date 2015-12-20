@@ -3,38 +3,18 @@ import {each, eachValue, normalizeObjectKey, urlEncode, urlDecode, getCroppedObj
 import {baseUrl, baseUrlApi} from '../config';
 import {EntryPoint} from "./WindowManagement";
 import {Injectable} from "angular2/core";
+import Backend from "./Backend";
+import JarvesSession from "./JarvesSession";
 
 @Injectable()
 export default class Jarves {
     getObjectLabelByItemTemplates:Object = {};
 
-    //constructor(private backend, private $q, private $injector, private translator) {
-    //}
-
-    /**
-     * Sets current session.
-     *
-     * @param session
-     */
-    setSession(session) {
-        this.$rootScope._session = session;
-    }
-
-    /**
-     * Checks if user is logged in.
-     *
-     * @returns {boolean}
-     */
-    isLoggedIn() {
-        return this.$rootScope._session && this.$rootScope._session.userId > 0;
+    constructor(private backend:Backend, private jarvesSession:JarvesSession) {
     }
 
     logout() {
         this.loginController.logout();
-    }
-
-    log(...args) {
-        window.console.log(...args);
     }
 
     protected entryPointOptionsCache = {};
@@ -53,6 +33,24 @@ export default class Jarves {
         }
 
         return deferred.promise;
+    }
+
+
+    loadInterface() {
+        return new ProgressPromise((resolve, reject, eventEmitter) => {
+            eventEmitter('progress', 25);
+
+            this.jarves.loadSettings()
+                .then(() => {
+                    eventEmitter('progress', 60);
+                    return this.jarves.loadMenu();
+                })
+                .then(() => {
+                    eventEmitter('progress', 100);
+                    resolve();
+                    this.showInterface();
+                });
+        });
     }
 
     /**
@@ -150,7 +148,7 @@ export default class Jarves {
     loadSettings(keyLimitation:Array = []):Promise {
         var deferred = this.$q.defer();
 
-        var query = {lang: this.translator.getLanguage(), keys: keyLimitation};
+        var query = {lang: this.jarvesSession.getLanguage(), keys: keyLimitation};
 
         this.backend.get('jarves/admin/backend/settings', {params: query})
             .success((response) => {
@@ -209,10 +207,6 @@ export default class Jarves {
      * Returns the definition of a entry point.
      */
     getEntryPoint(path:string):EntryPoint {
-        if (!angular.isString(path)) {
-            return;
-        }
-
         var splitted = path.split('/');
         var bundleName = splitted[0];
 
@@ -221,7 +215,7 @@ export default class Jarves {
         var code = splitted.join('/');
 
         var config, notFound = false, item;
-        path = [];
+        var path = [];
 
         config = this.getConfig(bundleName);
 

@@ -3,66 +3,46 @@ import {Component} from 'angular2/core';
 import WindowManagement from '../../services/WindowManagement';
 import Jarves from '../../services/Jarves';
 import JarvesLoginComponent from "./JarvesLoginComponent";
+import {Http, HTTP_PROVIDERS} from 'angular2/http';
+import Backend from "../../services/Backend";
+import Translator from "../../services/Translator";
+import JarvesSession from "../../services/JarvesSession";
+import {CORE_DIRECTIVES} from 'angular2/common';
+import JarvesConfig from '../../Jarves';
+import JarvesTextComponent from "../../fields/JarvesTextComponent";
 
 @Component({
     selector: 'jarves-admin',
-    providers: [Jarves, WindowManagement],
-    directives: [JarvesLoginComponent],
+    providers: [Jarves, WindowManagement, Backend, Translator, JarvesSession, HTTP_PROVIDERS],
+    directives: [JarvesTextComponent, CORE_DIRECTIVES, JarvesLoginComponent],
     template: `
-    <jarves-login></jarves-login>
-    <jarves-interface></jarves-interface>
+<jarves-login></jarves-login>
+<jarves-interface></jarves-interface>
     `
 })
-export class JarvesAdminComponent {
+export default class JarvesAdminComponent {
     public menuHidden:Object = {};
     public interfaceVisible:boolean = false;
 
-    public _baseUrl:string;
-    public _baseUrlApi:string;
-    public _session:Object;
-
-    constructor(public jarves:Jarves, public windowManagement:WindowManagement) {
-        this._baseUrl = baseUrl;
-        this._baseUrlApi = baseUrlApi;
-        this._session = window._session;
+    constructor(public jarves:Jarves, public jarvesSession:JarvesSession, public windowManagement:WindowManagement) {
     }
 
     showInterface() {
         this.windowManagement.restoreWindows();
+        this.jarvesSession.setInterfaceVisible(true);
+
         this.interfaceVisible = true;
 
-        this.$rootScope.$watch(() => {
-            return this.windowManagement.activeWindowList
-        }, () => {
-            this.windowManagement.updateUrlHash();
-        }, true);
+        this.windowManagement.activateUrlHashUpdating();
     }
 
     logout() {
+        this.jarvesSession.setInterfaceVisible(false);
         this.interfaceVisible = false;
         this.jarves.logout();
     }
 
-    loadInterface() {
-        var deferred = this.$q.defer();
-
-        deferred.notify(25);
-        this.jarves.loadSettings()
-            .then(function() {
-                deferred.notify(60);
-                return this.jarves.loadMenu();
-            }.bind(this))
-            .then(function() {
-                deferred.notify(100);
-                deferred.resolve();
-                this.showInterface();
-            }.bind(this));
-
-        return deferred.promise;
-    }
-
     loadWindow(entryPoint, options, parentWindowId, isInline) {
-
         if (!isInline && window.event && window.event.which === 2) {
             //open new tab.
             top.open(location.pathname + '#' + entryPoint.fullPath, '_blank');

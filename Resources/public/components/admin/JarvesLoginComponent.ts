@@ -2,102 +2,121 @@ import {Component} from 'angular2/core';
 import Jarves from "../../services/Jarves";
 import Translator from "../../services/Translator";
 import Backend from "../../services/Backend";
+import JarvesSession from "../../services/JarvesSession";
+import JarvesTextComponent from "../../fields/JarvesTextComponent";
+import JarvesPasswordComponent from "../../fields/JarvesPasswordComponent";
 
 @Component({
     selector: 'jarves-login',
-    templateUrl: 'bundles/jarves/views/login.html',
-    //controllerAs: 'loginController',
-    //require: '^jarvesAdmin'
+    directives: [JarvesTextComponent, JarvesPasswordComponent],
+    template: `
+<div>
+    <div *ngIf="loginVisible" class="jarves-login jarves-admin">
+        <div class="jarves-login-middle">
+            <div class="jarves-login-middle-top">
+                <img class="jarves-login-logo" src="{{jarvesSession.baseUrl}}/bundles/jarves/images/logo.png" />
+            </div>
+            <form id="loginForm" onsubmit="return false;" class="jarves-login-middle-form" autocomplete="off">
+
+
+                <jarves-text translate inline [(model)]="credentials.username" placeholder="Username"></jarves-text>
+                <jarves-password translate inline [(model)]="credentials.password" placeholder="Password"></jarves-password>
+
+                <!--<jarves-field type="language" inline model="language"></jarves-field>-->
+                <button (click)="login()" translate>Login</button>
+
+                <div class="jarves-login-loader-top" [ngClass]="{'active': inputBlocked}">
+                    <div class="jarves-login-loadingBarInside" style="width: {{progress}}%"></div>
+                </div>
+                <div class="jarves-login-loader-bottom" [ngClass]="{'active': inputBlocked}"></div>
+            </form>
+            <div class="loginMessage" [ngClass]="{'red': loginStatus==2}" [ngSwitch]="loginStatus">
+                <span *ngSwitchWhen="1">Log in ...</span>
+                <span *ngSwitchWhen="2">Login failed</span>
+                <span *ngSwitchWhen="3">Loading interface ...</span>
+                <span *ngSwitchWhen="4">Entering.</span>
+                <span *ngSwitchWhen="5">Logged out.</span>
+            </div>
+        </div>
+    </div>
+</div>
+    `
 })
 export default class JarvesLoginComponent {
     public loginStatus:number = 0;
     public inputBlocked:boolean = false;
     public progress:number = 0;
     public loginVisible:boolean = true;
-    public credentials:Object = {
+    public credentials:{username:string, password: string} = {
         username: '',
         password: ''
     };
 
-    constructor(private backend:Backend, private translator:Translator, private jarves:Jarves) {
-        //this.jarves.loginController = this;
-
-        //jarves.language = 'en';
-        //$rootScope.$watch('language', (v) => this.loadLanguage(v));
-    }
-
-    link(scope, element, attributes, controller) {
-        this.jarvesAdmin = controller;
-
-        if (this.jarves.isLoggedIn()) {
+    constructor(private backend:Backend, private translator:Translator, private jarves:Jarves, public jarvesSession:JarvesSession) {
+        if (this.jarvesSession.isLoggedIn()) {
             this.blockInput();
             this.loadInterface();
         }
     }
 
-    loadLanguage(language:string) {
-        window._session.lang = language;
+    public loadLanguage(language:string) {
         //Cookie.write('jarves_language', language);
-        this.translator.setLanguage(language);
+        this.jarvesSession.setLanguage(language);
+        this.translator.loadTranslations();
     }
 
-    logout() {
+    public logout() {
         this.loginStatus = 5;
-        this.$timeout(() => {
+        setTimeout(() => {
             this.loginStatus = 0;
         }, 2000);
 
         this.loginVisible = true;
-        this.$timeout(() => {
+        setTimeout(() => {
             this.inputBlocked = false;
         }, 10);
     }
 
-    /**
-     * @returns {jarves.AdminController}
-     */
-    getAdminController() {
-        return this.$parent;
-    }
-
-    doLogin() {
+    public login() {
         this.blockInput();
         this.loginStatus = 1;
+
         this.backend.post('jarves/admin/login', this.credentials)
-            .success((response) => this.success(response))
-            .error((response) => this.error(response));
+            .on('success', response => this.success(response))
+            .on('error', response => this.error(response))
     }
 
-    success(response) {
+    protected success(response) {
         this.credentials.password = '';
-        this.jarves.setSession(response.data);
+        this.jarvesSession.setSession(response.data);
 
         this.loadInterface();
     }
 
-    loadInterface() {
+    protected loadInterface() {
         this.loginStatus = 3;
         this.progress = 0;
-        this.jarvesAdmin.loadInterface()
-            .then(function() {
+        this.jarves.loadInterface()
+            .then(() => {
                 this.loginStatus = 4;
                 this.loginVisible = false;
-            }.bind(this), null, function(progress){
+            })
+            .on('progress', (progress) => {
                 this.progress = progress;
-            }.bind(this));
+            });
     }
 
-    error(response) {
+    protected error(response) {
         this.credentials.password = '';
         this.loginStatus = 2;
         this.unblockInput();
     }
 
-    blockInput() {
+    protected blockInput() {
         this.inputBlocked = true;
     }
 
-    unblockInput() {
+    protected unblockInput() {
         this.inputBlocked = false;
     }
 }

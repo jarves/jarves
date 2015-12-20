@@ -59,6 +59,8 @@ export default class WindowManagement {
         this.currentWindowIndex = 0;
     }
 
+    protected updateUrlHashActive:boolean = false;
+
     public restoreWindows() {
         //jarves#!users/users?parameter1=bla&parameter2=dummy
         var hash = window.location.hash.substr(1);
@@ -129,25 +131,34 @@ export default class WindowManagement {
             inFront: false,
             parameters: {}
         };
+
+        this.updateUrlHash();
     }
 
-    /**
-     *
-     * @param {Number} id
-     * @returns {JarvesWindow}
-     */
-    getWindow(id) {
+    getWindow(id:number):JarvesWindow {
         return this.jarvesWindows[id];
     }
 
-    setWindow(id, instance:JarvesWindow) {
+    setWindow(id:number, instance:JarvesWindow) {
         this.jarvesWindows[id] = instance;
+    }
+
+    public setUpdateUrlHashActive(enabled:boolean) {
+        this.updateUrlHashActive = enabled;
+    }
+
+    public activateUrlHashUpdating() {
+        this.setUpdateUrlHashActive(true);
     }
 
     /**
      * Rebuilds the url hash after #.
      */
     public updateUrlHash():void {
+        if (!this.updateUrlHashActive) {
+            return;
+        }
+
         var hash = [];
         for (let win of eachValue(this.activeWindowList)) {
             if (!win.parentWindowId && !win.isInline) {
