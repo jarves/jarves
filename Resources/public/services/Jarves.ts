@@ -5,6 +5,9 @@ import {EntryPoint} from "./WindowManagement";
 import {Injectable} from "angular2/core";
 import Backend from "./Backend";
 import JarvesSession from "./JarvesSession";
+import {MenuItem} from "./JarvesSession";
+import {InterfaceMenus} from "./JarvesSession";
+import EmitterPromise from "../EmitterPromise";
 
 @Injectable()
 export default class Jarves {
@@ -13,62 +16,77 @@ export default class Jarves {
     constructor(private backend:Backend, private jarvesSession:JarvesSession) {
     }
 
-    logout() {
-        this.loginController.logout();
-    }
+    //logout() {
+    //    this.loginController.logout();
+    //}
 
     protected entryPointOptionsCache = {};
 
-    public loadEntryPointOptions(entryPoint:string) : Promise {
-        var deferred = this.$q.defer();
+    public loadEntryPointOptions(entryPoint:string):Promise {
+        return new Promise((resolve, reject) => {
 
-        if (this.entryPointOptionsCache[entryPoint]) {
-            deferred.resolve(this.entryPointOptionsCache[entryPoint]);
-        } else {
-            var httpPromise = this.backend.post(entryPoint + '/?_method=options');
-            httpPromise.success((response) => {
-                this.entryPointOptionsCache[entryPoint] = response.data;
-                deferred.resolve(response.data);
-            });
-        }
-
-        return deferred.promise;
+            if (this.entryPointOptionsCache[entryPoint]) {
+                resolve(this.entryPointOptionsCache[entryPoint]);
+            } else {
+                this.backend.post(entryPoint + '/?_method=options')
+                    .on('success', response => {
+                        this.entryPointOptionsCache[entryPoint] = response.data;
+                        resolve(response.data);
+                    })
+                    .catch(error => reject(error));
+            }
+        });
     }
 
-
-    loadInterface() {
-        return new ProgressPromise((resolve, reject, eventEmitter) => {
+    public loadInterface():EmitterPromise {
+        return new EmitterPromise((resolve, reject, eventEmitter) => {
             eventEmitter('progress', 25);
 
-            this.jarves.loadSettings()
+            this.loadSettings()
                 .then(() => {
+                    console.log('outer loadSettings done');
                     eventEmitter('progress', 60);
-                    return this.jarves.loadMenu();
-                })
-                .then(() => {
-                    eventEmitter('progress', 100);
+                    this.loadMenu()
+                        .then(() => {
+                            eventEmitter('progress', 100);
+                            resolve();
+                        })
+                        .catch(error => console.error(error))
+                }, error => reject(error))
+        });
+    }
+
+    /**
+     * Loads settings from the backend to application.
+     */
+    loadSettings(keyLimitation?:Array = []):Promise {
+        console.log('init loading settings');
+
+        return new Promise((resolve, reject) => {
+            var queryString = {lang: this.jarvesSession.getLanguage(), keys: keyLimitation};
+
+            this.backend.get('jarves/admin/backend/settings', queryString)
+                .then(response => {
+                    var preparedSettings = this.prepareSettings(response.body.data);
+                    console.log('preparedSettings', preparedSettings);
+                    this.jarvesSession.setSettings(preparedSettings);
                     resolve();
-                    this.showInterface();
-                });
+                }, error => { reject(error); })
         });
     }
 
     /**
      * Loads all menu items from the backend.
      */
-    loadMenu() : Promise {
-        var deferred = this.$q.defer();
+    loadMenu():Promise {
+        return new Promise((resolve, reject) => {
+            this.backend.get('jarves/admin/backend/menus')
+                .then(response => {
+                    this.setMenus(response.body.data);
+                    resolve(response.body.data);
+                }, error => reject(error))
 
-        this.backend.get('jarves/admin/backend/menus')
-            .success((response) => {
-                this.setMenus(response.data);
-                deferred.resolve(response.data);
-            })
-            .error(() => {
-                deferred.reject();
-            });
-
-        return deferred.promise;
+        });
     }
 
     /**
@@ -77,10 +95,10 @@ export default class Jarves {
      * @param {Array} menus
      */
     setMenus(menus) {
-        var categorized = {};
+        var categorized:InterfaceMenus = {};
 
         var lastKey = '';
-        var lastBundle = '';
+        var lastBundle;
         for (let menu of eachValue(menus)) {
             lastBundle = menu.fullPath.split('/')[0];
 
@@ -103,7 +121,7 @@ export default class Jarves {
             categorized[lastKey].items.push(menu);
         }
 
-        this.$rootScope._menus = categorized;
+        this.jarvesSession.setMenus(categorized);
     }
 
     /**
@@ -111,55 +129,23 @@ export default class Jarves {
      *
      * @param {Object} settings
      */
-    setSettings(settings) {
+    prepareSettings(settings) {
+        var preparedSettings = this.jarvesSession.getSettings();
+
         for (let [key, val] of each(settings)) {
-            this.$rootScope._settings[key] = val;
+            preparedSettings[key] = val;
         }
 
-        this.$rootScope._settings['images'] = ['jpg', 'jpeg', 'bmp', 'png', 'gif', 'psd'];
+        preparedSettings['images'] = ['jpg', 'jpeg', 'bmp', 'png', 'gif', 'psd'];
 
-        if (!this.$rootScope._settings) {
-            this.$rootScope._settings = {};
+        preparedSettings.configsAlias = {};
+
+        for (let [key, config] of each(preparedSettings.configs)) {
+            preparedSettings.configsAlias[key.toLowerCase()] = preparedSettings.configs[key];
+            preparedSettings.configsAlias[key.toLowerCase().replace(/bundle$/, '')] = preparedSettings.configs[key];
         }
 
-        if (!angular.isObject(this.$rootScope._settings)) {
-            this.$rootScope._settings = {};
-        }
-
-        if (!this.$rootScope._settings['user']['windows']) {
-            this.$rootScope._settings['user']['windows'] = {};
-        }
-
-//        if (!this.options.frontPage && this.$rootScope._settings.system && this.$rootScope._settings.system.systemTitle) {
-//            document.title = this.$rootScope._settings.system.systemTitle + t(' | Jarves cms Administration');
-//        }
-
-        this.$rootScope._settings.configsAlias = {};
-
-        for (let [key, config] of each(this.$rootScope._settings.configs)) {
-            this.$rootScope._settings.configsAlias[key.toLowerCase()] = this.$rootScope._settings.configs[key];
-            this.$rootScope._settings.configsAlias[key.toLowerCase().replace(/bundle$/, '')] = this.$rootScope._settings.configs[key];
-        }
-    }
-
-    /**
-     * Loads settings from the backend to application.
-     */
-    loadSettings(keyLimitation:Array = []):Promise {
-        var deferred = this.$q.defer();
-
-        var query = {lang: this.jarvesSession.getLanguage(), keys: keyLimitation};
-
-        this.backend.get('jarves/admin/backend/settings', {params: query})
-            .success((response) => {
-                this.setSettings(response.data);
-                deferred.resolve();
-            })
-            .error(() => {
-                deferred.reject();
-            });
-
-        return deferred.promise;
+        return preparedSettings;
     }
 
 
@@ -189,18 +175,10 @@ export default class Jarves {
     getConfig(bundleName:string):Object {
         if (!bundleName) return;
 
-        return this.getSettings().configs[bundleName]
-            || this.getSettings().configs[bundleName.toLowerCase()]
-            || this.getSettings().configsAlias[bundleName]
-            || this.getSettings().configsAlias[bundleName.toLowerCase()];
-    }
-
-    /**
-     *
-     * @returns {Object}
-     */
-    getSettings():Object {
-        return this.$rootScope._settings;
+        return this.jarvesSession.getSettings().configs[bundleName]
+            || this.jarvesSession.getSettings().configs[bundleName.toLowerCase()]
+            || this.jarvesSession.getSettings().configsAlias[bundleName]
+            || this.jarvesSession.getSettings().configsAlias[bundleName.toLowerCase()];
     }
 
     /**
@@ -273,7 +251,7 @@ export default class Jarves {
      * @returns {Object}
      */
     getObjectDefinition(objectKey) {
-        if (!angular.isString(objectKey)) {
+        if ('string' !== typeof objectKey) {
             throw 'objectKey is not a string: ' + objectKey;
         }
 
@@ -579,68 +557,68 @@ export default class Jarves {
         }
 
         if (definition.objectRestEntryPoint) {
-            return jarvesRESTURL + definition.objectRestEntryPoint;
+            return 'jarves/' + definition.objectRestEntryPoint;
         }
 
-        return jarvesRESTURL + 'object/' + normalizeObjectKey(objectKey);
+        return 'jarves/' + normalizeObjectKey(objectKey);
 
     }
 
-    /**
-     * Returns the object label, based on a label field or label template (defined
-     * in the object definition).
-     *
-     * @param {String} objectKey
-     * @param {Object} item
-     * @param {String} [mode] 'default', 'field' or 'tree'. Default is 'default'
-     * @param {Object} [overwriteDefinition] overwrite definitions stored in the objectKey
-     *
-     * @return {String}
-     */
-    getObjectLabelByItem(objectKey, item, mode, overwriteDefinition) {
-
-        var definition = this.getObjectDefinition(objectKey);
-        if (!definition) {
-            throw 'Definition not found ' + objectKey;
-        }
-
-        var template = definition.treeTemplate ? definition.treeTemplate : definition.labelTemplate;
-        var label = definition.treeLabel ? definition.treeLabel : definition.labelField;
-
-        if (overwriteDefinition) {
-            ['fieldTemplate', 'fieldLabel', 'treeTemplate', 'treeLabel'].each(function (map) {
-                if (map in overwriteDefinition) {
-                    definition[map] = overwriteDefinition[map];
-                }
-            });
-        }
-
-        /* field ui */
-        if (mode == 'field' && definition.fieldTemplate) {
-            template = definition.fieldTemplate;
-        }
-
-        if (mode == 'field' && definition.singleItemLabelField) {
-            label = definition.singleItemLabelField;
-        }
-
-        /* tree */
-        if (mode == 'tree' && definition.treeTemplate) {
-            template = definition.treeTemplate;
-        }
-
-        if (mode == 'tree' && definition.treeLabel) {
-            label = definition.treeLabel;
-        }
-
-        if (!template) {
-            //we only have an label field, so return it
-            return item[label];
-        }
-
-        template = this.getObjectLabelByItemTemplates[template] || nunjucks.compile(template);
-        return template.render(item);
-    }
+    ///**
+    // * Returns the object label, based on a label field or label template (defined
+    // * in the object definition).
+    // *
+    // * @param {String} objectKey
+    // * @param {Object} item
+    // * @param {String} [mode] 'default', 'field' or 'tree'. Default is 'default'
+    // * @param {Object} [overwriteDefinition] overwrite definitions stored in the objectKey
+    // *
+    // * @return {String}
+    // */
+    //getObjectLabelByItem(objectKey, item, mode, overwriteDefinition) {
+    //
+    //    var definition = this.getObjectDefinition(objectKey);
+    //    if (!definition) {
+    //        throw 'Definition not found ' + objectKey;
+    //    }
+    //
+    //    var template = definition.treeTemplate ? definition.treeTemplate : definition.labelTemplate;
+    //    var label = definition.treeLabel ? definition.treeLabel : definition.labelField;
+    //
+    //    if (overwriteDefinition) {
+    //        for (let map of 'fieldTemplate', 'fieldLabel', 'treeTemplate', 'treeLabel') {
+    //            if (map in overwriteDefinition) {
+    //                definition[map] = overwriteDefinition[map];
+    //            }
+    //        });
+    //    }
+    //
+    //    /* field ui */
+    //    if (mode == 'field' && definition.fieldTemplate) {
+    //        template = definition.fieldTemplate;
+    //    }
+    //
+    //    if (mode == 'field' && definition.singleItemLabelField) {
+    //        label = definition.singleItemLabelField;
+    //    }
+    //
+    //    /* tree */
+    //    if (mode == 'tree' && definition.treeTemplate) {
+    //        template = definition.treeTemplate;
+    //    }
+    //
+    //    if (mode == 'tree' && definition.treeLabel) {
+    //        label = definition.treeLabel;
+    //    }
+    //
+    //    if (!template) {
+    //        //we only have an label field, so return it
+    //        return item[label];
+    //    }
+    //
+    //    template = this.getObjectLabelByItemTemplates[template] || nunjucks.compile(template);
+    //    return template.render(item);
+    //}
 
     /**
      * Returns all labels for a object item.

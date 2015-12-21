@@ -137,7 +137,7 @@ button::-moz-focus-inner {
         text-decoration: none;
     }
 
-    a:hover {
+    a.active, a.active:link, a:hover {
         color: $linkHoverColor;
         background-color: $linkHoverBgColor;
     }

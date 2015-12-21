@@ -1,5 +1,5 @@
 import {baseUrl, baseUrlApi} from '../../config';
-import {Component} from 'angular2/core';
+import {Component, HostBinding} from 'angular2/core';
 import WindowManagement from '../../services/WindowManagement';
 import Jarves from '../../services/Jarves';
 import JarvesLoginComponent from "./JarvesLoginComponent";
@@ -10,36 +10,41 @@ import JarvesSession from "../../services/JarvesSession";
 import {CORE_DIRECTIVES} from 'angular2/common';
 import JarvesConfig from '../../Jarves';
 import JarvesTextComponent from "../../fields/JarvesTextComponent";
+import BackendLogger from "../../services/BackendLogger";
+import JarvesBackendLogsComponent from "./JarvesBackendLogsComponent";
+import JarvesInterfaceComponent from "./JarvesInterfaceComponent";
 
 @Component({
     selector: 'jarves-admin',
-    providers: [Jarves, WindowManagement, Backend, Translator, JarvesSession, HTTP_PROVIDERS],
-    directives: [JarvesTextComponent, CORE_DIRECTIVES, JarvesLoginComponent],
+    providers: [Jarves, WindowManagement, Backend, Translator, JarvesSession, BackendLogger, HTTP_PROVIDERS],
+    directives: [JarvesTextComponent, CORE_DIRECTIVES, JarvesLoginComponent, JarvesBackendLogsComponent, JarvesInterfaceComponent],
     template: `
-<jarves-login></jarves-login>
-<jarves-interface></jarves-interface>
+<jarves-login *ngIf="!jarvesSession.isInterfaceVisible()"></jarves-login>
+<jarves-interface *ngIf="jarvesSession.isInterfaceVisible()" [class.jarves-white]="jarvesWhite"></jarves-interface>
+<jarves-backend-logs [class.jarves-white]="jarvesWhite" [errors]="backendLogger.errors"></jarves-backend-logs>
     `
 })
 export default class JarvesAdminComponent {
-    public menuHidden:Object = {};
-    public interfaceVisible:boolean = false;
 
-    constructor(public jarves:Jarves, public jarvesSession:JarvesSession, public windowManagement:WindowManagement) {
+    @HostBinding('class.jarves-admin') protected jarvesAdmin:boolean = true;
+    public jarvesWhite:boolean = true;
+
+    constructor(public jarves:Jarves, public jarvesSession:JarvesSession,
+                public windowManagement:WindowManagement, public backendLogger: BackendLogger) {
     }
 
-    showInterface() {
-        this.windowManagement.restoreWindows();
-        this.jarvesSession.setInterfaceVisible(true);
-
-        this.interfaceVisible = true;
-
-        this.windowManagement.activateUrlHashUpdating();
-    }
+    //showInterface() {
+    //    this.windowManagement.restoreWindows();
+    //    this.jarvesSession.setInterfaceVisible(true);
+    //
+    //    this.interfaceVisible = true;
+    //
+    //    this.windowManagement.activateUrlHashUpdating();
+    //}
 
     logout() {
         this.jarvesSession.setInterfaceVisible(false);
-        this.interfaceVisible = false;
-        this.jarves.logout();
+        this.jarvesSession.setSession({});
     }
 
     loadWindow(entryPoint, options, parentWindowId, isInline) {

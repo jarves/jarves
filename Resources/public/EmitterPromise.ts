@@ -31,10 +31,8 @@ export default class EmitterPromise {
         this.promise.then(() => this.then(...arguments));
     }
 
-    public catch(onRejected:Function):EmitterPromise {
-        this.promise.catch(onRejected);
-
-        return this;
+    public catch(onRejected:Function) {
+        return this.promise.catch(onRejected);
     }
 
     public on(eventName:string, callback:Function):EmitterPromise {
@@ -53,9 +51,7 @@ export default class EmitterPromise {
         return this;
     }
 
-    public then(onFulfilled:Function, onRejected:Function):EmitterPromise {
-        this.promise.then(onFulfilled, onRejected);
-
-        return this;
+    public then(onFulfilled:Function, onRejected?:Function) {
+        return this.promise.then(onFulfilled, onRejected);
     }
 }

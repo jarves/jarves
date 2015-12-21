@@ -1,14 +1,29 @@
 import {Injectable} from "angular2/core";
 
-interface Settings {
+export interface Settings {
 }
 
-interface Session {
+export interface Session {
     userId:number;
     access:boolean;
     sessionId:string;
     tokenId:string;
     lang: string;
+}
+
+export interface MenuItem {
+    fullPath: string;
+    icon: string;
+    label: string;
+}
+
+export interface InterfaceMenus {
+    [categoryKey: string]: InterfaceMenuCategory
+}
+
+export interface InterfaceMenuCategory {
+    label: string;
+    items: Array<MenuItem>
 }
 
 @Injectable()
@@ -17,6 +32,7 @@ export default class JarvesSession {
     protected language:string = 'en';
     protected settings:Settings = {};
     protected session:Session;
+    protected menus:InterfaceMenus = {};
     protected interfaceVisible:boolean = false;
 
     public baseUrl:string = './';
@@ -38,6 +54,14 @@ export default class JarvesSession {
 
     public getLanguage():string {
         return this.language;
+    }
+
+    public setMenus(menus:InterfaceMenus) {
+        this.menus = menus;
+    }
+
+    public getMenus():InterfaceMenus {
+        return this.menus;
     }
 
     public setLanguage(language:string) {

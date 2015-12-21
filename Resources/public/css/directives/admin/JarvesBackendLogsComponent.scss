@@ -1,0 +1,59 @@
+@import '../../admin/variables';
+
+jarves-backend-logs {
+    position: absolute;
+    z-index: 200200;
+    right: 10px;
+    bottom: 10px;
+    max-height: 100%;
+    color: white;
+    overflow: auto;
+    max-width: 40%;
+}
+
+.jarves-backend-logs-item {
+    background-color: lighten($mainColor, 5%);
+    padding: 15px;
+    display: block;
+
+    h3 {
+        padding: 0;
+        margin: 0;
+        font-size: 14px;
+    }
+}
+
+.jarves-backend-logs-small-item {
+
+}
+
+.jarves-backend-logs-small-item.active {
+    background-color: $mainColor;
+    border-left: 1px solid $linkHoverBgColor;
+}
+
+.jarves-backend-logs-items {
+    background-color: $mainColor;
+    a {
+        display: block;
+    }
+}
+
+.jarves-Backend-Logs-subline {
+    font-size: 11px;
+    color: silver;
+    margin: 5px 0;
+
+    span {
+        color: red;
+    }
+}
+
+.jarves-Backend-Logs-message {
+    white-space: pre-wrap;
+    background-color: lighten($mainColor, 3%);
+    overflow: auto;
+    padding: 5px;
+    max-height: 200px;
+    font-family: monospace;
+}
