@@ -285,6 +285,8 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      * Defines whether the list windows should display the language select box.
      * Note: Your table need a field 'lang' varchar(2). The windowList class filter by this.
      *
+     * If the object is nested=true and have a root object
+     *
      * @var bool
      */
     protected $multiLanguage = false;
@@ -355,6 +357,14 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      * @var int
      */
     protected $itemsPerPage = 15;
+
+//    /**
+//     * If true the results of this controller will be mapped in the objectRepository service at UI side,
+//     * which results basically in a re-rendering of changed data related to given $object.
+//     *
+//     * @var bool
+//     */
+//    protected $objectRepositoryMapping = true;
 
     /**
      * Uses the HTTP 'PATCH' instead of the 'PUT'.
@@ -589,12 +599,18 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
     public function getInfo()
     {
-        $vars = get_object_vars($this);
-        $blacklist = array('objectDefinition', 'entryPoint');
+//        $vars = get_object_vars($this);
+        $vars = [];
+        $reflect = new \ReflectionClass($this);
+        foreach ($reflect->getProperties() as $property) {
+            $vars[] = $property->getName();
+        }
+
+        $blacklist = array_flip(array('objectDefinition', 'entryPoint', 'request', 'obj'));
         $result = array();
 
-        foreach ($vars as $var => $val) {
-            if (in_array($var, $blacklist)) {
+        foreach ($vars as $var) {
+            if (isset($blacklist[$var])) {
                 continue;
             }
             $method = 'get' . ucfirst($var);
@@ -668,34 +684,41 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
                 continue;
             }
 
-            $oField = $this->objectDefinition->getField($key);
+            $fieldName = $key;
+            $objectName = $key;
+
+            if (strpos($key, '.')) {
+                list($objectName, $fieldName) = explode('.', $key);
+                $field['type'] = 'object';
+            }
+
+            $oField = $this->objectDefinition->getField($objectName);
             if ($oField) {
-                if (!isset($field['type'])) {
-                    $field['type'] = 'predefined';
-                }
-                if (strtolower($field['type']) == 'predefined' && !isset($field['object'])) {
-                    $field['object'] = $this->getObject();
-                }
-                if (strtolower($field['type']) == 'predefined' && !isset($field['field'])) {
-                    $field['field'] = $key;
-                }
-
-                if (!isset($field['label'])) {
-                    $field['label'] = $oField->getLabel();
-                }
-
-                if (!isset($field['desc'])) {
-                    $field['desc'] = $oField->getDesc();
-                }
+                $field = array_merge($oField->toArray(), $field);
+//
+//                if (!isset($field['type'])) {
+//                    $field['type'] = 'predefined';
+//                }
+//                if (strtolower($field['type']) == 'predefined' && !isset($field['object'])) {
+//                    $field['object'] = $this->getObject();
+//                }
+//                if (strtolower($field['type']) == 'predefined' && !isset($field['field'])) {
+//                    $field['field'] = $fieldName;
+//                }
+//
+//                if (!isset($field['label'])) {
+//                    $field['label'] = $oField->getLabel();
+//                }
+//
+//                if (!isset($field['desc']) && $oField->getDesc()) {
+//                    $field['desc'] = $oField->getDesc();
+//                }
 
                 if (!isset($field['label'])) {
                     $field['label'] = $key;
                 }
             }
 
-            if (isset($field['depends'])) {
-                $this->prepareFieldDefinition($field['depends']);
-            }
             if (isset($field['children'])) {
                 $this->prepareFieldDefinition($field['children']);
             }
@@ -873,7 +896,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
     }
 
     /**
-     *
      * $pk is an array with the primary key values.
      *
      * If one primary key:
@@ -953,7 +975,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      *       'pages' => $maxPages
      *   );
      *
-     * @param Request $request
      * @param array $filter
      * @param integer $limit
      * @param integer $offset
@@ -961,7 +982,12 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      * @param string $fields
      * @param array $orderBy
      *
+     * @param bool $withAcl
+     * @param array $primaryKeys
+     *
      * @return array
+     * @throws ObjectNotFoundException
+     * @throws \Exception
      */
     public function getItems(
         $filter = null,
@@ -970,7 +996,8 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         $query = '',
         $fields = null,
         $orderBy = [],
-        $withAcl = false
+        $withAcl = false,
+        array $primaryKeys = []
     ) {
         $options = array();
 
@@ -1017,6 +1044,23 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
             if ($queryCondition = $this->getQueryCondition($query, $options['fields'])) {
                 $condition->mergeAnd($queryCondition);
             }
+        }
+
+        if ($primaryKeys) {
+            $primaryKeyCondition = Condition::create();
+            foreach ($primaryKeys as $pk) {
+                $primaryKeyConditionItem = Condition::create();
+                foreach ($this->getObjectDefinition()->getPrimaryKeyNames() as $primaryKeyName) {
+                    if (!isset($pk[$primaryKeyName])) {
+                        throw new \LogicException(sprintf('Field %s not found in primaryKey parameter (%s)', $primaryKeyName, json_encode($pk)));
+                    }
+                    $primaryKeyConditionItem->addAnd([
+                        $primaryKeyName, '=', $pk[$primaryKeyName]
+                    ]);
+                }
+                $primaryKeyCondition->mergeOr($primaryKeyConditionItem);
+            }
+            $condition->mergeAndBegin($primaryKeyCondition);
         }
 
         if ($this->getPermissionCheck() && $aclCondition = $this->getJarves()->getACL()->getListingCondition($this->getObject())) {
@@ -1274,7 +1318,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         $offset = null,
         $withAcl = false
     ) {
-
         $storageController = $this->getJarves()->getObjects()->getStorageController($this->getObject());
 
         if (null !== $pk) {
@@ -1374,7 +1417,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         }
 
         return $storageController->getBranchChildrenCount($pk, $condition, $scope);
-
     }
 
     /**
@@ -2709,6 +2751,54 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
     public function setDomain($domain)
     {
         $this->domain = (int)$domain;
+    }
+
+//    /**
+//     * @return boolean
+//     */
+//    public function getObjectRepositoryMapping()
+//    {
+//        return $this->objectRepositoryMapping;
+//    }
+//
+//    /**
+//     * @param boolean $objectRepositoryMapping
+//     */
+//    public function setObjectRepositoryMapping($objectRepositoryMapping)
+//    {
+//        $this->objectRepositoryMapping = $objectRepositoryMapping;
+//    }
+
+    /**
+     * @return string
+     */
+    public function getOrderBy()
+    {
+        return $this->orderBy;
+    }
+
+    /**
+     * @param string $orderBy
+     */
+    public function setOrderBy($orderBy)
+    {
+        $this->orderBy = $orderBy;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderByDirection()
+    {
+        return $this->orderByDirection;
+    }
+
+    /**
+     * @param string $orderByDirection
+     */
+    public function setOrderByDirection($orderByDirection)
+    {
+        $this->orderByDirection = $orderByDirection;
     }
 
 }

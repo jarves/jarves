@@ -645,6 +645,9 @@ var jarves_system_module_edit = new Class({
             this.lr.cancel();
         }
 
+        this.win.setLoading(false);
+        return;
+
         this.lr = new Request.JSON({url: _pathAdmin + 'admin/system/bundle/getHelp',
             noCache: 1,
             onSuccess: function(res) {
@@ -799,10 +802,9 @@ var jarves_system_module_edit = new Class({
                     combine: t('[Window] Framework Combine')
                 },
                 children: {
-                    'class': {
-                        label: t('PHP Class'),
-                        desc: t('Example: \Module\Admin\ObjectList'),
-                        modifier: 'phpclass',
+                    'object': {
+                        label: t('Object'),
+                        type: 'objectKey',
                         required: true,
                         needValue: ['list', 'edit', 'add', 'combine', 'store']
                     },

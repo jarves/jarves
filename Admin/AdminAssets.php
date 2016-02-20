@@ -35,6 +35,23 @@ class AdminAssets
         return $this->jarves;
     }
 
+    public function appendAngularTemplates()
+    {
+        $response = $this->getJarves()->getPageResponse();
+
+        foreach ($this->getJarves()->getConfigs() as $bundle) {
+            $templates = $bundle->getAdminAngularTemplatesInfo();
+            foreach ($templates as $template) {
+                $publicPath = $this->getJarves()->resolvePublicWebPath($template->getPath());
+                $localPath = $this->getJarves()->resolveInternalPublicPath($template->getPath());
+
+                $content = file_get_contents($localPath);
+                $content = str_replace('</script>', '', $content);
+                $response->addHeader('<script type="text/ng-template" id="' . $publicPath. '">' . $content . '</script>');
+            }
+        }
+    }
+
     public function addSessionScripts()
     {
         $response = $this->getJarves()->getPageResponse();
@@ -102,7 +119,7 @@ class AdminAssets
         } else {
             $response->addCssFile($prefix . '/admin/backend/css');
             if (!$options['noJs']) {
-                $response->addJsFile($prefix . '/admin/backend/script');
+                $response->addJsFile($prefix . '/admin/backend/script', 3000);
             }
 
             foreach ($this->getJarves()->getConfigs() as $bundleConfig) {
@@ -111,10 +128,10 @@ class AdminAssets
                         continue;
                     }
 
-                    if ($assetInfo->getFile()) {
+                    if ($assetInfo->getPath()) {
                         // load javascript files, that are not accessible (means those point to a controller)
                         // because those can't be compressed
-                        $path = $this->getJarves()->resolveWebPath($assetInfo->getFile());
+                        $path = $this->getJarves()->resolveWebPath($assetInfo->getPath());
                         if (!file_exists($path)) {
                             $response->addAsset($assetInfo);
                             continue;
@@ -127,7 +144,7 @@ class AdminAssets
                         continue;
                     }
 
-                    if (!$assetInfo->getAllowCompression()) {
+                    if (!$assetInfo->isCompressionAllowed()) {
                         $response->addAsset($assetInfo);
                     }
                 }

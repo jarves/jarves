@@ -14,7 +14,6 @@ use Jarves\Controller\PageController;
 
 /**
  * This is the response, we use to generate the basic html skeleton.
- * Ths actual body content comes from Core\PageController.
  */
 class PageResponse extends Response
 {
@@ -248,25 +247,36 @@ class PageResponse extends Response
      *
      * @param string $path
      * @param string $contentType
+     * @param int $priority
      */
-    public function loadAssetFile($path, $contentType = null)
+    public function loadAssetFile($path, $contentType = null, $priority = 0)
     {
-        $this->injectAsset(array('path' => $path, 'contentType' => $contentType));
+        $this->injectAsset(array('path' => $path, 'contentType' => $contentType, 'priority' => $priority));
     }
 
+    /**
+     * @param array $definition
+     */
     protected function injectAsset($definition)
     {
         $assetInfo = new AssetInfo();
-        $assetInfo->setFile(@$definition['path']);
+        $assetInfo->setPath(@$definition['path']);
+        $assetInfo->setOriginalPath(@$definition['path']);
         $assetInfo->setContent(@$definition['content']);
         $assetInfo->setContentType(@$definition['contentType']);
+        $assetInfo->setPriority(@$definition['priority']+0);
 
-        $this->handleAsset($assetInfo);
+        foreach ($this->handleAsset($assetInfo) as $asset) {
 
-        if ('bottom' === strtolower(@$definition['position'])) {
-            $this->assetsInfoBottom[] = $assetInfo;
-        } else {
-            $this->assetsInfo[] = $assetInfo;
+            if ('bottom' === strtolower(@$definition['position'])) { //instead of position use $asset->getPossition();
+                if (!$this->hasAsset($asset, $this->assetsInfoBottom)) {
+                    $this->assetsInfoBottom[$asset->getPriority()][] = $asset;
+                }
+            } else {
+                if (!$this->hasAsset($asset)) {
+                    $this->assetsInfo[$asset->getPriority()][] = $asset;
+                }
+            }
         }
     }
 
@@ -274,15 +284,56 @@ class PageResponse extends Response
      * If needed the given asset gets compiled and $assetInfo will be modified.
      *
      * @param AssetInfo $assetInfo
+     *
+     * @return AssetInfo[]
      */
     public function handleAsset(&$assetInfo)
     {
         $assetHandlerContainer = $this->getJarves()->getAssetCompilerContainer();
-        if ($assetInfo->getFile() && $compiler = $assetHandlerContainer->getCompileHandlerByFileExtension($assetInfo->getFile())) {
-            if ($compiledAssetInfo = $compiler->compileFile($assetInfo->getFile())) {
-                $assetInfo = $compiledAssetInfo;
+        $compiler = $assetHandlerContainer->getCompileHandlerByContentType($assetInfo->getContentType());
+        if (!$compiler) {
+            $compiler = $assetHandlerContainer->getCompileHandlerByFileExtension($assetInfo->getPath());
+        }
+
+        if (!$compiler) {
+            return [$assetInfo]; //no compiler found, so ok
+        }
+
+        if ($compiledAssetInfoResult = $compiler->compileFile($assetInfo)) {
+            if (is_array($compiledAssetInfoResult)) {
+                return $compiledAssetInfoResult;
+            } else {
+                $compiledAssetInfo = $compiledAssetInfoResult;
+                if ($compiledAssetInfo instanceof AssetInfo) {
+                    if ($this->hasAsset($compiledAssetInfo)) {
+                        return []; //asset already in
+                    }
+                    $assetInfo = $compiledAssetInfo;
+                }
+                return [$assetInfo];
             }
         }
+        return [];
+    }
+
+    public function hasAsset(AssetInfo $assetInfo, $assets = null) {
+        if (!$assets) {
+            $assets = $this->assetsInfo;
+        }
+
+        $assets = $assets ? call_user_func_array('array_merge', $assets) : [];
+
+        foreach ($assets as $asset) {
+            if (!$assetInfo->getPath() && $assetInfo->getContent() === $asset->getContent()
+                && $assetInfo->getContentType() === $asset->getContentType()) {
+                return true;
+            }
+            if ($asset->getPath() && $asset->getPath() === $assetInfo->getPath()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -301,26 +352,29 @@ class PageResponse extends Response
      */
     public function addAsset(AssetInfo $assetInfo)
     {
-        if (array_search($assetInfo, $this->assetsInfo) === false) {
-            $this->handleAsset($assetInfo);
-            $this->assetsInfo[] = $assetInfo;
+        foreach ($this->handleAsset($assetInfo) as $asset) {
+            if (!$this->hasAsset($asset)) {
+                $this->assetsInfo[$asset->getPriority()][] = $asset;
+            }
         }
     }
 
     /**
      * @param string $file path to javascript file
+     * @param int $priority
      */
-    public function addJsFile($file)
+    public function addJsFile($file, $priority = 0)
     {
-        $this->loadAssetFile($file, 'text/javascript');
+        $this->loadAssetFile($file, 'text/javascript', $priority);
     }
 
     /**
      * @param string $script the actual javascript
+     * @param int $priority
      */
-    public function addJs($script)
+    public function addJs($script, $priority = 0)
     {
-        $this->injectAsset(array('content' => $script, 'contentType' => 'text/javascript'));
+        $this->injectAsset(array('content' => $script, 'contentType' => 'text/javascript', 'priority' => $priority));
     }
 
     /**
@@ -797,14 +851,21 @@ class PageResponse extends Response
     {
         $assetHandlerContainer = $this->getJarves()->getAssetCompilerContainer();
 
-        /** @var $assets \Jarves\AssetHandler\AssetInfo[] */
-        $assetsTop = $this->assetsInfo;
-        $assetsBottom = $this->assetsInfoBottom;
+//        /** @var $assets \Jarves\AssetHandler\AssetInfo[] */
+
+        // sort by priority, highest => lowest
+        krsort($this->assetsInfo);
+        krsort($this->assetsInfoBottom);
+
+        // flatten arrays
+        $assetsTop = $this->assetsInfo ? call_user_func_array('array_merge', $this->assetsInfo) : [];
+        $assetsBottom = $this->assetsInfoBottom ? call_user_func_array('array_merge', $this->assetsInfoBottom) : [];
 
         $tagsJsTop = '';
         $tagsCssTop = '';
         $tagsJsBottom = '';
         $tagsAssets = '';
+        $tagsAssetsBottom = '';
 
         $assetsTopGrouped =[];
         $assetsBottomGrouped = [];
@@ -813,16 +874,30 @@ class PageResponse extends Response
         $loaderMap = [];
 
         // group all asset per loader
+        $lastLoader = null;
+        $group = 0;
+//        var_dump($assetsTop); exit;
         foreach ($assetsTop as $asset) {
             if ($asset->getContentType()) {
                 $loader = $assetHandlerContainer->getLoaderHandlerByContentType($asset->getContentType());
             } else {
-                $loader = $assetHandlerContainer->getLoaderHandlerByExtension($asset->getFile());
+                $loader = $assetHandlerContainer->getLoaderHandlerByExtension($asset->getPath());
             }
 
             if ($loader) {
-                $loaderMap[spl_object_hash($loader)] = $loader;
-                $assetsTopGrouped[spl_object_hash($loader)][] = $asset;
+                if ($loader->needsGrouping()) {
+                    if ($loader !== $lastLoader) {
+                        $group++;
+                        $lastLoader = $loader;
+                    }
+                    //group those stuff
+                    $assetsTopGrouped[get_class($loader) . '_' . $group][] = $asset;
+                    $loaderMap[get_class($loader) . '_' . $group] = $loader;
+                } else {
+                    $group++;
+                    $assetsTopGrouped[get_class($loader)][] = $asset;
+                    $loaderMap[get_class($loader)] = $loader;
+                }
             }
         }
 
@@ -831,7 +906,7 @@ class PageResponse extends Response
             if ($asset->getContentType()) {
                 $loader = $assetHandlerContainer->getLoaderHandlerByContentType($asset->getContentType());
             } else {
-                $loader = $assetHandlerContainer->getLoaderHandlerByExtension($asset->getFile());
+                $loader = $assetHandlerContainer->getLoaderHandlerByExtension($asset->getPath());
             }
 
             if ($loader) {
@@ -846,21 +921,23 @@ class PageResponse extends Response
             $tags = implode("\n", (array)$loader->getTags($assets, $this->getResourceCompression()));
 
             if ($loader instanceof CssHandler) {
-                $tagsCssTop = $tags;
+                $tagsCssTop .= "\n" . $tags;
             } else if ($loader instanceof JsHandler) {
-                $tagsJsTop = $tags;
+                $tagsJsTop .= "\n" . $tags;
             } else {
-                $tagsAssets = $tags;
+                $tagsAssets .= "\n" . $tags;
             }
         }
 
-        // generate tags bottom
+//        // generate tags bottom
         foreach ($assetsBottomGrouped as $loaderHash => $assets) {
             $loader = $loaderMap[$loaderHash];
             $tags = implode("\n", (array)$loader->getTags($assets, $this->getResourceCompression()));
 
             if ($loader instanceof JsHandler) {
                 $tagsJsBottom = $tags;
+            } else {
+                $tagsAssetsBottom = $tags;
             }
         }
 
@@ -868,7 +945,8 @@ class PageResponse extends Response
             'jsTags' => $tagsJsTop,
             'cssTags' => $tagsCssTop,
             'jsTagsBottom' => $tagsJsBottom,
-            'assetTags' => $tagsAssets
+            'assetTags' => $tagsAssets,
+            'assetTagsBottom' => $tagsAssetsBottom
         ];
     }
 

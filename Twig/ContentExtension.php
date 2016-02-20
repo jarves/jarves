@@ -3,8 +3,6 @@
 namespace Jarves\Twig;
 
 use Jarves\Jarves;
-use Jarves\Model\Node;
-use Jarves\Controller\PageController;
 
 class ContentExtension extends \Twig_Extension
 {

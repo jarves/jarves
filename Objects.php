@@ -553,9 +553,9 @@ class Objects
      */
     public function get($objectKey, $pk, $options = array())
     {
-        $controller = $this->getController($objectKey, $options);
+        $repository = $this->getRepository($objectKey, $options);
 
-        return $controller->getItem($pk);
+        return $repository->getItem($pk);
     }
 
     /**
@@ -586,44 +586,9 @@ class Objects
      */
     public function getList($objectKey, $filter = null, $options = array())
     {
-        $controller = $this->getController($objectKey, $options);
+        $repository = $this->getRepository($objectKey, $options);
 
-        return $controller->getItems($filter, null, null, null, @$options['fields']);
-    }
-
-    /**
-     * Returns the class object for $objectKey
-     *
-     * @param string $objectKey
-     *
-     * @return \Jarves\ORM\ORMAbstract
-     * @throws ObjectNotFoundException
-     * @throws \Exception
-     */
-    public function getStorageController($objectKey)
-    {
-        if (!isset($this->instances[$objectKey])) {
-            $definition = $this->getDefinition($objectKey);
-
-            if (!$definition) {
-                throw new ObjectNotFoundException(sprintf('Object `%s` not found.', $objectKey));
-            }
-
-            if ('custom' === $definition->getDataModel()) {
-                if (!class_exists($className = $definition['class'])) {
-                    throw new \Exception(sprintf('Class for %s (%s) not found.', $objectKey, $definition['class']));
-                }
-
-                $this->instances[$objectKey] = new $className($objectKey, $definition, $this->getJarves());
-            } else {
-                $clazz = sprintf('\\Jarves\\ORM\\%s', ucfirst($definition->getDataModel()));
-                if (class_exists($clazz) || class_exists($clazz = $definition->getDataModel())) {
-                    $this->instances[$objectKey] = new $clazz(static::normalizeObjectKey($objectKey), $definition, $this->getJarves());
-                }
-            }
-        }
-
-        return $this->instances[$objectKey];
+        return $repository->getItems($filter, null, null, null, @$options['fields']);
     }
 
     /**
@@ -664,13 +629,13 @@ class Objects
      */
     public function getCount($objectKey, $condition = null, array $options = array())
     {
-        $controller = $this->getController($objectKey);
+        $repository = $this->getRepository($objectKey);
 
         if (isset($options['permissionCheck'])) {
-            $controller->setPermissionCheck($options['permissionCheck']);
+            $repository->setPermissionCheck($options['permissionCheck']);
         }
 
-        return $controller->getCount($condition, @$options['query']);
+        return $repository->getCount($condition, @$options['query']);
     }
 
     /**
@@ -692,12 +657,12 @@ class Objects
         array $options = array()
     ) {
 
-        $controller = $this->getController($objectKey);
+        $repository = $this->getRepository($objectKey);
         if (isset($options['permissionCheck'])) {
-            $controller->setPermissionCheck($options['permissionCheck']);
+            $repository->setPermissionCheck($options['permissionCheck']);
         }
 
-        return $controller->getBranchChildrenCount($pk, $scope, $condition);
+        return $repository->getBranchChildrenCount($pk, $scope, $condition);
     }
 
     /**
@@ -731,67 +696,106 @@ class Objects
             $targetObjectKey = Objects::normalizeObjectKey($targetObjectKey);
         }
 
-        $controller = $this->getController($objectKey, $options);
+        $repository = $this->getRepository($objectKey, $options);
 
-        return $controller->add($values, $targetPk, $position, $targetObjectKey);
+        return $repository->add($values, $targetPk, $position, $targetObjectKey);
     }
 
     /**
+     * Returns the controller to be used to call each update and query at. This controller handles a bit more than
+     * the pure storageController. For example: ACL, automatic filtering (per language) and event dispatcher. It need to extend ObjectCrud.
+     *
      * @param string $objectKey
      * @param array $options
      * @return ObjectCrud
      */
-    public function getController($objectKey, array $options = null)
+    public function getRepository($objectKey, array $options = null)
     {
         if (!$options) {
             $options = [];
         }
         $definition = $this->getDefinition($objectKey);
 
-        if ($controllerId = $definition->getController()) {
-            if (class_exists($controllerId)) {
-                $controller = new $controllerId();
+        if ($repositoryId = $definition->getRepositoryClass()) {
+            if (class_exists($repositoryId)) {
+                $repository = new $repositoryId();
             } else {
-                $controller = $this->getJarves()->getContainer()->get($controllerId);
+                $repository = $this->getJarves()->getContainer()->get($repositoryId);
             }
         } else {
-            $controller = new ObjectCrud();
+            $repository = new ObjectCrud();
         }
 
-        if ($controller instanceof ContainerAwareInterface) {
-            $controller->setContainer($this->getJarves()->getContainer());
+        if ($repository instanceof ContainerAwareInterface) {
+            $repository->setContainer($this->getJarves()->getContainer());
         }
 
-        $controller->setPermissionCheck(false);
+        $repository->setPermissionCheck(false);
         if (isset($options['permissionCheck'])) {
-            $controller->setPermissionCheck($options['permissionCheck']);
+            $repository->setPermissionCheck($options['permissionCheck']);
         }
 
-        $controller->setWithNewsFeed(false);
+        $repository->setWithNewsFeed(false);
         if (isset($options['newsFeed'])) {
-            $controller->setWithNewsFeed($options['newsFeed']);
+            $repository->setWithNewsFeed($options['newsFeed']);
         }
 
         if (isset($options['domain'])) {
-            $controller->setDomain($options['domain']);
+            $repository->setDomain($options['domain']);
         }
 
         if (isset($options['lang'])) {
-            $controller->setLanguage($options['lang']);
+            $repository->setLanguage($options['lang']);
         }
 
         if ($definition->getMultiLanguage()) {
-            $controller->setMultiLanguage(true);
+            $repository->setMultiLanguage(true);
         }
 
         if ($definition->getDomainDepended()) {
-            $controller->setDomainDepended(true);
+            $repository->setDomainDepended(true);
         }
 
-        $controller->setObject($objectKey);
-        $controller->initialize();
+        $repository->setObject($objectKey);
+        $repository->initialize();
 
-        return $controller;
+        return $repository;
+    }
+
+    /**
+     * Returns the storage controller, which directly accesses the actual object.
+     *
+     * @param string $objectKey
+     *
+     * @return \Jarves\ORM\ORMAbstract
+     *
+     * @throws ObjectNotFoundException
+     * @throws \Exception
+     */
+    public function getStorageController($objectKey)
+    {
+        if (!isset($this->instances[$objectKey])) {
+            $definition = $this->getDefinition($objectKey);
+
+            if (!$definition) {
+                throw new ObjectNotFoundException(sprintf('Object `%s` not found.', $objectKey));
+            }
+
+            if ('custom' === $definition->getDataModel()) {
+                if (!class_exists($className = $definition->getStorageClass())) {
+                    throw new \Exception(sprintf('Class for %s "%s" not found.', $objectKey, $definition->getStorageClass()));
+                }
+
+                $this->instances[$objectKey] = new $className($objectKey, $definition, $this->getJarves());
+            } else {
+                $clazz = sprintf('\\Jarves\\ORM\\%s', ucfirst($definition->getDataModel()));
+                if (class_exists($clazz) || class_exists($clazz = $definition->getDataModel())) {
+                    $this->instances[$objectKey] = new $clazz(static::normalizeObjectKey($objectKey), $definition, $this->getJarves());
+                }
+            }
+        }
+
+        return $this->instances[$objectKey];
     }
 
     /**
@@ -821,9 +825,9 @@ class Objects
      */
     public function update($objectKey, $pk, $values, array $options = array())
     {
-        $controller = $this->getController($objectKey, $options);
+        $repository = $this->getRepository($objectKey, $options);
 
-        return $controller->update($pk, $values);
+        return $repository->update($pk, $values);
     }
 
     /**
@@ -839,9 +843,9 @@ class Objects
      */
     public function patch($objectKey, $pk, $values, array $options = array())
     {
-        $controller = $this->getController($objectKey, $options);
+        $repository = $this->getRepository($objectKey, $options);
 
-        return $controller->patch($pk, $values);
+        return $repository->patch($pk, $values);
     }
 
 
@@ -870,9 +874,9 @@ class Objects
      */
     public function remove($objectKey, $pk, array $options = array())
     {
-        $controller = $this->getController($objectKey, $options);
+        $repository = $this->getRepository($objectKey, $options);
 
-        return $controller->remove($pk);
+        return $repository->remove($pk);
     }
 
     /*
@@ -902,9 +906,9 @@ class Objects
      */
     public function getRoot($objectKey, $scope, array $options = array())
     {
-        $controller = $this->getController($objectKey, $options);
+        $repository = $this->getRepository($objectKey, $options);
 
-        return $controller->getRoot($scope);
+        return $repository->getRoot($scope);
     }
 
     /**
@@ -919,9 +923,9 @@ class Objects
      */
     public function getRoots($objectKey, $condition = null, array $options = array())
     {
-        $controller = $this->getController($objectKey, $options);
+        $repository = $this->getRepository($objectKey, $options);
 
-        return $controller->getRoots($condition);
+        return $repository->getRoots($condition);
     }
 
     /**
@@ -946,9 +950,9 @@ class Objects
         array $options = array()
     ) {
 
-        $controller = $this->getController($objectKey, $options);
+        $repository = $this->getRepository($objectKey, $options);
 
-        return $controller->getBranchItems($pk, $condition, null, $scope, $depth);
+        return $repository->getBranchItems($pk, $condition, null, $scope, $depth);
 
     }
 
@@ -1043,9 +1047,9 @@ class Objects
      */
     public function getParent($objectKey, $pk, $options = null)
     {
-        $controller = $this->getController($objectKey, $options);
+        $repository = $this->getRepository($objectKey, $options);
 
-        return $controller->getParent($pk);
+        return $repository->getParent($pk);
     }
 
     /**
@@ -1170,13 +1174,13 @@ class Objects
      */
     public function getParents($objectKey, $pk, $options = null)
     {
-        $controller = $this->getController($objectKey);
+        $repository = $this->getRepository($objectKey);
 
         if (isset($options['permissionCheck'])) {
-            $controller->setPermissionCheck($options['permissionCheck']);
+            $repository->setPermissionCheck($options['permissionCheck']);
         }
 
-        return $controller->getParents($pk);
+        return $repository->getParents($pk);
     }
 
     /**
@@ -1214,9 +1218,9 @@ class Objects
         $options
 //        $overwrite = false
     ) {
-        $controller = $this->getController($objectKey, $options);
+        $repository = $this->getRepository($objectKey, $options);
 
-        return $controller->moveItem($pk, $targetPk, $position, $targetObjectKey);
+        return $repository->moveItem($pk, $targetPk, $position, $targetObjectKey);
     }
 
     /**

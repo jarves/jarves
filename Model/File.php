@@ -28,7 +28,7 @@ class File extends BaseFile implements FileInfoInterface
         $alreadyDumpedObjects = array()
     ) {
         $item = parent::toArray(
-            null === $keyType ? TableMap::TYPE_STUDLYPHPNAME : $keyType,
+            null === $keyType ? TableMap::TYPE_CAMELNAME : $keyType,
             $includeLazyLoadColumns,
             $alreadyDumpedObjects
         );

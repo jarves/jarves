@@ -154,7 +154,8 @@ class PropelHelper
         $platform = ucfirst($platform) . 'Platform';
 
         $input = new ArrayInput(array(
-            '--input-dir' => $tmp . 'propel/',
+            '--config-dir' => $tmp . 'propel/',
+            '--schema-dir' => $tmp . 'propel/',
             '--output-dir' => $tmp . 'propel/build/classes/',
             '--platform' => $platform,
             '--verbose' => 'vvv'
@@ -296,9 +297,6 @@ EOF;
 
         $yml = <<<EOF
 propel:
-  general:
-    project: jarves
-
   database:
     connections:
       $connections
@@ -306,8 +304,8 @@ propel:
     defaultConnection: default
     connections:
       - default
-    objectModel:
-      disableIdentifierQuoting: true
+#    objectModel:
+#      disableIdentifierQuoting: true
 
   runtime:
     defaultConnection: default
@@ -503,7 +501,8 @@ EOF;
         $platform = ucfirst($platform) . 'Platform';
 
         $input = new ArrayInput(array(
-            '--input-dir' => $tmp . 'propel/',
+            '--config-dir' => $tmp . 'propel/',
+            '--schema-dir' => $tmp . 'propel/',
             '--output-dir' => $tmp . 'propel/build/',
             '--platform' => $platform,
             '--verbose' => 'vvv'

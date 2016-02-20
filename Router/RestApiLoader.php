@@ -99,7 +99,7 @@ class RestApiLoader extends Loader
 
                 if ($entryPoints = $config->getAllEntryPoints()) {
                     foreach ($entryPoints as $entryPoint) {
-                        if ($entryPoint->isFrameworkWindow()) {
+                        if ($entryPoint->isFrameworkWindow() && $entryPoint->getClass()) {
                             $this->setupWindowRoute($entryPoint);
                         }
                     }
@@ -136,7 +136,7 @@ class RestApiLoader extends Loader
             ));
         }
 
-        $pattern = $object->getBundle()->getName() . '/' . $entryPoint->getFullPath();
+        $pattern = $entryPoint->getFullPath();
 
         $this->addEntryPointRoutes($importedRoutes, $pattern, $object);
     }
@@ -150,7 +150,10 @@ class RestApiLoader extends Loader
         foreach ($routes as $name => $route) {
 
             $method = explode('::', $route->getDefault('_controller'))[1];
-            $route->setPath('%jarves_admin_prefix%/' . $pattern . $route->getPath());
+
+            $path = '%jarves_admin_prefix%/' . $pattern . $route->getPath();
+            $route->setPath($path);
+
             $route->setDefault('_jarves_object', $objectName);
             $route->setDefault('_jarves_entry_point', $pattern);
             $this->setupObjectRouteRequirements($route, $object);
@@ -162,8 +165,8 @@ class RestApiLoader extends Loader
 
     public function importObjectRoutes()
     {
-        $resource = '@JarvesBundle/Controller/AutomaticObjectCrudController.php';
-        $resourceNested = '@JarvesBundle/Controller/AutomaticNestedObjectCrudController.php';
+        $defaultResource = '@JarvesBundle/Controller/AutomaticObjectCrudController.php';
+        $defaultResourceNested = '@JarvesBundle/Controller/AutomaticNestedObjectCrudController.php';
 
         foreach ($this->jarves->getBundles() as $bundleName => $bundle) {
 
@@ -179,14 +182,20 @@ class RestApiLoader extends Loader
                             continue;
                         }
 
+                        $controller = $object->isNested() ? $defaultResourceNested : $defaultResource;
+
+                        if ($apiController = $object->getApiController()) {
+                            $controller = $apiController;
+                        }
+
                         $objectName = $config->getName() . '/' . lcfirst($object->getId());
                         $pattern = '%jarves_admin_prefix%/object/' . $objectName;
 
                         $this->setupRoutes(
                             $config,
-                            $object->getClass() ? : $object->isNested() ? $resourceNested : $resource,
+                            $object->getStorageClass() ? : $controller,
                             $pattern,
-                            $bundle->getName() . '/' . lcfirst($object->getId()),
+                            $object->getKey(),
                             $object
                         );
 
@@ -217,7 +226,7 @@ class RestApiLoader extends Loader
 
                 $this->setupRoutes(
                     $object->getBundle(),
-                    $object->getClass() ? : $foreignObject->isNested() ? $resourceNested : $resource,
+                    $object->getStorageClass() ? : $foreignObject->isNested() ? $resourceNested : $resource,
                     $pattern . lcfirst($field->getObjectRelationName() ? : $field->getId()),
                     $objectName,
                     $foreignObject,
@@ -237,9 +246,6 @@ class RestApiLoader extends Loader
         Object $relationObject = null,
         Field $relationField = null
     ) {
-//        $bundleName = $config->getName();
-//        $routeName = 'jarves_object_' . strtolower($bundleName . '_' . $object->getId());
-
         /** @var $importedRoutes \Symfony\Component\Routing\RouteCollection */
         $importedRoutes = $this->import(
             $controller,
@@ -257,12 +263,13 @@ class RestApiLoader extends Loader
                 $this->setupObjectRouteRequirements($route, $relationObject, true);
             }
 
-            $route->setPath($route->getPath() . $routePattern);
+            $path = $route->getPath() . $routePattern;
+            $route->setPath($path);
             $route->setDefault('_jarves_object_requirePk', !!strpos($routePattern, '{pk}'));
 
             $this->setupObjectRouteRequirements($route, $object);
 
-            $route->setDefault('_jarves_object', $config->getBundleName() . '/' . $object->getId());
+            $route->setDefault('_jarves_object', $object->getKey());
             $route->setDefault('_jarves_object_section', $objectSection);
             $route->setDefault('_jarves_object_relation', $relationField ? $relationField->getId() : false);
 

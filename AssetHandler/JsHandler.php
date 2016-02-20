@@ -6,9 +6,9 @@ class JsHandler extends AbstractHandler implements LoaderHandlerInterface
 {
     protected function getTag(AssetInfo $assetInfo)
     {
-        if ($assetInfo->getFile()) {
-            $path = $this->getAssetPath($assetInfo->getFile());
-            $pubPath = $this->getPublicAssetPath($assetInfo->getFile());
+        if ($assetInfo->getPath()) {
+            $path = $this->getAssetPath($assetInfo->getPath());
+            $pubPath = $this->getPublicAssetPath($assetInfo->getPath());
             if (file_exists($path)) {
                 $pubPath .= '?c=' . substr(md5(filemtime($path)),0, 6);
             }
@@ -29,6 +29,10 @@ EOF
         }
     }
 
+    public function needsGrouping() {
+        return true;
+    }
+
     /**
      * @param AssetInfo[] $assetsInfo
      * @param bool $concatenation
@@ -42,10 +46,10 @@ EOF
             $filesToCompress = [];
 
             foreach ($assetsInfo as $asset) {
-                if ($asset->getFile()) {
+                if ($asset->getPath()) {
                     // load javascript files, that are not accessible (means those point to a controller)
                     // because those can't be compressed
-                    $localPath = $this->getAssetPath($asset->getFile());
+                    $localPath = $this->getAssetPath($asset->getPath());
                     if (!file_exists($localPath)) {
                         $tags[] = $this->getTag($asset);
                         continue;
@@ -63,7 +67,7 @@ EOF
                     continue;
                 }
 
-                $filesToCompress[] = $asset->getFile();
+                $filesToCompress[] = $asset->getPath();
             }
 
             if ($filesToCompress) {
@@ -115,7 +119,7 @@ EOF
         }
 
         $assetInfo = new AssetInfo();
-        $assetInfo->setFile($oFile);
+        $assetInfo->setPath($oFile);
 
         return $assetInfo;
     }

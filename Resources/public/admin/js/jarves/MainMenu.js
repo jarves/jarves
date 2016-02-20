@@ -87,7 +87,7 @@ jarves.MainMenu = new Class({
     },
 
     addLink: function(bundleName, entryPoint, container) {
-        var fullPath = bundleName + '/' + entryPoint.fullPath;
+        var fullPath = entryPoint.fullPath;
         if (this.items[fullPath]) {
             this.items[fullPath].destroy();
             delete this.items[fullPath];
@@ -101,8 +101,8 @@ jarves.MainMenu = new Class({
             text: entryPoint.label
         })
             .addEvent('click', function() {
-                this.fireEvent('click', entryPoint)
-                jarves.wm.open(bundleName + '/' + entryPoint.fullPath);
+                this.fireEvent('click', entryPoint);
+                jarves.wm.open(entryPoint.fullPath);
             }.bind(this))
             .inject(container);
 

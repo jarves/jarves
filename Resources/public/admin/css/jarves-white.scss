@@ -7,6 +7,7 @@
 
 $blackMainColor: #041114;
 $mainColor: #f0f0f0;
+$textColor: #111;
 
 $mainLinkColor: $blackMainColor;
 $buttonColor: #f8f8f8;
@@ -94,6 +95,9 @@ $linkHoverBgColor: darken($mainColor, 15%);
     /*
      * Buttons
      */
+    a.jarves-Button {
+        background-color: darken($mainColor, 15%);
+    }
     a.jarves-Button:hover,
     a.jarves-Button:link:hover {
         background-color: $linkHoverBgColor;
@@ -233,15 +237,15 @@ $linkHoverBgColor: darken($mainColor, 15%);
     }
 
     .jarves-Table-hover tr:hover > td {
-        background-color: #e8e8e8;
+        background-color: #dbdbdb;
     }
+
     .jarves-Table tr.active > td,
     .jarves-Table tr.active:hover > td,
     .jarves-Table-body tr.active > td,
     .jarves-Table-body tr.active:hover > td {
         background-color: #d6d6d6;
     }
-
 
     /*
      * Window List/Combine
@@ -304,12 +308,24 @@ $linkHoverBgColor: darken($mainColor, 15%);
     /*
      * Files
      */
+    .jarves-Files-item:hover {
+        background-color: #c8c8c8;
+
+        .jarves-Files-item-title-dimensions {
+            color: #444;
+        }
+    }
+
     .jarves-Files-item-selected,
     .jarves-Files-item-selected:hover,
-    .jarves-Files-item-drag-selected,
-    .jarves-Files-item:hover{
-        background-color: #e3e3e3;
+    .jarves-Files-item-drag-selected {
+        background-color: #b9b9b9;
+
+        .jarves-Files-item-title-dimensions {
+            color: #444;
+        }
     }
+
     .jarves-Files-addressFaker {
         border-radius: 0;
         border: 1px solid #D1D1D1;
@@ -400,6 +416,9 @@ $linkHoverBgColor: darken($mainColor, 15%);
     }
 
 
+    .jarves-main-dialog-container h1:first-child {
+        color: $textColor;
+    }
 
 
     .jarves-admin .jarves-field-type-childrenSwitcher a,

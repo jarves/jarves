@@ -1,13 +1,13 @@
 <?php
 
-namespace Jarves\Controller\Windows;
+namespace Jarves\Controller\ObjectAPI;
 
-use Jarves\Controller\WindowNestedController;
+use Jarves\Controller\NestedObjectCrudController;
 
 /**
  * AUTO-GENERATED THROUGH KRYN WINDOW-EDITOR
  */
-class NodeCrudController extends WindowNestedController
+class NodeCrudController extends NestedObjectCrudController
 {
     public $fields = array(
         '__General__' => array(

@@ -13,6 +13,7 @@ use Propel\Runtime\Map\TableMap;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 
 class BackendController extends Controller
@@ -66,6 +67,7 @@ class BackendController extends Controller
 
         if ($this->getJarves()->getAdminClient()->getUser()->getId() > 0) {
             $this->getJarves()->getAdminClient()->getUser()->setSettings($properties);
+
             return $this->getJarves()->getAdminClient()->getUser()->save();
         }
 
@@ -81,7 +83,6 @@ class BackendController extends Controller
      * @Rest\QueryParam(name="bundle", requirements=".+", strict=true, description="The bundle name")
      * @Rest\QueryParam(name="code", requirements=".+", strict=true, description="Slash separated entry point path")
      * @Rest\QueryParam(name="onLoad", requirements=".+", strict=true, description="onLoad id")
-
      * @Rest\Get("/admin/backend/custom-js")
      *
      * @param ParamFetcher $paramFetcher
@@ -112,6 +113,7 @@ class BackendController extends Controller
 
         $response = new Response($content);
         $response->headers->set('Content-Type', 'text/javascript');
+
         return $response;
     }
 
@@ -185,7 +187,7 @@ class BackendController extends Controller
         }
 
         if ($loadKeys == false || in_array('groups', $loadKeys)) {
-            $res['groups'] = GroupQuery::create()->find()->toArray(null, null, TableMap::TYPE_STUDLYPHPNAME);
+            $res['groups'] = GroupQuery::create()->find()->toArray(null, null, TableMap::TYPE_CAMELNAME);
         }
 
         if ($loadKeys == false || in_array('user', $loadKeys)) {
@@ -208,7 +210,11 @@ class BackendController extends Controller
         }
 
         if ($loadKeys == false || in_array('domains', $loadKeys)) {
-            $res['domains'] = $this->getJarves()->getObjects()->getList('JarvesBundle:Domain', null, array('permissionCheck' => true));
+            $res['domains'] = $this->getJarves()->getObjects()->getList(
+                'JarvesBundle:Domain',
+                null,
+                array('permissionCheck' => true)
+            );
         }
 
         if ($loadKeys == false || in_array('langs', $loadKeys)) {
@@ -218,7 +224,7 @@ class BackendController extends Controller
             $tlangs = $query->find()->toArray(
                 null,
                 null,
-                TableMap::TYPE_STUDLYPHPNAME
+                TableMap::TYPE_CAMELNAME
             );
 
             $langs = [];
@@ -263,6 +269,68 @@ class BackendController extends Controller
     }
 
     /**
+     * This is a try to increase initial loading performance, but I wasn't lucky.
+     *
+     * @ApiDoc(
+     *  section="Backend",
+     *  description="Prints all typscript modules combined"
+     * )
+     *
+     * @Rest\Get("/admin/backend/typescript-modules.ts")
+     *
+     * @return string CCS
+     */
+    public function loadTypescriptModules()
+    {
+        $newestMTime = 0;
+        $jsContent = '';
+
+        foreach ($this->getJarves()->getConfigs() as $bundleConfig) {
+            $path = $bundleConfig->getBundleClass()->getPath();
+
+            $assetInfos = $bundleConfig->getAdminPreloadTypescriptModulesInfo();
+
+            foreach ($assetInfos as $assetInfo) {
+                $localPath = $this->getJarves()->resolveInternalPublicPath($assetInfo->getPath());
+                $mtime = filemtime($localPath);
+                $newestMTime = max($newestMTime, $mtime);
+
+                $content = file_get_contents($localPath);
+                $moduleName = sprintf(
+                    './bundles/%s/%s',
+                    $bundleConfig->getName(),
+                    Tools::getRelativePath($localPath, $path . '/Resources/public/')
+                );
+                $jsContent .= "\n/* ts file $moduleName */\ndeclare module \"$moduleName\" {\n$content\n};\n";
+            }
+        }
+
+        $ifModifiedSince = $this->getJarves()->getRequest()->headers->get('If-Modified-Since');
+        if (isset($ifModifiedSince) && (strtotime($ifModifiedSince) == $newestMTime)) {
+            // Client's cache IS current, so we just respond '304 Not Modified'.
+
+            $response = new Response();
+            $response->setStatusCode(304);
+            $response->headers->set('Last-Modified', gmdate('D, d M Y H:i:s', $newestMTime) . ' GMT');
+
+            return $response;
+        }
+
+        $expires = 60 * 60 * 24 * 14; //2 weeks
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/javascript');
+        $response->headers->set('Pragma', 'public');
+        $response->headers->set('Cache-Control', 'max-age=' . $expires);
+        $response->headers->set('Expires', gmdate('D, d M Y H:i:s', time() + $expires) . ' GMT');
+
+//        $content = implode($files);
+
+        $response->setContent($jsContent);
+
+        return $response;
+    }
+
+    /**
      * @ApiDoc(
      *  section="Backend",
      *  description="Prints all CSS files combined"
@@ -274,19 +342,35 @@ class BackendController extends Controller
      */
     public function loadCssAction()
     {
-
-        $oFile = $this->getJarves()->getKernel()->getRootDir(). '/../web/cache/admin.style-compiled.css';
+        $oFile = $this->getJarves()->getKernel()->getRootDir() . '/../web/cache/admin.style-compiled.css';
         $md5String = '';
+
+        $assetHandlerContainer = $this->getJarves()->getAssetCompilerContainer();
+
 
         $files = [];
         foreach ($this->getJarves()->getConfigs() as $bundleConfig) {
             foreach ($bundleConfig->getAdminAssetsInfo() as $assetInfo) {
-                if (!$assetInfo->isStylesheet()) continue;
+                if (!$assetInfo->isCompressionAllowed()) {
+                    continue;
+                }
 
-                $path = $this->getJarves()->resolveWebPath($assetInfo->getFile());
-                if (file_exists($path)) {
-                    $files[] = $assetInfo->getFile();
-                    $md5String .= filemtime($path);
+                if ($assetInfo->isStylesheet()) {
+                    $path = $this->getJarves()->resolveWebPath($assetInfo->getPath());
+                    if (file_exists($path)) {
+                        $files[] = $assetInfo->getPath();
+                        $md5String .= filemtime($path);
+                    }
+                }
+
+                if ($assetInfo->isScss()) {
+                    $path = $this->getJarves()->resolveWebPath($assetInfo->getPath());
+                    if (file_exists($path)) {
+                        foreach ($assetHandlerContainer->compileAsset($assetInfo) as $subAssetInfo) {
+                            $files[] = $subAssetInfo->getPath();
+                        }
+                        $md5String .= filemtime($path);
+                    }
                 }
             }
         }
@@ -304,7 +388,10 @@ class BackendController extends Controller
         }
 
         if (!$fileUpToDate) {
-            $content = $this->getJarves()->getUtils()->compressCss($files, $this->getJarves()->getAdminPrefix() . 'admin/backend/');
+            $content = $this->getJarves()->getUtils()->compressCss(
+                $files,
+                $this->getJarves()->getAdminPrefix() . 'admin/backend/'
+            );
             $content = $md5Line . $content;
             file_put_contents($oFile, $content);
         }
@@ -317,6 +404,7 @@ class BackendController extends Controller
         $response->headers->set('Pragma', 'public');
         $response->headers->set('Cache-Control', 'max-age=' . $expires);
         $response->headers->set('Expires', gmdate('D, d M Y H:i:s', time() + $expires) . ' GMT');
+
         return $response;
     }
 
@@ -334,27 +422,31 @@ class BackendController extends Controller
      *
      * @return string javascript
      */
-    public function loadJsAction($printSourceMap = null)
+    public function loadJsAction()
     {
-        $printSourceMap = filter_var($printSourceMap, FILTER_VALIDATE_BOOLEAN);
-        $oFile = 'cache/admin.script-compiled.js';
-
-        $files = array();
         $assets = array();
         $md5String = '';
         $newestMTime = 0;
 
+        $jsContent = '';
+
         foreach ($this->getJarves()->getConfigs() as $bundleConfig) {
             foreach ($bundleConfig->getAdminAssetsInfo() as $assetInfo) {
-                if (!$assetInfo->isJavaScript()) continue;
+                if (!$assetInfo->isJavaScript()) {
+                    continue;
+                }
+                if (!$assetInfo->isCompressionAllowed()) {
+                    continue;
+                }
 
-                $path = $this->getJarves()->resolveWebPath($assetInfo->getFile());
+                $path = $this->getJarves()->resolveWebPath($assetInfo->getPath());
                 if (file_exists($path)) {
-                    $assets[] = $assetInfo->getFile();
-                    $files[] = '--js ' . escapeshellarg($this->getJarves()->resolveInternalPublicPath($assetInfo->getFile()));
+                    $assets[] = $assetInfo->getPath();
                     $mtime = filemtime($path);
                     $newestMTime = max($newestMTime, $mtime);
                     $md5String .= ">$path.$mtime<";
+                    $content = file_get_contents($path);
+                    $jsContent .= "\n/* file: {$assetInfo->getPath()} */\n$content\n";
                 }
             }
         }
@@ -365,7 +457,8 @@ class BackendController extends Controller
 
             $response = new Response();
             $response->setStatusCode(304);
-            $response->headers->set('Last-Modified', gmdate('D, d M Y H:i:s', $newestMTime).' GMT');
+            $response->headers->set('Last-Modified', gmdate('D, d M Y H:i:s', $newestMTime) . ' GMT');
+
             return $response;
         }
 
@@ -376,79 +469,11 @@ class BackendController extends Controller
         $response->headers->set('Cache-Control', 'max-age=' . $expires);
         $response->headers->set('Expires', gmdate('D, d M Y H:i:s', time() + $expires) . ' GMT');
 
-        $sourceMap = $oFile . '.map';
-        $cmdTest = 'java -version';
-        $closure = 'vendor/google/closure-compiler/compiler.jar';
-        $compiler = escapeshellarg(realpath('../' . $closure));
-        $cmd = 'java -jar ' . $compiler . ' --js_output_file ' . escapeshellarg($oFile);
-        $returnVal = 0;
-        $debugMode = false;
+//        $content = implode($files);
 
-        if ($printSourceMap) {
-            $content = file_get_contents($sourceMap);
-            $content = str_replace('"bundles/', '"../../../bundles/', $content);
-            $content = str_replace('"cache/admin.script-compiled.js', '"jarves/admin/backend/script.js', $content);
-            $response->setContent($content);
-            return $response;
-        }
+        $response->setContent($jsContent);
 
-        $handle = @fopen($oFile, 'r');
-        $fileUpToDate = false;
-        $md5Line = '//' . md5($md5String) . "\n";
-
-        if ($handle) {
-            $line = fgets($handle);
-            fclose($handle);
-            if ($line == $md5Line) {
-                $fileUpToDate = true;
-            }
-        }
-
-        if ($fileUpToDate) {
-            $content = file_get_contents($oFile);
-            $response->setContent(substr($content, 35));
-            return $response;
-        } else {
-            if (!$debugMode) {
-                system($cmdTest, $returnVal);
-            }
-
-            if (0 === $returnVal) {
-                $cmd .= ' --create_source_map ' . escapeshellarg($sourceMap);
-                $cmd .= ' --source_map_format=V3';
-
-                $cmd .= ' ' . implode(' ', $files);
-                $cmd .= ' 2>&1';
-                $output = shell_exec($cmd);
-                if (0 !== strpos($output, 'Unable to access jarfile')) {
-                    if (false !== strpos($output, 'ERROR - Parse error')) {
-                        $content = 'alert(\'Parse Error\');';
-                        $content .= $output;
-                        $response->setContent($content);
-                        return $response;
-                    }
-                    $content = file_get_contents($oFile);
-                    $sourceMapUrl = '//@ sourceMappingURL=script-map';
-                    $content = $md5Line . $content . $sourceMapUrl;
-                    file_put_contents($oFile, $content);
-
-                    $response->setContent(substr($content, 35));
-                    return $response;
-                }
-
-            }
-
-
-            $content = '';
-            foreach ($assets as $assetPath) {
-                $content .= "/* $assetPath */\n\n";
-                $path = $this->getJarves()->resolvePath($assetPath, 'Resources/public');
-                $content .= file_get_contents($path);
-            }
-
-            $response->setContent($content);
-            return $response;
-        }
+        return $response;
     }
 
     /**
@@ -468,7 +493,7 @@ class BackendController extends Controller
 
         foreach ($this->getJarves()->getConfigs() as $bundleName => $bundleConfig) {
             foreach ($bundleConfig->getAllEntryPoints() as $subEntryPoint) {
-                $path = $bundleConfig->getName() . '/' . $subEntryPoint->getFullPath(true);
+                $path = $subEntryPoint->getFullPath();
 
                 if (substr_count($path, '/') <= 3) {
                     if ($subEntryPoint->isLink()) {
@@ -480,6 +505,7 @@ class BackendController extends Controller
                                 'path' => $subEntryPoint->getPath(),
                                 'type' => $subEntryPoint->getType(),
                                 'system' => $subEntryPoint->getSystem(),
+                                'templateUrl' => $subEntryPoint->getTemplateUrl(),
                                 'level' => substr_count($path, '/')
                             );
                         }

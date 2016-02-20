@@ -135,7 +135,7 @@ jarves.AdminInterface = new Class({
     getDialogContainer: function(){
         if (!this.dialogContainer) {
             this.dialogContainer = new Element('div', {
-                'class': 'jarves-main-dialog-container'
+                'class': 'jarves-admin jarves-main-dialog-container'
             }).inject(this.getAppContainer(), 'after');
         }
         return this.dialogContainer;

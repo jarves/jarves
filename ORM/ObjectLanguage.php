@@ -2,7 +2,6 @@
 
 namespace Jarves\ORM;
 
-
 use Jarves\Configuration\Condition;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 

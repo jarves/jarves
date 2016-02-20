@@ -21,7 +21,7 @@ class DashboardWidgets extends Controller
 
         $result = [
             'time' => time(),
-            'items' => $items->find()->toArray(null, null, TableMap::TYPE_STUDLYPHPNAME)
+            'items' => $items->find()->toArray(null, null, TableMap::TYPE_CAMELNAME)
         ];
 
         $response['jarves/newsFeed'] = $result;

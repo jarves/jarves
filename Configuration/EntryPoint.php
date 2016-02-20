@@ -4,7 +4,7 @@ namespace Jarves\Configuration;
 
 class EntryPoint extends Model
 {
-    protected $attributes = ['path', 'type', 'icon', 'multi', 'link', 'system'];
+    protected $attributes = ['path', 'type', 'icon', 'multi', 'object', 'link', 'system', 'templateUrl'];
 
     protected $_excludeFromExport = ['parentInstance', 'fullPath', 'bundle'];
 
@@ -27,6 +27,14 @@ class EntryPoint extends Model
      * @var string
      */
     protected $class;
+
+    /**
+     * Object key. (example: jarves/user)
+     * Necessary if you haven't defined any $class and use a framework $type (combined, list, edit, add)
+     *
+     * @var string
+     */
+    protected $object;
 
     /**
      * @var string
@@ -62,6 +70,11 @@ class EntryPoint extends Model
      * @var EntryPoint
      */
     protected $parentInstance;
+
+    /**
+     * @var string
+     */
+    protected $templateUrl;
 
     /**
      * @var string
@@ -139,6 +152,7 @@ class EntryPoint extends Model
     {
         $result = parent::toArray($element);
         $result['fullPath'] = $this->getFullPath();
+        $result['hasClass'] = !!$this->getClass();
         return $result;
     }
 
@@ -156,6 +170,7 @@ class EntryPoint extends Model
                 }
                 array_unshift($path, $instance->getPath());
             }
+            array_unshift($path, $this->getBundle()->getName());
             $this->fullPath = implode('/', $path);
         }
 
@@ -210,7 +225,7 @@ class EntryPoint extends Model
 
     public function isFrameworkWindow()
     {
-        return in_array($this->type, ['combine', 'list', 'edit', 'add']);
+        return in_array($this->type, ['combined', 'list', 'edit', 'add']);
     }
 
     /**
@@ -315,6 +330,22 @@ class EntryPoint extends Model
     }
 
     /**
+     * @return string
+     */
+    public function getObject()
+    {
+        return $this->object;
+    }
+
+    /**
+     * @param string $object
+     */
+    public function setObject($object)
+    {
+        $this->object = $object;
+    }
+
+    /**
      * @param boolean $system
      */
     public function setSystem($system)
@@ -334,4 +365,21 @@ class EntryPoint extends Model
     {
         return true === $this->system;
     }
+
+    /**
+     * @return string
+     */
+    public function getTemplateUrl()
+    {
+        return $this->templateUrl;
+    }
+
+    /**
+     * @param string $templateUrl
+     */
+    public function setTemplateUrl($templateUrl)
+    {
+        $this->templateUrl = $templateUrl;
+    }
+
 }

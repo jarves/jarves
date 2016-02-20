@@ -7,7 +7,7 @@ jarves.WindowEdit = new Class({
     options: {
         saveLabel: '',
         renderLanguageSelector: true,
-        entryPoint: ''
+        entryPoint: null
     },
 
     fieldToTabOIndex: {}, //index fieldkey to main-tabid
@@ -121,11 +121,12 @@ jarves.WindowEdit = new Class({
     },
 
     getEntryPoint: function() {
-        var restPoint = this.options.entryPoint || this.win.getEntryPoint();
-        if (restPoint.substr(restPoint.length - 1) == '/') {
-            restPoint = restPoint.substr(0, restPoint.length - 1);
+        var entryPointDefinition = jarves.entrypoint.get(this.options.entryPoint);
+        if (entryPointDefinition.object) {
+            return 'object/' + entryPointDefinition.object;
         }
-        return restPoint;
+
+        return this.options.entryPoint;
     },
 
     load: function() {

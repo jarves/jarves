@@ -1,14 +1,10 @@
 <?php
 
-namespace Jarves\Controller\Windows;
+namespace Jarves\Controller\ObjectAPI;
 
-use Jarves\Client\ClientAbstract;
-use Jarves\Configuration\Field;
-use Jarves\Controller\WindowController;
-use Symfony\Component\HttpFoundation\Request;
+use Jarves\Controller\ObjectCrudController;
 
-class UserCrudController extends WindowController
-{
+class UserCrudController extends ObjectCrudController {
 
     public $columns = array(
         'lastName' =>

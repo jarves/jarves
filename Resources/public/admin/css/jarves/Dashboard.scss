@@ -8,9 +8,9 @@
 //    padding: 5px;
 }
 
-$width = 255px;
-$height = 215px;
-$margin = 10px;
+$width: 255px;
+$height: 215px;
+$margin: 10px;
 
 .jarves-Dashboard-widget {
     display: block;
@@ -45,11 +45,11 @@ $margin = 10px;
     -webkit-border-top-left-radius: 5px;
 }
 
-$containerPadding = 1205-880; //actual window width - container width of our container
+$containerPadding: 1205-880; //actual window width - container width of our container
 
 @for $i from $width through 3500 {
     @if $i % strip-unit($width) == 0 {
-        $mediaWidth = $i + $containerPadding;
+        $mediaWidth: $i + $containerPadding;
         @media all and (min-width: #{$mediaWidth}px) {
             @for $j from 1 through $i / $width {
                 .jarves-Dashboard-widget-grid-#{$j} {

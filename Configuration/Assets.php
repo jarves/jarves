@@ -13,14 +13,12 @@ use Symfony\Component\Finder\Finder;
  */
 class Assets extends Model implements \IteratorAggregate
 {
-    protected $attributes = ['recursive', 'compression'];
-
-    protected $nodeValueVar = 'path';
+    protected $attributes = ['recursive', 'compression', 'type', 'priority', 'src'];
 
     /**
      * @var string
      */
-    protected $path;
+    protected $src;
 
     /**
      * @var Asset[]
@@ -40,6 +38,48 @@ class Assets extends Model implements \IteratorAggregate
     protected $recursive = false;
 
     /**
+     * @var string
+     */
+    protected $type;
+
+    /**
+     * @var int
+     */
+    protected $priority;
+
+    /**
+     * @return int
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param int $priority
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
      * @param boolean $compression
      */
     public function setCompression($compression)
@@ -56,19 +96,19 @@ class Assets extends Model implements \IteratorAggregate
     }
 
     /**
-     * @param string $path
+     * @param string $src
      */
-    public function setPath($path)
+    public function setSrc($src)
     {
-        $this->path = $path;
+        $this->src = $src;
     }
 
     /**
      * @return string
      */
-    public function getPath()
+    public function getSrc()
     {
-        return $this->path;
+        return $this->src;
     }
 
     /**
@@ -93,13 +133,13 @@ class Assets extends Model implements \IteratorAggregate
     public function getAssets()
     {
         if (null === $this->assets) {
-            preg_match('/(\@[a-zA-Z0-9\-_\.\\\\]+)/', $this->getPath(), $match);
+            preg_match('/(\@[a-zA-Z0-9\-_\.\\\\]+)/', $this->getSrc(), $match);
 
             $bundleName = $match ? $match[1] : '';
             $prefixPath = $bundleName ? $this->getJarves()->resolvePath("$bundleName/Resources/public/") : '';
             $offset = strlen($prefixPath);
 
-            $path = $this->getJarves()->resolveInternalPublicPath($this->getPath());
+            $path = $this->getJarves()->resolveInternalPublicPath($this->getSrc());
             if (!$path) {
                 return [];
             }
@@ -113,7 +153,9 @@ class Assets extends Model implements \IteratorAggregate
             foreach ($files as $file) {
                 $asset = new Asset(null, $this->getJarves());
                 $file = ($bundleName ? $bundleName : '') . substr($file->getPathName(), $offset);
-                $asset->setPath($file);
+                $asset->setSrc($file);
+                $asset->setType($this->getType());
+                $asset->setPriority($this->getPriority());
                 $asset->setCompression($this->getCompression());
                 $this->assets[] = $asset;
             }

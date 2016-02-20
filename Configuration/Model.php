@@ -161,7 +161,7 @@ class Model implements \ArrayAccess
 
     /**
      * @param \DOMElement|array|string $values
-     * @param Core                     $jarves
+     * @param Jarves                   $jarves
      */
     public function __construct($values = null, Jarves $jarves = null)
     {

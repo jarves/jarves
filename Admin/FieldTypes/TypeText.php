@@ -9,5 +9,4 @@ class TypeText extends AbstractSingleColumnType
     protected $phpDataType = 'string';
 
     protected $sqlDataType = 'VARCHAR(255)';
-
 }

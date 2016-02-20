@@ -295,7 +295,7 @@ class ContentRender
 
         $html = $typeRenderer->render();
 
-        $data['content'] = $content->toArray(TableMap::TYPE_STUDLYPHPNAME);
+        $data['content'] = $content->toArray(TableMap::TYPE_CAMELNAME);
         $data['parameter'] = $parameters;
         $data['html'] = $html;
 

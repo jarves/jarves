@@ -46,7 +46,7 @@ class AuthTest extends AuthTestCase
                 'constraintType' => 1,
                 'constraintCode' => $this->getObjects()->getObjectUrlId('jarves/entryPoint', '/admin'),
             ],
-            TableMap::TYPE_STUDLYPHPNAME
+            TableMap::TYPE_CAMELNAME
         );
         $acl->save();
 

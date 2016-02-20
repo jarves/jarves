@@ -1097,7 +1097,7 @@ jarves.WindowCombine = new Class({
         }
 
         this.currentAdd = new jarves.WindowAdd(this.win, this.mainRight, {
-            entryPoint: jarves.entrypoint.getRelative(this.getEntryPoint(), this.classProperties.editEntrypoint),
+            entryPoint: this.classProperties.editEntrypoint || this.options.entryPoint,
             sidebar: this.editAddSidebarContainer
         });
         this.currentAdd.addEvent('add', this.addSaved.bind(this));
@@ -1143,7 +1143,7 @@ jarves.WindowCombine = new Class({
         }
 
         this.currentRootAdd = new jarves.WindowAdd(this.win, this.mainRight, {
-            entryPoint: jarves.entrypoint.getRelative(this.getEntryPoint(), this.classProperties.nestedRootAddEntrypoint),
+            entryPoint: jarves.entrypoint.getRelative(this.win.entryPoint, this.classProperties.nestedRootAddEntrypoint),
             sidebar: this.editAddSidebarContainer
         });
         this.currentRootAdd.addEvent('add', this.addRootSaved.bind(this));
@@ -1525,10 +1525,6 @@ jarves.WindowCombine = new Class({
 
     reloadAll: function() {
         this.loadItems(this.from, this.loadedCount);
-    },
-
-    getEntryPoint: function() {
-        return this.options.entryPoint || this.win.getEntryPoint();
     },
 
     loadAround: function(pPrimary) {

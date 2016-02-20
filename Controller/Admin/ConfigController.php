@@ -25,7 +25,7 @@ class ConfigController extends Controller
         $res['langs'] = LanguageQuery::create()
             ->orderByTitle()
             ->find()
-            ->toArray(null, null, TableMap::TYPE_STUDLYPHPNAME);
+            ->toArray(null, null, TableMap::TYPE_CAMELNAME);
 
         $res['timezones'] = timezone_identifiers_list();
 

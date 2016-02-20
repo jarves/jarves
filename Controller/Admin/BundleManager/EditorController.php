@@ -777,10 +777,10 @@ class EditorController extends ContainerAware
         $lSlash = strrpos($class, '\\');
         $class2Name = $lSlash !== -1 ? substr($class, $lSlash + 1) : $class;
 
-        $parentClass = '\Jarves\Controller\WindowController';
+        $parentClass = '\Jarves\Controller\ObjectCrudController';
         $objectDefinition = $this->getJarves()->getObjects()->getDefinition($general['object']);
         if ($objectDefinition->isNested()) {
-            $parentClass = '\Jarves\Controller\WindowNestedController';
+            $parentClass = '\Jarves\Controller\NestedObjectCrudController';
         }
 
         $namespace = substr(substr($class, 1), 0, $lSlash);

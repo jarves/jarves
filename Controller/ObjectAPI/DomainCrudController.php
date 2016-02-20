@@ -1,8 +1,10 @@
 <?php
 
-namespace Jarves\Controller\Windows;
+namespace Jarves\Controller\ObjectAPI;
+
+use Jarves\Controller\ObjectCrudController;
  
-class DomainCrudController extends \Jarves\Controller\WindowController {
+class DomainCrudController extends \Jarves\Controller\ObjectCrudController {
 
     public $fields = array (
   '__General__' => array (

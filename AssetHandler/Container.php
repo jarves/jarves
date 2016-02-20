@@ -15,6 +15,11 @@ class Container
     protected $handlerByExtension;
 
     /**
+     * @var CompileHandlerInterface[]
+     */
+    protected $handlerByType;
+
+    /**
      * @var LoaderHandlerInterface[]
      */
     protected $loaderByContentType;
@@ -43,6 +48,16 @@ class Container
         $this->handlerByExtension[strtolower($fileExtension)] = $serviceId;
     }
 
+
+    /**
+     * @param string $fileExtension
+     * @param string $serviceId
+     */
+    public function registerCompileHandlerByContentType($contentType, $serviceId)
+    {
+        $this->handlerByType[strtolower($contentType)] = $serviceId;
+    }
+
     /**
      * @param string $contentType
      * @param string $serviceId
@@ -69,7 +84,23 @@ class Container
     {
         $exploded = explode('.', $filePath);
         $extension = array_pop($exploded);
+        $extensionLong = array_pop($exploded) . '.' . $extension;
+
+        if ($serviceId = @$this->handlerByExtension[strtolower($extensionLong)]) {
+            return $this->container->get($serviceId);
+        }
         if ($serviceId = @$this->handlerByExtension[strtolower($extension)]) {
+            return $this->container->get($serviceId);
+        }
+    }
+
+    /**
+     * @param string $type
+     * @return CompileHandlerInterface
+     */
+    public function getCompileHandlerByContentType($type)
+    {
+        if ($serviceId = @$this->handlerByType[strtolower($type)]) {
             return $this->container->get($serviceId);
         }
     }
@@ -86,6 +117,34 @@ class Container
     }
 
     /**
+     * @param AssetInfo $assetInfo
+     *
+     * @return AssetInfo[]
+     */
+    public function compileAsset(AssetInfo $assetInfo)
+    {
+        $compiler = $this->getCompileHandlerByContentType($assetInfo->getContentType());
+        if (!$compiler) {
+            $compiler = $this->getCompileHandlerByFileExtension($assetInfo->getPath());
+        }
+
+        if (!$compiler) {
+            return [$assetInfo]; //no compiler found, so ok
+        }
+
+        if ($compiledAssetInfoResult = $compiler->compileFile($assetInfo)) {
+            if (is_array($compiledAssetInfoResult)) {
+                return $compiledAssetInfoResult;
+            } else {
+                if ($compiledAssetInfoResult instanceof AssetInfo) {
+                   return [$compiledAssetInfoResult];
+                }
+            }
+        }
+        return [];
+    }
+
+    /**
      * @param string $filePath
      * @return LoaderHandlerInterface
      */
@@ -93,7 +152,11 @@ class Container
     {
         $exploded = explode('.', $filePath);
         $extension = array_pop($exploded);
+        $extensionLong = array_pop($exploded) . '.' . $extension;
 
+        if ($serviceId = @$this->loaderByExtension[strtolower($extensionLong)]) {
+            return $this->container->get($serviceId);
+        }
         if ($serviceId = @$this->loaderByExtension[strtolower($extension)]) {
             return $this->container->get($serviceId);
         }

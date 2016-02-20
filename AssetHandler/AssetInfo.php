@@ -7,12 +7,12 @@ class AssetInfo
     /**
      * @var string
      */
-    protected $file;
+    protected $path;
 
     /**
      * @var string
      */
-    protected $originalFile;
+    protected $originalPath;
 
     /**
      * @var string
@@ -39,6 +39,11 @@ class AssetInfo
     protected $allowCompression = true;
 
     /**
+     * @var int
+     */
+    protected $priority = 0;
+
+    /**
      * @param string $key
      * @param $data
      */
@@ -59,17 +64,17 @@ class AssetInfo
     /**
      * @param string $originalFile
      */
-    public function setOriginalFile($originalFile)
+    public function setOriginalPath($originalFile)
     {
-        $this->originalFile = $originalFile;
+        $this->originalPath = $originalFile;
     }
 
     /**
      * @return string
      */
-    public function getOriginalFile()
+    public function getOriginalPath()
     {
-        return $this->originalFile;
+        return $this->originalPath;
     }
 
     /**
@@ -107,17 +112,17 @@ class AssetInfo
     /**
      * @param string $file
      */
-    public function setFile($file)
+    public function setPath($file)
     {
-        $this->file = $file;
+        $this->path = $file;
     }
 
     /**
      * @return string
      */
-    public function getFile()
+    public function getPath()
     {
-        return $this->file;
+        return $this->path;
     }
 
     /**
@@ -152,8 +157,8 @@ class AssetInfo
             return 'text/javascript' === strtolower($this->getContentType());
         }
 
-        if ($this->getFile()) {
-            $exploded = explode('.', $this->getFile());
+        if ($this->getPath()) {
+            $exploded = explode('.', $this->getPath());
             return 'js' === strtolower(array_pop($exploded));
         }
 
@@ -161,7 +166,26 @@ class AssetInfo
     }
 
     /**
-     * Returns true fi this is a stylesheet asset.
+     * Returns true if this is a typescript asset.
+     *
+     * @return bool
+     */
+    public function isTypeScript()
+    {
+        if ($this->getContentType()) {
+            return 'text/typescript' === strtolower($this->getContentType());
+        }
+
+        if ($this->getPath()) {
+            $exploded = explode('.', $this->getPath());
+            return 'ts' === strtolower(array_pop($exploded));
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns true if this is a stylesheet asset.
      *
      * @return bool
      */
@@ -171,10 +195,47 @@ class AssetInfo
             return 'text/css' === strtolower($this->getContentType());
         }
 
-        if ($this->getFile()) {
-            $exploded = explode('.', $this->getFile());
+        if ($this->getPath()) {
+            $exploded = explode('.', $this->getPath());
             return 'css' === strtolower(array_pop($exploded));
         }
+
+        return false;
+    }
+
+    /**
+     * Returns true if this is a stylesheet asset.
+     *
+     * @return bool
+     */
+    public function isScss()
+    {
+        if ($this->getContentType()) {
+            return 'text/scss' === strtolower($this->getContentType());
+        }
+
+        if ($this->getPath()) {
+            $exploded = explode('.', $this->getPath());
+            return 'scss' === strtolower(array_pop($exploded));
+        }
+
+        return false;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param int $priority
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
     }
 
 }

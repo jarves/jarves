@@ -189,6 +189,9 @@ jarves.entrypoint = {
     },
 
     getRelative: function(current, entryPoint) {
+        if (!entryPoint) {
+            return current;
+        }
 
         if (typeOf(entryPoint) != 'string' || !entryPoint) {
             return current;

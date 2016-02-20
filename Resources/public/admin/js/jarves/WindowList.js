@@ -6,14 +6,14 @@ jarves.WindowList = new Class({
     options: {
 
         nestedRootAddLabel: null,
-        newLabel: null
-
+        newLabel: null,
+        entryPoint: null
     },
 
     loadAlreadyTriggeredBySearch: false,
 
     initialize: function (pWindow, pContainer, pOptions) {
-        this.options = this.setOptions(pOptions);
+        this.setOptions(pOptions);
         this.win = pWindow;
 
         if (pContainer) {
@@ -46,7 +46,17 @@ jarves.WindowList = new Class({
     },
 
     getEntryPoint: function() {
-        return this.options.entryPoint || this.win.getEntryPoint();
+        var entryPointDefinition = jarves.entrypoint.get(this.options.entryPoint);
+
+        if (!entryPointDefinition) {
+            throw 'Entrypoint definition for %s not found'.sprintf(this.options.entryPoint);
+        }
+
+        if (entryPointDefinition.object) {
+            return 'object/' + entryPointDefinition.object;
+        }
+
+        return this.options.entryPoint;
     },
 
     reload: function () {

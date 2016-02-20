@@ -15,8 +15,7 @@
       <entryPoint path="pages" type="custom" icon="#icon-monitor" link="true">
         <label>Pages</label>
       </entryPoint>
-      <entryPoint path="nodes" type="combine" icon="#icon-tree" link="true" multi="true">
-        <class>Jarves\Controller\Windows\NodeCrudController</class>
+      <entryPoint path="nodes" object="jarves/node" type="combine" icon="#icon-tree" link="true" multi="true">
         <label>Nodes</label>
         <children>
           <entryPoint path="add" type="custom" multi="true">
@@ -110,8 +109,7 @@
       <entryPoint path="user" system="true" link="true">
         <label>User Management</label>
         <children>
-          <entryPoint path="users" type="combine" system="true" icon="#icon-user-9" link="true">
-            <class>Jarves\Controller\Windows\UserCrudController</class>
+          <entryPoint path="users" object="jarves/user" type="combine" system="true" icon="#icon-user-9" link="true">
             <label>Users</label>
             <children>
               <entryPoint path="editMe">
@@ -128,8 +126,7 @@
               </entryPoint>
             </children>
           </entryPoint>
-          <entryPoint path="groups" type="combine" system="true" icon="#icon-users-2" link="true">
-            <class>Jarves\Controller\Windows\GroupCrudController</class>
+          <entryPoint path="groups" object="jarves/groups" type="combine" system="true" icon="#icon-users-2" link="true">
             <label>Groups</label>
           </entryPoint>
           <entryPoint path="acl" type="custom" system="true" icon="#icon-key-4" link="true">

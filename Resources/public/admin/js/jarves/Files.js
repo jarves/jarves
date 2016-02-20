@@ -1848,7 +1848,7 @@ jarves.Files = new Class({
             return;
         }
 
-        var dragged = event.dataTransfer.getData('text/x-jarves-file');
+        var dragged = event && event.dataTransfer ? event.dataTransfer.getData('text/x-jarves-file') : null;
 
         if (dragged) {
             //maybe internal drag'n'drop
@@ -2554,7 +2554,9 @@ jarves.Files = new Class({
             [_('Name')],
             [_('Size'), 100],
             [_('Last modified'), 155]
-        ]).inject(this.filesFragment);
+        ], {
+            hover: false
+        }).inject(this.filesFragment);
 
         var rows = [];
         this.files2View.each(function(file) {
