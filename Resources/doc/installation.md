@@ -6,14 +6,14 @@ This describes the customized installation, usually used by developers.
 A end-user zip package can be downloaded at http://jarves.io when we've released the first alpha version.
 
 ### 1. [Install Symfony](http://symfony.com/doc/current/book/installation.html)
-### 2. Install the JarvesBundle
-
-Download all php files:
-
-Check first that you have `"minimum-stability": "dev",` in your `composer.json`.
+### 2. Install the JarvesBundle for Developer and testing
 
 ```bash
-./composer.phar require jarves/jarves-bundle
+cd src
+git clone git@github.com:jarves/jarves.git Jarves
+cd Jarves
+git clone git@github.com:jarves/jarves-publication.git Publication
+git clone  git@github.com:jarves/jarves-demotheme.git DemoTheme
 ```
 
 Activate the bundle in your AppKernel:
