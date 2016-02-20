@@ -71,7 +71,7 @@
       </object>
       <object id="Node">
         <label>Node</label>
-        <apiController>@JarvesBundle/Controller/ObjectAPI/UserCrudController.php</apiController>
+        <apiController>@JarvesBundle/Controller/ObjectAPI/NodeCrudController.php</apiController>
         <desc>Pages, Links, Trays and Navigation folder</desc>
         <table>system_node</table>
         <labelField>title</labelField>

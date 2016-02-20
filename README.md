@@ -52,27 +52,29 @@ Features
 Screenshot
 ----------
 
-![Administration Dashboard](Resources/doc/images/admin-dashboard.png)
+![Administration Login](http://jarves.io/screens/0.png)
+
+### Frontend inline editing
+
 ![Administration Frontend Edit](Resources/doc/images/admin-frontend-edit.png)
+![Administration Frontend Edit 2](Resources/doc/images/admin-frontend-edit-content-elements.png)
+
+### File manager
+
+1. Drag'n'Drop inside the app, from your desktop to Jarves and vice-versa.
+2. OSX like preview
+3. File editing (rename, delete)
+4. Image editing (crop/resize)
+5. File Abstraction Layer (for AWS S3 inside Jarves for example)
+ 
 ![Administration File manager](Resources/doc/images/admin-files-context-image.png)
 ![Administration File manager Images](Resources/doc/images/admin-files-context-image2.png)
+
+### CRUD Framework
 ![Administration CRUD Framework Window List](Resources/doc/images/admin-list.png)
 ![Administration CRUD Framework Window](Resources/doc/images/admin-users.png)
 
 [More Screenshots](Resources/doc/screenshots.markdown)
 
 More information:
-https://www.facebook.com/jarves
-
-PHPUnit
--------
-
-- Preparing the database and models:
-
-```bash
-  Tests/Integration/skeletion/app/console jarves:configuration:database --help
-  Tests/Integration/skeletion/app/console jarves:models:build
-  Tests/Integration/skeletion/app/console jarves:install:demo localhost /
-```
-
-- Fire `phpunit`.
+https://jarves.io

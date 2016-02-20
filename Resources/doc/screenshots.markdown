@@ -7,10 +7,6 @@ General
 Administration login
 ![Administration login](images/admin-login.png)
 
-Dashboard
-![Administration Frontend Edit](images/admin-dashboard.png)
-
-Frontend Inline Edit
 ![Administration Frontend Edit](images/admin-frontend-edit.png)
 
 File manager
@@ -54,9 +50,6 @@ Objects Tab
 
 Objects Tab Fields
 ![Objects Tab Fields](images/admin-extensioneditor-objects-fields.png)
-
-Objects Tab Field properties
-![Objects Tab Field properties](images/admin-extensioneditor-objects-fields-properties.png)
 
 Windows Tab
 ![Windows Tab](images/admin-extensioneditor-windows.png)
@@ -108,7 +101,13 @@ Stuff
 ------------------
 
 Errors/Exception Debug View
+
 ![Errors/Exception Debug View](images/admin-logs.png)
 
+![Errors/Exception Debug View](images/admin-logs-detail.png)
+
 REST API
+
 ![REST API](images/rest-api.png)
+
+![REST API](images/rest-api-2.png)

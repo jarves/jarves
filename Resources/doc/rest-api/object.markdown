@@ -1,6 +1,7 @@
 
 ## REST Entry Points for Object Entries ##
 
+**COMPLETELY OBSOLETE, lock in http://yourinstallation/jarves/doc instead!**
 
 Return a list of object entries with the ability to filter.
 

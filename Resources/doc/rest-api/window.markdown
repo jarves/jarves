@@ -1,6 +1,8 @@
 
 ## REST Entry Points for the Window Class ##
 
+**COMPLETELY OBSOLETE, lock in http://yourinstallation/jarves/doc instead!**
+
 `entryPoint` represents the actual path to the entry point the window class is used.
 
 `QS` is `QueryString` and means a argument through `GET`. Example `admin?foo=bar`, `foo` is passed as QS.
