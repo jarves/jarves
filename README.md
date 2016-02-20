@@ -89,4 +89,4 @@ Screenshot
 [More Screenshots](Resources/doc/screenshots.markdown)
 
 More information:
-https://jarves.io
+http://jarves.io
