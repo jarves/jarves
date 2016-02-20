@@ -31,6 +31,13 @@ A end-user zip package can be downloaded at http://jarves.io when we've released
 
 Read the [installation documentation](Resources/doc/installation.md).
 
+Extensions
+----------
+
+This is how a theme extension looks like: https://github.com/jarves/jarves-demotheme
+
+This is how a more details news extension looks like: https://github.com/jarves/jarves-publication
+
 Requirements
 ------------
 
