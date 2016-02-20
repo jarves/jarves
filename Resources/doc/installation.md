@@ -38,6 +38,28 @@ public function registerBundles()
 }
 ```
 
+Add following composer dependencies to the root `composer.json`:
+
+```json
+
+   "require": [
+   
+    
+        "propel/propel-bundle": "2.0.x-dev@dev",
+        "propel/propel": "dev-master",
+        "sybio/image-workshop": ">=2",
+        "michelf/php-markdown": ">=1.3",
+        "composer\/composer": "1.0.*@dev",
+        "friendsofsymfony/rest-bundle": "1.1.*",
+        "jms/serializer-bundle": "0.12.*",
+        "nelmio/api-doc-bundle": "~2.5",
+        "icap/html-diff": ">=1.0.1",
+        "leafo/scssphp": ">=0.6.1"
+    ]
+```
+
+and run `composer update`.
+
 ### 3. Define the jarves configuration
 
 ```bash
