@@ -1,0 +1,27 @@
+<database namespace="Jarves\Model" name="default">
+  <table name="system_domain" phpName="Domain">
+    <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+    <column name="domain" type="VARCHAR" size="255" required="true"/>
+    <column name="lang" type="VARCHAR" size="7"/>
+    <column name="master" type="BOOLEAN"/>
+    <column name="alias" type="VARCHAR" size="255"/>
+    <column name="redirect" type="VARCHAR" size="255"/>
+    <column name="startnode_id" type="INTEGER"/>
+    <column name="resource_compression" type="BOOLEAN"/>
+    <column name="path" type="VARCHAR" size="255" required="true"/>
+    <column name="email" type="VARCHAR" size="255"/>
+    <column name="robots" type="LONGVARCHAR"/>
+    <column name="favicon" type="LONGVARCHAR"/>
+    <column name="search_index_key" type="VARCHAR" size="255"/>
+    <column name="theme_properties" type="OBJECT"/>
+    <column name="session_properties" type="OBJECT"/>
+    <column name="theme" type="VARCHAR" size="255"/>
+    <column name="title_format" type="VARCHAR" size="255"/>
+    <foreign-key phpName="Startnode" foreignTable="system_node" onDelete="cascade" onUpdate="cascade" skipSql="true">
+      <reference local="startnode_id" foreign="id"/>
+    </foreign-key>
+    <vendor type="mysql">
+      <parameter name="Charset" value="utf8"/>
+    </vendor>
+  </table>
+</database>

@@ -1,0 +1,24 @@
+<database namespace="Jarves\Model" name="default">
+  <table name="system_user" phpName="User">
+    <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+    <column name="username" type="VARCHAR" size="255"/>
+    <column name="auth_class" type="VARCHAR" size="255"/>
+    <column name="password" type="VARCHAR" size="512"/>
+    <column name="password_salt" type="VARCHAR" size="64"/>
+    <column name="activation_key" type="VARCHAR" size="255"/>
+    <column name="email" type="VARCHAR" size="255"/>
+    <column name="settings" type="OBJECT"/>
+    <column name="widgets" type="OBJECT"/>
+    <column name="activate" type="BOOLEAN"/>
+    <column name="logins" type="INTEGER"/>
+    <column name="last_login" type="INTEGER"/>
+    <column name="created" type="BIGINT"/>
+    <column name="modified" type="BIGINT"/>
+    <column name="first_name" type="VARCHAR" size="255"/>
+    <column name="last_name" type="VARCHAR" size="255"/>
+    <column name="image_path" type="LONGVARCHAR"/>
+    <vendor type="mysql">
+      <parameter name="Charset" value="utf8"/>
+    </vendor>
+  </table>
+</database>
