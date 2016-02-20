@@ -6,14 +6,14 @@ This describes the customized installation, usually used by developers.
 A end-user zip package can be downloaded at http://jarves.io when we've released the first alpha version.
 
 ### 1. [Install Symfony](http://symfony.com/doc/current/book/installation.html)
-### 2. Install the JarvesBundle
-
-Download all php files:
-
-Check first that you have `"minimum-stability": "dev",` in your `composer.json`.
+### 2. Install the JarvesBundle for Developer and testing
 
 ```bash
-./composer.phar require jarves/jarves-bundle
+cd src
+git clone git@github.com:jarves/jarves.git Jarves
+cd Jarves
+git clone git@github.com:jarves/jarves-publication.git Publication
+git clone  git@github.com:jarves/jarves-demotheme.git DemoTheme
 ```
 
 Activate the bundle in your AppKernel:
@@ -38,86 +38,11 @@ public function registerBundles()
 }
 ```
 
-### 3. Define the database configuration
-
-You have four ways to configure your database. Choose one of them.
-
-### 3.1 Through symfony
-
-This is the default symfony way to define your database connection configuration.
-
-In `app/config/paramters.yml`:
-
-```
-parameters:
-     database_driver: pdo_mysql
-     database_host: 127.0.0.1
-     database_port: null
-     database_name: symfony
-     database_user: root
-     database_password: null
-```
-
-### 3.2 Through the Jarves cms configuration
-
-With this configuration you have more possibilies to configure your database.
-
-For example, you can define here table-prefix or a master with slave connections.
-
-You can either use the `jarves:configuration:database` command or edit the `app/config/config.jarves.xml` file directly.
-
-#### 3.2.1 Using the installation script
-
-Copy the installation script to your public folder:
+### 3. Define the jarves configuration
 
 ```bash
-   cp vendor/jarves/jarves-bundle/Jarves/Resources/meta/installation-wizard.php.dist web/install.php
-```
-
-Open the `install.php` script in your browser and follow the wizard.
-
-#### 3.2.2 Using the configuration command
-
-```
-$ app/console jarves:configuration:database --help
-Usage:
- jarves:configuration:database type database-name username [pw] [server] [port]
-
-Arguments:
- type                  database type: mysql|pgsql|sqlite
- database-name         database name
- username              database login username
- pw                    use '' to define a empty password
- server                hostname or ip
- port
-
-Options:
- --help (-h)           Display this help message.
- --quiet (-q)          Do not output any message.
- --verbose (-v|vv|vvv) Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
- --version (-V)        Display this application version.
- --ansi                Force ANSI output.
- --no-ansi             Disable ANSI output.
- --no-interaction (-n) Do not ask any interactive question.
- --shell (-s)          Launch the shell.
- --process-isolation   Launch commands from shell as a separate process.
- --env (-e)            The Environment name. (default: "dev")
- --no-debug            Switches off debug mode.
-
-Help:
-
- You can set with this command configuration values inside the app/config/config.jarves.xml file.
-
- It overwrites only options that you provide.
-```
-
-```bash
-app/console jarves:configuration:database mysql symfony root ''
-```
-
-#### 3.2.3 or Editing the jarves configuration directly
-
-```bash
+   cp src/Jarves/Resources/meta/config.xml.dist app/config/config.jarves.xml
+   #or if from composer
    cp vendor/jarves/jarves-bundle/Jarves/Resources/meta/config.xml.dist app/config/config.jarves.xml
 ```
 
@@ -154,8 +79,18 @@ app/console jarves:configuration:database mysql symfony root ''
 ### 4. Setup models and database schema
 
 ```bash
-app/console jarves:models:build
-app/console jarves:schema:update #updates database's schema
+
+#build propel's schema.xml for each Bundle, only necessary if Jarves object definitions have changed
+php app/console jarves:orm:build:propel Jarves
+php app/console jarves:orm:build:propel JarvesPublication
+
+# this is required
+php app/console propel:model:build #build base model
+
+php app/console propel:migration:diff #generates a database schema diff
+php app/console propel:migration:up #upgrade the database schema
+
+#installs demo data
 app/console jarves:install:demo localhost /web-folder/ #the web-folder is usually just /
 ```
 
