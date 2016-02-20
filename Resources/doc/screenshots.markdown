@@ -18,9 +18,6 @@ File manager Image View
 Nodes
 ![Administration Nodes](images/admin-nodes.png)
 
-System
-![System settings](images/admin-system.png)
-
 CRUD Framework
 
 ![Administration CRUD Framework Window List](images/admin-list.png)

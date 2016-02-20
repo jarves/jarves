@@ -113,6 +113,16 @@ parameters:
     jarves_admin_prefix: /jarves
 ```
 
+### 6. Verify
+
+run
+
+```bash
+php app/console server:run
+# open http://127.0.0.1/jarves
+```
+
+REST API doc powered by NelmioApiBundle is available at # open http://127.0.0.1/jarves/doc.
 
 
 The frontend routes are loaded automatically.
