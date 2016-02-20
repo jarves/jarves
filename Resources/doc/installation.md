@@ -79,8 +79,18 @@ public function registerBundles()
 ### 4. Setup models and database schema
 
 ```bash
-app/console jarves:models:build
-app/console jarves:schema:update #updates database's schema
+
+#build propel's schema.xml for each Bundle, only necessary if Jarves object definitions have changed
+php app/console jarves:orm:build:propel Jarves
+php app/console jarves:orm:build:propel JarvesPublication
+
+# this is required
+php app/console propel:model:build #build base model
+
+php app/console propel:migration:diff #generates a database schema diff
+php app/console propel:migration:up #upgrade the database schema
+
+#installs demo data
 app/console jarves:install:demo localhost /web-folder/ #the web-folder is usually just /
 ```
 
