@@ -17,7 +17,7 @@ to work so extensively again since its really a sophisticated and big project.
 I open sourced this project because I still believe there are really shitty PHP CMS out there and I tried to make it better with Jarves.
 
 If you want to continue to develop this project, co-maintain, or participate in another way feel free to contact me. I'd love to add more people to this organisation and bring it forward.
-I invested already several thousand of overs in this project and can not bring it alone to an end. Help to make the CMS world a better place. :)
+I invested already several thousand of hours in this project and can not bring it alone to an end. Help to make the CMS world a better place. :)
 
 [![Build Status](https://travis-ci.org/jarves/jarves.png?branch=master)](https://travis-ci.org/jarves/jarves)
 
