@@ -7,7 +7,7 @@ other rock-solid libraries.
 
 We're in development. This means, there are still a _lot_ of issues in this product (not even an Alpha) and it's not everything implemented yet.
 
-[![Build Status](https://travis-ci.org/jarves/JarvesBundle.png?branch=master)](https://travis-ci.org/jarves/JarvesBundle)
+[![Build Status](https://travis-ci.org/jarves/jarves.png?branch=master)](https://travis-ci.org/jarves/jarves)
 
 
 Installation
