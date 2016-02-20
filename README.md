@@ -5,7 +5,19 @@ An enterprise and high-speed open-source Content-Management-System (CMS) based o
 a user friendly administration interface and rapid application development (RAD) framework using Composer, Propel and
 other rock-solid libraries.
 
-We're in development. This means, there are still a _lot_ of issues in this product (not even an Alpha) and it's not everything implemented yet.
+## Status
+
+I developed this project several years ago and continued it in my spare time, so this is completely a hobby project being in the very early alpha version.
+I dropped angular 1 and angular 2 support because it was way too much work to convert all those several thousand line of codes and HTML. (would take another year to finish it)
+Although the current version is available in their branches. Maybe some day someone continues the work.
+
+Feel free to use it, to continue the development. I'm open to merge and maintain pull-request but don't have the time
+to work so extensively again since its really a sophisticated and big project.
+
+I open sourced this project because I still believe there are really shitty PHP CMS out there and I tried to make it better with Jarves.
+
+If you want to continue to develop this project, co-maintain, or participate in another way feel free to contact me. I'd love to add more people to this organisation and bring it forward.
+I invested already several thousand of overs in this project and can not bring it alone to an end. Help to make the CMS world a better place. :)
 
 [![Build Status](https://travis-ci.org/jarves/JarvesBundle.png?branch=master)](https://travis-ci.org/jarves/JarvesBundle)
 
