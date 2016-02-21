@@ -1,7 +1,11 @@
-Jarves cms - A full-featured CMS bundle for the Symfony framework
+Jarves CMS
 ========
 
-An enterprise and high-speed open-source Content-Management-System (CMS) based on the Symfony framework with a full RESTful API,
+<p align="center">
+    <img src="https://avatars1.githubusercontent.com/u/7001307?v=4&s=150" />
+</p>
+
+An enterprise and high-speed open-source Content-Management-System (CMS) / Application Framework based on the Symfony framework with a full RESTful API,
 a user friendly administration interface and rapid application development (RAD) framework using Composer, Propel and
 other rock-solid libraries.
 
