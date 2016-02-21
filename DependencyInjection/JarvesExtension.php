@@ -102,7 +102,7 @@ class JarvesExtension extends Extension implements PrependExtensionInterface
 
         if (!$systemConfig) {
             $configXml = file_exists($configFile) ? file_get_contents($configFile) : [];
-            $systemConfig = new SystemConfig($configXml, $this);
+            $systemConfig = new SystemConfig($configXml);
             file_put_contents($cacheFile, $systemConfigHash . "\n" . serialize($systemConfig));
         }
 
