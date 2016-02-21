@@ -5,7 +5,12 @@ This describes the customized installation, usually used by developers.
 
 A end-user zip package can be downloaded at http://jarves.io when we've released the first alpha version.
 
-### 1. [Install Symfony](http://symfony.com/doc/current/book/installation.html)
+### 1. [Install Symfony](http://symfony.com/doc/current/book/installation.html) (2.8)
+
+```bash
+symfony new website-with-jarves 2.8
+```
+
 ### 2. Install the JarvesBundle for Developer and testing
 
 ```bash
