@@ -118,11 +118,8 @@ php app/console propel:migration:diff #generates a database schema diff
 php app/console propel:migration:up #upgrade the database schema
 
 #installs demo data
-app/console jarves:install:demo localhost /web-folder/ #the web-folder is usually just /
+app/console jarves:install:demo localhost /
 ```
-
-Important: If you haven't configured a database-prefix the `jarves:schema:update` will **DROP ALL TABLES** in the current
-database that are not port of Jarves cms.
 
 ### 5. Setup the administration route. Open `app/config/routing.yml` and paste this route:
 
