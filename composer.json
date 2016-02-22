@@ -7,14 +7,6 @@
         "WCMS"
     ],
     "repositories": [
-        {
-            "type": "vcs",
-            "url":  "git@bitbucket.org:marcj/jarvespublicationbundle.git"
-        },
-        {
-            "type": "vcs",
-            "url":  "git@bitbucket.org:marcj/jarvesdemotheme.git"
-        }
     ],
     "license": "LGPL-3.0",
     "homepage": "http:\/\/jarves.io\/",
