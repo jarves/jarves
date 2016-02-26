@@ -147,6 +147,8 @@ php app/console server:run
 # open http://127.0.0.1/jarves
 ```
 
+Username and password for the administration login (http://127.0.0.1/jarves) is both `admin`.
+
 REST API doc powered by NelmioApiBundle is available at # open http://127.0.0.1/jarves/doc.
 
 
