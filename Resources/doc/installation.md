@@ -36,6 +36,7 @@ public function registerBundles()
         new Jarves\Publication\JarvesPublicationBundle(),
 
         // our dependencies
+        new Propel\Bundle\PropelBundle\PropelBundle(),
         new FOS\RestBundle\FOSRestBundle(),
         new JMS\SerializerBundle\JMSSerializerBundle(),
         new Nelmio\ApiDocBundle\NelmioApiDocBundle(),
