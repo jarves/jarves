@@ -126,7 +126,7 @@
               </entryPoint>
             </children>
           </entryPoint>
-          <entryPoint path="groups" object="jarves/groups" type="combine" system="true" icon="#icon-users-2" link="true">
+          <entryPoint path="groups" object="jarves/group" type="combine" system="true" icon="#icon-users-2" link="true">
             <label>Groups</label>
           </entryPoint>
           <entryPoint path="acl" type="custom" system="true" icon="#icon-key-4" link="true">
