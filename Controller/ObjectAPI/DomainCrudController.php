@@ -12,9 +12,7 @@ class DomainCrudController extends \Jarves\Controller\ObjectCrudController {
     'type' => 'tab',
     'children' => array (
       'domain' => array (
-        'type' => 'predefined',
-        'object' => 'JarvesBundle:Domain',
-        'field' => 'domain',
+        'type' => 'text',
       ),
       'path' => array (
         'type' => 'predefined',
@@ -22,9 +20,8 @@ class DomainCrudController extends \Jarves\Controller\ObjectCrudController {
         'field' => 'path',
       ),
       'lang' => array (
-        'type' => 'predefined',
-        'object' => 'jarves/domain',
-        'field' => 'lang',
+        'type' => 'lang',
+        'label' => 'Language'
       ),
       'master' => array (
         'type' => 'predefined',
@@ -42,7 +39,6 @@ class DomainCrudController extends \Jarves\Controller\ObjectCrudController {
         'field' => 'theme',
       ),
     ),
-    'key' => '__General__',
   ),
   '__Extra__' => array (
     'label' => 'Extra',
@@ -79,7 +75,6 @@ class DomainCrudController extends \Jarves\Controller\ObjectCrudController {
         'field' => 'redirect',
       ),
     ),
-    'key' => '__Extra__',
   ),
 );
 

@@ -69,11 +69,11 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
     {
         $relative = Tools::getRelativePath(dirname($from), dirname($to)) . '/';
 
-        $content = preg_replace('/@import \'([^\/].*)\'/', '@import \'' . $relative . '$1\'', $content);
-        $content = preg_replace('/@import "([^\/].*)"/', '@import "' . $relative . '$1"', $content);
-        $content = preg_replace('/url\(\'([^\/][^\)]*)\'\)/', 'url(\'' . $relative . '$1\')', $content);
-        $content = preg_replace('/url\(\"([^\/][^\)]*)\"\)/', 'url(\"' . $relative . '$1\")', $content);
-        $content = preg_replace('/url\((?!data:image)([^\/\'].*)\)/', 'url(' . $relative . '$1)', $content);
+        $content = preg_replace('/@import \'(?!.*:\/\/)([^\/].*)\'/', '@import \'' . $relative . '$1\'', $content);
+        $content = preg_replace('/@import "(?!.*:\/\/)([^\/].*)"/', '@import "' . $relative . '$1"', $content);
+        $content = preg_replace('/url\(\'(?!.*:\/\/)([^\/][^\)]*)\'\)/', 'url(\'' . $relative . '$1\')', $content);
+        $content = preg_replace('/url\(\"(?!.*:\/\/)([^\/][^\)]*)\"\)/', 'url(\"' . $relative . '$1\")', $content);
+        $content = preg_replace('/url\((?!.*data:image)(?!.*:\/\/)([^\/\'].*)\)/', 'url(' . $relative . '$1)', $content);
 
         return $content;
     }

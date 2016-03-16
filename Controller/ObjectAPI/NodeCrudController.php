@@ -4,9 +4,6 @@ namespace Jarves\Controller\ObjectAPI;
 
 use Jarves\Controller\NestedObjectCrudController;
 
-/**
- * AUTO-GENERATED THROUGH KRYN WINDOW-EDITOR
- */
 class NodeCrudController extends NestedObjectCrudController
 {
     public $fields = array(
@@ -261,7 +258,7 @@ class NodeCrudController extends NestedObjectCrudController
 
     public $addMultiple = true;
 
-    public $object = 'JarvesBundle:Node';
+    public $object = 'jarves/node';
 
     public $preview = false;
 

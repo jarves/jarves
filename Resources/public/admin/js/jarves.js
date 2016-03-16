@@ -202,12 +202,18 @@ jarves.entrypoint = {
         }
 
         current = current + '';
-        if (current.substr(current.length - 1, 1) != '/') {
+
+        if (current.slice(-1) != '/') {
             current += '/';
         }
 
-        return current + entryPoint;
+        current += entryPoint;
 
+        if (current.slice(-1) === '/') {
+            current = current.slice(0, -1);
+        }
+
+        return current;
     },
 
     //executes a entry point from type function
@@ -236,35 +242,52 @@ jarves.entrypoint = {
         var code = splitted.join('/');
 
         var config, notFound = false, item;
-        path = [];
+        var pathArray = [];
 
         config = jarves.getConfig(bundleName);
 
         if (!config) {
-            throw 'Config not found for bundleName: ' + bundleName;
+            notFound = true;
         }
 
-        var tempEntry = config.entryPoints[splitted.shift()]
-        if (!tempEntry) {
-            return null;
-        }
-        path.push(tempEntry['label']);
+        if (!notFound) {
+            var tempEntry = config.entryPoints[splitted.shift()];
+            if (!tempEntry) {
+                return null;
+            }
 
-        while (item = splitted.shift()) {
-            if (tempEntry.children && tempEntry.children[item]) {
-                tempEntry = tempEntry.children[item];
-                path.push(tempEntry['label']);
-            } else {
-                notFound = true;
-                break;
+            pathArray.push(tempEntry['label']);
+
+            while (item = splitted.shift()) {
+                if (tempEntry.children && tempEntry.children[item]) {
+                    tempEntry = tempEntry.children[item];
+                    pathArray.push(tempEntry['label']);
+                } else {
+                    notFound = true;
+                    break;
+                }
             }
         }
 
         if (notFound) {
+
+            if (bundleName !== 'jarves') {
+                var jarvesEntryPoint;
+
+                try {
+                    jarvesEntryPoint = jarves.entrypoint.get('jarves/' + path);
+                } catch(e){}
+
+                if (jarvesEntryPoint) {
+                    return jarvesEntryPoint;
+                }
+            }
+
+            throw 'EntryPoint '+path+' not found';
             return null;
         }
 
-        tempEntry._path = path;
+        tempEntry._path = pathArray;
         tempEntry._module = bundleName;
         tempEntry._code = code;
 

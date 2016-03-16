@@ -146,6 +146,7 @@
       </object>
       <object id="Domain">
         <label>Domain</label>
+        <apiController>@JarvesBundle/Controller/ObjectAPI/DomainCrudController.php</apiController>
         <table>system_domain</table>
         <labelField>domain</labelField>
         <labelTemplate>[{{lang}}] {{domain}}</labelTemplate>

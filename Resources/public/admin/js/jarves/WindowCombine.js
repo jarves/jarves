@@ -1354,13 +1354,11 @@ jarves.WindowCombine = new Class({
                 win[i] = this.win[i];
             }
 
-            win.entryPoint = jarves.entrypoint.getRelative(this.win.entryPoint, this.classProperties.nestedRootEditEntrypoint);
-            win.params = {item: pItem};
-            win.getSidebar = function() {
-                return this.editAddSidebarContainer;
-            }.bind(this);
-
-            this.currentRootEdit = new jarves.WindowEdit(win, this.mainRight);
+            this.currentRootEdit = new jarves.WindowEdit(win, this.mainRight, {
+                entryPoint: jarves.entrypoint.getRelative(this.win.entryPoint, this.classProperties.nestedRootEditEntrypoint),
+                sidebar: this.editAddSidebarContainer,
+                primaryKey: pItem
+            });
 
             this.currentRootEdit.addEvent('save', this.saved.bind(this));
             this.currentRootEdit.addEvent('load', this.itemLoaded.bind(this));

@@ -364,11 +364,12 @@ class Utils
                     while (!feof($h) && $h) {
                         $buffer = fgets($h, 4096);
 
-                        $buffer = preg_replace('/@import \'([^\/].*)\'/', '@import \'' . $cssDir . '$1\'', $buffer);
-                        $buffer = preg_replace('/@import "([^\/].*)"/', '@import "' . $cssDir . '$1"', $buffer);
-                        $buffer = preg_replace('/url\(\'([^\/][^\)]*)\'\)/', 'url(\'' . $cssDir . '$1\')', $buffer);
-                        $buffer = preg_replace('/url\("([^\/][^\)]*)"\)/', 'url("' . $cssDir . '$1")', $buffer);
-                        $buffer = preg_replace('/url\((?!data:image)([^\)"\']*)\)/', 'url(' . $cssDir . '$1)', $buffer);
+                        $buffer = preg_replace('/@import \'(?!.*:\/\/)([^\/].*)\'/', '@import \'' . $cssDir . '$1\'', $buffer);
+                        $buffer = preg_replace('/@import "(?!.*:\/\/)([^\/].*)"/', '@import "' . $cssDir . '$1"', $buffer);
+                        $buffer = preg_replace('/url\(\'(?!.*:\/\/)([^\/][^\)]*)\'\)/', 'url(\'' . $cssDir . '$1\')', $buffer);
+                        $buffer = preg_replace('/url\(\"(?!.*:\/\/)([^\/][^\)]*)\"\)/', 'url(\"' . $cssDir . '$1\")', $buffer);
+                        $buffer = preg_replace('/url\((?!.*data:image)(?!.*:\/\/)([^\/\'].*)\)/', 'url(' . $cssDir . '$1)', $buffer);
+                        
                         $buffer = str_replace(array('  ', '    ', "\t", "\n", "\r"), '', $buffer);
                         $buffer = str_replace(': ', ':', $buffer);
 

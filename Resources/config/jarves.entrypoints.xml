@@ -24,8 +24,7 @@
           <entryPoint path="addDomains" type="custom" multi="true">
             <label>Add domains</label>
           </entryPoint>
-          <entryPoint path="root" type="combine">
-            <class>Jarves\Controller\Windows\DomainCrudController</class>
+          <entryPoint path="root" object="jarves/domain" type="combine">
             <label>Domain</label>
           </entryPoint>
         </children>
