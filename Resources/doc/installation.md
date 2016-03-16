@@ -49,8 +49,8 @@ Add following composer dependencies to the root `composer.json`:
 ```json
 
    "require": [
-   
-    
+
+
         "propel/propel-bundle": "2.0.x-dev@dev",
         "propel/propel": "dev-master",
         "sybio/image-workshop": ">=2",
@@ -64,9 +64,90 @@ Add following composer dependencies to the root `composer.json`:
     ]
 ```
 
-and run `composer update`.
+do **not** run `composer update` yet.
+
+Remove in `composer.json` the `config.platform.php` settings (latest lines).
+
+Use `"symfony-assets-install": "symlink"` if your system supports symlinks.
+
+Composer.json should look like:
+
+```json
+{
+    "name": "aetros/aetros.com",
+    "license": "proprietary",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "": "src/"
+        },
+        "classmap": [
+            "app/AppKernel.php",
+            "app/AppCache.php"
+        ]
+    },
+    "require": {
+        "php": ">=5.3.9",
+        "symfony/symfony": "2.8.*",
+        "doctrine/orm": "^2.4.8",
+        "doctrine/doctrine-bundle": "~1.4",
+        "symfony/swiftmailer-bundle": "~2.3",
+        "symfony/monolog-bundle": "~2.4",
+        "sensio/distribution-bundle": "~5.0",
+        "sensio/framework-extra-bundle": "^3.0.2",
+        "incenteev/composer-parameter-handler": "~2.0",
+
+"propel/propel-bundle": "2.0.x-dev@dev",
+        "propel/propel": "dev-master",
+        "sybio/image-workshop": ">=2",
+        "michelf/php-markdown": ">=1.3",
+        "composer\/composer": "1.0.*@dev",
+        "friendsofsymfony/rest-bundle": "1.1.*",
+        "jms/serializer-bundle": "0.12.*",
+        "nelmio/api-doc-bundle": "~2.5",
+        "icap/html-diff": ">=1.0.1",
+        "leafo/scssphp": ">=0.6.1"
+
+    },
+    "require-dev": {
+        "sensio/generator-bundle": "~3.0",
+        "symfony/phpunit-bridge": "~2.7"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
+        ],
+        "post-update-cmd": [
+            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
+        ]
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "extra": {
+        "symfony-app-dir": "app",
+        "symfony-web-dir": "web",
+        "symfony-assets-install": "symlink",
+        "incenteev-parameters": {
+            "file": "app/config/parameters.yml"
+        }
+    }
+}
+```
+
 
 ### 3. Define the jarves configuration
+
 
 ```bash
    cp src/Jarves/Resources/meta/config.xml.dist app/config/config.jarves.xml
@@ -74,10 +155,7 @@ and run `composer update`.
    cp vendor/jarves/jarves-bundle/Jarves/Resources/meta/config.xml.dist app/config/config.jarves.xml
 ```
 
-   Either you define your database settings in the Symfony way (in`app/config/paramters.yml`) or
-   you can uncomment the `<database>` (by removing the `_` character) configuration in `app/config/config.jarves.xml`.
-
-   Example:
+   Adjust the `<database>` configuration in `app/config/config.jarves.xml`.
 
 ```xml
   <database>
@@ -104,15 +182,14 @@ and run `composer update`.
   </database>
 ```
 
+Adjust in `app/config/config.jarves.xml` `<groupOwner>www-data</groupOwner>` to a group that your websites is running in.
+For OSX its mostly `_www` or `staff`, and for Ubuntu/Debian `www-data`.
+
+Now **run** `composer update`.
+
 ### 4. Setup models and database schema
 
 ```bash
-
-#build propel's schema.xml for each Bundle, only necessary if Jarves object definitions have changed
-php app/console jarves:orm:build:propel Jarves
-php app/console jarves:orm:build:propel JarvesPublication
-
-# this is required
 php app/console propel:model:build #build base model
 
 php app/console propel:migration:diff #generates a database schema diff
@@ -129,7 +206,7 @@ jarves:
     resource: "@JarvesBundle/Resources/config/routing.yml"
 ```
 
-Define the `jarves_admin_prefix` parameter:
+Change the `jarves_admin_prefix` parameter if n:
 
 ```yaml
 # app/config/parameters.yml
@@ -150,6 +227,5 @@ php app/console server:run
 Username and password for the administration login (http://127.0.0.1/jarves) is both `admin`.
 
 REST API doc powered by NelmioApiBundle is available at # open http://127.0.0.1/jarves/doc.
-
 
 The frontend routes are loaded automatically.

@@ -1,232 +1,103 @@
+Jarves CMS
+========
+
+<p align="center">
+    <img src="https://avatars1.githubusercontent.com/u/7001307?v=4&s=150" />
+</p>
+
+An enterprise and high-speed open-source Content-Management-System (CMS) / Application Framework based on the Symfony framework with a full RESTful API,
+a user friendly administration interface and rapid application development (RAD) framework using Composer, Propel and
+other rock-solid libraries.
+
+## Status
+
+I developed this project several years ago and continued it in my spare time, so this is completely a hobby project being in the very early alpha version.
+I dropped angular 1 and angular 2 support because it was way too much work to convert all those several thousand line of codes and HTML. (would take another year to finish it)
+Although the current version is available in their branches. Maybe some day someone continues the work.
+
+Feel free to use it, to continue the development. I'm open to merge and maintain pull-request but don't have the time
+to work so extensively again since its really a sophisticated and big project.
+
+I open sourced this project because I still believe there are really shitty PHP CMS out there and I tried to make it better with Jarves.
+
+If you want to continue to develop this project, co-maintain, or participate in another way feel free to contact me. I'd love to add more people to this organisation and bring it forward.
+I invested already several thousand of hours in this project and can not bring it alone to an end. Help to make the CMS world a better place. :)
+
+[![Build Status](https://travis-ci.org/jarves/jarves.png?branch=master)](https://travis-ci.org/jarves/jarves)
+
+
 Installation
-============
+------------
 
 This describes the customized installation, usually used by developers.
 
-A end-user zip package can be downloaded at http://jarves.io when we've released the first alpha version.
+A end-user zip package can be downloaded at http://jarves.io when we've released the first alpha version
 
-### 1. [Install Symfony](http://symfony.com/doc/current/book/installation.html) (2.8)
+Read the [installation documentation](Resources/doc/installation.md).
 
-```bash
-symfony new website-with-jarves 2.8
-```
+Extensions
+----------
 
-### 2. Install the JarvesBundle for Developer and testing
+This is how a theme extension looks like: https://github.com/jarves/jarves-demotheme
 
-```bash
-cd src
-git clone git@github.com:jarves/jarves.git Jarves
-cd Jarves
-git clone git@github.com:jarves/jarves-publication.git Publication
-git clone  git@github.com:jarves/jarves-demotheme.git DemoTheme
-```
+This is how a more details news extension looks like: https://github.com/jarves/jarves-publication
 
-Activate the bundle in your AppKernel:
+Requirements
+------------
 
-```php
-<?php
-// app/AppKernel.php
-
-public function registerBundles()
-{
-    $bundles = array(
-        // ...
-        new Jarves\JarvesBundle(),
-        new Jarves\DemoTheme\JarvesDemoThemeBundle(),
-        new Jarves\Publication\JarvesPublicationBundle(),
-
-        // our dependencies
-        new Propel\Bundle\PropelBundle\PropelBundle(),
-        new FOS\RestBundle\FOSRestBundle(),
-        new JMS\SerializerBundle\JMSSerializerBundle(),
-        new Nelmio\ApiDocBundle\NelmioApiDocBundle(),
-    );
-}
-```
-
-Add following composer dependencies to the root `composer.json`:
-
-```json
-
-   "require": [
+1. PHP 5.4+
+2. *nix OS (Linux, BSD, OSX)
+3. PHP extensions: PDO, mbstring, gd, zip
+4. MySQL, PostgreSQL or SQLite (completely tested through unit tests)
 
 
-        "propel/propel-bundle": "2.0.x-dev@dev",
-        "propel/propel": "dev-master",
-        "sybio/image-workshop": ">=2",
-        "michelf/php-markdown": ">=1.3",
-        "composer\/composer": "1.0.*@dev",
-        "friendsofsymfony/rest-bundle": "1.1.*",
-        "jms/serializer-bundle": "0.12.*",
-        "nelmio/api-doc-bundle": "~2.5",
-        "icap/html-diff": ">=1.0.1",
-        "leafo/scssphp": ">=0.6.1"
-    ]
-```
+Features
+--------
 
-do **not** run `composer update` yet.
+ - Based on Symfony
+ - Based on Propel ORM (Propel supports MySQL, PostgreSQL, SQLite, MSSQL, and Oracle), http://www.propelorm.org
+ - Advanced, fast and fresh administration interface
+ - The administration API is completely abstracted through a [REST API](Resources/doc/images/rest-api.png)
+ - File abstraction layer (for mounts with external storages [s3, ftp, dropbox, etc]), CDN
+ - i18n using `getText` (with all of its features [e.g. including plural support, contexts]) compatible .po files
+ - High-Performance through several cache layers
+ - Session storage through several layers (distributed sessions supported)
+ - Easy to extend through a fancy extension editor, completely modulized - the symfony way
+ - CRUD window generator, without writing one line of code
+ - Easy and integrated backup system, perfect for live/dev-scenarios
+ - Extremely detailed permission system
+ - Ships with a solid bunch of UI input widgets (input fields)
+ - Several flexible authentication layers (e.g. changeable for administration, changeable per domain)
+ - Secure password storage using up-to-date encryptions
+ - Feature-rich inline editing (TinyMCE, Markdown, Drag'n'Drop', etc)
+ - Awesome file manager
 
-Remove in `composer.json` the `config.platform.php` settings (latest lines).
+Screenshot
+----------
 
-Use `"symfony-assets-install": "symlink"` if your system supports symlinks.
+![Administration Login](http://jarves.io/screens/0.png)
 
-Composer.json should look like:
+### Frontend inline editing
 
-```json
-{
-    "name": "aetros/aetros.com",
-    "license": "proprietary",
-    "type": "project",
-    "autoload": {
-        "psr-4": {
-            "": "src/"
-        },
-        "classmap": [
-            "app/AppKernel.php",
-            "app/AppCache.php"
-        ]
-    },
-    "require": {
-        "php": ">=5.3.9",
-        "symfony/symfony": "2.8.*",
-        "doctrine/orm": "^2.4.8",
-        "doctrine/doctrine-bundle": "~1.4",
-        "symfony/swiftmailer-bundle": "~2.3",
-        "symfony/monolog-bundle": "~2.4",
-        "sensio/distribution-bundle": "~5.0",
-        "sensio/framework-extra-bundle": "^3.0.2",
-        "incenteev/composer-parameter-handler": "~2.0",
+![Administration Frontend Edit](Resources/doc/images/admin-frontend-edit.png)
+![Administration Frontend Edit 2](Resources/doc/images/admin-frontend-edit-content-elements.png)
 
-"propel/propel-bundle": "2.0.x-dev@dev",
-        "propel/propel": "dev-master",
-        "sybio/image-workshop": ">=2",
-        "michelf/php-markdown": ">=1.3",
-        "composer\/composer": "1.0.*@dev",
-        "friendsofsymfony/rest-bundle": "1.1.*",
-        "jms/serializer-bundle": "0.12.*",
-        "nelmio/api-doc-bundle": "~2.5",
-        "icap/html-diff": ">=1.0.1",
-        "leafo/scssphp": ">=0.6.1"
+### File manager
 
-    },
-    "require-dev": {
-        "sensio/generator-bundle": "~3.0",
-        "symfony/phpunit-bridge": "~2.7"
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
-        ],
-        "post-update-cmd": [
-            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
-        ]
-    },
-    "config": {
-        "bin-dir": "bin"
-    },
-    "extra": {
-        "symfony-app-dir": "app",
-        "symfony-web-dir": "web",
-        "symfony-assets-install": "symlink",
-        "incenteev-parameters": {
-            "file": "app/config/parameters.yml"
-        }
-    }
-}
-```
+1. Drag'n'Drop inside the app, from your desktop to Jarves and vice-versa.
+2. OSX like preview
+3. File editing (rename, delete)
+4. Image editing (crop/resize)
+5. File Abstraction Layer (for AWS S3 inside Jarves for example)
 
+![Administration File manager](Resources/doc/images/admin-files-context-image.png)
+![Administration File manager Images](Resources/doc/images/admin-files-context-image2.png)
 
-### 3. Define the jarves configuration
+### CRUD Framework
+![Administration CRUD Framework Window List](Resources/doc/images/admin-list.png)
+![Administration CRUD Framework Window](Resources/doc/images/admin-users.png)
 
+[More Screenshots](Resources/doc/screenshots.markdown)
 
-```bash
-   cp src/Jarves/Resources/meta/config.xml.dist app/config/config.jarves.xml
-   #or if from composer
-   cp vendor/jarves/jarves-bundle/Jarves/Resources/meta/config.xml.dist app/config/config.jarves.xml
-```
-
-   Adjust the `<database>` configuration in `app/config/config.jarves.xml`.
-
-```xml
-  <database>
-    <!--All tables will be prefixed with this string. Best practise is to suffix it with a underscore.
-    Examples: dev_, domain_ or prod_-->
-    <prefix>jarves_</prefix>
-    <connections>
-      <!--
-        type: mysql|pgsql|sqlite (the pdo driver name)
-        persistent: true|false (if the connection should be persistent)
-        slave: true|false (if the connection is a slave or not (readonly or not))
-        charset: 'utf8'
-      -->
-      <connection type="mysql" persistent="false" charset="utf8" slave="false">
-        <!--Can be a IP or a hostname. For SQLite enter here the path to the file.-->
-        <server>127.0.0.1</server>
-        <port></port>
-        <!--The schema/database name-->
-        <name>test</name>
-        <username>root</username>
-        <password></password>
-      </connection>
-    </connections>
-  </database>
-```
-
-Adjust in `app/config/config.jarves.xml` `<groupOwner>www-data</groupOwner>` to a group that your websites is running in.
-For OSX its mostly `_www` or `staff`, and for Ubuntu/Debian `www-data`.
-
-Now **run** `composer update`.
-
-### 4. Setup models and database schema
-
-```bash
-php app/console propel:model:build #build base model
-
-php app/console propel:migration:diff #generates a database schema diff
-php app/console propel:migration:up #upgrade the database schema
-
-#installs demo data
-app/console jarves:install:demo localhost /
-```
-
-### 5. Setup the administration route. Open `app/config/routing.yml` and paste this route:
-
-```yaml
-jarves:
-    resource: "@JarvesBundle/Resources/config/routing.yml"
-```
-
-Change the `jarves_admin_prefix` parameter if n:
-
-```yaml
-# app/config/parameters.yml
-parameters:
-    # ...
-    jarves_admin_prefix: /jarves
-```
-
-### 6. Verify
-
-run
-
-```bash
-php app/console server:run
-# open http://127.0.0.1/jarves
-```
-
-Username and password for the administration login (http://127.0.0.1/jarves) is both `admin`.
-
-REST API doc powered by NelmioApiBundle is available at # open http://127.0.0.1/jarves/doc.
-
-
-The frontend routes are loaded automatically.
+More information:
+http://jarves.io
