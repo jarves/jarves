@@ -24,6 +24,14 @@ class JarvesExtension extends Extension implements PrependExtensionInterface
 //        $configuration = new Configuration();
 //        $config = $this->processConfiguration($configuration, $configs);
 
+        if (!$container->hasParameter('database_driver')) {
+            $container->setParameter('database_driver', 'mysql');
+        }
+
+        if (!$container->hasParameter('jarves_admin_prefix')) {
+            $container->setParameter('jarves_admin_prefix', '/jarves');
+        }
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('services/content-types.yml');

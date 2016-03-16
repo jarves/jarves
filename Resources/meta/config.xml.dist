@@ -13,7 +13,7 @@
   <!--This is a key generated through the installation process. You should not change it!
     The system needs this key to decrypt the passwords in the users database.-->
   <passwordHashKey></passwordHashKey>
-  <_database_> <!-- it's deactivated through the underscore. Remove it to activate it. Don't forget the end tag! -->
+  <database>
     <!--All tables will be prefixed with this string. Best practise is to suffix it with a underscore.
     Examples: dev_, domain_ or prod_-->
     <prefix>jarves_</prefix>
@@ -34,7 +34,7 @@
         <password></password>
       </connection>
     </connections>
-  </_database_>
+  </database>
   <!--
   The cache layer we use for the distributed caching.
   (The `fast caching` is auto determined (Order: APC, XCache, Files))
