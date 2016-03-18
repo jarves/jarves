@@ -4,6 +4,7 @@ namespace Jarves\EventListener;
 
 use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Util\FormatNegotiatorInterface;
+use Jarves\Jarves;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestMatcher;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +26,9 @@ class SecurityFirewallListener
 
     public function onKernelRequest(GetResponseEvent $event)
     {
+        /** @var Jarves $jarvesCms */
         $jarvesCms = $this->container->get('jarves');
+
         if ($jarvesCms->isAdmin()) {
             $whiteList = [
                 '/',

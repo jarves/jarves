@@ -798,6 +798,10 @@ class Jarves extends Controller
 
     public function resolvePublicWebPath($path)
     {
+        if (strpos($path, '://') !== false) {
+            return $path;
+        }
+
         $webDir = realpath($this->getKernel()->getRootDir().'/../web') . '/';
 
         if ($path && '@' === $path[0]) {

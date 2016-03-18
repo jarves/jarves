@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of Jarves cms.
  *
@@ -17,6 +16,7 @@ use Jarves\Model\Acl as AclObject;
 use Jarves\Model\AclQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
+
 
 class ACL
 {

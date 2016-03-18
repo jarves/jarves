@@ -204,7 +204,9 @@ abstract class ClientAbstract
             $this->getToken(),
             time() + $this->config['timeout'],
             $this->config['cookiePath'],
-            $this->config['cookieDomain']
+            $this->config['cookieDomain'],
+            false,
+            false
         );
         $this->getJarves()->getPageResponse()->headers->setCookie($cookie);
     }
