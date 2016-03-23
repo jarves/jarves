@@ -23,10 +23,6 @@ class AdminLoginController extends PluginController
      */
     public function showLoginAction(Request $request)
     {
-        if ($this->container->has('profiler')) {
-            $this->container->get('profiler')->disable();
-        }
-
         $adminAssets = new AdminAssets($this->getJarves());
         $adminAssets->addMainResources();
         $adminAssets->addLanguageResources();

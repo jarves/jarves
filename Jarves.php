@@ -320,6 +320,14 @@ class Jarves extends Controller
     }
 
     /**
+     * Terminates everything, each post request event.
+     */
+    public function terminate() {
+        $this->adminClient = null;
+        $this->client = null;
+    }
+
+    /**
      * @param bool $withCache
      *
      * @return SystemConfig
@@ -493,6 +501,10 @@ class Jarves extends Controller
      */
     public function getConfigs()
     {
+        if (!$this->configs) {
+            $this->loadBundleConfigs();
+        }
+
         return $this->configs;
     }
 
