@@ -16,6 +16,7 @@ parameters:
      jarves.pluginResponse.listener.class: Jarves\EventListener\PluginResponseListener
      jarves.paramFetcher.listener.class: Jarves\EventListener\ParamFetcherListener
      jarves.securityFirewall.listener.class: Jarves\EventListener\SecurityFirewallListener
+     jarves.termination.listener.class: Jarves\EventListener\TerminationListener
      jarves.restException.listener.class: Jarves\EventListener\RestExceptionListener
      jarves.viewResponse.listener.class: Jarves\EventListener\ViewResponseListener
      jarves.frontendRoutes.listener.class: Jarves\EventListener\FrontendRouteListener
@@ -156,6 +157,12 @@ services:
         arguments: ["@service_container"]
         tags:
             - { name: kernel.event_listener, event: kernel.request, priority: 21 }
+
+     jarves.termination.listener:
+        class: %jarves.termination.listener.class%
+        arguments: ["@jarves"]
+        tags:
+            - { name: kernel.event_listener, event: kernel.terminate, priority: 21 }
 
      jarves.restException.listener:
         class: %jarves.restException.listener.class%

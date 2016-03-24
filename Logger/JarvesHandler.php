@@ -181,4 +181,11 @@ class JarvesHandler extends AbstractProcessingHandler
 
         return $this->logRequest;
     }
+
+    /**
+     * Resets the current LogRequest. Needed after each request.
+     */
+    public function resetLogRequest() {
+        $this->logRequest = null;
+    }
 }

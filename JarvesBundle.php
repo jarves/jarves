@@ -46,9 +46,6 @@ class JarvesBundle extends Bundle
     public function boot()
     {
         parent::boot();
-//        $this->additionalLoader = new UniversalClassLoader();
-//        $this->additionalLoader->registerNamespaceFallback($this->container->get('kernel')->getCacheDir().'/propel-classes/');
-//        $this->additionalLoader->register();
 
         /** @var $jarves Jarves */
         $jarves = $this->container->get('jarves');
@@ -57,14 +54,6 @@ class JarvesBundle extends Bundle
 
         $jarves->prepareWebSymlinks();
         $jarves->loadBundleConfigs();
-
-//        /*
-//         * Propel orm initialisation.
-//         */
-//        $propelHelper = new PropelHelper($jarves);
-//        $propelHelper->loadConfig();
-
-//        $jarves->getModelBuilder()->boot();
 
         if ($jarves->getSystemConfig()->getLogs(true)->isActive()) {
             /** @var $logger \Symfony\Bridge\Monolog\Logger */

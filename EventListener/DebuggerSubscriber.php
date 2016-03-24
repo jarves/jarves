@@ -60,6 +60,8 @@ class DebuggerSubscriber implements EventSubscriberInterface
             $logRequest->setCounts(json_encode($this->jarvesLogHandler->getCounts()));
             $logRequest->save();
         }
+
+        $this->jarvesLogHandler->resetLogRequest();
     }
 
 }
