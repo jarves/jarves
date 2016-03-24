@@ -623,6 +623,14 @@ class Object extends Model
      */
     public function getApiController()
     {
+        if (null === $this->apiController) {
+
+            $defaultResource = '@JarvesBundle/Controller/AutomaticObjectCrudController.php';
+            $defaultResourceNested = '@JarvesBundle/Controller/AutomaticNestedObjectCrudController.php';
+
+            return $this->isNested() ? $defaultResourceNested : $defaultResource;
+        }
+
         return $this->apiController;
     }
 

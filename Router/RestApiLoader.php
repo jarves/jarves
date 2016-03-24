@@ -165,9 +165,6 @@ class RestApiLoader extends Loader
 
     public function importObjectRoutes()
     {
-        $defaultResource = '@JarvesBundle/Controller/AutomaticObjectCrudController.php';
-        $defaultResourceNested = '@JarvesBundle/Controller/AutomaticNestedObjectCrudController.php';
-
         foreach ($this->jarves->getBundles() as $bundleName => $bundle) {
 
             if ($this->jarves->isJarvesBundle($bundleName)) {
@@ -182,18 +179,12 @@ class RestApiLoader extends Loader
                             continue;
                         }
 
-                        $controller = $object->isNested() ? $defaultResourceNested : $defaultResource;
-
-                        if ($apiController = $object->getApiController()) {
-                            $controller = $apiController;
-                        }
-
                         $objectName = $config->getName() . '/' . lcfirst($object->getId());
                         $pattern = '%jarves_admin_prefix%/object/' . $objectName;
 
                         $this->setupRoutes(
                             $config,
-                            $object->getStorageClass() ? : $controller,
+                            $object->getApiController(),
                             $pattern,
                             $object->getKey(),
                             $object
