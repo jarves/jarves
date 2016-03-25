@@ -20,8 +20,7 @@ $linkHoverColor: black;
 $linkHoverBgColor: darken($mainColor, 15%);
 
 
-.jarves-admin.jarves-white,
-.jarves-white .jarves-admin {
+.jarves-admin.jarves-white {
 
     ::-webkit-scrollbar-corner {
         background-color: darken($mainColor, 1%);
@@ -35,8 +34,15 @@ $linkHoverBgColor: darken($mainColor, 15%);
         background-color: darken($mainColor, 35%);
     }
 
+    color: #222 !important;
 
-    color: #222;
+    a, a:link {
+        color: #222;
+    }
+
+    a.jarves-mainMenu-link {
+        color: #f9f9f9;
+    }
 
     .jarves-app-container {
         color: #444;

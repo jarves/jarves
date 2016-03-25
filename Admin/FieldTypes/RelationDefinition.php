@@ -176,6 +176,8 @@ class RelationDefinition implements RelationDefinitionInterface {
     }
 
     /**
+     * If the storage backend should also create a constraint so its not possible to pass a invalid reference id.
+     *
      * @param boolean $withConstraint
      */
     public function setWithConstraint($withConstraint)

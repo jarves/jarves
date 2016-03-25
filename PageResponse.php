@@ -247,7 +247,7 @@ class PageResponse extends Response
      *
      * @param string $path
      * @param string $contentType
-     * @param int $priority
+     * @param int    $priority
      */
     public function loadAssetFile($path, $contentType = null, $priority = 0)
     {
@@ -260,15 +260,27 @@ class PageResponse extends Response
     protected function injectAsset($definition)
     {
         $assetInfo = new AssetInfo();
-        $assetInfo->setPath(@$definition['path']);
-        $assetInfo->setOriginalPath(@$definition['path']);
-        $assetInfo->setContent(@$definition['content']);
-        $assetInfo->setContentType(@$definition['contentType']);
-        $assetInfo->setPriority(@$definition['priority']+0);
+
+        if (isset($definition['path'])) {
+            $assetInfo->setPath($definition['path']);
+            $assetInfo->setOriginalPath($definition['path']);
+        }
+        if (isset($definition['content'])) {
+            $assetInfo->setContent($definition['content']);
+        }
+        if (isset($definition['contentType'])) {
+            $assetInfo->setContentType($definition['contentType']);
+        }
+
+        if (isset($definition['priority'])) {
+            $assetInfo->setPriority($definition['priority'] + 0);
+        }
 
         foreach ($this->handleAsset($assetInfo) as $asset) {
 
-            if ('bottom' === strtolower(@$definition['position'])) { //instead of position use $asset->getPossition();
+            if (isset($definition['position']) && 'bottom' === strtolower($definition['position'])) {
+                //instead of position use $asset->getPosition();
+
                 if (!$this->hasAsset($asset, $this->assetsInfoBottom)) {
                     $this->assetsInfoBottom[$asset->getPriority()][] = $asset;
                 }
@@ -310,13 +322,16 @@ class PageResponse extends Response
                     }
                     $assetInfo = $compiledAssetInfo;
                 }
+
                 return [$assetInfo];
             }
         }
+
         return [];
     }
 
-    public function hasAsset(AssetInfo $assetInfo, $assets = null) {
+    public function hasAsset(AssetInfo $assetInfo, $assets = null)
+    {
         if (!$assets) {
             $assets = $this->assetsInfo;
         }
@@ -325,7 +340,8 @@ class PageResponse extends Response
 
         foreach ($assets as $asset) {
             if (!$assetInfo->getPath() && $assetInfo->getContent() === $asset->getContent()
-                && $assetInfo->getContentType() === $asset->getContentType()) {
+                && $assetInfo->getContentType() === $asset->getContentType()
+            ) {
                 return true;
             }
             if ($asset->getPath() && $asset->getPath() === $assetInfo->getPath()) {
@@ -361,7 +377,7 @@ class PageResponse extends Response
 
     /**
      * @param string $file path to javascript file
-     * @param int $priority
+     * @param int    $priority
      */
     public function addJsFile($file, $priority = 0)
     {
@@ -370,7 +386,7 @@ class PageResponse extends Response
 
     /**
      * @param string $script the actual javascript
-     * @param int $priority
+     * @param int    $priority
      */
     public function addJs($script, $priority = 0)
     {
@@ -541,6 +557,7 @@ class PageResponse extends Response
      * Builds the html body of the current page.
      *
      * @return string
+     * @throws \Exception
      */
     public function buildBody()
     {
@@ -551,11 +568,13 @@ class PageResponse extends Response
 
         $themeId = $page->getTheme() ?: $this->getJarves()->getCurrentDomain()->getTheme();
         if (!$theme = $this->getJarves()->getConfigs()->getTheme($themeId)) {
-            throw new \Exception(sprintf('Theme `%s` not found.', $themeId));
+            throw new \LogicException(sprintf('Theme `%s` not found.', $themeId));
         }
 
         if (!$layout = $theme->getLayoutByKey($page->getLayout())) {
-            throw new \Exception(sprintf('Layout for `%s` in theme `%s` not found.', $page->getLayout(), $themeId));
+            throw new \LogicException(
+                sprintf('Layout for `%s` in theme `%s` not found.', $page->getLayout(), $themeId)
+            );
         }
         $layoutPath = $layout->getFile();
 
@@ -568,7 +587,7 @@ class PageResponse extends Response
                     'themeProperties' => [] //Jarves::$themeProperties
                 )
             );
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             throw new \Exception(sprintf('Cant render view `%s` of theme `%s`.', $layoutPath, $themeId), 0, $e);
         }
 
@@ -714,7 +733,28 @@ class PageResponse extends Response
      */
     public function getTitle()
     {
-        return $this->title;
+        if (null !== $this->title) {
+            return $this->title;
+        }
+
+        if ($this->getDomainHandling() && $this->getJarves()->getCurrentDomain()) {
+            $title = $this->getJarves()->getCurrentDomain()->getTitleFormat();
+
+            if ($page = $this->getJarves()->getCurrentPage()) {
+                return str_replace(
+                    array(
+                         '%title'
+                    ),
+                    array(
+                        $page->getAlternativeTitle() ? : $page->getTitle()
+                    )
+                    ,
+                    $title
+                );
+            }
+        } else {
+            return $this->title;
+        }
     }
 
     /**
@@ -732,7 +772,6 @@ class PageResponse extends Response
     {
         return $this->assets;
     }
-
 
     /**
      * Compares two PageResponses and returns the difference as array/
@@ -776,7 +815,7 @@ class PageResponse extends Response
 
     /**
      * @param  array $p1
-     * @param  arry $p2
+     * @param  arry  $p2
      *
      * @return array
      */
@@ -867,7 +906,7 @@ class PageResponse extends Response
         $tagsAssets = '';
         $tagsAssetsBottom = '';
 
-        $assetsTopGrouped =[];
+        $assetsTopGrouped = [];
         $assetsBottomGrouped = [];
 
         /** @var \Jarves\AssetHandler\LoaderHandlerInterface[] $loaderMap */
@@ -922,10 +961,12 @@ class PageResponse extends Response
 
             if ($loader instanceof CssHandler) {
                 $tagsCssTop .= "\n" . $tags;
-            } else if ($loader instanceof JsHandler) {
-                $tagsJsTop .= "\n" . $tags;
             } else {
-                $tagsAssets .= "\n" . $tags;
+                if ($loader instanceof JsHandler) {
+                    $tagsJsTop .= "\n" . $tags;
+                } else {
+                    $tagsAssets .= "\n" . $tags;
+                }
             }
         }
 

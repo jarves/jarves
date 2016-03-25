@@ -1011,7 +1011,7 @@ class Propel extends ORMAbstract
             &$ignoreNotExistingValues
         ) {
             $fieldName = lcfirst($relation->getName());
-            $fieldValue = @$values[$fieldName];
+            $fieldValue = isset($values[$fieldName]) ? $values[$fieldName] : null;
 
             if (!isset($values[$fieldName]) && $ignoreNotExistingValues) {
                 return;
@@ -1120,7 +1120,6 @@ class Propel extends ORMAbstract
         foreach ($this->getDefinition()->getRelations() as $relation) {
             $applyRelation($relation);
         }
-
 
 //        /*
 //         * all virtual fields which are not present in the object.

@@ -403,6 +403,7 @@ class Jarves extends Controller
      */
     public function setCurrentDomain($currentDomain)
     {
+        $this->getJarves()->getPageResponse()->setResourceCompression($currentDomain->getResourceCompression());
         $this->currentDomain = $currentDomain;
     }
 

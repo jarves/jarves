@@ -116,7 +116,7 @@ class TypePlugin extends AbstractType
                             array(
                                  '_controller' => $clazz . '::' . $method,
                                  '_content' => $this->getContent(),
-                                 'options' => $this->plugin['options'] ?: array()
+                                 'options' => isset($this->plugin['options']) ? $this->plugin['options'] : array()
                             )
                         );
 

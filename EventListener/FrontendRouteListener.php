@@ -3,14 +3,14 @@
 namespace Jarves\EventListener;
 
 use Jarves\Jarves;
-use Jarves\PluginResponse;
+use Jarves\Model\Base\NodeQuery;
 use Jarves\Router\FrontendRouter;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
@@ -75,7 +75,6 @@ class FrontendRouteListener extends RouterListener
         return $this->routes;
     }
 
-
     public function onKernelRequest(GetResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
@@ -83,18 +82,33 @@ class FrontendRouteListener extends RouterListener
             $this->getJarves()->prepareNewMasterRequest();
 
             if (!isset($this->loaded[$event->getRequest()->getPathInfo()])) {
-                $router = new FrontendRouter($this->getJarves(), $event->getRequest());
-                if ($response = $router->loadRoutes($this->routes)) {
+                $frontendRouter = new FrontendRouter($this->getJarves(), $event->getRequest());
+
+                $this->loaded[$event->getRequest()->getPathInfo()] = true;
+
+                //check for redirects/access requirements and populates $this->routes with current page routes and its plugins
+                if ($response = $frontendRouter->loadRoutes($this->routes)) {
                     $event->setResponse($response);
+
                     return;
                 }
-                $this->loaded[$event->getRequest()->getPathInfo()] = true;
             }
         }
 
         try {
+            //check routes in $this->route
             parent::onKernelRequest($event);
-        } catch(NotFoundHttpException $e) {
+
+            if ($event->getRequest()->attributes->has('_route')){
+                $name = $event->getRequest()->attributes->get('_route');
+                $route = $this->routes->get($name);
+                $nodeId = $route->getDefault('nodeId');
+                $node = NodeQuery::create()->findPk($nodeId);
+                $this->jarves->setCurrentPage($node);
+                $this->jarves->setCurrentDomain($node->getDomain());
+            }
+        } catch (MethodNotAllowedException $e) {
+        } catch (NotFoundHttpException $e) {
         }
     }
 }

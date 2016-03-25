@@ -2,6 +2,7 @@
 
 namespace Jarves\Command;
 
+use Jarves\Admin\FieldTypes\RelationDefinition;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,15 +57,25 @@ class ObjectsCommand extends AbstractCommand
                         $table->setStyle('compact');
                         $table->setHeaders(['property', 'value']);
                         foreach ($object->toArray() as $key => $value) {
+
                             if ('browserOptions' === $key || 'fields' === $key || 'browserColumns' === $key) {
                                 $newValue = [];
                                 foreach ($value as $field) {
-                                    $newValue[] = sprintf('<info>%s</info> (%s): %s', $field['id'], $field['type'], @$field['label']);
+                                    $line = sprintf(
+                                        '<info>%s</info> (%s): %s',
+                                        $field['id'],
+                                        $field['type'],
+                                        @$field['label']
+                                    );
+
+                                    if ($field['type'] === 'object') {
+                                        $line .= sprintf(' (->%s %s)', $field['object'], $field['objectRelation']);
+                                    }
+
+                                    $newValue[] = $line;
                                 }
                                 $value = join("\n", $newValue);
-                            }
-
-                            if (null === $value) {
+                            } else if (null === $value) {
                                 $value = 'null';
                             } else if (is_array($value)) {
                                 $value = json_encode($value);
@@ -72,11 +83,27 @@ class ObjectsCommand extends AbstractCommand
                                 $value = $value ? 'true' : 'false';
                             } else if (!is_scalar($value)) {
                                 $value = $value->toArray();
+                            } else if (is_scalar($value)){
+                            } else {
+                                continue;
                             }
+
                             $table->addRow([$key, $value]);
                         }
-                        $table->render();
 
+                        $relations = [];
+                        foreach ($object->getRelations() as $relation) {
+                            $relations[] = sprintf(
+                                '<info>%s</info> (%s) -> %s',
+                                $relation->getName(),
+                                $relation->getType(),
+                                $relation->getForeignObjectKey()
+                            );
+                        }
+                        $relations = join("\n", $relations);
+                        $table->addRow(['relations', $relations]);
+
+                        $table->render();
 
                         $output->writeln('');
                         $output->writeln(' REST API Controller');

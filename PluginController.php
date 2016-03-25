@@ -16,7 +16,7 @@ class PluginController extends Controller
     protected function setOptions(array &$values, array $defaults)
     {
         foreach ($defaults as $key => $default) {
-            if (!@$values[$key]) {
+            if (!isset($values[$key]) || !$values[$key]) {
                 $values[$key] = $default;
             }
         }

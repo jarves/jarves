@@ -129,6 +129,9 @@ class Configs implements \IteratorAggregate
 
         foreach ($this->getConfigFiles($bundle) as $file) {
             if (file_exists($file) && file_get_contents($file)) {
+                if (function_exists('ppm_register_file')) {
+                    ppm_register_file($file);
+                }
                 $doc = new \DOMDocument();
                 $doc->load($file);
 

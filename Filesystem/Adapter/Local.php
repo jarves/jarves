@@ -96,7 +96,7 @@ class Local extends AbstractAdapter
         }
 
         if ($this->groupName) {
-            if (!chgrp($path, $this->groupName)) {
+            if (!@chgrp($path, $this->groupName)) {
                 throw new FileOperationPermittedException(sprintf(
                     'Operation to chgrp the file %s to %s is permitted.',
                     $path,

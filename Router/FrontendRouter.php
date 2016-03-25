@@ -3,8 +3,8 @@
 namespace Jarves\Router;
 
 use Jarves\Jarves;
-use Jarves\Model\NodeQuery;
 use Jarves\Model\Node;
+use Jarves\Model\NodeQuery;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -20,7 +20,7 @@ class FrontendRouter
 {
 
     /**
-     * @var Request
+     * @var Request|null
      */
     protected $request;
 
@@ -37,7 +37,7 @@ class FrontendRouter
     /**
      * @var string
      */
-    protected $foundPageUrl;
+    protected $foundPageUrl = null;
 
     /**
      * @var bool
@@ -98,28 +98,34 @@ class FrontendRouter
         return $this->request;
     }
 
+    /**
+     * Check for redirects/access requirements
+     *
+     * @param RouteCollection $routes
+     *
+     * @return null|RedirectResponse|Response
+     */
     public function loadRoutes(RouteCollection $routes)
     {
-        $pathInfo = $this->getRequest()->getPathInfo();
+        $this->routes = $routes;
 
-        if ($this->getJarves()->isAdmin()) {
-            return null;
-        }
-
-        if ($this->searchDomain() && $this->searchPage($pathInfo)) {
-            if ($response = $this->checkPageAccess()) {
-                return $response;
+        if ($this->request) {
+            if ($this->getJarves()->isAdmin()) {
+                return null;
             }
-            $this->routes = $routes;
-            $this->registerMainPage();
-            $this->registerPluginRoutes();
+
+            if ($this->searchDomain() && $page = $this->searchPage($this->request->getPathInfo())) {
+                $this->registerMainPage($page);
+                $this->registerPluginRoutes($page);
+                if ($response = $this->checkPageAccess($page)) {
+                    return $response;
+                }
+            }
         }
     }
 
-    public function checkPageAccess()
+    public function checkPageAccess(Node $page)
     {
-        $page = $this->getJarves()->getCurrentPage();
-
         $oriPage = $page;
 
         if ($page->getAccessFrom() > 0 && ($page->getAccessFrom() > time())) {
@@ -175,11 +181,13 @@ class FrontendRouter
             if (intval($to) > 0) {
                 $to = $this->getJarves()->getNodeUrl($to);
             }
+
             return new RedirectResponse($to);
         }
 
         if (!$page && $oriPage->getAccessNeedVia() == 1) {
             $response = new Response();
+
             return $response;
             //create
 //            header(
@@ -189,29 +197,33 @@ class FrontendRouter
 //            header('HTTP/1.0 401 Unauthorized');
 
         }
-
 //        return $page;
     }
 
-    public function registerMainPage()
+    public function registerMainPage(Node $page)
     {
-        $page = $this->getJarves()->getCurrentPage();
-        $domain = $this->getJarves()->getCurrentDomain();
+        $domain = $page->getDomain();
 
         $clazz = 'Jarves\\Controller\\PageController';
-        $domainUrl = (!$domain->getMaster()) ? '/' . $domain->getLang() : '';
+        $domainUrl = $domain->getMaster() ? '' : '/' . $domain->getLang();
 
-        $url = $this->foundPageUrl;
+        $url = $domainUrl . $page->getUrn();
 
         $controller = $clazz . '::handleAction';
 
-        if (!$this->editorMode && '' !== $url && '/' !== $url && $domain && $domain->getStartnodeId() == $page->getId()) {
+        if (!$this->editorMode && '' !== $url && '/' !== $url && $domain && $domain->getStartnodeId() == $page->getId(
+            )
+        ) {
             //This is the start page, so add a redirect controller
             $this->routes->add(
                 'jarves_page_redirect_to_startpage',
                 new SyRoute(
                     $url,
-                    array('_controller' => $clazz . '::redirectToStartPageAction')
+                    array(
+                        '_controller' => $clazz . '::redirectToStartPageAction',
+                        'jarvesFrontend' => true,
+                        'nodeId' => $page->getId()
+                    )
                 )
             );
 
@@ -219,24 +231,25 @@ class FrontendRouter
         }
 
         $this->routes->add(
-            'jarves_page_' . $page->getId().'-'.preg_replace('/\W/', '_', $page->getUrn()),
+            'jarves_page_' . $page->getId() . '-' . preg_replace('/\W/', '_', $page->getUrn()),
             new SyRoute(
                 $url,
-                array('_controller' => $controller)
+                array('_controller' => $controller, 'jarvesFrontend' => true, 'nodeId' => $page->getId())
             )
         );
     }
 
-    public function registerPluginRoutes()
+    public function registerPluginRoutes(Node $page)
     {
+        $domain = $page->getDomain();
         $this->getJarves()->getStopwatch()->start('Register Plugin Routes');
         //add all router to current router and fire sub-request
-        $cacheKey = 'core/node/plugins-' . $this->getJarves()->getCurrentPage()->getId();
+        $cacheKey = 'core/node/plugins-' . $page->getId();
         $plugins = $this->getJarves()->getDistributedCache($cacheKey);
 
         if (null === $plugins) {
             $plugins = ContentQuery::create()
-                ->filterByNodeId($this->getJarves()->getCurrentPage()->getId())
+                ->filterByNodeId($page->getId())
                 ->filterByType('plugin')
                 ->find();
 
@@ -253,15 +266,11 @@ class FrontendRouter
             $data = json_decode($plugin->getContent(), true);
 
             if (!$data) {
-                continue;
-            }
-
-            if (!$data) {
                 $this->getJarves()->getLogger()->addAlert(
                     sprintf(
                         'On page `%s` [%d] is a invalid plugin `%d`.',
-                        $this->getJarves()->getCurrentPage()->getTitle(),
-                        $this->getJarves()->getCurrentPage()->getId(),
+                        $page->getTitle(),
+                        $page->getId(),
                         $plugin->getId()
                     )
                 );
@@ -277,8 +286,8 @@ class FrontendRouter
                         'Bundle `%s` for plugin `%s` on page `%s` [%d] does not not exist.',
                         $bundleName,
                         @$data['plugin'],
-                        $this->getJarves()->getCurrentPage()->getTitle(),
-                        $this->getJarves()->getCurrentPage()->getId()
+                        $page->getTitle(),
+                        $page->getId()
                     )
                 );
                 continue;
@@ -292,8 +301,8 @@ class FrontendRouter
                         'In bundle `%s` the plugin `%s` on page `%s` [%d] does not not exist.',
                         $bundleName,
                         @$data['plugin'],
-                        $this->getJarves()->getCurrentPage()->getTitle(),
-                        $this->getJarves()->getCurrentPage()->getId()
+                        $page->getTitle(),
+                        $page->getId()
                     )
                 );
                 continue;
@@ -306,25 +315,32 @@ class FrontendRouter
                     if (false !== strpos($clazz, '\\')) {
                         $controller = $clazz . '::' . $pluginDefinition->getMethod();
                     } else {
-                        $controller = $clazz . '\\' . $pluginDefinition->getClass() . '::' . $pluginDefinition->getMethod();
+                        $controller = $clazz . '\\' . $pluginDefinition->getClass(
+                            ) . '::' . $pluginDefinition->getMethod();
                     }
 
                     $defaults = array(
                         '_controller' => $controller,
                         '_content' => $plugin,
-                        'options' => @$data['options']
+                        '_title' => sprintf('%s: %s', $bundleName, $pluginDefinition->getLabel()),
+                        'options' => isset($data['options']) && is_array($data['options']) ? $data['options'] : [],
+                        'jarvesFrontend' => true,
+                        'nodeId' => $page->getId()
                     );
 
                     if ($route->getDefaults()) {
                         $defaults = array_merge($defaults, $route->getArrayDefaults());
                     }
 
+                    $domainUrl = $domain->getMaster() ? '' : '/' . $domain->getLang();
+                    $url = $domainUrl . $page->getUrn();
+
                     $this->routes->add(
-                        'jarves_plugin_' . ($route->getId() ? : $plugin->getId()).'_'.$idx,
+                        'jarves_plugin_' . ($route->getId() ?: $plugin->getId()) . '_' . $idx,
                         new SyRoute(
-                            $this->foundPageUrl . '/' . $route->getPattern(),
+                            $url . '/' . $route->getPattern(),
                             $defaults,
-                            $route->getArrayRequirements() ? : array()
+                            $route->getArrayRequirements() ?: array()
                         )
                     );
                 }
@@ -379,24 +395,32 @@ class FrontendRouter
 //        }
     }
 
+    /**
+     * Returns the domain if found
+     *
+     * @param bool $noRefreshCache
+     *
+     * @return \Jarves\Model\Domain|null
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function searchDomain($noRefreshCache = false)
     {
         $request = $this->getRequest();
         $dispatcher = $this->getJarves()->getEventDispatcher();
 
         if ($domainId = $request->get('_jarves_editor_domain')) {
-            $hostname = DomainQuery::create()->select('domain')->findPk($domainId);
+            $hostname = DomainQuery::create()->select('domain')->findOneById($domainId);
         } else {
             $hostname = $request->getHost();
         }
-
         $stopwatch = $this->getJarves()->getStopwatch();
 
         $title = sprintf('Searching Domain [%s]', $hostname);
         $stopwatch->start($title);
 
-        /** @var \Jarves\Model\Domain $domain */
-        $domain = null;
+        /** @var \Jarves\Model\Domain $foundDomain */
+        $foundDomain = null;
         $possibleLanguage = $this->getPossibleLanguage();
         $hostnameWithLanguage = $hostname . '/' . $possibleLanguage;
 
@@ -445,39 +469,46 @@ class FrontendRouter
             && (isset($cachedDomains['!redirects'][$hostnameWithLanguage]) && $redirectToDomain = $cachedDomains['!redirects'][$hostnameWithLanguage])
             || (isset($cachedDomains['!redirects'][$hostname]) && $redirectToDomain = $cachedDomains['!redirects'][$hostname])
         ) {
-            $domain = $cachedDomains[$redirectToDomain];
-            $dispatcher->dispatch('core/domain-redirect', new GenericEvent($domain));
+            $foundDomain = $cachedDomains[$redirectToDomain];
+            $dispatcher->dispatch('core/domain-redirect', new GenericEvent($foundDomain));
 
             return null;
         }
 
         //search alias
         if (isset($cachedDomains['!aliases']) &&
-            (($aliasHostname = $cachedDomains['!aliases'][$hostnameWithLanguage]) ||
-                ($aliasHostname = $cachedDomains['!aliases'][$hostname]))
+            ((isset($cachedDomains['!aliases'][$hostnameWithLanguage]) && $aliasHostname = $cachedDomains['!aliases'][$hostnameWithLanguage]) ||
+                (isset($cachedDomains['!aliases'][$hostname]) && $aliasHostname = $cachedDomains['!aliases'][$hostname]))
         ) {
-            $domain = $cachedDomains[$aliasHostname];
+            $foundDomain = $cachedDomains[$aliasHostname];
             $hostname = $aliasHostname;
         } else {
             if (isset($cachedDomains[$hostname])) {
-                $domain = $cachedDomains[$hostname];
+                $foundDomain = $cachedDomains[$hostname];
             }
         }
 
-        if (!$domain) {
+        if (!$foundDomain) {
             $dispatcher->dispatch('core/domain-not-found', new GenericEvent($hostname));
+
             return null;
         }
 
-        $this->getJarves()->setCurrentDomain($domain);
-        $this->getJarves()->getPageResponse()->setResourceCompression($domain->getResourceCompression());
-        $domain->setRealDomain($hostname);
+        $this->getJarves()->setCurrentDomain($foundDomain);
+        $foundDomain->setRealDomain($hostname);
 
         $stopwatch->stop($title);
 
-        return $domain;
+        return $foundDomain;
     }
 
+    /**
+     * Returns the id of given path-info. Null if not existent.
+     *
+     * @param string $pathInfo
+     *
+     * @return Node|null
+     */
     protected function searchPage($pathInfo)
     {
         $url = $this->getRequest()->getPathInfo();
@@ -490,7 +521,6 @@ class FrontendRouter
             if ($this->getJarves()->isEditMode($nodeId)) {
                 $title = sprintf('Use Page from Editor [%s]', $nodeId);
                 $page = NodeQuery::create()->findPk($nodeId);
-                $this->foundPageUrl = $pathInfo;
                 $this->editorMode = true;
                 if ($layout = $this->getRequest()->get('_jarves_editor_layout')) {
                     $page->setLayout($layout);
@@ -526,8 +556,6 @@ class FrontendRouter
                 $possibleUrl = '/';
             }
 
-            $this->foundPageUrl = $possibleUrl;
-
             $url = $possibleUrl;
 
             if ($url == '/') {
@@ -536,7 +564,6 @@ class FrontendRouter
                 if (!$pageId > 0) {
                     $this->getJarves()->getEventDispatcher()->dispatch('core/domain-no-start-page');
                 }
-
             } else {
                 $pageId = $id;
             }
@@ -547,7 +574,7 @@ class FrontendRouter
 
         $stopwatch->stop($title);
 
-        return $page ? $page->getId() : null;
+        return $page;
     }
 
 }

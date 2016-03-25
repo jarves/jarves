@@ -86,11 +86,11 @@ class Container
         $extension = array_pop($exploded);
         $extensionLong = array_pop($exploded) . '.' . $extension;
 
-        if ($serviceId = @$this->handlerByExtension[strtolower($extensionLong)]) {
-            return $this->container->get($serviceId);
+        if (isset($this->handlerByExtension[strtolower($extensionLong)])) {
+            return $this->container->get($this->handlerByExtension[strtolower($extensionLong)]);
         }
-        if ($serviceId = @$this->handlerByExtension[strtolower($extension)]) {
-            return $this->container->get($serviceId);
+        if (isset($this->handlerByExtension[strtolower($extension)])) {
+            return $this->container->get($this->handlerByExtension[strtolower($extension)]);
         }
     }
 
@@ -100,8 +100,8 @@ class Container
      */
     public function getCompileHandlerByContentType($type)
     {
-        if ($serviceId = @$this->handlerByType[strtolower($type)]) {
-            return $this->container->get($serviceId);
+        if (isset($this->handlerByType[strtolower($type)])) {
+            return $this->container->get($this->handlerByType[strtolower($type)]);
         }
     }
 
@@ -111,8 +111,8 @@ class Container
      */
     public function getLoaderHandlerByContentType($contentType)
     {
-        if ($serviceId = @$this->loaderByContentType[strtolower($contentType)]) {
-            return $this->container->get($serviceId);
+        if (isset($this->loaderByContentType[strtolower($contentType)])) {
+            return $this->container->get($this->loaderByContentType[strtolower($contentType)]);
         }
     }
 

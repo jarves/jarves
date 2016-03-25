@@ -21,6 +21,10 @@ $margin: 10px;
     overflow: hidden;
 }
 
+.jarves-white .jarves-Dashboard-widget {
+    color: #3A3A3A;
+}
+
 .jarves-Dashboard-widget-content {
     background-color: lighten($mainColor, 3%);
 
@@ -30,6 +34,10 @@ $margin: 10px;
 
     margin: $margin;
     height: $height - $margin;
+}
+
+.jarves-white .jarves-Dashboard-widget-content {
+    background-color: #e3e3e3;
 }
 
 .jarves-Dashboard-widget h3 {

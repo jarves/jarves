@@ -40,23 +40,26 @@ class Object extends Model
     protected $table;
 
     /**
-     * The storage/persistent class that handles the actual data storage/retrievement (to a file e.g) of the object interface.
-     * Needs 'dataModel'='custom' to have any effect. This class is used by $controller (Jarves\Admin\ObjectCrud class)
+     * The storage/persistent class that handles the actual data storage/retrievement (to a file e.g) of the object
+     * interface. Needs 'dataModel'='custom' to have any effect. This class is used by $controller
+     * (Jarves\Admin\ObjectCrud class)
      *
      * @var string
      */
     protected $storageClass;
 
     /**
-     * The controller php class or service id to use as controller which is used in jarves and external bundles to modify actual objects.
+     * The controller php class or service id to use as controller which is used in jarves and external bundles to
+     * modify actual objects.
      *
      * @var string
      */
     protected $repositoryClass;
 
     /**
-     * Controller which builds the external API (Symfony routes for the REST API). Per default one of Jarves\Controller\*ObjectCrudController.
-     * If you overwrite this, make sure to extend from one of those classes there.
+     * Controller which builds the external API (Symfony routes for the REST API). Per default one of
+     * Jarves\Controller\*ObjectCrudController. If you overwrite this, make sure to extend from one of those classes
+     * there.
      *
      * Example: @BundleName/Controller/MySuperCustomAPIController.php
      *
@@ -128,7 +131,8 @@ class Object extends Model
     protected $domainDepended = false;
 
     /**
-     * Which field shall be used as default label for a default text input `field` instance in the user interface for example.
+     * Which field shall be used as default label for a default text input `field` instance in the user interface for
+     * example.
      * (jarves.Field instance)
      *
      * @var string
@@ -375,6 +379,7 @@ class Object extends Model
         }
     }
 
+//    not in use anymore
 //    /**
 //     * Do whatever is needed to setup the build environment correctly.
 //     *
@@ -399,6 +404,7 @@ class Object extends Model
         $vars = parent::__sleep();
         $vars[] = 'relations';
         $vars[] = 'indexes';
+
         return $vars;
     }
 
@@ -463,6 +469,7 @@ class Object extends Model
 
     /**
      * @param $name
+     *
      * @return bool
      */
     public function hasRelation($name)
@@ -472,6 +479,7 @@ class Object extends Model
 
     /**
      * @param $name
+     *
      * @return \Jarves\Admin\FieldTypes\RelationDefinitionInterface
      */
     public function getRelation($name)
@@ -760,6 +768,7 @@ class Object extends Model
 
     /**
      * @param string $name
+     *
      * @return bool
      */
     public function hasField($name)
@@ -869,6 +878,7 @@ class Object extends Model
                 $names[] = lcfirst($field->getId());
             }
         }
+
         return $names;
     }
 
@@ -897,7 +907,7 @@ class Object extends Model
      */
     public function getKey()
     {
-        return ($this->getBundle() ? $this->getBundle()->getName() : '[no-bundle]') . '/'.lcfirst($this->getId());
+        return ($this->getBundle() ? $this->getBundle()->getName() : '[no-bundle]') . '/' . lcfirst($this->getId());
     }
 
     /**
