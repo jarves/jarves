@@ -23,7 +23,7 @@ a.jarves-helpsystem-bubble-closer:hover {
 }
 
 .jarves-helpsystem-bubble {
-    background-color: lighten($mainColor, 8%);
+    background-color: darken($mainColor, 8%);
     padding: 10px 10px;
     font-size: 11px;
     margin-top: 5px;

@@ -511,6 +511,7 @@ class PageResponse extends Response
             $body = $this->buildBody();
         }
 
+        $this->getStopwatch()->start(sprintf('Render DocType [%s]', $this->getDocType()));
         $templating = $this->getJarves()->getTemplating();
 
         $data = [
@@ -531,6 +532,7 @@ class PageResponse extends Response
             $html
         );
 
+        $this->getStopwatch()->stop('Render DocType');
 //        $html = Jarves::parseObjectUrls($html);
 //        $html = Jarves::translate($html);
 //        Jarves::removeSearchBlocks($html);
@@ -562,16 +564,20 @@ class PageResponse extends Response
     public function buildBody()
     {
         $this->getJarves()->getStopwatch()->start('Build PageBody');
+
         if (!$page = $this->getJarves()->getCurrentPage()) {
+            $this->getJarves()->getStopwatch()->stop('Build PageBody');
             return '';
         }
 
         $themeId = $page->getTheme() ?: $this->getJarves()->getCurrentDomain()->getTheme();
         if (!$theme = $this->getJarves()->getConfigs()->getTheme($themeId)) {
+            $this->getJarves()->getStopwatch()->stop('Build PageBody');
             throw new \LogicException(sprintf('Theme `%s` not found.', $themeId));
         }
 
         if (!$layout = $theme->getLayoutByKey($page->getLayout())) {
+            $this->getJarves()->getStopwatch()->stop('Build PageBody');
             throw new \LogicException(
                 sprintf('Layout for `%s` in theme `%s` not found.', $page->getLayout(), $themeId)
             );
@@ -588,6 +594,7 @@ class PageResponse extends Response
                 )
             );
         } catch (\Exception $e) {
+            $this->getJarves()->getStopwatch()->stop('Build PageBody');
             throw new \Exception(sprintf('Cant render view `%s` of theme `%s`.', $layoutPath, $themeId), 0, $e);
         }
 
@@ -868,8 +875,6 @@ class PageResponse extends Response
     }
 
     /**
-     *
-     *
      * @param  PluginResponse $response
      *
      * @return PageResponse
@@ -897,7 +902,9 @@ class PageResponse extends Response
         krsort($this->assetsInfoBottom);
 
         // flatten arrays
+        /** @var AssetInfo[] $assetsTop */
         $assetsTop = $this->assetsInfo ? call_user_func_array('array_merge', $this->assetsInfo) : [];
+        /** @var AssetInfo[] $assetsBottom */
         $assetsBottom = $this->assetsInfoBottom ? call_user_func_array('array_merge', $this->assetsInfoBottom) : [];
 
         $tagsJsTop = '';
@@ -915,7 +922,6 @@ class PageResponse extends Response
         // group all asset per loader
         $lastLoader = null;
         $group = 0;
-//        var_dump($assetsTop); exit;
         foreach ($assetsTop as $asset) {
             if ($asset->getContentType()) {
                 $loader = $assetHandlerContainer->getLoaderHandlerByContentType($asset->getContentType());

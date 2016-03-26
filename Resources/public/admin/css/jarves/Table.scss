@@ -46,7 +46,7 @@
 .jarves-Table-head th,
 .jarves-Table > tbody > tr > td,
 .jarves-Table-body td {
-    border-bottom: 1px solid lighten($mainColor, 5%);
+    border-bottom: 1px solid darken($mainColor, 5%);
 }
 
 .jarves-Table > thead > tr > th,
@@ -90,7 +90,7 @@
 .jarves-Table tr.active:hover > td,
 .jarves-Table-body tr.active > td,
 .jarves-Table-body tr.active:hover > td {
-    background-color: lighten($mainColor, 12%);
+    background-color: darken($mainColor, 12%);
 }
 
 .jarves-Table tr.active > td a,
@@ -98,5 +98,5 @@
 }
 
 .jarves-Table-hover tr:hover > td {
-    background-color: lighten($mainColor, 3%);
+    background-color: darken($mainColor, 3%);
 }

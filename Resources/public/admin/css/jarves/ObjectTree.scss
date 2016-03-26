@@ -62,6 +62,7 @@
     height: 25px;
     cursor: default;
     white-space: nowrap;
+    text-overflow: ellipsis;
     display: inline-block;
     min-width: 100%;
     box-sizing: border-box;
@@ -70,7 +71,7 @@
 .jarves-objectTree-item-hover,
 .jarves-objectTree-item-hover:link,
 .jarves-objectTree-item-selectable:hover {
-    background-color: lighten($mainColor, 2%);
+    background-color: darken($mainColor, 2%);
 }
 
 .jarves-objectTree-item-over {
@@ -111,17 +112,7 @@
 
 .jarves-objectTree-item-selected,
 .jarves-objectTree-item-selected:hover {
-    background-color: lighten($mainColor, 4%);
-    color: white;
-}
-
-.jarves-objectTree-item-selected .jarves-objectTree-item-masks:before {
-    color: white;
-}
-
-.jarves-objectTree-item-selected .jarves-objectTree-item-toggler,
-.jarves-objectTree-item-selected:hover .jarves-objectTree-item-toggler {
-    color: white;
+    background-color: darken($mainColor, 4%);
 }
 
 .jarves-objectTree-drag-box {

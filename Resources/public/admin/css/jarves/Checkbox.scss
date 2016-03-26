@@ -1,7 +1,7 @@
 @import "../base";
 
 .jarves-admin {
-    .jarves-Checkbox:link {
+    .jarves-Checkbox {
         height: 25px;
         width: 50px;
         -moz-border-radius: 15px;
@@ -11,6 +11,7 @@
         cursor: default;
         display: inline-block;
         line-height: 28px;
+        background-color: #d7d7d7;
     }
 
     .jarves-Checkbox:focus {
@@ -49,16 +50,16 @@
 
     a.jarves-Checkbox-off,
     a.jarves-Checkbox-off:hover {
-        background-color: lighten($mainColor, 4%);
+        background-color: #DCDADA;
     }
 
     a.jarves-Checkbox-on,
     a.jarves-Checkbox-on:hover {
-        background-color: lighten($mainColor, 9%);
+        background-color: #7EB375;
     }
 
     .jarves-Checkbox-knob {
-        background-color: #29475E;
+        background-color: white;
 
         -moz-border-radius: 15px;
         -webkit-border-radius: 15px;

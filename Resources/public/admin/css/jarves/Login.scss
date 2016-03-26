@@ -1,5 +1,18 @@
 @import "../base";
 
+.jarves-login {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    background-color: $blackMainColor;
+    text-align: center;
+    z-index: 200101;
+    overflow: hidden;
+}
+
+
 .jarves-login-middle {
     margin: auto;
     width: 325px;
@@ -13,6 +26,10 @@
     display: block;
     line-height: 30px;
     height: 30px;
+    font-size: 13px;
+    color: white;
+    background-color: lighten($blackMainColor, 5%);
+    border: 1px solid lighten($blackMainColor, 8%);
 }
 .jarves-login-middle .jarves-Button,
 .jarves-login-middle .jarves-Button:link {
@@ -20,17 +37,26 @@
     margin: 0;
     position: relative;
     top: 2px;
+    background-color: lighten($blackMainColor, 6%);
+    color: white;
 }
 
 .jarves-login-middle .jarves-Select-box,
 .jarves-login-middle .jarves-Select-box:link {
-    line-height: 30px;
+    line-height: 28px;
     height: 30px;
     width: auto;
     float: left;
     margin: 0;
     position: relative;
     top: 2px;
+
+    background-color: lighten($blackMainColor, 6%);
+    color: white;
+    &:hover {
+        color: white;
+        background-color: lighten($blackMainColor, 10%);
+    }
 }
 
 .jarves-login-barrierTape {
@@ -50,7 +76,7 @@
     left: 0px;
     right: 0px;
     bottom: 0px;
-    background-color: white;
+    background-color: $blackMainColor;
 }
 
 .jarves-login-barrierTape div {
@@ -68,19 +94,6 @@
 .jarves-login-logo {
     width: 55px;
 }
-
-.jarves-login {
-    position: absolute;
-    left: 0px;
-    right: 0px;
-    top: 0px;
-    bottom: 0px;
-    background-color: $mainColor;
-    text-align: center;
-    z-index: 200101;
-    overflow: hidden;
-}
-
 .jarves-login-icon {
     font-size: 18px;
     color: #ddd;
@@ -102,8 +115,8 @@
     right: 29px;
     bottom: 68px;
     position: absolute;
-    border: 1px solid #c7c7c7;
-    background-color: #f8f8f8;
+    border: 1px solid lighten($blackMainColor, 10%);
+    background-color: $blackMainColor;
 }
 
 .jarves-ai-loader-txt {
@@ -118,7 +131,7 @@
 .jarves-login-middle-form {
     position: relative;
     margin: 15px;
-    @include line-bottom;
+    @include line-bottom-dark;
 }
 
 .jarves-login-desktopMode {
@@ -144,7 +157,7 @@
     width: 350px;
     height: 0;
     overflow: hidden;
-    background-color: $mainColor;
+    background-color: $blackMainColor;
     z-index: 5;
 }
 

@@ -36,15 +36,18 @@ $linkHoverBgColor: darken($mainColor, 15%);
 
     color: #222 !important;
 
-    a, a:link {
-        color: #222;
+    .jarves-app-container {
+        a, a:link {
+            color: #222;
+        }
     }
 
     a.jarves-mainMenu-link {
         color: #f9f9f9;
     }
 
-    .jarves-app-container {
+    .jarves-app-container,
+    .jarves-main-dialog-container {
         color: #444;
         background-color: #f0f0f0;
 

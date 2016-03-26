@@ -47,7 +47,6 @@
             <asset src="@JarvesBundle/font/OpenSans/open-sans.css" />
             <asset src="@JarvesBundle/font/OpenSans/open-sans-condensed.css" />
             <assets src="@JarvesBundle/admin/css/jarves.scss" />
-            <assets src="@JarvesBundle/admin/css/jarves-white.scss" />
             <asset src="@JarvesBundle/admin/css/jarves/Button.scss" />
             <asset src="@JarvesBundle/admin/css/jarves/ButtonGroup.scss" />
             <assets src="@JarvesBundle/admin/css/lib/*.css" />

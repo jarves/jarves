@@ -318,16 +318,6 @@ var jarves_system_settings = new Class({
 
         });
 
-        this.actionBarContainer = new Element('div', {
-            style: 'text-align: right; '
-        }).inject(this.win.getTitleGroupContainer());
-
-        this.actionBar = new jarves.ButtonGroup(this.actionBarContainer);
-        document.id(this.actionBar).setStyle('float', 'right');
-        this.resetBtn = this.actionBar.addButton(t('Reset'), '#icon-escape');
-        this.saveBtn = this.actionBar.addButton(t('Save'), '#icon-checkmark-6');
-        this.saveBtn.setButtonStyle('blue');
-
         this.fieldObject = new jarves.FieldForm(this.win.content, fields, {
             allTableItems: true,
             tabsInWindowHeader: true,
@@ -335,6 +325,12 @@ var jarves_system_settings = new Class({
         }, {
             win: this.win
         });
+
+        this.actionBar = new jarves.ButtonGroup(this.win.getSidebar());
+
+        this.saveBtn = this.actionBar.addButton(t('Save'), '#icon-checkmark-6');
+        this.saveBtn.setButtonStyle('blue');
+        this.resetBtn = this.actionBar.addButton(t('Reset'), '#icon-escape');
 
         this.load();
 

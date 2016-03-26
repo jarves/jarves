@@ -5,6 +5,7 @@ namespace Jarves\EventListener;
 use Jarves\Jarves;
 use Jarves\Model\Base\NodeQuery;
 use Jarves\Router\FrontendRouter;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -39,7 +40,8 @@ class FrontendRouteListener extends RouterListener
         $this->routes = new RouteCollection();
 
         parent::__construct(
-            new UrlMatcher($this->routes, new RequestContext())
+            new UrlMatcher($this->routes, new RequestContext()),
+            new RequestStack()
         );
     }
 

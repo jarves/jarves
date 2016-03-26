@@ -61,7 +61,7 @@
 }
 
 .jarves-editor-content-item:hover {
-    background-color: lighten($mainColor, 5%);
+    background-color: darken($mainColor, 5%);
 }
 
 .jarves-editor-content-item:before {
@@ -78,12 +78,12 @@
     max-width: 80%;
     max-height: 90%;
     overflow: auto;
-    border-top: 2px solid lighten($mainColor, 15%);
-    border-bottom: 2px solid lighten($mainColor, 15%);
+    border-top: 2px solid darken($mainColor, 15%);
+    border-bottom: 2px solid darken($mainColor, 15%);
     background-color: $mainColor;
     padding: 2px 15px;
     padding-top: 0;
-    box-shadow: 0 0 5px lighten($mainColor, 8%);
+    box-shadow: 0 0 5px darken($mainColor, 8%);
     visibility: hidden;
 }
 

@@ -171,7 +171,7 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
     position: absolute;
     width: 600px;
     text-align: center;
-    background-color: lighten($mainColor, 2%);
+    background-color: darken($mainColor, 2%);
 }
 
 .jarves-Files-preview-inner {
@@ -341,7 +341,7 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
 }
 
 .jarves-Files-item:hover {
-    background-color: lighten($mainColor, 3%);
+    background-color: darken($mainColor, 3%);
 }
 
 .jarves-Files-item-title {
@@ -379,8 +379,8 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
 //    -moz-border-radius: 5px;
 //    -webkit-border-radius: 5px;
 //    border-radius: 5px;
-//    outline: 1px dotted lighten($mainColor, 15%);
-    background-color: lighten($mainColor, 6%);
+//    outline: 1px dotted darken($mainColor, 15%);
+    background-color: darken($mainColor, 6%);
 }
 
 /* listType: miniatur */
@@ -444,7 +444,7 @@ table.jarves-files-search-table tr:hover td {
     height: 40px;
     background-repeat: no-repeat;
     background-position: center center;
-    color: lighten($mainColor, 20%);
+    color: $blackMainColor;
 }
 
 .jarves-Files-listtype-miniatur .jarves-Files-item {

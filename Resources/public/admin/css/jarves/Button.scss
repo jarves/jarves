@@ -1,7 +1,6 @@
 @import "../base";
 
-a.jarves-Button,
-a.jarves-Button:link {
+a.jarves-Button {
     white-space: nowrap;
     padding: 0px 10px;
     position: relative;
@@ -24,8 +23,7 @@ a.jarves-Button:link {
     border-radius: 0;
 }
 
-a.jarves-button-icon,
-a.jarves-button-icon:link {
+a.jarves-button-icon {
     display: inline-block;
     cursor: pointer;
     line-height: 28px;
@@ -40,11 +38,8 @@ a.jarves-Button > span {
 }
 
 //.jarves-ActionBar a.jarves-Button,
-//.jarves-ActionBar a.jarves-Button:link,
 //.jarves-windowEdit-action-bar a.jarves-Button,
-//.jarves-windowEdit-action-bar a.jarves-Button:link,
-//.jarves-Window-win-titleGroups a.jarves-Button,
-//.jarves-Window-win-titleGroups a.jarves-Button:link {
+//.jarves-Window-win-titleGroups a.jarves-Button {
 //    line-height: 28px;
 //    height: 30px;
 //}
@@ -79,11 +74,9 @@ a.jarves-Button:focus {
 
 a.jarves-Button:active,
 a.jarves-Button-pressed,
-a.jarves-Button-pressed:link,
 a.jarves-Button-pressed:hover,
 a.jarves-Button-pressed:active {
-    color: #f5f5f5;
-    background-color: lighten($mainColor, 15%);
+    background-color: darken($mainColor, 35%);
 }
 
 div.button-list {
@@ -105,7 +98,7 @@ a.jarves-Button img {
     left: -3px;
 }
 
-//a.jarves-Button-red, a.jarves-Button-red:link {
+//a.jarves-Button-red {
 //    color: white;
 //    background-color: #b23935;
 //}
@@ -118,8 +111,7 @@ a.jarves-Button img {
 //    background-color: #af1715;
 //}
 //
-//a.jarves-Button-blue,
-//a.jarves-Button-blue:link {
+//a.jarves-Button-blue {
 //    @include button-primary();
 //}
 //
@@ -133,7 +125,6 @@ a.jarves-Button img {
 //}
 
 a.jarves-Button-deactivate,
-a.jarves-Button-deactivate:link,
 a.jarves-Button-deactivate:active,
 a.jarves-Button-deactivate:hover {
     cursor: default;

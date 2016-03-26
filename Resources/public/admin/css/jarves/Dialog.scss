@@ -12,8 +12,8 @@
 
 .jarves-dialog {
     background-color: $mainColor;
-    box-shadow: 0 0 20px lighten($mainColor, 5%);
-    @include line-bottom;
+    box-shadow: 0 0 20px darken($mainColor, 5%);
+    border: 1px solid darken($mainColor, 10%);
     position: absolute;
 
     min-height: 50px;

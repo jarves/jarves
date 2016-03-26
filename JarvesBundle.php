@@ -25,11 +25,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class JarvesBundle extends Bundle
 {
     /**
-     * @var UniversalClassLoader
-     */
-    protected $additionalLoader;
-
-    /**
      * @var SystemConfig
      */
     public static $systemConfig;
@@ -60,13 +55,5 @@ class JarvesBundle extends Bundle
             $logger = $this->container->get('logger');
             $logger->pushHandler($this->container->get('jarves.logger.handler'));
         }
-    }
-
-    /**
-     * Shutdowns the Bundle.
-     */
-    public function shutdown()
-    {
-        unset($this->additionalLoader);
     }
 }

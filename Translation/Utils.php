@@ -276,8 +276,12 @@ class Utils extends Controller
     public static function extractFrameworkFields($fields)
     {
         foreach ($fields as $field) {
-            $GLOBALS['moduleTempLangs'][$field['label']] = $field['label'];
-            $GLOBALS['moduleTempLangs'][$field['desc']] = $field['desc'];
+            if (isset($field['label'])) {
+                $GLOBALS['moduleTempLangs'][$field['label']] = $field['label'];
+            }
+            if (isset($field['desc'])) {
+                $GLOBALS['moduleTempLangs'][$field['desc']] = $field['desc'];
+            }
         }
     }
 

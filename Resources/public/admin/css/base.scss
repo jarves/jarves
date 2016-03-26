@@ -46,7 +46,7 @@
         width: 1px;
         height: 1px;
         content: '';
-        background-color: lighten($mainColor, 50%);
+        background-color: darken($mainColor, 50%);
     }
 }
 
@@ -59,7 +59,7 @@
         width: 1px;
         height: 1px;
         content: '';
-        background-color: lighten($mainColor, 50%);
+        background-color: darken($mainColor, 50%);
     }
 }
 
@@ -80,28 +80,114 @@
 }
 
 @mixin line-top-right {
-    border-top: 1px solid lighten($mainColor, 15%);
+    border-top: 1px solid darken($mainColor, 13%);
     @include dot-right();
 }
 
 @mixin line-top-left {
-    border-top: 1px solid lighten($mainColor, 15%);
+    border-top: 1px solid darken($mainColor, 13%);
     @include dot-left();
 }
 
 @mixin line-top {
-    border-top: 1px solid lighten($mainColor, 15%);
+    border-top: 1px solid darken($mainColor, 13%);
     @include dot-right();
     @include dot-left();
 }
 
 @mixin line-bottom-left {
-    border-bottom: 1px solid lighten($mainColor, 15%);
+    border-bottom: 1px solid darken($mainColor, 13%);
     @include dot-left-bottom();
 }
 
 @mixin line-bottom {
-    border-bottom: 1px solid lighten($mainColor, 15%);
+    border-bottom: 1px solid darken($mainColor, 13%);
     @include dot-left-bottom();
     @include dot-right-bottom();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@mixin dot-right-dark {
+    position: relative;
+    &:after {
+        position: absolute;
+        right: 0;
+        top: -1px;
+        width: 1px;
+        height: 1px;
+        content: '';
+        background-color: lighten($blackMainColor, 50%);
+    }
+}
+
+@mixin dot-left-dark() {
+    position: relative;
+    &:before {
+        position: absolute;
+        left: 0;
+        top: -1px;
+        width: 1px;
+        height: 1px;
+        content: '';
+        background-color: lighten($blackMainColor, 50%);
+    }
+}
+
+@mixin dot-left-bottom-dark() {
+    @include dot-left-dark;
+    &:before {
+        bottom: -1px;
+        top: auto;
+    }
+}
+
+@mixin dot-right-bottom-dark() {
+    @include dot-right-dark;
+    &:after {
+        bottom: -1px;
+        top: auto;
+    }
+}
+
+@mixin line-top-right-dark {
+    border-top: 1px solid lighten($blackMainColor, 15%);
+    @include dot-right-dark();
+}
+
+@mixin line-top-left-dark {
+    border-top: 1px solid lighten($blackMainColor, 15%);
+    @include dot-left-dark();
+}
+
+@mixin line-top-dark {
+    border-top: 1px solid lighten($blackMainColor, 15%);
+    @include dot-right-dark();
+    @include dot-left-dark();
+}
+
+@mixin line-bottom-left-dark {
+    border-bottom: 1px solid lighten($blackMainColor, 15%);
+    @include dot-left-bottom-dark();
+}
+
+@mixin line-bottom-dark {
+    border-bottom: 1px solid lighten($blackMainColor, 15%);
+    @include dot-left-bottom-dark();
+    @include dot-right-bottom-dark();
 }

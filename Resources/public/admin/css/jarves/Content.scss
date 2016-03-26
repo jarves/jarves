@@ -263,7 +263,7 @@
     position: absolute;
     text-align: center;
     background-color: $mainColor;
-    color: white;
+    color: black;
     top: -6px;
     width: 13px;
     left: -11px;
@@ -271,7 +271,7 @@
     border-radius: 7px;
     line-height: 12px;
     font-size: 10px;
-    border: 1px solid #D3D3D3;
+    border: 1px solid #333;
 }
 
 .jarves-content-placer:hover a.jarves-content-placer-place,
@@ -282,7 +282,7 @@
     width: 21px;
     left: -16px;
     height: 21px;
-    color: lighten($mainColor, 45%);
+    color: black;
     border-radius: 15px;
 //    font-size: 14px;
     line-height: 21px;

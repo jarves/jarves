@@ -3,7 +3,7 @@
 .jarves-List {
     position: absolute;
     left: 0;
-    top: 46px;
+    top: 28px;
     bottom: 0px;
     right: 0;
     overflow: auto;
@@ -12,15 +12,15 @@
 
 .jarves-List-split {
     padding: 3px 6px;
-    border-bottom: 1px solid lighten($mainColor, 10%);
-    background-color: lighten($mainColor, 3%);
-    color: #eee;
+    border-bottom: 1px solid #d1d1d1;
+    background-color: #ececec;
+    color: #666;
     font-size: 11px;
     text-transform: uppercase;
 }
 
 .jarves-List-item {
-    border-bottom: 1px solid lighten($mainColor, 10%);
+    border-bottom: 1px solid darken($mainColor, 10%);
     cursor: pointer;
     padding: 6px;
     position: relative;
@@ -41,16 +41,16 @@
 }
 
 .jarves-List-item .sub {
-    color: #ccc;
+    color: #7B7B7B;
 }
 
 .jarves-List-item:hover {
-    background-color: lighten($mainColor, 2%);
+    background-color: darken($mainColor, 4%);
 }
 
 .jarves-List-item.active,
 .jarves-List-item.active:hover {
-    background-color: lighten($mainColor, 4%);
+    background-color: darken($mainColor, 6%);
 }
 
 .jarves-List-loader:hover {

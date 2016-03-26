@@ -145,11 +145,7 @@ class ObjectView extends Propel
         } else {
 
             $directory = $this->getJarves()->resolvePath($path, 'Resources/views', true) . '/';
-            try {
-                $files = $this->getJarves()->getFilesystem()->getFiles($directory);
-            } catch(\Exception $e) {
-                throw new \Exception(sprintf('Can not find `%s` (in %s)', $path, $directory));
-            }
+            $files = $this->getJarves()->getFilesystem()->getFiles($directory);
 
             foreach ($files as $file) {
                 if ($condition && $condition->hasRules() && !$condition->satisfy($file, 'JarvesBundle:file')) {

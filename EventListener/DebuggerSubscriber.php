@@ -11,7 +11,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class DebuggerSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var Jarves
      */

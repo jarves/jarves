@@ -26,6 +26,8 @@ var jarves_backend_chooser = new Class({
 
         this.setOptions(this.win.params);
 
+        this.win.disable
+
         this.value = this.win.params.value;
 
         this.options.multi = (this.options.multi) ? true : false;

@@ -4,7 +4,6 @@
 html, body {
     margin: 0;
     padding: 0;
-    color: white;
 }
 
 $base-font-size: 13px;
@@ -28,15 +27,15 @@ $base-font-size: 13px;
 }
 
 ::-webkit-scrollbar-corner {
-    background-color: lighten($mainColor, 1%);
+    background-color: darken($mainColor, 1%);
 }
 
 ::-webkit-scrollbar-track-piece {
-    background-color: lighten($mainColor, 3%);
+    background-color: darken($mainColor, 3%);
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: lighten($mainColor, 7%);
+    background-color: darken($mainColor, 7%);
 }
 
 .jarves-admin {
@@ -57,7 +56,7 @@ $base-font-size: 13px;
 
     h1 {
         font-size: 38px;
-        color: #797979;
+        color: #505050;
         line-height: 50px;
         margin: 5px 0;
         padding: 0;
@@ -65,7 +64,7 @@ $base-font-size: 13px;
 
     h2 {
         font-size: 26px;
-        color: #969696;
+        color: #646464;
         margin: 5px 0;
         padding: 0;
     }
@@ -107,8 +106,8 @@ $base-font-size: 13px;
         user-select: none;
     }
 
-    a,
-    a:link {
+    a {
+
         color: $mainLinkColor;
         display: inline-block;
         padding: 1px 3px;
@@ -121,8 +120,7 @@ $base-font-size: 13px;
         background-color: $linkHoverBgColor;
     }
 
-    a img,
-    a:link img {
+    a img {
         border: 0px;
     }
 
@@ -261,18 +259,18 @@ $base-font-size: 13px;
     .mce-btn button,
     .mce-ico,
     .mce-menubtn span {
-        color: white;
+        //color: white;
     }
 
     .mce-btn:hover, .mce-btn:focus {
-        color: lighten($mainLinkColor, 60%);
-        background-color: lighten($mainColor, 15%);
+        color: darken($mainLinkColor, 60%);
+        background-color: darken($mainColor, 15%);
         background-image: none;
     }
 
     .mce-btn.mce-active, .mce-btn.mce-active:hover {
-        color: lighten($mainLinkColor, 60%);
-        background-color: lighten($mainColor, 10%);
+        color: darken($mainLinkColor, 60%);
+        background-color: darken($mainColor, 10%);
         background-image: none;
     }
 }
@@ -284,15 +282,19 @@ $base-font-size: 13px;
     right: 0;
     overflow: hidden;
     bottom: 0;
-    background-color: $mainColor;
+    background-color: $blackMainColor;
 }
 
 .jarves-app-container {
     position: absolute;
-    left: 265px;
+    left: 245px;
     top: 0;
-    right: 15px;
+    right: 0;
     bottom: 0;
+
+    background-color: $mainColor;
+    border-left: 20px solid $mainColor;
+    border-right: 15px solid $mainColor;
 
     -webkit-transition: all 0.2s ease-out;
     -moz-transition: all 0.2s ease-out;
@@ -352,7 +354,6 @@ $base-font-size: 13px;
     padding: 5px 0;
     margin: 0;
     @include line-bottom;
-    color: white;
     line-height: 15px;
 }
 
@@ -383,15 +384,17 @@ $base-font-size: 13px;
     height: 30px;
     padding: 0 15px;
     padding-right: 25px;
-    background-color: lighten($mainColor, 5%);
+    background-color: darken($mainColor, 5%);
     cursor: default;
-    color: #eee;
     position: relative;
+
+    &:last-child {
+        border-right: 1px solid #e2e2e2;
+    }
 }
 
 .jarves-admin {
-    .jarves-wm-tab > a,
-    .jarves-wm-tab > a:link {
+    .jarves-wm-tab > a {
         position: absolute;
         right: 3px;
         top: 7px;
@@ -400,7 +403,6 @@ $base-font-size: 13px;
         padding: 2px;
         line-height: 13px;
         text-decoration: none;
-        color: #D5D5D5;
     }
 
     .jarves-wm-tab > a:active {
@@ -413,137 +415,13 @@ $base-font-size: 13px;
 }
 
 .jarves-wm-tab:hover {
-    background-color: lighten($mainColor, 3%);
+    background-color: darken($mainColor, 3%);
 }
 
 .jarves-wm-tab-active,
 .jarves-wm-tab-active:hover {
-    background-color: lighten($mainColor, 15%);
-    color: white;
-}
-
-.jarves-main-menu {
-    position: absolute;
-    top: 230px;
-    left: 0;
-    bottom: 50px;
-    right: 0;
-    text-align: center;
-}
-
-.jarves-main-menu-bottom {
-    @include line-top-right;
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 40px;
-    text-align: right;
-}
-
-.jarves-main-menu-bottom-collapse {
-    text-transform: uppercase;
-}
-
-.jarves-main-menu-bottom-collapse span {
-    position: relative;
-    top: 1px;
-    margin-left: 2px;
-}
-
-.jarves-main-menu-left {
-    position: absolute;
-    top: 0;
-    left: 15px;
-    bottom: 0;
-    width: 215px;
-    text-align: center;
-    overflow: auto;
-}
-
-.jarves-main-menu-actions,
-.jarves-main-menu-user {
-    text-align: right;
-    @include line-top-right;
-}
-
-.jarves-main-menu-actions {
-    padding: 7px 0;
-}
-
-input.jarves-main-menu-actions-search-input {
-    margin-bottom: 2px;
-}
-
-.jarves-main-menu-actions-links {
-    text-transform: uppercase;
-}
-
-.jarves-main-menu-actions-links a {
-    display: inline-block;
-    margin-left: 7px;
-    font-size: 11px;
-}
-
-.jarves-main-menu-user-name {
-    margin: 0;
-    padding: 3px 0;
-    color: white;
-    display: inline-block;
-    font-size: 12px;
-    font-weight: normal;
-    text-transform: uppercase;
-    line-height: 20px;
-    font-weight: 300;
-}
-
-.jarves-main-menu-user .username {
-    color: #ddd;
-}
-
-.jarves-frame .jarves-main-menu-user a.jarves-Button,
-.jarves-frame .jarves-main-menu-user a.jarves-Button:link {
-    background-color: transparent;
-    background: transparent;
-    color: #bdd1dd;
-    border: 0;
-    border-radius: 0;
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
-    margin: 0px 7px;
-    display: inline-block;
-    line-height: 17px;
-    box-shadow: none;
-}
-
-.jarves-frame .jarves-main-menu-user a.jarves-Button:hover {
-    cursor: pointer;
-    text-decoration: underline;
-}
-
-.jarves-main-menu-user .profile-image {
-    max-width: 20px;
-    margin: 0 15px;
-    vertical-align: text-bottom;
-}
-
-.jarves-menu-withRightTopBorderRadius {
-    -moz-border-radius-topright: 5px;
-    -webkit-border-top-right-radius: 5px;
-    border-top-right-radius: 5px;
-}
-
-div.jarves-mainLinks a.bar-dock-logo {
-    width: 30px;
-    padding-left: 5px;
-    padding-right: 5px;
-}
-
-.jarves-main-menu-login-name {
-    text-decoration: none;
-    padding: 8px 5px;
-    padding-top: 8px;
-    font-weight: bold;
+    background-color: $mainColor;
+    height: 32px;
 }
 
 .jarves-iconbar-item {
@@ -555,8 +433,7 @@ div.jarves-mainLinks a.bar-dock-logo {
     display: inline-block;
 }
 
-.jarves-iconbar-item > a,
-.jarves-iconbar-item > a:link {
+.jarves-iconbar-item > a {
     color: #f3f3f3;
     padding: 0 2px;
     display: inline-block;
@@ -640,12 +517,6 @@ img.jarves-main-menu-start {
     width: 55px;
 }
 
-.jarves-main-menu-logo-container {
-    margin-top: 13px;
-    @include line-top-right(13px);
-    padding: 6px 0;
-}
-
 .jarves-search-query-icon {
     position: absolute;
     right: 31px;
@@ -700,8 +571,7 @@ a.jarves-create-search-index-icon.red {
     padding-left: 19px;
 }
 
-.jarves-mini-search-results a,
-.jarves-mini-search-results a:link {
+.jarves-mini-search-results a {
     display: block;
     margin-bottom: 2px;
 }

@@ -1,19 +1,17 @@
 
-$mainColor: #040f14;
-$mainColor: #041114;
+$blackMainColor: #041114;
+$mainColor: #f0f0f0;
+$textColor: #111;
 
-$mainLinkColor: #227ba6;
-$mainLinkColor: #3195c5;
-$mainLinkColor: #3195c5;
-$mainLinkColor: #CCEBF7;
-
+$mainLinkColor: $blackMainColor;
 $buttonColor: #f8f8f8;
 $buttonColorPrimary: $mainColor;
 
-$linkHoverColor: lighten($mainLinkColor, 60%);
-$linkHoverBgColor: lighten($mainColor, 15%);
-$linkBgColor: lighten($mainColor, 2%);
-$linkColor: white;
+$linkColor: $blackMainColor;
+$linkBgColor: darken($mainColor, 10%);
+
+$linkHoverColor: black;
+$linkHoverBgColor: darken($mainColor, 15%);
 
 @function strip-unit($num) {
     @return $num / ($num * 0 + 1);

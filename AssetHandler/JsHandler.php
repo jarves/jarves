@@ -109,12 +109,20 @@ EOF
             }
         }
 
-        if (true || !$fileUpToDate) {
-            $result = $this->getJarves()->getUtils()->compressJs(
-                $files,
-                $oFile
-            );
-            $content = $md5Line . $this->getJarves()->getWebFileSystem()->read($oFile);
+        if (!$fileUpToDate) {
+            // googles minifier
+//            $result = $this->getJarves()->getUtils()->compressJs(
+//                $files,
+//                $oFile
+//            );
+            $content = '';
+            foreach ($files as $assetPath) {
+                $content .= "\n/* $assetPath */\n\n";
+                $path = $this->getJarves()->resolveWebPath($assetPath);
+                $content .= file_get_contents($path);
+            }
+
+            $content = $md5Line . $content;
             $this->getJarves()->getWebFileSystem()->write($oFile, $content);
         }
 

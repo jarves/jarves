@@ -2,7 +2,6 @@
 
 .jarves-Input-text,
 input.text {
-    color: #eee;
     font-size: 12px;
     line-height: 28px;
     height: 28px;
@@ -20,7 +19,6 @@ input.text {
 
     display: inline-block;
 
-    background-color: lighten($mainColor, 5%);
 
     min-width: 20px;
 
@@ -28,8 +26,11 @@ input.text {
 
     @include box-sizing(border-box);
     @include transition(all 0.2s ease-out);
-    border: 1px solid lighten($mainColor, 8%);
+    background-color: lighten($mainColor, 5%);
+    border: 1px solid darken($mainColor, 8%);
+    border-radius: 2px;
 }
+
 .jarves-Input-text:hover,
 input.text:hover {
     background-color: lighten($mainColor, 7%);

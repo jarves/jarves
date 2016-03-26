@@ -89,6 +89,7 @@ input.jarves-user-acl-query {
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
+    background-color: #C7C7C7;
 }
 
 .jarves-user-acl-object-list {

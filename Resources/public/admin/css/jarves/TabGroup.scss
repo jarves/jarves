@@ -2,22 +2,24 @@
 
 .jarves-tabGroup,
 .jarves-tabGroup-small {
-    @include line-bottom;
     position: relative;
     white-space: nowrap;
     text-align: left;
     padding: 1px 0;
 }
 
+
 .jarves-admin .jarves-Window-win-titleGroups {
-    .jarves-tabGroup, .jarves-tabGroup-small {
+    .jarves-tabGroup,
+    .jarves-tabGroup-small {
         border-bottom: 0;
         height: 30px;
-        display: inline-block;
+        text-align: center;
+        background-color: #e4e4e4;
     }
     a.jarves-tabGroup-item {
-        line-height: 29px;
-        height: 29px;
+        line-height: 30px;
+        height: 31px;
     }
 }
 
@@ -48,7 +50,7 @@
     line-height: 22px;
     height: 24px;
     font-size: 13px;
-    background-color: lighten($mainColor, 3%);
+    background-color: darken($mainColor, 6%);
 }
 
 .jarves-admin .jarves-tabGroup-small a.jarves-tabGroup-item {
@@ -76,13 +78,13 @@
  }
 
 .jarves-admin a.jarves-tabGroup-item:hover {
-    background-color: lighten($mainColor, 3%);
-    color: #eee;
+    background-color: darken($mainColor, 4%);
+    color: #333;
 }
 
 .jarves-admin a.jarves-tabGroup-item-active,
 .jarves-admin a.jarves-tabGroup-item-active:hover  {
     position: relative;
-    color: white;
-    background-color: lighten($mainColor, 15%);
+    color: #222;
+    background-color: $mainColor;
 }

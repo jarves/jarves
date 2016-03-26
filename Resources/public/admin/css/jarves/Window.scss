@@ -14,12 +14,8 @@
 .jarves-Window-border > .jarves-Layout-main-fixed {
     bottom: 0;
     left: 0;
-    right: 25px;
+    right: 0;
     top: 39px;
-}
-
-.jarves-dialog-content .jarves-Window-border > .jarves-Layout-main-fixed {
-    left: 25px;
 }
 
 .jarves-frontpage-backend .jarves-Window-border {
@@ -83,8 +79,8 @@
 .jarves-Window-win-titleGroups {
 //    @include line-top-left;
 //    margin-bottom: 11px;
-//    height: 54px;
-    padding-top: 5px;
+    height: 54px;
+    //padding-top: 5px;
     @include box-sizing(border-box);
 }
 
@@ -290,7 +286,7 @@ h3.jarves-headline {
     color: white;
 
     position: relative;
-    background-color: lighten($mainColor, 15%);
+    background-color: darken($mainColor, 15%);
 }
 
 .jarves-jarves-Window-sizer {
@@ -369,7 +365,7 @@ h3.jarves-headline {
     top: 93px;
     bottom: 40px;
     width: 150px;
-    color: #ddd;
+    color: #333;
 }
 
 .jarves-Window-sidebar-title {
@@ -388,7 +384,7 @@ h3.jarves-headline {
     bottom: 0;
     right: 0;
     overflow: auto;
-    background-color: #021216;
+    background-color: darken($mainColor, 10%);
 }
 
 .jarves-Window-sidebar .jarves-Window-sidebar-container + .jarves-Splitter-main {
@@ -405,13 +401,17 @@ h3.jarves-headline {
     background-image: none;
     background-color: transparent;
     box-shadow: none;
-    color: white;
     border: 0;
     padding: 0 15px;
     text-align: left;
     margin: 0;
     cursor: pointer;
     @include transition(all 0.2s ease-out);
+
+    &:hover {
+        color: black;
+        background-color: darken($mainColor, 15%);
+    }
 }
 
 .jarves-Window-sidebar a.jarves-Button-pressed,
@@ -421,7 +421,7 @@ h3.jarves-headline {
     top: 0;
     box-shadow: none;
     background-image: none;
-    background-color: #3d3d3d;
+    background-color: darken($mainColor, 30%);
 }
 
 .jarves-Window-sidebar a.jarves-Button-deactivate,
@@ -429,28 +429,21 @@ h3.jarves-headline {
 .jarves-Window-sidebar a.jarves-Button-deactivate:active,
 .jarves-Window-sidebar a.jarves-Button-deactivate:hover {
     cursor: default;
-    color: #808080;
-//    background-color: rgba(0, 0, 0, 0);
+    color: #A5A5A5;
 }
 
 .jarves-Window-sidebar a.jarves-Select-box,
 .jarves-Window-sidebar a.jarves-Select-box:link {
-//    background-image: none;
-//    background-color: transparent;
-    padding: 0 15px;
-    color: white;
+    padding: 0 8px;
     width: 100% !important;
-//    border: 1px solid #9C9C9C;
+    border-left: 0;
+    border-bottom: 1px solid silver;
 }
 
 .jarves-Window-sidebar .jarves-Select-arrow {
 //    background-image: none;
 //    background-color: transparent;
 //    border-left: 1px solid #9f9f9f;
-}
-
-.jarves-Window-sidebar .jarves-Select-arrow:before {
-    color: #eee;
 }
 
 .jarves-Window-sidebar .jarves-Splitter-main {

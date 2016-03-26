@@ -636,9 +636,9 @@ jarves.AdminInterface = new Class({
         this.loginLangSelection.inject(form);
 
         this.loginLangSelection.addEvent('change',function() {
-            this.loadLanguage(this.loginLangSelection.getValue());
+            jarves.loadLanguage(this.loginLangSelection.getValue());
             this.reloadLogin();
-        }).inject(form);
+        }.bind(this)).inject(form);
 
         Object.each(jarves.possibleLangs, function(lang) {
             this.loginLangSelection.add(lang.code, lang.title + ' (' + lang.langtitle + ')');
@@ -873,11 +873,11 @@ jarves.AdminInterface = new Class({
 
     blockLoginForm: function(pAlready) {
         if (pAlready) {
-            this.loaderTop.setStyles({'height': 91, 'border-bottom': '1px solid #aaaaaa'});
-            this.loaderBottom.setStyles({'height': 92, 'border-top': '1px solid #aaaaaa'});
+            this.loaderTop.setStyles({'height': 91, 'border-bottom': '1px solid #868686'});
+            this.loaderBottom.setStyles({'height': 92, 'border-top': '1px solid #868686'});
         } else {
-            this.loaderTop.morph({'height': 91, 'border-bottom': '1px solid #aaaaaa'});
-            this.loaderBottom.morph({'height': 92, 'border-top': '1px solid #aaaaaa'});
+            this.loaderTop.morph({'height': 91, 'border-bottom': '1px solid #868686'});
+            this.loaderBottom.morph({'height': 92, 'border-top': '1px solid #868686'});
         }
     },
 
