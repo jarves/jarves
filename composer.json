@@ -1,5 +1,5 @@
 {
-    "name": "jarves\/jarves-bundle",
+    "name": "jarves\/jarves",
     "description": "An open-source Content-Management-System CMS as Symfony Bundle.",
     "keywords": [
         "CMS",
@@ -44,8 +44,8 @@
         "leafo/scssphp": ">=0.6.1"
     },
     "require-dev": {
-        "phpunit\/phpunit": "~3.7",
-        "jarves\/demotheme-bundle": "dev-master",
-        "jarves\/publication-bundle": "dev-master"
+        "phpunit/phpunit": "~3.7",
+        "jarves/demotheme-bundle": "dev-master",
+        "jarves/publication-bundle": "dev-master"
     }
 }
