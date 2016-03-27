@@ -61,20 +61,23 @@ class TypePlugin extends AbstractType
         return $this->jarves;
     }
 
-    public function exceptionHandler(GetResponseForExceptionEvent $event) {
-        throw new PluginException(sprintf(
-            'The plugin `%s` from bundle `%s` [%s] returned a wrong result.',
-            $this->plugin['plugin'],
-            $this->bundleName,
-            $this->pluginDef->getClass() . '::' . $this->pluginDef->getMethod()
-        ), null, $event->getException());
+    public function exceptionHandler(GetResponseForExceptionEvent $event)
+    {
+        throw new PluginException(
+            sprintf(
+                'The plugin `%s` from bundle `%s` [%s] returned a wrong result.',
+                $this->plugin['plugin'],
+                $this->bundleName,
+                $this->pluginDef->getClass() . '::' . $this->pluginDef->getMethod()
+            ), null, $event->getException()
+        );
     }
 
     public function setContent(ContentInterface $content)
     {
         parent::setContent($content);
         $this->plugin = json_decode($content->getContent(), 1);
-        $this->bundleName = $this->plugin['bundle'] ? : $this->plugin['module']; //module for BC
+        $this->bundleName = $this->plugin['bundle'] ?: $this->plugin['module']; //module for BC
     }
 
     public function fixResponse(GetResponseForControllerResultEvent $event)
@@ -84,10 +87,18 @@ class TypePlugin extends AbstractType
         if ($data instanceof PluginResponse) {
             $response = $data;
         } else {
-            $response = new PluginResponse('');
+            $response = new PluginResponse($data);
         }
         $response->setControllerRequest($event->getRequest());
         $event->setResponse($response);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPreview()
+    {
+        return isset($this->getParameters()['preview']) ? $this->getParameters()['preview'] : false;
     }
 
     public function render()
@@ -110,13 +121,25 @@ class TypePlugin extends AbstractType
 
                 if (class_exists($clazz)) {
                     if (method_exists($clazz, $method)) {
+                        if ($this->isPreview()) {
+                            if (!$this->pluginDef->isPreview()) {
+                                //plugin does not allow to have a preview on the actual action method,
+                                //so try <method>Preview
+                                if (method_exists($clazz, $method . 'Preview')) {
+                                    $method = $method . 'Preview';
+                                } else {
+                                    return $config->getLabel() . ': ' . $this->pluginDef->getLabel();
+                                }
+                            }
+                        }
+
                         //create a sub request
                         $request = new Request();
                         $request->attributes->add(
                             array(
-                                 '_controller' => $clazz . '::' . $method,
-                                 '_content' => $this->getContent(),
-                                 'options' => isset($this->plugin['options']) ? $this->plugin['options'] : array()
+                                '_controller' => $clazz . '::' . $method,
+                                '_content' => $this->getContent(),
+                                'options' => isset($this->plugin['options']) ? $this->plugin['options'] : array()
                             )
                         );
 

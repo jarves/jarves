@@ -4,7 +4,7 @@ namespace Jarves\Configuration;
 
 class Plugin extends Model
 {
-    protected $attributes = ['id'];
+    protected $attributes = ['id', 'preview'];
 
     /**
      * @var string
@@ -35,6 +35,16 @@ class Plugin extends Model
      * @var Field[]
      */
     protected $options;
+
+    /**
+     * Whether the action in the controller is also usable as preview or not.
+     * If the controller for examples has requirements in queryString its not possible,
+     * but the plugin could use a additional preview method (listing() => listingPreview()) that
+     * does not have the requirement.
+     *
+     * @var bool
+     */
+    protected $preview = false;
 
     /**
      * @param Route[] $routes
@@ -161,6 +171,22 @@ class Plugin extends Model
     public function getMethod()
     {
         return $this->method;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isPreview()
+    {
+        return $this->preview;
+    }
+
+    /**
+     * @param boolean $preview
+     */
+    public function setPreview($preview)
+    {
+        $this->preview = $this->bool($preview);
     }
 
 }

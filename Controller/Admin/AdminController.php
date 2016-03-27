@@ -164,7 +164,9 @@ class AdminController extends Controller
 
         $render = $this->getJarves()->getContentRender();
 
-        return $render->renderContent($contentObject);
+        return $render->renderContent($contentObject, [
+            'preview' => true
+        ]);
     }
 
     /**

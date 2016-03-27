@@ -439,7 +439,7 @@ class Jarves
     /**
      * @param Node $currentPage
      */
-    public function setCurrentPage($currentPage)
+    public function setCurrentPage(Node $currentPage)
     {
         $this->currentPage = $currentPage;
     }

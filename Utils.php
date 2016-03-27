@@ -5,7 +5,7 @@ namespace Jarves;
 use Icap\HtmlDiff\HtmlDiff;
 use Jarves\Model\AppLockQuery;
 use Jarves\Model\Base\NodeQuery;
-use Symfony\Component\HttpFoundation\Response;
+use Jarves\Model\Node;
 
 class Utils
 {
@@ -143,7 +143,6 @@ class Utils
      * Creates a temp folder and returns its path.
      * Please use TempFile::createFolder() class instead.
      *
-     * @static
      * @internal
      *
      * @param  string $prefix
@@ -185,7 +184,6 @@ class Utils
      * @param int $domainId If not defined, it returns the current domain.
      *
      * @return \Jarves\Model\Domain
-     * @static
      */
     public function getDomain($domainId = null)
     {
@@ -213,8 +211,7 @@ class Utils
      *
      * @param  int $pageId If not defined, it returns the current page.
      *
-     * @return \Page
-     * @static
+     * @return Node
      */
     public function getPage($pageId = null)
     {
@@ -236,8 +233,6 @@ class Utils
 
     /**
      * Returns the domain of the given $id page.
-     *
-     * @static
      *
      * @param  integer $id
      *
@@ -577,7 +572,6 @@ class Utils
      * @param  mixed $objectPk        Propel PK for $objectClassName int, string or array
      *
      * @return mixed Propel object
-     * @static
      */
     public function getPropelCacheObject($objectClassName, $objectPk)
     {
