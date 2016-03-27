@@ -195,7 +195,7 @@ class  Condition extends Model
 //        if ($objectKey) {
 //            $def = $this->getJarves()->getObjects()->getDefinition($objectKey);
 //            if ($def) {
-//                $tableName = $this->getJarves()->getSystemConfig()->getDatabase()->getPrefix() . $def->getTable();
+//                $tableName = $def->getTable();
 //            }
 //        }
 //
@@ -537,7 +537,7 @@ class  Condition extends Model
             if (null === $ovalue && $objectKey && $definition = $this->getJarves()->getObjects()->getDefinition($objectKey)) {
                 $tableName = substr($field, 0, strpos($field, '.'));
                 $fieldName = substr($field, strpos($field, '.') + 1);
-                if ($tableName === $this->getJarves()->getSystemConfig()->getDatabase()->getPrefix().$definition->getTable()) {
+                if ($tableName === $definition->getTable()) {
                     $ovalue = $objectItem[$fieldName];
                 }
             }

@@ -54,7 +54,12 @@ class CreateTest extends KernelAwareTestCase
         $date = ('+'. rand(2, 30) . ' days +' . rand(2, 24) . ' hours');
         $values = array(
             'title' => 'News item',
-            'intro' => 'Lorem ipsum',
+            'intro' => [
+                [
+                    'type' => 'text',
+                    'content' => 'Lorem ipsum'
+                ]
+            ],
             'newsDate' => strtotime($date),
             'lang' => 'en'
         );
@@ -63,7 +68,13 @@ class CreateTest extends KernelAwareTestCase
         $item = $this->getObjects()->get('JarvesPublicationBundle:News', $pk);
 
         $this->assertEquals($values['title'], $item['title']);
-        $this->assertEquals($values['intro'], $item['intro']);
+
+        $intro = $item['intro'][0];
+        $this->assertEquals($intro['content'], $item['intro'][0]['content']);
+        $this->assertEquals($intro['type'], $item['intro'][0]['type']);
+        $this->assertGreaterThan(0, $intro['id']);
+        $this->assertEquals($item['id'], $intro['foreignId']);
+
         $this->assertEquals($values['newsDate'], $item['newsDate']);
         $this->assertEquals($values['lang'], $item['lang']);
 

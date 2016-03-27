@@ -118,6 +118,10 @@ class Jarves
             return false;
         }
 
+        if (!$this->getRequest()) {
+            return false;
+        }
+
         return (0 === strpos($this->getRequest()->getPathInfo(), $adminPrefix . '/'));
     }
 

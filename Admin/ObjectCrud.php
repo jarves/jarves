@@ -1590,16 +1590,18 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      *          ....
      *     ],
      *
+     *     //same value across all items, all without underscore
      *     fixedField1: 'asd',
-     *     fixedField2: 'fgh',
+     *     field3: 'fgh',
      *
-     *     _: 'first', //take a look at `$this->getJarves()->getObjects()->add()` at parameter `$pPosition`
+     *     _position: 'first', //take a look at `$this->getJarves()->getObjects()->add()` at parameter `$pPosition`
      *     _pk: {
      *         id: 123132
      *     },
-     *     _targetObjectKey: 'node' //can differ between the actual object and the target (if we have a different object as root,
-     *                              //then only position `first` and 'last` are available.)
      *
+     *     //can differ between the actual object and the target (if we have a different object as root,
+     *     //then only position `first` and 'last` are available.)
+     *     _targetObjectKey: 'jarves/node'
      *
      * }
      *
@@ -1963,9 +1965,10 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
         foreach ($fields as $field) {
             $key = lcfirst($field->getId());
-            $value = @$data[$key];
+            $value = isset($data[$key]) ? $data[$key] : null;
+
             if (null == $value && $defaultData) {
-                $value = @$defaultData[$key];
+                $value = isset($defaultData[$key]) ? $defaultData[$key] : null;
             }
 
             if ($field['customValue'] && method_exists($this, $method = $field['customValue'])) {

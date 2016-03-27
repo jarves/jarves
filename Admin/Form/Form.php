@@ -87,7 +87,7 @@ class Form {
      */
     public function addField(Field $field)
     {
-        $field->setForm($field);
+        $field->setForm($this);
         $this->fields[] = $field;
     }
 }

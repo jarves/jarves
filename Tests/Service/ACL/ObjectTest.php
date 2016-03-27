@@ -48,7 +48,7 @@ class ObjectTest extends AuthTestCase
         ];
         $this->assertEquals($expectedArray, $condition->toArray());
         $this->assertEquals([':p1' => 'TestNode tree'], $params);
-        $this->assertEquals(' jarves_system_node.title = :p1  OR 1= 1', $sql);
+        $this->assertEquals(' system_node.title = :p1  OR 1= 1', $sql);
     }
 
     public function testNestedSubPermission()
@@ -251,7 +251,7 @@ class ObjectTest extends AuthTestCase
 
         $item1 = new Item();
         $item1->setTitle('Item 1');
-        $item1->addCategory($cat1);
+        $item1->addItemCategory($cat1);
         $item1->save();
 
         $cat2 = new ItemCategory();
@@ -259,7 +259,7 @@ class ObjectTest extends AuthTestCase
 
         $item2 = new Item();
         $item2->setTitle('Item 2');
-        $item2->addCategory($cat2);
+        $item2->addItemCategory($cat2);
         $item2->save();
 
         $this->getACL()->removeObjectRules('test/item');

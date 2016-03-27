@@ -26,13 +26,12 @@ class NestedTest extends KernelAwareTestCase
             '_multiple' => true,
             '_position' => 'next',
             '_pk' => ['id' => $blog->getId()],
-            '_targetObjectKey' => 'JarvesBundle:Node'
+            '_targetObjectKey' => 'jarves/node'
         );
 
         $response = $this->restCall('/jarves/object/jarves/node/:multiple', 'POST', $post);
 
         $this->assertEquals(200, $response['status']);
-        var_dump($response['data']);
         $this->assertGreaterThan(1, $response['data'][0]['id']);
 
         $id = $response['data'][0]['id'];

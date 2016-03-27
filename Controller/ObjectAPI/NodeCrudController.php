@@ -264,10 +264,10 @@ class NodeCrudController extends NestedObjectCrudController
 
     public $titleField = 'Node';
 
-    public $workspace = true;
+    public $workspace = false;
 
 //    public $domainDepended = true;
-    public $multiLanguage = true;
+    public $multiLanguage = false;
 
     public $multiDomain = false;
 

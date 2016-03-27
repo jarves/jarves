@@ -16,6 +16,8 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Finder\Finder;
 
 /**
+ * This is not in use anymore.
+ *
  * Class PropelHelper
  *
  * @package Core

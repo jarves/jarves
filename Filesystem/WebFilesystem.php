@@ -5,7 +5,7 @@ namespace Jarves\Filesystem;
 use Jarves\Jarves;
 use Jarves\File\FileInfo;
 use Jarves\Filesystem\Adapter\AdapterInterface;
-use Propel\Runtime\Propel;
+use Jarves\Model\FileQuery;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Finder\Finder;
 
@@ -164,17 +164,7 @@ class WebFilesystem extends Filesystem
             return $id;
         }
 
-        //page bases caching here
-        $sql = 'SELECT path
-        FROM ' . $this->getJarves()->getSystemConfig()->getDatabase()->getPrefix() . 'system_file
-        WHERE id = ' . ($id + 0);
-        $con = Propel::getReadConnection('default');
-        $stmt = $con->prepare($sql);
-
-        $stmt->execute();
-
-        return $stmt->fetchColumn();
-
+        return FileQuery::create()->select('path')->findOneBy($id);
     }
 
     public function move($source, $target)

@@ -1181,18 +1181,6 @@ function step3()
                 <td><input required type="text" class="jarves-Input-text" name="db" id="db_name" value="<?php echo $jarves->getSystemConfig()->getDatabase()->getMainConnection()->getName() ?>"/></td>
             </tr>
             <tr>
-                <td>Table Prefix
-                    <div style="color: #aaa">
-                        Please use only a lowercase string.<br />
-                        In the next step all tables with a name that starts with this prefix WILL BE DROPPED!<br/>
-                        If you don't enter a prefix ALL TABLES WILL BE REMOVED in this database/schema.
-
-                    </div>
-                </td>
-                <td><input style="width: 80px" type="text" class="jarves-Input-text" name="prefix" id="db_prefix"
-                           value="<?php echo $jarves->getSystemConfig()->getDatabase()->getPrefix() ?: 'jarves_' ?>"/></td>
-            </tr>
-            <tr>
                 <td colspan="2">
                     <br/>
                     * Required fields.

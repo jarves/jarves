@@ -97,7 +97,12 @@ class Propel implements BuildInterface
         }
     }
 
-    protected function getSchema(Object $object)
+    /**
+     * @param Object $object
+     *
+     * @return string
+     */
+    public function getSchema(Object $object)
     {
         $xml = simplexml_load_string('<database></database>');
         $this->declareTable($xml, $object);

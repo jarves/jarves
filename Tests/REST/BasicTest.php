@@ -42,7 +42,7 @@ class BasicTest extends KernelAwareTestCase
         $response = $this->restCall('/jarves/object/jarves/node/');
 
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals(14, count($response['data']), "we have 14 nodes from the installation script.");
+        $this->assertGreaterThanOrEqual(14, count($response['data']), "we have at least 14 nodes from the installation script.");
 
         ItemQuery::create()->deleteAll();
 

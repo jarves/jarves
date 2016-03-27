@@ -322,12 +322,12 @@ class Objects
     {
         static $tableName;
         if ($tableName && $tableName[$objectKey]) {
-            return $this->getJarves()->getSystemConfig()->getDatabase()->getPrefix() . $tableName[$objectKey];
+            return $tableName[$objectKey];
         }
         $def = $this->getDefinition($objectKey);
         $tableName[$objectKey] = $def['table'];
 
-        return $this->getJarves()->getSystemConfig()->getDatabase()->getPrefix() . $tableName[$objectKey];
+        return $tableName[$objectKey];
     }
 
     /**

@@ -1,8 +1,8 @@
 language: php
 
 php:
-  - 5.4
-  - 5.5
+  - 5.6
+  - 7.0
 
 env:
   - DB_TYPE=mysql DB_USER=root DB_NAME=test
@@ -21,4 +21,7 @@ before_script:
 
   - Tests/Integration/skeletion/app/console jarves:configuration:database $DB_TYPE $DB_NAME $DB_USER --server=$DB_SERVER
   - rm -rf Tests/Integration/skeletion/app/cache/*
+  - Tests/Integration/skeletion/app/console propel:model:build
+  - Tests/Integration/skeletion/app/console propel:migration:diff
+  - Tests/Integration/skeletion/app/console propel:migration:up
   - Tests/Integration/skeletion/app/console jarves:install:demo localhost /

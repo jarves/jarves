@@ -1037,6 +1037,15 @@ class Propel extends ORMAbstract
                         $coll = new ObjectCollection();
                         $coll->setModel(ucfirst($foreignClass));
 
+                        if (!is_array($fieldValue)) {
+                            throw new \LogicException(sprintf(
+                                'Relation `%s` on object %s requires array value, not %s',
+                                $relation->getName(),
+                                $this->getObjectKey(),
+                                gettype($fieldValue)
+                            ));
+                        }
+
                         foreach ($fieldValue as $foreignItem) {
                             $pk = $self->getJarves()->getObjects()->getObjectPk(
                                 $relation->getForeignObjectKey(),

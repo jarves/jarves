@@ -64,39 +64,39 @@ class RelationTest extends KernelAwareTestCase
         $this->assertTrue($reflection->hasMethod('getCategoryCrossItems')); //<objectRefRelationName>CategoryCrossItems</objectRefRelationName>
     }
 
-    /**
-     * @group test
-     */
-    public function testContentElements()
-    {
-        ContentElementItemQuery::create()->deleteAll();
-        $contents = array();
-
-        $contents[] = array(
-            'slotId' => 1,
-            'type' => 'text',
-            'content' => 'Hello World'
-        );
-
-        $contents[] = array(
-            'slotId' => 2,
-            'type' => 'text',
-            'content' => 'Hello Peter'
-        );
-
-        $data = array(
-            'name' => 'Peter',
-            'content' => $contents
-        );
-        $pk = $this->getJarves()->getObjects()->add('test/contentElementItem', $data);
-
-        $addedItem = $this->getJarves()->getObjects()->get('test/contentElementItem', $pk);
-
-        $this->assertEquals('Peter', $addedItem['name']);
-        $this->assertCount(2, $addedItem['content']);
-        $this->assertEquals('Hello World', $addedItem['content'][0]['content']);
-        $this->assertEquals('Hello Peter', $addedItem['content'][1]['content']);
-    }
+//    /**
+//     * @group test
+//     */
+//    public function testContentElements()
+//    {
+//        ContentElementItemQuery::create()->deleteAll();
+//        $contents = array();
+//
+//        $contents[] = array(
+//            'slotId' => 1,
+//            'type' => 'text',
+//            'content' => 'Hello World'
+//        );
+//
+//        $contents[] = array(
+//            'slotId' => 2,
+//            'type' => 'text',
+//            'content' => 'Hello Peter'
+//        );
+//
+//        $data = array(
+//            'name' => 'Peter',
+//            'content' => $contents
+//        );
+//        $pk = $this->getJarves()->getObjects()->add('test/contentElementItem', $data);
+//
+//        $addedItem = $this->getJarves()->getObjects()->get('test/contentElementItem', $pk);
+//
+//        $this->assertEquals('Peter', $addedItem['name']);
+//        $this->assertCount(2, $addedItem['content']);
+//        $this->assertEquals('Hello World', $addedItem['content'][0]['content']);
+//        $this->assertEquals('Hello Peter', $addedItem['content'][1]['content']);
+//    }
 
     public function testNtoNRelation()
     {

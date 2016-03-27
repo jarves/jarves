@@ -86,7 +86,7 @@ class ConditionSubSelect extends Condition
         if ($objectKey) {
             $def = $this->getJarves()->getObjects()->getDefinition($objectKey);
             if ($def) {
-                $tableName = $this->getJarves()->getSystemConfig()->getDatabase()->getPrefix() . $def->getTable();
+                $tableName = $def->getTable();
             }
         }
 

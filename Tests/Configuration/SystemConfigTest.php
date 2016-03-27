@@ -51,9 +51,6 @@ class SystemConfigTest extends KernelAwareTestCase
     {
         $xml = '<config>
   <database>
-    <!--All tables will be prefixed with this string. Best practise is to suffix it with a underscore.
-    Examples: dev_, domain_ or prod_-->
-    <prefix>dev_</prefix>
     <connections>
       <!--
         type: mysql|pgsql|sqlite (the pdo driver name)
@@ -77,7 +74,6 @@ class SystemConfigTest extends KernelAwareTestCase
         $connection->setName('testdb');
 
         $database = new Database();
-        $database->setPrefix('dev_');
         $config->setDatabase($database);
         $config->getDatabase()->addConnection($connection);
 
@@ -237,7 +233,6 @@ class SystemConfigTest extends KernelAwareTestCase
         $config = new SystemConfig();
 
         $database = new Database();
-        $database->setPrefix('jarves_');
         $connection = new Connection();
         $connection->setType('mysql');
         $connection->setServer('127.0.0.1');
@@ -276,7 +271,6 @@ class SystemConfigTest extends KernelAwareTestCase
 
         $reverse = new SystemConfig($distConfig);
 
-        $this->assertEquals('jarves_', $reverse->getDatabase()->getPrefix());
         $firstConnection = $reverse->getDatabase()->getConnections()[0];
         $this->assertInstanceOf('Jarves\Configuration\Connection', $firstConnection);
         $this->assertEquals('mysql', $firstConnection->getType());

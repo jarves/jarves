@@ -13,9 +13,10 @@ use Jarves\Publication\Model\NewsVersionQuery;
 
 class WorkspacesTest extends KernelAwareTestCase
 {
-
     public function testDifferentWorkspaces()
     {
+        $this->markTestSkipped('Workspaces are not yet supported.');
+
         $this->getObjects()->clear('JarvesPublicationBundle:News');
 
         WorkspaceManager::setCurrent(0);
@@ -64,6 +65,8 @@ class WorkspacesTest extends KernelAwareTestCase
 
     public function testThroughCoreObjectWrapper()
     {
+        $this->markTestSkipped('Workspaces are not yet supported.');
+
         $this->getObjects()->clear('JarvesPublicationBundle:News');
         $count = $this->getObjects()->getCount('JarvesPublicationBundle:News');
         $this->assertEquals(0, $count);
@@ -121,6 +124,8 @@ class WorkspacesTest extends KernelAwareTestCase
 
     public function testThroughPropelObjects()
     {
+        $this->markTestSkipped('Workspaces are not yet supported.');
+
         NewsQuery::create()->deleteAll();
         NewsVersionQuery::create()->deleteAll();
 
