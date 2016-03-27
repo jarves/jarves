@@ -31,6 +31,8 @@ A end-user zip package can be downloaded at http://jarves.io when we've released
 
 Read the [installation documentation](Resources/doc/installation.md).
 
+Read the [Create A Theme](Resources/doc/create-a-theme.md), to create layouts for your website.
+
 Extensions
 ----------
 

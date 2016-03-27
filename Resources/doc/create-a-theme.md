@@ -103,10 +103,10 @@ The `1` means an identifier you can choose, Jarves uses to identify this place h
 `{{ navigationLevel(1) }}` means you want to place at this position a navigation containing all available nodes
 (administration -> Nodes. Types: pages, links, navigations) at the `1`, first level.
 
-Statements like `{{ navigationLevel(2) }}` is alos possible and means the second level of the current active navigation
+Statements like `{{ navigationLevel(2) }}` is also possible and means the second level of the current active navigation
 item.
 
-Per default for navigation generation uses the template `JarvesBundle:Default/navigation.html.twig`. If you want to use
+Per default for navigation generation, Jarves uses the template `JarvesBundle:Default/navigation.html.twig`. If you want to use
 your own, copy this file into your bundle, for example `src/AppBundle/Resources/views/Navigation/my-navigation.html.twig`
 and use it with `{{ navigationLevel(1, 'AppBundle:Navigation/my-navigation.html.twig') }}`.
 
@@ -115,7 +115,7 @@ and use it with `{{ navigationLevel(1, 'AppBundle:Navigation/my-navigation.html.
 
 Creating the file alone is not enough. You need to tell Jarves what this file is and how it should treat it.
 
-This is done in so called themes. In Jarves a theme is a collection of layouts. A layouts is typically just a template file.
+This is done in so called themes. In Jarves a theme is a collection of layouts. A layout is typically just a template file.
 
 You can either create a theme in the bundle editor or by creating the configuration file on your own.
 
@@ -143,8 +143,8 @@ If you create new files in `Resources/views` they appear in these select boxes a
 __Pro tip__: You can also define theme options (for example a color, or feature switch using a checkbox), but this is not covered
 in this tutorial, since mostly only themes that are distributed for third-partys are using this feature. 
 
-If you configured everything correct, you should click 'Save' at the bottom right, so let Jarves create for you the configuration
-in  `src/AppBundle/Resources/config/jarves.themes.xml`. Make sure Jarves correctly wrote the file be checking the folder
+If you configured everything correctly, you should click 'Save' at the bottom right, to let Jarves create for you the configuration
+in  `src/AppBundle/Resources/config/jarves.themes.xml`. Make sure Jarves correctly wrote the file by checking the folder
  `src/AppBundle/Resources/config/`.
 
 ### Create the configuration xml
@@ -189,8 +189,8 @@ To understand all the `key`, `id`, `<label>` stuff please take a look into `Crea
 
 After creating all necessary files using the bundle editor or the configuration file directly, you should reload Jarves administration.
 
-Per default, Jarves scopes all available layouts for page by the chosen theme in the domain. So you need to choose your newly created theme
-in the domain you want use it. All pages inside this domain can now choose layouts from defined theme.
+Per default, Jarves scopes all available layouts for pages by the chosen theme in their domain. So you need to choose your newly created theme
+in the domain you want use it. All pages inside this domain can now choose layouts from the defined theme.
 
 ![Domain, theme setting](create-a-theme/pages-domain.png)
 
