@@ -262,18 +262,24 @@ class Utils
                     preg_match('/\s*\t*namespace ([a-zA-Z0-9_\\\\]+)/', $classPlain, $namespace);
                     $className = (count($namespace) > 1 ? $namespace[1] . '\\' : '') . $className[1];
                     $classReflection = new \ReflectionClass($className);
+
                     if ($classReflection->isSubclassOf('Jarves\Admin\ObjectCrud')) {
                         $tempObj = new $className();
+
                         if ($tempObj instanceof ContainerAwareInterface) {
                             $tempObj->setContainer($this->getJarves()->getContainer());
                         }
 
-                        $tempObj->initialize();
-                        if ($tempObj->getColumns()) {
-                            self::extractFrameworkFields($tempObj->getColumns());
-                        }
-                        if ($tempObj->getInitializedFields()) {
-                            self::extractFrameworkFields($tempObj->getFields());
+                        try {
+                            $tempObj->initialize();
+                            if ($tempObj->getColumns()) {
+                                self::extractFrameworkFields($tempObj->getColumns());
+                            }
+                            if ($tempObj->getInitializedFields()) {
+                                self::extractFrameworkFields($tempObj->getFields());
+                            }
+                        } catch (\Exception $e) {
+                            throw new \Exception(sprintf('Could not extract field from ' . $className), 0, $e);
                         }
                     }
 //                    if ($tempObj->tabFields) {

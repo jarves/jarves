@@ -652,11 +652,11 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      *
      * @param $fields
      */
-    public function prepareFieldDefinition(&$fields)
+    public function prepareFieldDefinition(array &$fields)
     {
-        $i = 0;
-
-        foreach ($fields as $key => $field) {
+        for ($i = 0; $i < count($fields); $i++) {
+            $key = array_keys($fields)[$i];
+            $field = $fields[$key];
             if (is_numeric($key) && !$field instanceof Field) {
 
                 $newItem = $this->objectDefinition->getField($field);
@@ -674,10 +674,8 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
                     array($field => $newItem),
                     array_slice($fields, $i + 1)
                 );
-                reset($fields);
                 $i = -1;
             }
-            $i++;
         }
 
         foreach ($fields as $key => &$field) {

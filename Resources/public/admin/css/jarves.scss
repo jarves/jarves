@@ -27,15 +27,15 @@ $base-font-size: 13px;
 }
 
 ::-webkit-scrollbar-corner {
-    background-color: darken($mainColor, 1%);
+    background-color: #8ca5aa;
 }
 
 ::-webkit-scrollbar-track-piece {
-    background-color: darken($mainColor, 3%);
+    background-color: #7A8F94;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: darken($mainColor, 7%);
+    background-color: lighten($blackMainColor, 11%);
 }
 
 .jarves-admin {

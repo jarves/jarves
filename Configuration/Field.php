@@ -293,6 +293,7 @@ class Field extends Model
     {
         $vars = parent::__sleep();
         $vars[] = 'objectDefinition';
+
         return $vars;
     }
 
@@ -310,12 +311,14 @@ class Field extends Model
 
     /**
      * @param bool $printDefaults
+     *
      * @return array
      */
     public function toArray($printDefaults = false)
     {
         $array = parent::toArray($printDefaults);
         $array['selection'] = $this->getFieldType()->getSelection();
+
         return $array;
     }
 
@@ -336,23 +339,27 @@ class Field extends Model
                     $object = $this->getObjectDefinition();
                 }
                 if (null === $object) {
-                    throw new ObjectNotFoundException(sprintf(
-                        'Object `%s` for predefined field `%s` not found.',
-                        $this->getObject(),
-                        $this->getId()
-                    ));
+                    throw new ObjectNotFoundException(
+                        sprintf(
+                            'Object `%s` for predefined field `%s` not found.',
+                            $this->getObject(),
+                            $this->getId()
+                        )
+                    );
                 }
                 if (!$fieldId = $this->getField()) {
                     $fieldId = $this->getId();
                 }
 
                 if (!$field = $object->getField($fieldId)) {
-                    throw new ObjectFieldNotFoundException(sprintf(
-                        'Field `%s` of Object `%s` for predefined field `%s` not found.',
-                        $fieldId,
-                        $object->getKey(),
-                        $this->getId()
-                    ));
+                    throw new ObjectFieldNotFoundException(
+                        sprintf(
+                            'Field `%s` of Object `%s` for predefined field `%s` not found.',
+                            $fieldId,
+                            $object->getKey(),
+                            $this->getId()
+                        )
+                    );
                 }
                 $type = $field->getType();
             }
@@ -360,7 +367,12 @@ class Field extends Model
                 $this->fieldType = $this->getJarves()->getFieldTypes()->newType($type);
             } catch (\Exception $e) {
                 if ($this->getObjectDefinition()) {
-                    $message = sprintf('FieldType `%s` for field `%s` in object `%s` not found.', $type, $this->getId(), $this->getObjectDefinition()->getId());
+                    $message = sprintf(
+                        'FieldType `%s` for field `%s` in object `%s` not found.',
+                        $type,
+                        $this->getId(),
+                        $this->getObjectDefinition()->getId()
+                    );
                 } else {
                     $message = sprintf('FieldType `%s` for field `%s` not found.', $type, $this->getId());
                 }
@@ -405,7 +417,7 @@ class Field extends Model
      * e.g. create cross foreignKeys for 1-to-n relations.
      *
      * @param \Jarves\Configuration\Object $object
-     * @param Configs $configs
+     * @param Configs                      $configs
      */
     public function bootRunTime(Object $object, Configs $configs)
     {
@@ -465,7 +477,7 @@ class Field extends Model
      */
     public function setOption($key, $value)
     {
-        $this->options = $this->options ? : new Options(null, $this->getJarves());
+        $this->options = $this->options ?: new Options(null, $this->getJarves());
         $this->options->setOption($key, $value);
     }
 
@@ -486,7 +498,6 @@ class Field extends Model
     {
         return $this->options ? $this->options->getOption($key) : null;
     }
-
 
     /**
      * @param Field[] $children
@@ -961,15 +972,15 @@ class Field extends Model
         return $this->requiredRegex;
     }
 
-	/**
-	 * Returns the internal data type.
-	 *
-	 * @return string
-	 */
-	public function getPhpDataType()
-	{
-		return $this->getFieldType()->getPhpDataType();
-	}
+    /**
+     * Returns the internal data type.
+     *
+     * @return string
+     */
+    public function getPhpDataType()
+    {
+        return $this->getFieldType()->getPhpDataType();
+    }
 
     /**
      * Hidden means here if the `needValue` is correct with the value of parent or `getAgainstField`.
