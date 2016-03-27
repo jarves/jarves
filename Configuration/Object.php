@@ -631,6 +631,14 @@ class Object extends Model
      */
     public function getApiController()
     {
+        return $this->apiController;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFinalApiController() {
+
         if (null === $this->apiController) {
 
             $defaultResource = '@JarvesBundle/Controller/AutomaticObjectCrudController.php';

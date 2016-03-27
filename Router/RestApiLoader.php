@@ -184,7 +184,7 @@ class RestApiLoader extends Loader
 
                         $this->setupRoutes(
                             $config,
-                            $object->getApiController(),
+                            $object->getFinalApiController(),
                             $pattern,
                             $object->getKey(),
                             $object

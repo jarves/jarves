@@ -9,6 +9,7 @@ class JsHandler extends AbstractHandler implements LoaderHandlerInterface
         if ($assetInfo->getPath()) {
             $path = $this->getAssetPath($assetInfo->getPath());
             $pubPath = $this->getPublicAssetPath($assetInfo->getPath());
+
             if (file_exists($path)) {
                 $pubPath .= '?c=' . substr(md5(filemtime($path)),0, 6);
             }

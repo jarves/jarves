@@ -3,26 +3,19 @@
 namespace Jarves\Tests;
 
 use Jarves\ContainerHelperTrait;
+use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class KernelAwareTestCase extends WebTestCase
 {
     use ContainerHelperTrait;
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
     protected $allCookies;
+    protected $container;
 
     public function setUp()
     {
-        static::$kernel = static::createKernel();
-        static::$kernel->boot();
-
+        static::bootKernel([]);
         $this->container = static::$kernel->getContainer();
     }
 
@@ -79,6 +72,26 @@ class KernelAwareTestCase extends WebTestCase
         $this->allCookies = $client->getCookieJar()->all();
 
         return $client->getInternalResponse()->getContent();
+    }
+
+    /**
+     * Creates a Client.
+     *
+     * @param array $options An array of options to pass to the createKernel class
+     * @param array $server  An array of server parameters
+     *
+     * @return Client A Client instance
+     */
+    protected static function createClient(array $options = array(), array $server = array())
+    {
+        if (!static::$kernel || !static::$kernel->getContainer()->has('test.client')) {
+            static::bootKernel($options);
+        }
+
+        $client = static::$kernel->getContainer()->get('test.client');
+        $client->setServerParameters($server);
+
+        return $client;
     }
 
     public function resetCookies()

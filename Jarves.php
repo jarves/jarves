@@ -15,9 +15,11 @@ use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\HttpKernel\KernelInterface;
 
-class Jarves extends Controller
+class Jarves
 {
+    use ContainerHelperTrait;
 
     /**
      * @var Configuration\Configs|Configuration\Bundle[]
@@ -103,6 +105,43 @@ class Jarves extends Controller
     }
 
     /**
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        $adminPrefix = $this->container->getParameter('jarves_admin_prefix');
+        if ('/' === substr($adminPrefix, -1)) {
+            $adminPrefix = substr($adminPrefix, 0, -1);
+        }
+
+        if (!$this->container->has('request')) {
+            return false;
+        }
+
+        return (0 === strpos($this->getRequest()->getPathInfo(), $adminPrefix . '/'));
+    }
+
+    public function isEditMode($nodeId = null)
+    {
+        $hasRequest = $this->container->has('request');
+
+        if ($nodeId) {
+            return $hasRequest && 1 == $this->getRequest()->get('_jarves_editor')
+            && $this->getACL()->checkUpdate(
+                'JarvesBundle:Node',
+                $nodeId
+            );
+        }
+
+        return $hasRequest && 1 == $this->getRequest()->get('_jarves_editor')
+        && $this->getJarves()->getCurrentPage()
+        && $this->getACL()->checkUpdate(
+            'JarvesBundle:Node',
+            $this->getJarves()->getCurrentPage()->getId()
+        );
+    }
+
+    /**
      * Creates all symlink in /web/<bundleName> to <bundlePath>/Resources/public
      * if not already.
      */
@@ -112,7 +151,9 @@ class Jarves extends Controller
         $bundles = 'web/bundles/';
         if (!is_dir($bundles)) {
             if (!@mkdir($bundles)) {
-                throw new \Exception(sprintf('Can not create `%s` directory. Please check permissions.', getcwd() . '/' . $bundles));
+                throw new \Exception(
+                    sprintf('Can not create `%s` directory. Please check permissions.', getcwd() . '/' . $bundles)
+                );
             }
         }
 
@@ -156,7 +197,7 @@ class Jarves extends Controller
      *
      * Default is $time is `mark all caches as invalid which are older than CURRENT`.
      *
-     * @param  string $key
+     * @param  string  $key
      * @param  integer $time Unix timestamp. Default is microtime(true). Uses float for ms.
      *
      * @return boolean
@@ -164,14 +205,14 @@ class Jarves extends Controller
     public function invalidateCache($key, $time = null)
     {
         if ($this->isDebugMode()) {
-            $time = $time ? : microtime(true);
+            $time = $time ?: microtime(true);
             $micro = sprintf("%06d", ($time - floor($time)) * 1000000);
             $this->getLogger()->addDebug(
                 sprintf('Invalidate `%s` (from %s)', $key, date('F j, Y, H:i:s.' . $micro, $time))
             );
         }
 
-        return $this->getCache()->invalidate($key, $time ? : microtime(true));
+        return $this->getCache()->invalidate($key, $time ?: microtime(true));
     }
 
     /**
@@ -244,8 +285,8 @@ class Jarves extends Controller
      * stores extra values at the value, which makes getCache() returning something invalid.
      *
      * @param string $key
-     * @param mixed $value Only simple data types. Serialize your value if you have objects/arrays.
-     * @param int $lifeTime
+     * @param mixed  $value Only simple data types. Serialize your value if you have objects/arrays.
+     * @param int    $lifeTime
      *
      * @return boolean
      * @static
@@ -314,7 +355,7 @@ class Jarves extends Controller
             $domainClientConfig = new Client($domainClientConfigXml);
         }
 
-        $domainClientClass = $domainClientConfig->getClass() ? : $defaultClientClass;
+        $domainClientClass = $domainClientConfig->getClass() ?: $defaultClientClass;
 
         return $this->client = new $domainClientClass($this, $domainClientConfig);
     }
@@ -322,7 +363,8 @@ class Jarves extends Controller
     /**
      * Terminates everything, each post request event.
      */
-    public function terminate() {
+    public function terminate()
+    {
         $this->adminClient = null;
         $this->client = null;
     }
@@ -337,7 +379,8 @@ class Jarves extends Controller
         if (null === $this->systemConfig) {
 
             $configFile = $this->getKernel()->getRootDir() . '/config/config.jarves.xml';
-            $configEnvFile = $this->getKernel()->getRootDir() . '/config/config.jarves_' . $this->getKernel()->getEnvironment() . '.xml';
+            $configEnvFile = $this->getKernel()->getRootDir() . '/config/config.jarves_' . $this->getKernel(
+                )->getEnvironment() . '.xml';
             if (file_exists($configEnvFile)) {
                 $configFile = $configEnvFile;
             }
@@ -367,7 +410,6 @@ class Jarves extends Controller
                 $database = $this->container->get('jarves.configuration.database');
                 $this->systemConfig->setDatabase($database);
             }
-
         }
 
         return $this->systemConfig;
@@ -447,6 +489,7 @@ class Jarves extends Controller
      * It's used for example in the web/bundles/ directory.
      *
      * @param string $bundleName
+     *
      * @return string
      */
     public function getShortBundleName($bundleName)
@@ -534,6 +577,7 @@ class Jarves extends Controller
 
     /**
      * @param string $bundleName
+     *
      * @return \Symfony\Component\HttpKernel\Bundle\BundleInterface
      */
     public function getBundle($bundleName)
@@ -561,6 +605,7 @@ class Jarves extends Controller
      * Jarves\JarvesBundle => JarvesBundle
      *
      * @param string $bundleClass
+     *
      * @return string
      */
     public function getBundleName($bundleClass)
@@ -572,6 +617,7 @@ class Jarves extends Controller
 
     /**
      * @param string $bundleName full className or bundleName or short bundleName
+     *
      * @return string with leading / relative to root folder
      */
     public function getBundleDir($bundleName)
@@ -609,6 +655,7 @@ class Jarves extends Controller
      * Checks if a (jarves) bundle is activated.
      *
      * @param string $bundleName
+     *
      * @return bool
      */
     public function isActiveBundle($bundleName)
@@ -618,6 +665,7 @@ class Jarves extends Controller
 
     /**
      * @param string $bundleName
+     *
      * @return bool
      */
     public function isJarvesBundle($bundleName)
@@ -634,8 +682,9 @@ class Jarves extends Controller
     }
 
     /**
-     * @param $nodeOrId
+     * @param      $nodeOrId
      * @param bool $fullUrl
+     *
      * @return string
      */
     public function getNodeUrl($nodeOrId, $fullUrl = false, $suppressStartNodeCheck = false)
@@ -672,7 +721,7 @@ class Jarves extends Controller
         }
 
         if ($fullUrl || !$currentDomain || $domainId != $currentDomain->getId()) {
-            $domain = $currentDomain ? : $this->getUtils()->getDomain($domainId);
+            $domain = $currentDomain ?: $this->getUtils()->getDomain($domainId);
 
             $domainName = $domain->getRealDomain();
             if ($domain->getMaster() != 1) {
@@ -728,7 +777,8 @@ class Jarves extends Controller
     /**
      * @param string $path
      * @param string $suffix
-     * @param bool $relativePath
+     * @param bool   $relativePath
+     *
      * @return string without trailing slash when relative
      * @throws Exceptions\BundleNotFoundException
      */
@@ -742,11 +792,13 @@ class Jarves extends Controller
             try {
                 $bundle = $this->getKernel()->getBundle($matches[1]);
             } catch (\InvalidArgumentException $e) {
-                throw new BundleNotFoundException(sprintf(
-                    'Bundle for `%s` (%s) not found.',
-                    $matches[1],
-                    $path
-                ), 0, $e);
+                throw new BundleNotFoundException(
+                    sprintf(
+                        'Bundle for `%s` (%s) not found.',
+                        $matches[1],
+                        $path
+                    ), 0, $e
+                );
             }
 
             $path = substr($path, strlen($matches[1]) + 1);
@@ -756,7 +808,7 @@ class Jarves extends Controller
             $path = trim($path, '/');
             $bundlePath = '/' . trim($bundlePath, '/');
 
-            $path = $bundlePath . ($suffix ? '/' . $suffix : '' ) . '/' . $path;
+            $path = $bundlePath . ($suffix ? '/' . $suffix : '') . '/' . $path;
         } else {
             $path = $root . $path;
         }
@@ -772,6 +824,7 @@ class Jarves extends Controller
      * Shortcut for $this->resolvePath($path, 'Resources/public')
      *
      * @param string $path
+     *
      * @return mixed
      */
     public function resolveInternalPublicPath($path)
@@ -781,6 +834,7 @@ class Jarves extends Controller
 
     /**
      * @param string $path
+     *
      * @return string
      * @throws Exceptions\BundleNotFoundException
      */
@@ -795,11 +849,13 @@ class Jarves extends Controller
             try {
                 $bundle = $this->getKernel()->getBundle(str_replace('@', '', $matches[1]));
             } catch (\InvalidArgumentException $e) {
-                throw new BundleNotFoundException(sprintf(
-                    'Bundle for `%s` (%s) not found.',
-                    $matches[1],
-                    $path
-                ), 0, $e);
+                throw new BundleNotFoundException(
+                    sprintf(
+                        'Bundle for `%s` (%s) not found.',
+                        $matches[1],
+                        $path
+                    ), 0, $e
+                );
             }
             $targetDir = 'web/bundles/' . $this->getShortBundleName($bundle->getName());
 
@@ -815,7 +871,7 @@ class Jarves extends Controller
             return $path;
         }
 
-        $webDir = realpath($this->getKernel()->getRootDir().'/../web') . '/';
+        $webDir = realpath($this->getKernel()->getRootDir() . '/../web') . '/';
 
         if ($path && '@' === $path[0]) {
             try {
@@ -837,7 +893,9 @@ class Jarves extends Controller
             );
 
             if (false !== $prefix) {
-                $path = substr($prefix, 1) . '/' . $path;
+                if ($prefix && $prefix = substr($prefix, 1)) {
+                    $path = $prefix . '/' . $path;
+                }
             }
         }
 
@@ -939,7 +997,7 @@ class Jarves extends Controller
      */
     public function getId()
     {
-        return 'jarves-' . ($this->getSystemConfig()->getId() ? : 'no-id');
+        return 'jarves-' . ($this->getSystemConfig()->getId() ?: 'no-id');
     }
 
 }

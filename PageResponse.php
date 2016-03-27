@@ -532,7 +532,7 @@ class PageResponse extends Response
             $html
         );
 
-        $this->getStopwatch()->stop('Render DocType');
+        $this->getStopwatch()->stop(sprintf('Render DocType [%s]', $this->getDocType()));
 //        $html = Jarves::parseObjectUrls($html);
 //        $html = Jarves::translate($html);
 //        Jarves::removeSearchBlocks($html);

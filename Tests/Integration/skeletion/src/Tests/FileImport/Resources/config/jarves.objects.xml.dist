@@ -3,7 +3,7 @@
     <objects>
       <object id="Test">
         <label>Test</label>
-        <class>Core\Models\Test</class>
+        <storageClass>Core\Models\Test</storageClass>
         <dataModel>custom</dataModel>
         <fields>
           <field id="id" type="number" primaryKey="true">

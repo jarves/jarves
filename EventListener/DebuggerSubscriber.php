@@ -40,9 +40,9 @@ class DebuggerSubscriber implements EventSubscriberInterface
 
     public function onKernelTerminate(PostResponseEvent $event)
     {
-        if ($this->jarves->has('profiler')) {
+        if ($this->jarves->getContainer()->has('profiler')) {
             /** @var $profiler \Symfony\Component\HttpKernel\Profiler\Profiler */
-            $profiler = $this->jarves->get('profiler');
+            $profiler = $this->jarves->getContainer()->get('profiler');
 
             if ($profile = $profiler->loadProfileFromResponse($event->getResponse())) {
                 $logRequest = $this->jarvesLogHandler->getLogRequest();

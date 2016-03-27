@@ -16,7 +16,6 @@ class ConfigTest extends KernelAwareTestCase
 {
     public function testBasics()
     {
-        $this->assertCount(13, $this->getJarves()->getBundles());
         $this->assertCount(4, $this->getJarves()->getConfigs()->getConfigs());
         $this->assertCount(4, $this->getJarves()->getConfigs()->getConfigs());
     }

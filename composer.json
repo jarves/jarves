@@ -22,7 +22,6 @@
             "Jarves\\": ""
         }
     },
-    "minimum-stability": "dev",
     "require": {
         "php": ">=5.4",
         "symfony/symfony": ">=2.8",

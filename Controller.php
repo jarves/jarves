@@ -1,11 +1,14 @@
 <?php
 
 namespace Jarves;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as sController;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
-class Controller extends sController implements ContainerAwareInterface {
-
+class Controller extends sController implements ContainerAwareInterface
+{
     use ContainerHelperTrait;
 
     /**
@@ -13,33 +16,11 @@ class Controller extends sController implements ContainerAwareInterface {
      */
     public function isAdmin()
     {
-        $adminPrefix = $this->container->getParameter('jarves_admin_prefix');
-        if ('/' === substr($adminPrefix, -1)) {
-            $adminPrefix = substr($adminPrefix, 0, -1);
-        }
-
-        if (!$this->getRequest()) {
-            return false;
-        }
-
-        return (0 === strpos($this->getRequest()->getPathInfo(), $adminPrefix.'/'));
+        return $this->container->get('jarves')->isAdmin();
     }
 
     public function isEditMode($nodeId = null)
     {
-        if ($nodeId) {
-            return $this->getRequest() && 1 == $this->getRequest()->get('_jarves_editor')
-            && $this->getACL()->checkUpdate(
-                'JarvesBundle:Node',
-                $nodeId
-            );
-        }
-
-        return $this->getRequest() && 1 == $this->getRequest()->get('_jarves_editor')
-        && $this->getJarves()->getCurrentPage()
-        && $this->getACL()->checkUpdate(
-            'JarvesBundle:Node',
-            $this->getJarves()->getCurrentPage()->getId()
-        );
+        return $this->container->get('jarves')->isEditMode($nodeId);
     }
 }

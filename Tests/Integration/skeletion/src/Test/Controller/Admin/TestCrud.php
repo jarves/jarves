@@ -2,7 +2,7 @@
 
 namespace Test\Controller\Admin;
  
-class TestCrud extends \Jarves\Controller\WindowController {
+class TestCrud extends \Jarves\Controller\ObjectCrudController {
 
     public $fields = array (
   '__Gazzo__' => 

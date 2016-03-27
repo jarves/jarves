@@ -330,9 +330,14 @@ class Local extends AbstractAdapter
             $fileInfo->setPath(substr($file, strlen($this->getRoot()) - 1));
             $fileInfo->setType(is_dir($file) ? FileInfo::DIR : FileInfo::FILE);
 
-            $fileInfo->setCreatedTime(filectime($file));
-            $fileInfo->setModifiedTime(filectime($file));
-            $fileInfo->setSize(filesize($file));
+            if (!is_link($file)) {
+                $fileInfo->setCreatedTime(filectime($file));
+                $fileInfo->setModifiedTime(filemtime($file));
+                if (is_file($file)) {
+                    $fileInfo->setSize(filesize($file));
+                }
+            }
+
             $items[] = $fileInfo;
         }
 

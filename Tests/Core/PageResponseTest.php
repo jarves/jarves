@@ -117,7 +117,7 @@ EOF;
         $assetsTags = $response->getAssetTags();
 
         $expected = '<script type="text/javascript" src="app_dev.php/jarves/admin/ui/languages"></script>';
-        $this->assertEquals($expected, $assetsTags['jsTags']);
+        $this->assertEquals($expected, trim($assetsTags['jsTags']));
     }
 
     public function testPrefixingDifferentEntryPointProd()
@@ -128,6 +128,7 @@ EOF;
         $request->server->set('SCRIPT_FILENAME', '/Users/marc/bude/symfony-24/web/app.php');
         $request->server->set('SCRIPT_NAME', '/symfony-24/web/app.php');
         $request->getBasePath();
+
         $this->getJarves()->getRequestStack()->push($request);
         $response = $this->getJarves()->getPageResponse();
         $prefix = substr($this->getJarves()->getAdminPrefix(), 1);
@@ -136,7 +137,7 @@ EOF;
         $assetsTags = $response->getAssetTags();
 
         $expected = '<script type="text/javascript" src="jarves/admin/ui/languages"></script>';
-        $this->assertEquals($expected, $assetsTags['jsTags']);
+        $this->assertEquals($expected, trim($assetsTags['jsTags']));
     }
 
 }

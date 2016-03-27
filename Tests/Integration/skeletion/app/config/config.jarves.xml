@@ -31,9 +31,9 @@
         <server>127.0.0.1</server>
         <port></port>
         <!--The schema/database name-->
-        <name>test</name>
+        <name>jarves-test</name>
         <username>root</username>
-        <password></password>
+        <password>marc</password>
       </connection>
     </connections>
   </database>

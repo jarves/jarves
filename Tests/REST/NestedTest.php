@@ -32,6 +32,7 @@ class NestedTest extends KernelAwareTestCase
         $response = $this->restCall('/jarves/object/jarves/node/:multiple', 'POST', $post);
 
         $this->assertEquals(200, $response['status']);
+        var_dump($response['data']);
         $this->assertGreaterThan(1, $response['data'][0]['id']);
 
         $id = $response['data'][0]['id'];

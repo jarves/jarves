@@ -113,7 +113,7 @@ class BundleConfigTest extends KernelAwareTestCase
     <objects>
       <object id="Test2">
         <label>Test</label>
-        <class>Core\Models\Test</class>
+        <storageClass>Core\Models\Test</storageClass>
         <dataModel>custom</dataModel>
         <fields>
           <field id="id" type="number" primaryKey="true">
@@ -172,7 +172,7 @@ class BundleConfigTest extends KernelAwareTestCase
     <objects>
       <object id="Test2">
         <label>Test</label>
-        <class>Core\Models\Test</class>
+        <storageClass>Core\Models\Test</storageClass>
         <dataModel>custom</dataModel>
         <fields>
           <field id="id" type="number" primaryKey="true">
@@ -425,7 +425,7 @@ class BundleConfigTest extends KernelAwareTestCase
         $xml = '<object id="View">
   <label>Template View</label>
   <desc>Template views</desc>
-  <class>\Admin\ObjectView</class>
+  <storageClass>\Admin\ObjectView</storageClass>
   <labelField>name</labelField>
   <dataModel>custom</dataModel>
   <nested>true</nested>
@@ -446,7 +446,7 @@ class BundleConfigTest extends KernelAwareTestCase
             'id' => 'View',
             'label' => 'Template View',
             'desc' => 'Template views',
-            'class' => '\\Admin\\ObjectView',
+            'storageClass' => '\\Admin\\ObjectView',
             'labelField' => 'name',
             'dataModel' => 'custom',
             'nested' => true,
@@ -477,7 +477,7 @@ class BundleConfigTest extends KernelAwareTestCase
         $object->setLabelField('name');
         $object->setDataModel('custom');
         $object->setNested(true);
-        $object->setClass('\Admin\ObjectView');
+        $object->setStorageClass('\Admin\ObjectView');
 
         $treeIconMapping = new TreeIconMapping(null, $this->getJarves());
         $treeIconMapping->setOption('dir', '#icon-folder-4');
@@ -496,7 +496,6 @@ class BundleConfigTest extends KernelAwareTestCase
 
         $object->setFields(array($field1, $field2));
 
-
         $this->assertEquals($xml, $object->toXml());
         $this->assertEquals($xmlObject->toXml(), $object->toXml());
         $this->assertEquals($xml, $xmlObject->toXml());
@@ -512,7 +511,7 @@ class BundleConfigTest extends KernelAwareTestCase
         $xml = '<object id="View">
   <label>Template View</label>
   <desc>Template views</desc>
-  <class>\Admin\ObjectView</class>
+  <storageClass>\Admin\ObjectView</storageClass>
   <labelField>name</labelField>
   <dataModel>custom</dataModel>
   <nested>true</nested>
@@ -541,7 +540,7 @@ class BundleConfigTest extends KernelAwareTestCase
         $object->setLabelField('name');
         $object->setDataModel('custom');
         $object->setNested(true);
-        $object->setClass('\Admin\ObjectView');
+        $object->setStorageClass('\Admin\ObjectView');
 
         $field1 = new Field(null, $this->getJarves());
         $field1->setId('path');

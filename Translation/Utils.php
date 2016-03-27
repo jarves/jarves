@@ -4,12 +4,36 @@ namespace Jarves\Translation;
 
 use Jarves\Controller;
 use Jarves\Exceptions\FileNotWritableException;
+use Jarves\Jarves;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Finder\Finder;
 
-class Utils extends Controller
+class Utils
 {
     public static $extractTranslations;
+
+    /**
+     * @var Jarves
+     */
+    protected $jarves;
+
+    /**
+     * Utils constructor.
+     *
+     * @param Jarves $jarves
+     */
+    public function __construct(Jarves $jarves)
+    {
+        $this->jarves = $jarves;
+    }
+
+    /**
+     * @return Jarves
+     */
+    protected function getJarves()
+    {
+        return $this->jarves;
+    }
 
     public function getPluralForm($lang, $onlyAlgorithm = false)
     {
@@ -70,7 +94,6 @@ class Utils extends Controller
                         $lastId = $nextIsThisContext . "\004" . $lastId;
                         $nextIsThisContext = false;
                     }
-
                 }
             }
 
@@ -101,7 +124,9 @@ class Utils extends Controller
                     $res['header'][substr($match[1], 0, $fp)] = str_replace('\n', '', substr($match[1], $fp + 2));
                 } else {
                     if (is_array($res['translations'][$lastId])) {
-                        $res['translations'][static::evalString($lastId)][$lastPluralId] .= static::evalString($match[1]);
+                        $res['translations'][static::evalString($lastId)][$lastPluralId] .= static::evalString(
+                            $match[1]
+                        );
                     } else {
                         if ($lastWasPlural) {
                             $res['plurals'][static::evalString($lastId)] .= static::evalString($match[1]);
@@ -111,7 +136,6 @@ class Utils extends Controller
                     }
                 }
             }
-
         }
 
         return $res;
@@ -121,6 +145,7 @@ class Utils extends Controller
      * @param string $bundle
      * @param string $lang
      * @param array  $translation
+     *
      * @return bool
      * @throws FileNotWritableException
      */
@@ -155,7 +180,6 @@ class Utils extends Controller
                 fwrite($fh, '"' . $k . ': ' . $v . '\n"' . "\n");
             }
             fwrite($fh, "\n\n");
-
         } else {
 
             //write initial header
@@ -171,7 +195,6 @@ class Utils extends Controller
 "Language: ' . $lang . '\n"
 "Plural-Forms: ' . $pluralForms . '\n"' . "\n\n"
             );
-
         }
         if (count($translations) > 0) {
 
@@ -195,22 +218,18 @@ class Utils extends Controller
                     foreach ($translation as $k => $v) {
                         fwrite($fh, 'msgstr[' . $k . '] ' . self::toPoString($v) . "\n");
                     }
-
                 } else {
                     fwrite($fh, 'msgstr ' . self::toPoString($translation) . "\n");
                 }
 
                 fwrite($fh, "\n");
-
             }
-
         }
         fclose($fh);
 
         $this->getJarves()->invalidateCache('core/lang');
 
         return true;
-
     }
 
     public static function toPoString($string)
@@ -222,14 +241,13 @@ class Utils extends Controller
         return '"' . $res . '"';
     }
 
-
     public function extractLanguage($bundleName)
     {
-        $root = realpath($this->getJarves()->getKernel()->getRootDir(). '/../');
+        $root = realpath($this->getJarves()->getKernel()->getRootDir() . '/../');
         $bundleDir = $this->getJarves()->getBundleDir($bundleName);
 
         $translations = [];
-        $translations = array_merge($translations, $this->readDirectory($bundleDir. 'Resources/views'));
+        $translations = array_merge($translations, $this->readDirectory($bundleDir . 'Resources/views'));
 
         $files = Finder::create()
             ->files()
@@ -240,9 +258,9 @@ class Utils extends Controller
             $classPlain = file_get_contents($file);
             if (preg_match('/ extends ObjectCrud/', $classPlain)) {
                 preg_match('/^\s*\t*class ([a-z0-9_]+)/mi', $classPlain, $className);
-                if (isset($className[1]) && $className[1]){
+                if (isset($className[1]) && $className[1]) {
                     preg_match('/\s*\t*namespace ([a-zA-Z0-9_\\\\]+)/', $classPlain, $namespace);
-                    $className = (count($namespace) > 1 ? $namespace[1] . '\\' : '' ) . $className[1];
+                    $className = (count($namespace) > 1 ? $namespace[1] . '\\' : '') . $className[1];
                     $classReflection = new \ReflectionClass($className);
                     if ($classReflection->isSubclassOf('Jarves\Admin\ObjectCrud')) {
                         $tempObj = new $className();
@@ -293,7 +311,6 @@ class Utils extends Controller
                     $GLOBALS['moduleTempLangs'][$value['title']] = $value['title'];
                 }
                 if ($value['type'] == 'add' || $value['type'] == 'edit' || $value['type'] == 'list') {
-
                 }
                 if (is_array($value['childs'])) {
                     self::extractAdmin($value['childs']);
@@ -387,9 +404,11 @@ class Utils extends Controller
 
     public function readDirectory($path)
     {
-        $root = realpath($this->getJarves()->getKernel()->getRootDir().'/../');
-        if (!file_exists($root .'/'. $path)) return;
-        $h = opendir($root .'/'. $path);
+        $root = realpath($this->getJarves()->getKernel()->getRootDir() . '/../');
+        if (!file_exists($root . '/' . $path)) {
+            return;
+        }
+        $h = opendir($root . '/' . $path);
 
         $result = [];
         while ($file = readdir($h)) {
@@ -402,6 +421,7 @@ class Utils extends Controller
                 $result = array_merge($result, $this->extractFile($root . '/' . $path . '/' . $file));
             }
         }
+
         return $result;
     }
 

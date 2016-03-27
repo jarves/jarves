@@ -17,7 +17,7 @@ class AppKernel extends Kernel
             new FOS\RestBundle\FOSRestBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle(),
             new Nelmio\ApiDocBundle\NelmioApiDocBundle(),
-//            new Propel\PropelBundle\PropelBundle(),
+            new Propel\Bundle\PropelBundle\PropelBundle(),
             new Jarves\JarvesBundle(),
             new Jarves\DemoTheme\JarvesDemoThemeBundle(),
             new Jarves\Publication\JarvesPublicationBundle(),

@@ -2,6 +2,8 @@
 
 namespace Jarves;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 trait ContainerHelperTrait
 {
     /**
@@ -106,6 +108,9 @@ trait ContainerHelperTrait
         return $this->container->get('kernel');
     }
 
+    /**
+     * @return ContainerInterface
+     */
     public function getContainer()
     {
         return $this->container;
