@@ -270,7 +270,6 @@ jarves.FieldTypes.PageContents = new Class({
 
     setValue: function(value, internal) {
         this.backupedValue = value;
-        console.error('setvalue', value);
 
         if (this.getField().getForm()) {
             this.setValueFromForm(value, internal);
