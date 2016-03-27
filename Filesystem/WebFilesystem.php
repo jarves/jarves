@@ -46,8 +46,6 @@ class WebFilesystem extends Filesystem
         return $this->jarves;
     }
 
-
-
     /**
      * @param string $path
      * @return AdapterInterface
@@ -137,7 +135,7 @@ class WebFilesystem extends Filesystem
             foreach ($this->getJarves()->getSystemConfig()->getMountPoints() as $mountPoint) {
                 $fileInfo = new FileInfo();
                 $fileInfo->setPath('/' . $mountPoint->getPath());
-                $fileInfo->setIcon($mountPoint->getIcon());
+//                $fileInfo->setIcon($mountPoint->getIcon());
                 $fileInfo->setType(FileInfo::DIR);
                 $fileInfo->setMountPoint(true);
                 array_unshift($items, $fileInfo);

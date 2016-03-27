@@ -96,6 +96,7 @@ services:
 
      jarves.filesystem.adapter.local:
          class: %jarves.filesystem.adapter.local.class%
+         scope: prototype
          arguments: ["/"]
          calls:
              - [setJarves, ["@jarves"]]
