@@ -14,9 +14,6 @@
     The system needs this key to decrypt the passwords in the users database.-->
   <passwordHashKey></passwordHashKey>
   <database>
-    <!--All tables will be prefixed with this string. Best practise is to suffix it with a underscore.
-    Examples: dev_, domain_ or prod_-->
-    <prefix>jarves_</prefix>
     <connections>
       <!--
         type: mysql|pgsql|sqlite (the pdo driver name)

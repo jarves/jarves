@@ -97,7 +97,7 @@ Composer.json should look like:
         "sensio/framework-extra-bundle": "^3.0.2",
         "incenteev/composer-parameter-handler": "~2.0",
 
-"propel/propel-bundle": "2.0.x-dev@dev",
+        "propel/propel-bundle": "2.0.x-dev@dev",
         "propel/propel": "dev-master",
         "sybio/image-workshop": ">=2",
         "michelf/php-markdown": ">=1.3",
@@ -159,9 +159,6 @@ Composer.json should look like:
 
 ```xml
   <database>
-    <!--All tables will be prefixed with this string. Best practise is to suffix it with a underscore.
-    Examples: dev_, domain_ or prod_-->
-    <prefix>jarves_</prefix>
     <connections>
       <!--
         type: mysql|pgsql|sqlite (the pdo driver name)

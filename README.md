@@ -9,21 +9,17 @@ An enterprise and high-speed open-source Content-Management-System (CMS) / Appli
 a user friendly administration interface and rapid application development (RAD) framework using Composer, Propel and
 other rock-solid libraries.
 
+[![Build Status](https://travis-ci.org/jarves/jarves.png?branch=master)](https://travis-ci.org/jarves/jarves)
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/jarves/jarves)
+
+
 ## Status
 
-I developed this project several years ago and continued it in my spare time, so this is completely a hobby project being in the very early alpha version.
-I dropped angular 1 and angular 2 support because it was way too much work to convert all those several thousand line of codes and HTML. (would take another year to finish it)
-Although the current version is available in their branches. Maybe some day someone continues the work.
+This project is currently in development and has no releases yet.
 
-Feel free to use it, to continue the development. I'm open to merge and maintain pull-request but don't have the time
-to work so extensively again since its really a sophisticated and big project.
-
-I open sourced this project because I still believe there are really shitty PHP CMS out there and I tried to make it better with Jarves.
-
-If you want to continue to develop this project, co-maintain, or participate in another way feel free to contact me. I'd love to add more people to this organisation and bring it forward.
-I invested already several thousand of hours in this project and can not bring it alone to an end. Help to make the CMS world a better place. :)
-
-[![Build Status](https://travis-ci.org/jarves/jarves.png?branch=master)](https://travis-ci.org/jarves/jarves)
+If you want to support this project, co-maintain, or participate in another way feel free to contact me.
+I'd love to add more people to this organisation and bring it forward.
+I invested already several thousand of hours in this project and can probably not bring it alone to an end. Help to make the CMS world a better place. :)
 
 
 Installation
@@ -45,7 +41,7 @@ This is how a more details news extension looks like: https://github.com/jarves/
 Requirements
 ------------
 
-1. PHP 5.4+
+1. PHP 5.5+
 2. *nix OS (Linux, BSD, OSX)
 3. PHP extensions: PDO, mbstring, gd, zip
 4. MySQL, PostgreSQL or SQLite (completely tested through unit tests)
