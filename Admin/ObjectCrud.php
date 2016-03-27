@@ -734,6 +734,16 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      */
     public function prepareFieldItem($fields)
     {
+
+        if ($this->getMultiLanguage() && !isset($this->_fields['lang'])) {
+            $langField = new Field(null, $this->getJarves());
+            $langField->setId('lang');
+            $langField->setType('text');
+            $langField->setRequired(true);
+            $this->_fields['lang'] = $langField;
+        }
+
+
         if (is_array($fields)) {
             foreach ($fields as &$field) {
                 $this->prepareFieldItem($field);
@@ -1951,14 +1961,6 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
         if ($fieldsToReturn) {
             $fieldsToReturn = array_flip($fieldsToReturn); //flip keys so the check is faster
-        }
-
-        if ($this->getMultiLanguage()) {
-            $langField = new Field(null, $this->getJarves());
-            $langField->setId('lang');
-            $langField->setType('text');
-            $langField->setRequired(true);
-            $fields[] = $langField;
         }
 
         new \Jarves\Admin\Form\Form($fields);
