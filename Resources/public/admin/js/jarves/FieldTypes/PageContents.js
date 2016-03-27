@@ -317,7 +317,7 @@ jarves.FieldTypes.PageContents = new Class({
         this.layoutSelectionContainer.empty();
 
         this.layoutSelection = new jarves.Field({
-            noWrapper: true,8
+            noWrapper: true,
             type: 'layout',
             value: layoutId,
             options: {
