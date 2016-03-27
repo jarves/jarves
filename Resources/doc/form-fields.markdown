@@ -153,4 +153,4 @@ Examples:
 }
 ```
 
-__Notice__: All fields in `fields` are regular jarves.Fields but with the property `noWrapper=true`.
+__Notice__: In the last example all fields in `fields` are regular jarves.Fields but with the property `noWrapper=true`.

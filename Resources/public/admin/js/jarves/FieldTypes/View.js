@@ -21,7 +21,9 @@ jarves.FieldTypes.View = new Class({
     options: {
         inputWidth: '100%',
         directory: '',
-        fullPath: false
+        fullPath: false,
+        selectFirst: false,
+        selectFirstOnNull: false
     },
 
     module: '',

@@ -59,7 +59,7 @@ class NavigationExtension extends \Twig_Extension
         return $navigation->get($options);
     }
 
-    public function navigationLevel($level, $view = 'JarvesBundle:Default:navigation.html.twig')
+    public function navigationLevel($level, $view = 'JarvesBundle:Default/navigation.html.twig')
     {
         $navigation = $this->getJarves()->getNavigation();
 

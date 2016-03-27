@@ -77,6 +77,10 @@ class Theme extends Model
      */
     public function getLayoutByKey($key)
     {
+        if (!$this->layouts) {
+            throw new \LogicException(sprintf('The theme %s does not contain any layouts', $this->getId()));
+        }
+
         foreach ($this->layouts as $layout) {
             if (strtolower($layout->getKey()) === strtolower($key)) {
                 return $layout;
