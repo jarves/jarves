@@ -20,11 +20,6 @@ abstract class AbstractType implements TypeInterface
     protected $value;
 
     /**
-     * @var \Jarves\Admin\Form\Form
-     */
-    protected $form;
-
-    /**
      * @var string
      */
     protected $name;
@@ -46,19 +41,11 @@ abstract class AbstractType implements TypeInterface
     }
 
     /**
-     * @param \Jarves\Admin\Form\Form $form
-     */
-    public function setForm($form)
-    {
-        $this->form = $form;
-    }
-
-    /**
      * @return \Jarves\Admin\Form\Form
      */
     public function getForm()
     {
-        return $this->form;
+        return $this->getFieldDefinition()->getForm();
     }
 
     /**
@@ -198,5 +185,15 @@ abstract class AbstractType implements TypeInterface
     public function isDiffAllowed()
     {
         return true;
+    }
+
+    /**
+     * A list of field names that are included additional in ObjectCrud's field list during loading of this field.
+     *
+     * @return array
+     */
+    public function getRequiredFields()
+    {
+        return [];
     }
 }

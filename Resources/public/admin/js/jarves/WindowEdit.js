@@ -829,7 +829,6 @@ jarves.WindowEdit = new Class({
         }
 
         return req;
-
     },
 
     hasUnsavedChanges: function() {
@@ -961,7 +960,7 @@ jarves.WindowEdit = new Class({
             onSuccess: function(response) {
 
                 if (false === response.data) {
-                    this.saveBtn.failedLoading(t('No changes'));
+                    this.saveBtn.doneLoading(t('No changes'));
                 } else {
                     this.saveBtn.doneLoading(t('Saved'));
                 }

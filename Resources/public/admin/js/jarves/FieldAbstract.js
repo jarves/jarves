@@ -143,8 +143,9 @@ jarves.FieldAbstract = new Class({
      *
      * @param {*} value
      * @param {Boolean} internal
+     * @param {Object} [formValues] only if this field is attached to a jarves.Form
      */
-    setValue: function (value, internal) {
+    setValue: function (value, internal, formValues) {
         /* Override it to your needs */
     },
 

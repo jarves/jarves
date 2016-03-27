@@ -106,4 +106,11 @@ interface TypeInterface
 
     public function isDiffAllowed();
 
+    /**
+     * A list of field names that are included additional in ObjectCrud's field list during loading of this field.
+     *
+     * @return array
+     */
+    public function getRequiredFields();
+
 }

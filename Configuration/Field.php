@@ -279,8 +279,11 @@ class Field extends Model
     private $fieldType;
 
     /**
-     * If this is a virtual field or not. Virtual fields a dummy fields
-     * to keep the relation between object fields in sync.
+     * If this is a virtual field or not. Virtual fields a technical implementation
+     * fields to keep for example arelation between object fields in sync or if a fieldType needs
+     * multiple fields to be able to store their data.
+     *
+     * Virtual fields are not exported to the configuration xml.
      *
      * @var boolean
      */

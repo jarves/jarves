@@ -767,7 +767,7 @@ jarves.FieldForm = new Class({
                 });
             }
 
-            obj.setValue(value, internal);
+            obj.setValue(value, internal, values);
         }.bind(this));
 
         this.value = Object.clone(this.getValue());
@@ -849,7 +849,13 @@ jarves.FieldForm = new Class({
                         && (val !== field.options['default'] || field.options.returnDefault)
                         ) {
 
-                        res[id] = val;
+
+                        if (typeOf(val) === 'object' && instanceOf(val, jarves.MultiValue)) {
+                            res[id] = val.mainValue;
+                            res = Object.merge(res, val.additionalValues);
+                        } else {
+                            res[id] = val;
+                        }
                     }
                 }
             }.bind(this));

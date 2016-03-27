@@ -21,6 +21,7 @@
             <asset src="@JarvesBundle/admin/js/jarves/FieldAbstract.js" />
             <asset src="@JarvesBundle/admin/js/jarves/Dialog.js" />
             <assets src="@JarvesBundle/admin/js/jarves/*.js" />
+
             <assets src="@JarvesBundle/admin/js/lib/*.js" />
             <assets src="@JarvesBundle/admin/js/jarves/DashboardWidgets/Base.js" />
             <assets src="@JarvesBundle/admin/js/jarves/DashboardWidgets/*.js" />

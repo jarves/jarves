@@ -5,6 +5,7 @@ namespace Jarves\Admin;
 use Jarves\Configuration\Condition;
 use Jarves\Configuration\Field;
 use Jarves\Configuration\Model;
+use Jarves\Exceptions\AccessDeniedException;
 use Jarves\Jarves;
 use Jarves\Exceptions\ObjectNotFoundException;
 use Jarves\Exceptions\Rest\ValidationFailedException;
@@ -825,7 +826,12 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
                         break;
                 }
+
                 $this->_fields[$fields->getId()] = $fields;
+                foreach ($fields->getFieldType()->getRequiredFields() as $fieldName) {
+                    $this->_fields[$fieldName] = $this->getObjectDefinition()->getField($fieldName);
+                    $this->prepareFieldItem($this->_fields[$fieldName]);
+                }
             }
 
             if (is_array($fields->getChildren())) {
@@ -1886,11 +1892,10 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
 
             foreach ($values as $fieldName => $value) {
                 if (!$this->getJarves()->getACL()->checkUpdateExact($this->getObject(), $pk, [$fieldName => $value])) {
-                    unset($values[$fieldName]);
+                    throw new AccessDeniedException(sprintf('Not allowed to change `%s`', $fieldName));
                 }
             }
         }
-
 
         if (($condition = $this->getCondition()) && $condition->hasRules()) {
             if (!$condition->satisfy($item, $this->getObject())) {
@@ -1926,7 +1931,7 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
         }
 
         $fields = $this->_fields;
-        $values = [];
+        $values = $requestOrData->request->all();
 
         foreach ($fields as $field) {
             $key = lcfirst($field->getId());
@@ -1947,67 +1952,20 @@ class ObjectCrud extends ContainerAware implements ObjectCrudInterface
      * Iterates only through all defined fields in $fields.
      *
      * @param  array $data
-     * @param  string[] $fieldsToReturn Field name list to map, empty for all
+     * @param  string[] $filterFields Field name list to map, empty for all
      * @param  mixed $defaultData Default data. Is used if a field is not defined through _POST or _GET
      *
      * @return array
      * @throws \Jarves\Exceptions\InvalidFieldValueException
      */
-    public function mapData(array $data, array $fieldsToReturn = null, $defaultData = null)
+    public function mapData(array $data, array $filterFields = null, $defaultData = null)
     {
-        $values = array();
-
         $fields = $this->_fields;
 
-        if ($fieldsToReturn) {
-            $fieldsToReturn = array_flip($fieldsToReturn); //flip keys so the check is faster
-        }
+        $form = new \Jarves\Admin\Form\Form($fields);
 
-        new \Jarves\Admin\Form\Form($fields);
-
-        foreach ($fields as $field) {
-            $key = lcfirst($field->getId());
-            $value = isset($data[$key]) ? $data[$key] : null;
-
-            if (null == $value && $defaultData) {
-                $value = isset($defaultData[$key]) ? $defaultData[$key] : null;
-            }
-
-            if ($field['customValue'] && method_exists($this, $method = $field['customValue'])) {
-                $value = $this->$method($field, $key);
-            }
-
-            $field->setValue($value);
-        }
-
-        foreach ($fields as $field) {
-            $key = $field->getId();
-            if ($field['noSave']) {
-                continue;
-            }
-
-            if ($field->getSaveOnlyFilled() && ($field->getValue() === '' || $field->getValue() === null)) {
-                continue;
-            }
-
-            if ($field->getCustomSave() && method_exists($this, $method = $field->getCustomSave())) {
-                $this->$method($values, $values, $field);
-                continue;
-            }
-
-            if (!$fieldsToReturn || isset($fieldsToReturn[$key])) {
-                if (!$errors = $field->validate()) {
-                    $field->mapValues($values);
-                } else {
-                    $restException = new ValidationFailedException(sprintf(
-                        'Field `%s` has a invalid value.',
-                        $key
-                    ), 420);
-                    $restException->setData(['fields' => [$field->getId() => $errors]]);
-                    throw $restException;
-                }
-            }
-        }
+        $form->setData($data);
+        $values = $form->mapData($defaultData, $filterFields);
 
         return $values;
     }

@@ -169,7 +169,7 @@ class Bundle extends Model
                     //does not exists, so attach it
                     $attribute->setAttribute(true);
                     $targetObject->addField($attribute);
-                    $configs->addReboot();
+                    $configs->addReboot(sprintf('Added field attribute %s to %s', $key, $targetObject->getId()));
                 }
             }
         }

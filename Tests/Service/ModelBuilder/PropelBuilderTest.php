@@ -185,6 +185,8 @@ class PropelBuilderTest extends KernelAwareTestCase
   <table name="test_object1" phpName="Object1">
     <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
     <column name="title" type="VARCHAR" size="255"/>
+    <column name="layout" type="VARCHAR" size="255"/>
+    <column name="theme" type="VARCHAR" size="255"/>
     <vendor type="mysql">
       <parameter name="Charset" value="utf8"/>
     </vendor>

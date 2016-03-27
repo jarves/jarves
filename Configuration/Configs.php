@@ -46,9 +46,15 @@ class Configs implements \IteratorAggregate
         $this->configElements = $this->parseConfig($this->configElements);
     }
 
-    public function addReboot($source = 'none')
+    /**
+     * Recalls `bootRunTime` on each field when this is call inside one bootRunTime.
+     * Needed to keep all bootRunTime informed when someone added or changed a field.
+     *
+     * @param string $source
+     */
+    public function addReboot($source)
     {
-        $this->needRebootBy[] = $source;
+        $this->needRebootBy[] = $source ?: 'n/a';
     }
 
     public function resetReboot()
@@ -172,14 +178,11 @@ class Configs implements \IteratorAggregate
             if ($this->needsReboot()) {
                 $rebootSources = array_merge($rebootSources, $this->needRebootBy);
             }
-//            foreach ($this->needRebootBy as $reboot) {
-//                var_dump($reboot);
-//            }
             $i++;
             if ($i > 100) {
                 throw new \RuntimeException(sprintf(
                     'Can not boot bundle configuration, there is a infinite loop. Reboots triggered by: ',
-                    join(', ', $rebootSources)
+                    json_encode($rebootSources, JSON_PRETTY_PRINT)
                 ));
             }
         }

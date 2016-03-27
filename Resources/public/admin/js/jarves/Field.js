@@ -445,8 +445,9 @@ jarves.Field = new Class({
      *
      * @param {*} value
      * @param {Boolean} internal Fires fireChange() which fires the 'change' event. Default is false.
+     * @param {Object} [formValues] only if this field is attached to a jarves.Form
      */
-    setValue: function(value, internal) {
+    setValue: function(value, internal, formValues) {
         if (!this.fieldObject) {
             return null;
         }
@@ -457,7 +458,7 @@ jarves.Field = new Class({
         }
 
         if (this.fieldObject) {
-            this.fieldObject.setValue(value, internal);
+            this.fieldObject.setValue(value, internal, formValues);
         }
 
         if (internal) {

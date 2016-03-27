@@ -26,10 +26,6 @@ class TypeContentElements extends AbstractType
         return [];
     }
 
-    public function bootBuildTime(Object $object, Configs $configs)
-    {
-    }
-
     public function bootRunTime(Object $object, Configs $configs)
     {
         $contentsObjectName = $object->getId() . ucfirst($this->getFieldDefinition()->getId());

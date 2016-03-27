@@ -220,7 +220,6 @@ jarves.FieldTypes.PageContents = new Class({
         }.bind(this));
     },
 
-
     /**
      * @param {Number} domainId
      */
@@ -262,11 +261,17 @@ jarves.FieldTypes.PageContents = new Class({
     },
 
     getValue: function() {
-        return this.editor ? this.editor.getValue() : this.backupedValue;
+        var content = this.editor ? this.editor.getValue() : this.backupedValue;
+
+        return new jarves.MultiValue(content, {
+            layout: this.layoutSelection ? this.layoutSelection.getValue() : this.firstSelectedLayout
+        });
     },
 
     setValue: function(value, internal) {
         this.backupedValue = value;
+        console.error('setvalue', value);
+
         if (this.getField().getForm()) {
             this.setValueFromForm(value, internal);
         } else {
@@ -312,7 +317,7 @@ jarves.FieldTypes.PageContents = new Class({
         this.layoutSelectionContainer.empty();
 
         this.layoutSelection = new jarves.Field({
-            noWrapper: true,
+            noWrapper: true,8
             type: 'layout',
             value: layoutId,
             options: {
