@@ -388,6 +388,7 @@ class  Condition extends Model
             return $condition;
         }
 
+        $primaries = null;
         if ($objectKey && $this->getJarves()->getObjects()->getDefinition($objectKey)) {
             $primaries = $this->getJarves()->getObjects()->getPrimaryList($objectKey);
         }
@@ -412,7 +413,7 @@ class  Condition extends Model
                 } else {
 
                     $primKey = $idx;
-                    if (!is_string($idx)) {
+                    if (!is_string($idx) && $primaries) {
                         $primKey = $primaries[0];
                     }
 
