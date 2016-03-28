@@ -1,6 +1,6 @@
 # Create a theme
 
-When you start creating a website the first thing is usually to create a theme, a layout.
+When you start creating a website the first thing to do is to create a theme, a layout.
 
 Doing so is in Jarves very easy. Below you'll find a step by step tutorial how to create a theme.
 
@@ -12,33 +12,34 @@ In a nutshell:
 4. Use the new theme in a domain (administration -> nodes -> domain).
 5. Choose your newly created layouts in pages (administration -> nodes).
 
-
-## 1. Create a bundle 
+## 1. Create a bundle
 
 Normally, when creating new layouts you do so for your website project, not for third-partys (means installable by others).
 Since in Jarves everything is contained in a Symfony bundle, you need first of all a bundle.
 Either you have already an `AppBundle` (in `src/AppBundle`) or you need to create it.
- 
+
 ## 2. Create a layout html file
- 
+
 So, since you have a bundle, you now need to create a first layout inside it.
 We choose a very typical path for it: `src/AppBundle/Resources/views/Layout/default.html.twig`.
 
 > __Pro tip__: This file is usually referenced in the Symfony way via `AppBundle:Layout/default.html.twig`.
 
 You may already have noticed the file name `default.html.twig` This means we want to generate `.html` using `.twig` template
-engine. 
+engine.
 
 > __Pro tip__: You could register in Symfony additional template engines like Smarty for different template engines, but be aware:
 Jarves provides only for Twig the full integration (means functionality like Navigation generation, Content Placeholder, Breadcrumb etc)
 
-  
-src/AppBundle/Resources/views/Layout/default.html.twig:
+
+Below you see an example layout:
+
+`src/AppBundle/Resources/views/Layout/default.html.twig`
 
 ```html
 {{ loadAsset('https://code.jquery.com/jquery-2.2.1.min.js') }}`
 {{ loadAsset('@AppBundle/css/style.scss') }}
-{{ loadAsset('@AppBundle/js/my-super-js') }}
+{{ loadAsset('@AppBundle/js/app.js') }}
 
 <header id="header">
     <a id="logo" href="/"><img src="bundles/app/images/logo.png"></a>
@@ -59,13 +60,17 @@ src/AppBundle/Resources/views/Layout/default.html.twig:
 </footer>
 ```
 
-What you see above is a very typical website structure: A Header, main section with dynamic content and a footer.
+What you see above is a very typical website structure: A Header with navigation, main section with dynamic content and a footer.
 
-### loadAsset function
+A typical folder structure:
+
+![Folder structure](create-a-theme/appbundle-folder-structure.png?1)
+
+### Load additional assets
 
 If you looked closely you might found statements like `{{ loadAsset('@AppBundle/css/style.scss') }}`. What does this mean?
 
-`loadAsset` is a twig function you can use to inject additional resources into you website. Jarves is using these
+`loadAsset()` is a twig function you can use to inject additional resources/assets into you website. Jarves is using these
 information and injects `<link>`, `<script>` tags automatically depending on the file path for you.
 In addition to that Jarves also has the ability to automatically compile SCSS for you, so you don't need additional build tools.
 
@@ -98,9 +103,9 @@ your plugin response with the master response.
 ### Content placeholder
 
 Most websites contain some sort of dynamic content, or content from a database. Jarves brings a content editor
-(administration -> Pages, or administraton -> Node and choose a page -> tab 'Content')
+(administration -> Pages, or administraton -> Node and choose a page -> tab 'Content') which is being used for content placeholders, you can simply place in your layouts.
 
-A twig statement like `{% contents '1' %}` means that you want at exactly this place content.
+A twig statement like `{% contents 1 %}` means that you want to give an user at exactly this place the ability to manage content.
 If you open the Jarves content editor (administration -> pages) Jarves automatically reads your layout and renders
 at the `{% contents '1' %}` editor widgets, where a user can place content like a static text, a plugin, an images etc.
 
@@ -190,8 +195,8 @@ So, enough talked. Here is the file:
 ```
 
 To understand all the `key`, `id`, `<label>` stuff please take a look into `Create a theme using the bundle editor`, section above.
- 
- 
+
+
 ### Use the theme
 
 After creating all necessary files using the bundle editor or the configuration file directly, you should reload Jarves administration.
