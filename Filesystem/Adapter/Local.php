@@ -4,7 +4,7 @@ namespace Jarves\Filesystem\Adapter;
 
 use Jarves\Exceptions\FileNotFoundException;
 use Jarves\Exceptions\FileNotWritableException;
-use Jarves\Exceptions\FileOperationPermittedException;
+use Jarves\Exceptions\FileOperationDeniedException;
 use Jarves\Exceptions\NotADirectoryException;
 use Jarves\File\FileInfo;
 
@@ -86,7 +86,7 @@ class Local extends AbstractAdapter
      *
      * @param  string $path
      *
-     * @throws FileOperationPermittedException
+     * @throws FileOperationDeniedException
      * @return bool
      */
     public function setPermission($path)
@@ -97,8 +97,8 @@ class Local extends AbstractAdapter
 
         if ($this->groupName) {
             if (!@chgrp($path, $this->groupName)) {
-                throw new FileOperationPermittedException(sprintf(
-                    'Operation to chgrp the file %s to %s is permitted.',
+                throw new FileOperationDeniedException(sprintf(
+                    'Operation to chgrp the file %s to %s is denied.',
                     $path,
                     $this->groupName
                 ));
@@ -108,8 +108,8 @@ class Local extends AbstractAdapter
         if (is_dir($path)) {
 
             if (!chmod($path, $this->dirMode)) {
-                throw new FileOperationPermittedException(sprintf(
-                    'Operation to chmod the folder %s to %o is permitted.',
+                throw new FileOperationDeniedException(sprintf(
+                    'Operation to chmod the folder %s to %o is denied.',
                     $path,
                     $this->dirMode
                 ));
@@ -220,13 +220,13 @@ class Local extends AbstractAdapter
      * @param  string $path The full absolute path
      *
      * @return bool
-     * @throws FileOperationPermittedException
+     * @throws FileOperationDeniedException
      */
     private function _mkdir($path)
     {
         if (!is_dir($path)) {
             if (!@mkdir($path, $this->dirMode, true) ){
-                throw new FileOperationPermittedException(sprintf(
+                throw new FileOperationDeniedException(sprintf(
                     'mkdir(%s): Permission denied.',
                     $path
                 ));
@@ -235,8 +235,8 @@ class Local extends AbstractAdapter
 
         if ($this->groupName) {
             if (!@chgrp($path, $this->groupName)) {
-                throw new FileOperationPermittedException(sprintf(
-                    'Operation to chgrp the folder %s to %s is permitted.',
+                throw new FileOperationDeniedException(sprintf(
+                    'Operation to chgrp the folder %s to %s is denied.',
                     $path,
                     $this->groupName
                 ));
@@ -244,8 +244,8 @@ class Local extends AbstractAdapter
         }
 
         if (!chmod($path, $this->dirMode)) {
-            throw new FileOperationPermittedException(sprintf(
-                'Operation to chmod the folder %s to %o is permitted.',
+            throw new FileOperationDeniedException(sprintf(
+                'Operation to chmod the folder %s to %o is denied.',
                 $path,
                 $this->dirMode
             ));
@@ -549,7 +549,7 @@ class Local extends AbstractAdapter
             return $this->delDir($path2);
         } elseif (is_file($path2)) {
             if (!@unlink($path2)) {
-                throw new FileOperationPermittedException(sprintf(
+                throw new FileOperationDeniedException(sprintf(
                     'unlink(%s): Permission denied.',
                     $path2
                 ));
@@ -573,7 +573,7 @@ class Local extends AbstractAdapter
                             $this->delDir($dirName . '/' . $file);
                         } else {
                             if (!@unlink($dirName . '/' . $file)){
-                                throw new FileOperationPermittedException(sprintf(
+                                throw new FileOperationDeniedException(sprintf(
                                     'unlink(%s): Permission denied.',
                                     $dirName . '/' . $file
                                 ));
