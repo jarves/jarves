@@ -83,7 +83,7 @@ whereas `{{ loadAsset('@AppBundle/css/style.scss') }}` produces:
 `<link rel="stylesheet" type="text/css" href="cache/scss/bundles/app/css/style.css?c=0980bc" >`, which means it compiled
 your scss file and placed it into the `web/cache/` folder. If you change this file `app/css/style.scss`
 (which is a symlink to `@AppBundle/css/style.scss`, or as real path `src/AppBundle/Resources/public/css/style.scss`)
-the generated css will automatically re-generated.
+the generated css will be automatically re-generated.
 
 > __Pro tip__: Per default 'resources compression' at the domain is activated (administration -> nodes -> domain).
   Once activated Jarves combines all javascript and css files into two bigger files.
@@ -140,7 +140,7 @@ The bundle editor opens: Click on tab 'Themes'. Click at the left side on 'Add' 
 
 ![Bundle Editor, Themes](create-a-theme/bundle-editor--themes.png)
 
-Now you have defined the theme. Next step is to link your tempalte with an layout. Click on the button 'Page layouts':
+Now you have defined the theme. Next step is to link your template with an layout. Click on the button 'Page Layouts':
 
 ![Bundle Editor, Themes, page layouts](create-a-theme/bundle-editor--themes--page-layouts.png)
 
@@ -165,14 +165,16 @@ in  `src/AppBundle/Resources/config/jarves.themes.xml`. Make sure Jarves correct
 If you don't want to use the bundle editor, you can create the configuration file yourself.
 
 Jarves configuration files are located usually at `src/AppBundle/Resources/config/jarves.*.xml`. All files with this pattern
-is automatically loaded and merged, parsed and read by Jarves/Configuration classes (for example `Jarves/Configuration/Theme.php`).
+are automatically loaded, merged and parsed by Jarves/Configuration classes (for example `Jarves/Configuration/Theme.php`).
 
 The bundle editor uses for theme settings the file `src/AppBundle/Resources/config/jarves.themes.xml`, so we should (but not a must) do the same.
 
 > __Pro tip__: If you choose a different name like `jarves.xml`, you can do that. The bundle editor is able to detect where `<themes>`
 has been configured and uses the detected file for further adjustments.
 
-So, enough talked. Here is the file:
+So, enough talked. Here is the file.
+
+`src/AppBundle/Resources/config/jarves.themes.xml`:
 
 ```xml
 <config>
@@ -195,7 +197,18 @@ So, enough talked. Here is the file:
 ```
 
 To understand all the `key`, `id`, `<label>` stuff please take a look into `Create a theme using the bundle editor`, section above.
+It's pretty self explaining:
 
+* `<theme id="app"></theme>` creates a new theme with given `id`.
+* `<theme><label>` defines a label for this theme.
+* `<layouts></layouts>` is a container for all `<layout>` elements.
+* `<layout key="default">` defines a layout with given `key`.
+* `<layout><file>` defines a file path for the layout.
+
+You can create as many `<theme>` and `<layout>` elements as you want, but make sure that especially for the layout elements `key`
+value is a standard value. If a user has several themes to choose and changes a theme at a domain all pages with layout keys
+that are not existent in the new theme won't map and result in a error. The user needs to change the layout for all pages that don't match.
+By using `default`, `startpage`, `full` you can solve that issue, as most themes should have at least `default` defined.
 
 ### Use the theme
 
