@@ -201,7 +201,7 @@ class Jarves
      *
      * Default is $time is `mark all caches as invalid which are older than CURRENT`.
      *
-     * @param  string  $key
+     * @param  string $key
      * @param  integer $time Unix timestamp. Default is microtime(true). Uses float for ms.
      *
      * @return boolean
@@ -289,8 +289,8 @@ class Jarves
      * stores extra values at the value, which makes getCache() returning something invalid.
      *
      * @param string $key
-     * @param mixed  $value Only simple data types. Serialize your value if you have objects/arrays.
-     * @param int    $lifeTime
+     * @param mixed $value Only simple data types. Serialize your value if you have objects/arrays.
+     * @param int $lifeTime
      *
      * @return boolean
      * @static
@@ -383,8 +383,7 @@ class Jarves
         if (null === $this->systemConfig) {
 
             $configFile = $this->getKernel()->getRootDir() . '/config/config.jarves.xml';
-            $configEnvFile = $this->getKernel()->getRootDir() . '/config/config.jarves_' . $this->getKernel(
-                )->getEnvironment() . '.xml';
+            $configEnvFile = $this->getKernel()->getRootDir() . '/config/config.jarves_' . $this->getKernel()->getEnvironment() . '.xml';
             if (file_exists($configEnvFile)) {
                 $configFile = $configEnvFile;
             }
@@ -688,24 +687,27 @@ class Jarves
     /**
      * @param      $nodeOrId
      * @param bool $fullUrl
+     * @param bool $suppressStartNodeCheck
+     * @param Domain $domain
      *
      * @return string
      */
-    public function getNodeUrl($nodeOrId, $fullUrl = false, $suppressStartNodeCheck = false)
+    public function getNodeUrl($nodeOrId, $fullUrl = false, $suppressStartNodeCheck = false, Domain $domain = null)
     {
         $id = $nodeOrId;
-        if ($nodeOrId instanceof Node) {
-            $id = $nodeOrId->getId();
-        }
 
         if (!$nodeOrId) {
             $nodeOrId = $this->getCurrentPage();
         }
 
+        if ($nodeOrId instanceof Node) {
+            $id = $nodeOrId->getId();
+        }
+
         $domainId = $nodeOrId instanceof Node ? $nodeOrId->getDomainId() : $this->getUtils()->getDomainOfPage(
-            $nodeOrId + 0
+            $id
         );
-        $currentDomain = $this->getCurrentDomain();
+        $currentDomain = $domain ?: $this->getCurrentDomain();
 
         if (!$suppressStartNodeCheck && $currentDomain->getStartnodeId() === $id) {
             $url = '/';
@@ -715,10 +717,13 @@ class Jarves
         }
 
         //do we need to add app_dev.php/ or something?
-        $prefix = substr(
-            $this->requestStack->getMasterRequest()->getBaseUrl(),
-            strlen($this->requestStack->getMasterRequest()->getBasePath())
-        );
+        $prefix = '';
+        if ($this->requestStack && $this->requestStack->getMasterRequest()) {
+            $prefix = substr(
+                $this->requestStack->getMasterRequest()->getBaseUrl(),
+                strlen($this->requestStack->getMasterRequest()->getBasePath())
+            );
+        }
 
         if (false !== $prefix) {
             $url = substr($prefix, 1) . $url;
@@ -781,7 +786,7 @@ class Jarves
     /**
      * @param string $path
      * @param string $suffix
-     * @param bool   $relativePath
+     * @param bool $relativePath
      *
      * @return string without trailing slash when relative
      * @throws Exceptions\BundleNotFoundException

@@ -781,7 +781,7 @@ class PageResponse extends Response
     }
 
     /**
-     * Compares two PageResponses and returns the difference as array/
+     * Compares two PageResponses and returns the difference as array.
      *
      * @param  PageResponse $response
      *

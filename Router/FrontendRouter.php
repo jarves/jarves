@@ -207,7 +207,7 @@ class FrontendRouter
         $clazz = 'Jarves\\Controller\\PageController';
         $domainUrl = $domain->getMaster() ? '' : '/' . $domain->getLang();
 
-        $url = $domainUrl . $page->getUrn();
+        $url = $this->jarves->getNodeUrl($page->getId(), null, null, $domain);
 
         $controller = $clazz . '::handleAction';
 
@@ -332,8 +332,7 @@ class FrontendRouter
                         $defaults = array_merge($defaults, $route->getArrayDefaults());
                     }
 
-                    $domainUrl = $domain->getMaster() ? '' : '/' . $domain->getLang();
-                    $url = $domainUrl . $page->getUrn();
+                    $url = $this->jarves->getNodeUrl($page->getId(), null, null, $domain);
 
                     $this->routes->add(
                         'jarves_plugin_' . ($route->getId() ?: $plugin->getId()) . '_' . $idx,

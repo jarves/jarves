@@ -276,21 +276,26 @@ class Utils
     }
 
     /**
+     * Returns a array map nodeId -> url
+     * 
      * @param  integer $domainId
      *
      * @return array
      */
     public function &getCachedPageToUrl($domainId)
     {
-        if (isset($cachedPageToUrl[$domainId])) {
-            return $cachedPageToUrl[$domainId];
-        }
-
-        $cachedPageToUrl[$domainId] = array_flip($this->getCachedUrlToPage($domainId));
-
-        return $cachedPageToUrl[$domainId];
+        return array_flip($this->getCachedUrlToPage($domainId));
     }
 
+    /**
+     * Returns a array map url -> nodeId
+     * 
+     * @param integer $domainId
+     * 
+     * @return array
+     * 
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function &getCachedUrlToPage($domainId)
     {
         $cacheKey = 'core/urls/' . $domainId;
@@ -312,6 +317,7 @@ class Utils
                 if ($node['lvl'] == 0) {
                     continue;
                 } //root
+
                 if ($node['type'] == 3) {
                     continue;
                 } //deposit
