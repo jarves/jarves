@@ -784,11 +784,20 @@ class Jarves
     }
 
     /**
+     * ('@JarvesBundle/Resources/public/test.png') => /var/www/jarves/src/Jarves/Resources/public/test.png
+     * ('@JarvesBundle/Resources/public/test.png', '', true) => src/Jarves/Resources/public/test.png
+     *
+     * ('@JarvesBundle/test.png', 'Resources/public/') => /var/www/jarves/src/Jarves/Resources/public/test.png
+     * ('@JarvesBundle/test.png') => /var/www/jarves/src/Jarves/test.png
+     *
+     * ('images/test.png') => /var/www/jarves/images/webtest.png
+     *
      * @param string $path
      * @param string $suffix
      * @param bool $relativePath
      *
      * @return string without trailing slash when relative
+     *
      * @throws Exceptions\BundleNotFoundException
      */
     public function resolvePath($path, $suffix = '', $relativePath = false)
@@ -832,8 +841,9 @@ class Jarves
     /**
      * Shortcut for $this->resolvePath($path, 'Resources/public')
      *
-     * @param string $path
+     * ('@JarvesBundle/admin/js/test.js') => /var/www/jarves/src/Jarves/Resources/public/admin/js/test.js
      *
+     * @param string $path
      * @return mixed
      */
     public function resolveInternalPublicPath($path)
@@ -842,8 +852,12 @@ class Jarves
     }
 
     /**
-     * @param string $path
      *
+     * ('@JarvesBundle/admin/js/test.js') => web/bundles/jarves/admin/js/test.js
+     *
+     * ('images/test.png') => web/images/webtest.png
+     *
+     * @param string $path
      * @return string
      * @throws Exceptions\BundleNotFoundException
      */
@@ -874,8 +888,23 @@ class Jarves
         return 'web/' . $path;
     }
 
+    /**
+     *
+     * ('@JarvesBundle/admin/js/test.js') => bundles/jarves/admin/js/test.js
+     *
+     * ('images/test.png') => images/webtest.png
+     *
+     * ('routepath/do-something') => routepath/do-something
+     * ('routepath/do-something') => app_dev.php/routepath/do-something
+     *
+     * ('http://external.tld/style.css') => http://external.tld/style.css
+     *
+     * @param string $path
+     * @return string
+     */
     public function resolvePublicWebPath($path)
     {
+        //if its a external path?
         if (strpos($path, '://') !== false) {
             return $path;
         }
