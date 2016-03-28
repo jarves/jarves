@@ -282,7 +282,7 @@ class Utils
      *
      * @return array
      */
-    public function &getCachedPageToUrl($domainId)
+    public function getCachedPageToUrl($domainId)
     {
         return array_flip($this->getCachedUrlToPage($domainId));
     }
@@ -296,7 +296,7 @@ class Utils
      * 
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function &getCachedUrlToPage($domainId)
+    public function getCachedUrlToPage($domainId)
     {
         $cacheKey = 'core/urls/' . $domainId;
         $urls = $this->getJarves()->getDistributedCache($cacheKey);

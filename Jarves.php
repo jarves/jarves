@@ -712,7 +712,7 @@ class Jarves
         if (!$suppressStartNodeCheck && $currentDomain->getStartnodeId() === $id) {
             $url = '/';
         } else {
-            $urls =& $this->getUtils()->getCachedPageToUrl($domainId);
+            $urls = $this->getUtils()->getCachedPageToUrl($domainId);
             $url = isset($urls[$id]) ? $urls[$id] : '';
         }
 
