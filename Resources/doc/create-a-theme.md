@@ -1,8 +1,16 @@
 # Create a theme
 
-When you start creating a website the first thing to do is to create a theme, a layout.
+When you start creating a website the first thing is usually to create a theme, a layout.
 
 Doing so is in Jarves very easy. Below you'll find a step by step tutorial how to create a theme.
+
+In a nutshell:
+
+1. Create a bundle or use AppBundle.
+2. Create one or several layouts, e.g `src/AppBundle/Resources/views/Layout/default.html.twig`.
+3. Create a theme in Jarves Bundle Editor (administration -> bundles -> development -> edit -> themes) or write the configuration yourself.
+4. Use the new theme in a domain (administration -> nodes -> domain).
+5. Choose your newly created layouts in pages (administration -> nodes).
 
 
 ## 1. Create a bundle 
@@ -16,14 +24,14 @@ Either you have already an `AppBundle` (in `src/AppBundle`) or you need to creat
 So, since you have a bundle, you now need to create a first layout inside it.
 We choose a very typical path for it: `src/AppBundle/Resources/views/Layout/default.html.twig`.
 
-__Pro tip__: This file is usually referenced in the Symfony way via `AppBundle:Layout/default.html.twig`.
+> __Pro tip__: This file is usually referenced in the Symfony way via `AppBundle:Layout/default.html.twig`.
 
 You may already have noticed the file name `default.html.twig` This means we want to generate `.html` using `.twig` template
 engine. 
 
-__Pro tip__: You could register in Symfony additional template engines like Smarty for different template engines, but be aware:
+> __Pro tip__: You could register in Symfony additional template engines like Smarty for different template engines, but be aware:
 Jarves provides only for Twig the full integration (means functionality like Navigation generation, Content Placeholder, Breadcrumb etc)
-  
+
   
 src/AppBundle/Resources/views/Layout/default.html.twig:
 
@@ -72,25 +80,25 @@ your scss file and placed it into the `web/cache/` folder. If you change this fi
 (which is a symlink to `@AppBundle/css/style.scss`, or as real path `src/AppBundle/Resources/public/css/style.scss`)
 the generated css will automatically re-generated.
 
-__Pro tip__: Per default 'resources compression' at the domain is activated (administration -> nodes -> domain).
+> __Pro tip__: Per default 'resources compression' at the domain is activated (administration -> nodes -> domain).
   Once activated Jarves combines all javascript and css files into two bigger files.
-  
+
 ```html
 <link rel="stylesheet" type="text/css" href="cache/compressed-css/181a21f7b37d55ea542ac02bbfed67b2.css?c=f2f5cf" >
-    
+
 <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
 <script type="text/javascript" src="cache/compressed-js/58bede386dfceffa916fab97d43cbcd3.js?c=f2f5cf"></script>
 ```
 
 Above you see the 'Resource compression' in action. As you can see, external resources won't be compressed.
 
-__Pro tip__: You can also use `loadAsset()` in your plugin templates. Jarves is able to merge the asset information of
+> __Pro tip__: You can also use `loadAsset()` in your plugin templates. Jarves is able to merge the asset information of
 your plugin response with the master response.
 
-### Content placeholder 
+### Content placeholder
 
 Most websites contain some sort of dynamic content, or content from a database. Jarves brings a content editor
-(administration -> Pages, or administraton -> Node and choose a page -> tab 'Content')  
+(administration -> Pages, or administraton -> Node and choose a page -> tab 'Content')
 
 A twig statement like `{% contents '1' %}` means that you want at exactly this place content.
 If you open the Jarves content editor (administration -> pages) Jarves automatically reads your layout and renders
@@ -127,7 +135,7 @@ The bundle editor opens: Click on tab 'Themes'. Click at the left side on 'Add' 
 
 ![Bundle Editor, Themes](create-a-theme/bundle-editor--themes.png)
 
-Now you have defined the theme. Next step is to link your tempalte with an layout. Click on the button 'Page layouts': 
+Now you have defined the theme. Next step is to link your tempalte with an layout. Click on the button 'Page layouts':
 
 ![Bundle Editor, Themes, page layouts](create-a-theme/bundle-editor--themes--page-layouts.png)
 
@@ -140,27 +148,26 @@ the file we previously created. Per default, you see all `*.html.twig` files in 
 
 If you create new files in `Resources/views` they appear in these select boxes and you can choose the right file for the right use case.
 
-__Pro tip__: You can also define theme options (for example a color, or feature switch using a checkbox), but this is not covered
-in this tutorial, since mostly only themes that are distributed for third-partys are using this feature. 
+> __Pro tip__: You can also define theme options (for example a color, or feature switch using a checkbox), but this is not covered
+in this tutorial, since mostly only themes that are distributed for third-partys are using this feature.
 
 If you configured everything correctly, you should click 'Save' at the bottom right, to let Jarves create for you the configuration
 in  `src/AppBundle/Resources/config/jarves.themes.xml`. Make sure Jarves correctly wrote the file by checking the folder
  `src/AppBundle/Resources/config/`.
 
 ### Create the configuration xml
- 
+
 If you don't want to use the bundle editor, you can create the configuration file yourself.
 
 Jarves configuration files are located usually at `src/AppBundle/Resources/config/jarves.*.xml`. All files with this pattern
 is automatically loaded and merged, parsed and read by Jarves/Configuration classes (for example `Jarves/Configuration/Theme.php`).
 
 The bundle editor uses for theme settings the file `src/AppBundle/Resources/config/jarves.themes.xml`, so we should (but not a must) do the same.
- 
-__Pro tip__: If you choose a different name like `jarves.xml`, you can do that. The bundle editor is able to detect where `<themes>`
-has been configured and uses the detected file for further adjustments. 
+
+> __Pro tip__: If you choose a different name like `jarves.xml`, you can do that. The bundle editor is able to detect where `<themes>`
+has been configured and uses the detected file for further adjustments.
 
 So, enough talked. Here is the file:
-
 
 ```xml
 <config>
@@ -210,4 +217,4 @@ Since you have used `{% contents 1 %}` in your layout, you can manage content at
 
 ## Done
 
-You're done. You created successfully your first page layout, configured a theme and used it in one page.
+You're done. 🎉 You created successfully your first page layout, configured a theme and used it in one page. 🎉
