@@ -694,12 +694,13 @@ class Jarves
     public function getNodeUrl($nodeOrId, $fullUrl = false, $suppressStartNodeCheck = false)
     {
         $id = $nodeOrId;
-        if ($nodeOrId instanceof Node) {
-            $id = $nodeOrId->getId();
-        }
 
         if (!$nodeOrId) {
             $nodeOrId = $this->getCurrentPage();
+        }
+
+        if ($nodeOrId instanceof Node) {
+            $id = $nodeOrId->getId();
         }
 
         $domainId = $nodeOrId instanceof Node ? $nodeOrId->getDomainId() : $this->getUtils()->getDomainOfPage(
