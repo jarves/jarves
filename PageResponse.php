@@ -54,12 +54,12 @@ class PageResponse extends Response
     protected $assets = [];
 
     /**
-     * @var AssetInfo[]
+     * @var AssetInfo[][]
      */
     protected $assetsInfo = [];
 
     /**
-     * @var AssetInfo[]
+     * @var AssetInfo[][]
      */
     protected $assetsInfoBottom = [];
 
@@ -803,18 +803,44 @@ class PageResponse extends Response
                 continue;
             }
 
-            $particular = null;
             $other = $response->$getter();
+
+            if ('assetsInfo' === $key || 'assetsInfoBottom' === $key) {
+
+                $assetsInfoDiff = [];
+                foreach ($other as $priority => $assetInfos) {
+
+                    if (!isset($this->assetsInfo[$priority])) {
+                        $assetsInfoDiff[$priority] = $assetInfos;
+                    } else {
+                        if ($assetDiff = $this->arrayDiff($this->assetsInfo[$priority], $assetInfos)) {
+                            $assetsInfoDiff[$priority] = $this->arrayDiff($this->assetsInfo[$priority], $assetInfos);
+                        }
+                    }
+                }
+
+                if ($assetsInfoDiff) {
+                    $diff[$key] = $assetsInfoDiff;
+                }
+
+                continue;
+            }
 
             if (is_array($value)) {
                 $particular = $this->arrayDiff($value, $other);
-            } elseif ($value != $other) {
+                if (0 === count($particular)) {
+                    unset($particular);
+                }
+            } elseif (is_scalar($value) && $value !== $other) {
                 $particular = $other;
             }
+            //todo, compare also header
 
-            if ($particular) {
+            if (isset($particular)) {
                 $diff[$key] = $particular;
             }
+
+            unset($particular);
         }
 
         return $diff;
@@ -848,6 +874,20 @@ class PageResponse extends Response
         $refClass = new \ReflectionClass($this);
         $defaults = $refClass->getDefaultProperties();
         foreach ($diff as $key => $value) {
+
+            if ('assetsInfo' === $key || 'assetsInfoBottom' === $key) {
+
+                foreach ($value as $priority => $assetInfosDiff) {
+                    if (!isset($this->assetsInfo[$priority])) {
+                        $this->assetsInfo[$priority] = $assetInfosDiff;
+                    } else {
+                        $this->assetsInfo[$priority] = array_merge($this->assetsInfo[$priority], $assetInfosDiff);
+                    }
+                }
+
+                continue;
+            }
+
             if (is_array($value) && is_array($this->$key)) {
                 $this->$key = array_merge($this->$key, $value);
             } else {
