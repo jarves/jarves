@@ -38,8 +38,6 @@ class ContentRender
      */
     private $stopwatch;
 
-    private $cachedSlotContents = array();
-
     /**
      * @param Jarves $jarves
      * @param StopwatchHelper $stopwatch
@@ -84,7 +82,7 @@ class ContentRender
             $nodeId = $this->jarves->getCurrentPage()->getId();
         }
 
-        $contents =& $this->getSlotContents($nodeId, $slotId);
+        $contents = $this->getSlotContents($nodeId, $slotId);
         return $this->renderContents($contents, $params);
     }
 
@@ -106,7 +104,7 @@ class ContentRender
             $nodeId = $this->jarves->getCurrentPage()->getId();
         }
 
-        $contents =& $this->getSlotContents($nodeId, $slotId);
+        $contents = $this->getSlotContents($nodeId, $slotId);
         return $this->renderContents($contents, $params);
     }
 
@@ -115,28 +113,25 @@ class ContentRender
      * @param integer $slotId
      * @return Model\Content[]
      */
-    public function &getSlotContents($nodeId, $slotId)
+    public function getSlotContents($nodeId, $slotId)
     {
-        if (!isset($this->cachedSlotContents[$nodeId.'.'.$slotId])){
+        $cacheKey = 'core/contents/' . $nodeId . '.' . $slotId;
+        $cache = $this->getJarves()->getDistributedCache($cacheKey);
+        $contents = null;
 
-            $cacheKey = 'core/contents/' . $nodeId . '.' . $slotId;
-            $cache = $this->getJarves()->getDistributedCache($cacheKey);
-            $contents = null;
-
-            if (!$cache) {
-                $contents = ContentQuery::create()
-                    ->filterByNodeId($nodeId)
-                    ->filterByBoxId($slotId)
-                    ->orderByRank()
-                    ->find();
-
-                $this->getJarves()->setDistributedCache($cacheKey, serialize($contents));
-            }
-
-            $this->cachedSlotContents[$nodeId.'.'.$slotId] = $contents ? : unserialize($cache);
+        if ($cache) {
+            return unserialize($cache);
         }
 
-        return $this->cachedSlotContents[$nodeId.'.'.$slotId];
+        $contents = ContentQuery::create()
+            ->filterByNodeId($nodeId)
+            ->filterByBoxId($slotId)
+            ->orderByRank()
+            ->find();
+
+        $this->getJarves()->setDistributedCache($cacheKey, serialize($contents));
+
+        return $contents;
     }
 //
 //    public function renderView(&$contents, $view)
