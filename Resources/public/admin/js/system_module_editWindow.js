@@ -271,7 +271,7 @@ var jarves_system_module_editWindow = new Class({
 
         new Element('h3', {
             text: t('Inspector'),
-            'class': 'jarves-system-module-editWindow-windowInspector-header'
+            'class': 'jarves-system-module-editWindow-windowInspector-container'
         }).inject(this.windowInspector);
 
         this.windowInspectorContainer = new Element('div', {
@@ -688,7 +688,7 @@ var jarves_system_module_editWindow = new Class({
                     'export': {
                         label: t('Export'),
                         type: 'checkbox',
-                        desc: t('Provide a export button in the window header.')
+                        desc: t('Provide a export button in the window container.')
                     },
 
                     /*export_types: {

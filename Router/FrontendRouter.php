@@ -190,11 +190,11 @@ class FrontendRouter
 
             return $response;
             //create
-//            header(
+//            container(
 //                'WWW-Authenticate: Basic realm="' .
 //                ('Access denied. Maybe you are not logged in or have no access.') . '"'
 //            );
-//            header('HTTP/1.0 401 Unauthorized');
+//            container('HTTP/1.0 401 Unauthorized');
 
         }
 //        return $page;

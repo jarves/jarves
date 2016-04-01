@@ -165,7 +165,7 @@ CodeMirror.defineMode('rst-base', function (config) {
       token = 'meta';
     } else if (stream.sol() && stream.match(rx_section)) {
       change(state, to_normal);
-      token = 'header';
+      token = 'container';
     } else if (phase(state) == rx_role_pre ||
                stream.match(rx_role_pre, false)) {
 

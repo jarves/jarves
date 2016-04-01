@@ -427,7 +427,7 @@ jarves.FieldProperty = new Class({
          text: t('Surround the key above with __ and __ (double underscore) to define a field which acts only as a user interface item and does not appear in the result.'),
          style: 'color: gray',
          'class': 'jarves-fieldTable-key-info'
-         }).inject(this.header);
+         }).inject(this.container);
          }*/
 
         var main = new Element('div', {'class': 'jarves-fieldTable-definition'}).inject(this.dialog.content);

@@ -675,7 +675,7 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
         linkTitle: s.linkTitle,
         em: s.em,
         strong: s.strong,
-        header: s.header,
+        header: s.container,
         taskList: s.taskList,
         list: s.list,
         listDepth: s.listDepth,
@@ -694,7 +694,7 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
       if (stream.sol()) {
         var forceBlankLine = stream.match(/^\s*$/, true) || state.header;
 
-        // Reset state.header
+        // Reset state.container
         state.header = 0;
 
         if (forceBlankLine) {

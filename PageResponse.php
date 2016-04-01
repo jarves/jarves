@@ -450,7 +450,7 @@ class PageResponse extends Response
     }
 
     /**
-     * Adds a additionally HTML header element.
+     * Adds a additionally HTML container element.
      *
      * @param string $content
      */
@@ -541,7 +541,7 @@ class PageResponse extends Response
     }
 
     /**
-     * Builds the html header tag for the favicon.
+     * Builds the html container tag for the favicon.
      *
      * @return string
      */
@@ -617,7 +617,7 @@ class PageResponse extends Response
     }
 
     /**
-     * Returns all additional html header elements.
+     * Returns all additional html container elements.
      */
     public function getAdditionalHeaderTags()
     {
@@ -834,7 +834,7 @@ class PageResponse extends Response
             } elseif (is_scalar($value) && $value !== $other) {
                 $particular = $other;
             }
-            //todo, compare also header
+            //todo, compare also container
 
             if (isset($particular)) {
                 $diff[$key] = $particular;

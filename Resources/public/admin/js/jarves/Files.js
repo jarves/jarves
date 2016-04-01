@@ -236,9 +236,9 @@ jarves.Files = new Class({
 
         if (!this.options.useWindowHeader) {
             this.header = new Element('div', {
-                'class': 'jarves-Files-wrapper-header'
+                'class': 'jarves-Files-wrapper-container'
             }).inject(this.container);
-            this.wrapper.addClass('jarves-Files-with-own-header');
+            this.wrapper.addClass('jarves-Files-with-own-container');
         } else {
             this.header = this.win.titleGroups;
             this.win.extendHead();
@@ -258,7 +258,7 @@ jarves.Files = new Class({
             ]
         });
 
-        document.id(this.headerLayout).addClass('jarves-Files-header');
+        document.id(this.headerLayout).addClass('jarves-Files-container');
         var actionsContainer = this.headerLayout.getCell(1, 1);
 
         actionsContainer.setStyle('white-space', 'nowrap');

@@ -23,11 +23,11 @@
      "[comment&formatting&formatting-code ``][comment foo ` bar][comment&formatting&formatting-code ``]");
 
   FT("formatting_atxHeader",
-     "[header&header-1&formatting&formatting-header&formatting-header-1 #][header&header-1  foo # bar ][header&header-1&formatting&formatting-header&formatting-header-1 #]");
+     "[container&container-1&formatting&formatting-container&formatting-container-1 #][container&container-1  foo # bar ][container&container-1&formatting&formatting-container&formatting-container-1 #]");
 
   FT("formatting_setextHeader",
      "foo",
-     "[header&header-1&formatting&formatting-header&formatting-header-1 =]");
+     "[container&container-1&formatting&formatting-container&formatting-container-1 =]");
 
   FT("formatting_blockquote",
      "[quote&quote-1&formatting&formatting-quote&formatting-quote-1 > ][quote&quote-1 foo]");
@@ -138,58 +138,58 @@
   // http://daringfireball.net/projects/markdown/syntax#header
 
   MT("atxH1",
-     "[header&header-1 # foo]");
+     "[container&container-1 # foo]");
 
   MT("atxH2",
-     "[header&header-2 ## foo]");
+     "[container&container-2 ## foo]");
 
   MT("atxH3",
-     "[header&header-3 ### foo]");
+     "[container&container-3 ### foo]");
 
   MT("atxH4",
-     "[header&header-4 #### foo]");
+     "[container&container-4 #### foo]");
 
   MT("atxH5",
-     "[header&header-5 ##### foo]");
+     "[container&container-5 ##### foo]");
 
   MT("atxH6",
-     "[header&header-6 ###### foo]");
+     "[container&container-6 ###### foo]");
 
   // H6 - 7x '#' should still be H6, per Dingus
   // http://daringfireball.net/projects/markdown/dingus
   MT("atxH6NotH7",
-     "[header&header-6 ####### foo]");
+     "[container&container-6 ####### foo]");
 
   // Inline styles should be parsed inside headers
   MT("atxH1inline",
-     "[header&header-1 # foo ][header&header-1&em *bar*]");
+     "[container&container-1 # foo ][container&container-1&em *bar*]");
 
   // Setext headers - H1, H2
   // Per documentation, "Any number of underlining =’s or -’s will work."
   // http://daringfireball.net/projects/markdown/syntax#header
-  // Ideally, the text would be marked as `header` as well, but this is
+  // Ideally, the text would be marked as `container` as well, but this is
   // not really feasible at the moment. So, instead, we're testing against
   // what works today, to avoid any regressions.
   //
   // Check if single underlining = works
   MT("setextH1",
      "foo",
-     "[header&header-1 =]");
+     "[container&container-1 =]");
 
   // Check if 3+ ='s work
   MT("setextH1",
      "foo",
-     "[header&header-1 ===]");
+     "[container&container-1 ===]");
 
   // Check if single underlining - works
   MT("setextH2",
      "foo",
-     "[header&header-2 -]");
+     "[container&container-2 -]");
 
   // Check if 3+ -'s work
   MT("setextH2",
      "foo",
-     "[header&header-2 ---]");
+     "[container&container-2 ---]");
 
   // Single-line blockquote with trailing space
   MT("blockquoteSpace",
@@ -276,9 +276,9 @@
      "1. bar",
      "2. hello");
 
-  // List after header
+  // List after container
   MT("listAfterHeader",
-     "[header&header-1 # foo]",
+     "[container&container-1 # foo]",
      "[variable-2 - bar]");
 
   // Formatting in lists (*)

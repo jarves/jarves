@@ -96,9 +96,9 @@ CodeMirror.defineMode("tiddlywiki", function () {
     ch = stream.next();
 
     if (sol && /[\/\*!#;:>|]/.test(ch)) {
-      if (ch == "!") { // tw header
+      if (ch == "!") { // tw container
         stream.skipToEnd();
-        return ret("header", "header");
+        return ret("container", "container");
       }
       if (ch == "*") { // tw list
         stream.eatWhile('*');
@@ -121,7 +121,7 @@ CodeMirror.defineMode("tiddlywiki", function () {
         return ret("quote", "quote");
       }
       if (ch == '|') {
-        return ret('table', 'header');
+        return ret('table', 'container');
       }
     }
 

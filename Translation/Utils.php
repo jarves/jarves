@@ -68,7 +68,7 @@ class Utils
 
     public function parsePo($file)
     {
-        $res = array('header' => array(), 'translations' => array(), 'file' => $file);
+        $res = array('container' => array(), 'translations' => array(), 'file' => $file);
         if (!file_exists($file)) {
             return $res;
         }
@@ -121,7 +121,7 @@ class Utils
             if (preg_match('/^"(((\\\\.)|[^"])*)"/', $buffer, $match)) {
                 if ($inHeader == true) {
                     $fp = strpos($match[1], ': ');
-                    $res['header'][substr($match[1], 0, $fp)] = str_replace('\n', '', substr($match[1], $fp + 2));
+                    $res['container'][substr($match[1], 0, $fp)] = str_replace('\n', '', substr($match[1], $fp + 2));
                 } else {
                     if (is_array($res['translations'][$lastId])) {
                         $res['translations'][static::evalString($lastId)][$lastPluralId] .= static::evalString(
@@ -171,18 +171,18 @@ class Utils
         $pluralForms = $this->getPluralForm($lang) ?: 'nplurals=2; plural=(n!=1);';
 
         if ($current) {
-            $current['header']['Plural-Forms'] = $pluralForms;
-            $current['header']['PO-Revision-Date'] = date('Y-m-d H:iO');
+            $current['container']['Plural-Forms'] = $pluralForms;
+            $current['container']['PO-Revision-Date'] = date('Y-m-d H:iO');
 
             fwrite($fh, 'msgid ""' . "\n" . 'msgstr ""' . "\n");
 
-            foreach ($current['header'] as $k => $v) {
+            foreach ($current['container'] as $k => $v) {
                 fwrite($fh, '"' . $k . ': ' . $v . '\n"' . "\n");
             }
             fwrite($fh, "\n\n");
         } else {
 
-            //write initial header
+            //write initial container
             fwrite(
                 $fh,
                 '

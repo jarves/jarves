@@ -139,7 +139,7 @@ class Model implements \ArrayAccess
     protected $arrayKey;
 
     /**
-     * Defines a header comment for each property (not attributes).
+     * Defines a container comment for each property (not attributes).
      *
      * Example:
      *

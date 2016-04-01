@@ -15,7 +15,7 @@ jarves.AutoTable = new Class({
         ;
 
         this.boxTitle = new Element('div', {
-            'class': 'jarves-autotable-box-header',
+            'class': 'jarves-autotable-box-container',
             html: this.opts.title
         }).inject(this.boxBorder);
 

@@ -33,7 +33,7 @@ CodeMirror.defineMode("properties", function() {
       } else if (sol && ch === "[") {
         state.afterSection = true;
         stream.skipTo("]"); stream.eat("]");
-        return "header";
+        return "container";
       } else if (ch === "=" || ch === ":") {
         state.position = "quote";
         return null;

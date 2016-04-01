@@ -600,7 +600,7 @@ class FileController extends Controller
      *  description="Displays a thumbnail/resized version of a image"
      * )
      *
-     * This exists the process and sends a `content-type: image/png` http header.
+     * This exists the process and sends a `content-type: image/png` http container.
      *
      * @Rest\QueryParam(name="path", requirements=".+", strict=true, description="The file path or its ID")
      * @Rest\QueryParam(name="width", requirements="[0-9]+", description="The image width")

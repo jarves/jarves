@@ -63,7 +63,7 @@ CodeMirror.defineMode("asterisk", function() {
     if(ch == '[') {
       stream.skipTo(']');
       stream.eat(']');
-      return "header";
+      return "container";
     }
     // string
     if(ch == '"') {

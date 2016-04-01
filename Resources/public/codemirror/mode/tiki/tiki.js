@@ -71,7 +71,7 @@ CodeMirror.defineMode('tiki', function(config) {
       break;
     case "-":
       if (stream.eat("=")) {//titleBar
-        return chain(inBlock("header string", "=-", inText));
+        return chain(inBlock("container string", "=-", inText));
       } else if (stream.eat("-")) {//deleted
         return chain(inBlock("error tw-deleted", "--", inText));
       }
@@ -99,17 +99,17 @@ CodeMirror.defineMode('tiki', function(config) {
     //start of line types
     if (sol) {
       switch (ch) {
-      case "!": //header at start of line
+      case "!": //container at start of line
         if (stream.match('!!!!!')) {
-          return chain(inLine("header string"));
+          return chain(inLine("container string"));
         } else if (stream.match('!!!!')) {
-          return chain(inLine("header string"));
+          return chain(inLine("container string"));
         } else if (stream.match('!!!')) {
-          return chain(inLine("header string"));
+          return chain(inLine("container string"));
         } else if (stream.match('!!')) {
-          return chain(inLine("header string"));
+          return chain(inLine("container string"));
         } else {
-          return chain(inLine("header string"));
+          return chain(inLine("container string"));
         }
         break;
       case "*": //unordered list line item, or <li /> at start of line

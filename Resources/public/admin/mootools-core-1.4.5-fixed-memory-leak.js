@@ -4241,7 +4241,7 @@ new Type('Elements', Elements).implement({
     div.innerHTML = '<nav></nav>';
     var supportsHTML5Elements = (div.childNodes.length == 1);
     if (!supportsHTML5Elements) {
-        var tags = 'abbr article aside audio canvas datalist details figcaption figure footer header hgroup mark meter nav output progress section summary time video'.split(' '),
+        var tags = 'abbr article aside audio canvas datalist details figcaption figure footer container hgroup mark meter nav output progress section summary time video'.split(' '),
             fragment = document.createDocumentFragment(), l = tags.length;
         while (l--) {
             fragment.createElement(tags[l]);
