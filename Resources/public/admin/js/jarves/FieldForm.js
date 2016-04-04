@@ -721,7 +721,7 @@ jarves.FieldForm = new Class({
      * Resets the patch status. Next getValue() only returns changed that will be made from now on.
      */
     resetPatch: function() {
-        this.value = this.getValue();
+        this.value = Object.clone(this.getValue());
     },
 
     /**
@@ -849,7 +849,6 @@ jarves.FieldForm = new Class({
                         && (val !== field.options['default'] || field.options.returnDefault)
                         ) {
 
-
                         if (typeOf(val) === 'object' && instanceOf(val, jarves.MultiValue)) {
                             res[id] = val.mainValue;
                             res = Object.merge(res, val.additionalValues);
@@ -863,7 +862,6 @@ jarves.FieldForm = new Class({
 
         if (patch) {
             var patchValue = {};
-
             Object.each(res, function(v, k) {
                 if (!this.value || this.isDifferent(v, this.value[k])) {
                     patchValue[k] = v;
@@ -896,36 +894,6 @@ jarves.FieldForm = new Class({
     },
 
     isDifferent: function(a, b) {
-        if (typeOf(a) !== typeOf(b)) {
-            return true;
-        }
-
-        var changed;
-        if ('object' === typeOf(a)) {
-            changed = false;
-            if (Object.getLength(a) !== Object.getLength(b)) {
-                return true;
-            }
-            Object.each(a, function(v, k) {
-                if (changed) return false;
-                changed = this.isDifferent(v, b[k]);
-            }.bind(this));
-            return changed;
-        }
-
-        if ('array' === typeOf(a)) {
-            changed = false;
-            if (a.length !== b.length) {
-                return true;
-            }
-            Array.each(a, function(v, k) {
-                if (changed) return false;
-                changed = this.isDifferent(v, b[k]);
-            }.bind(this));
-            return changed;
-        }
-
-
-        return a !== b;
+        return JSON.encode(a) !== JSON.encode(b);
     }
 });

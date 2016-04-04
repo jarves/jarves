@@ -261,7 +261,7 @@ jarves.FieldTypes.PageContents = new Class({
     },
 
     getValue: function() {
-        var content = this.editor ? this.editor.getValue() : this.backupedValue;
+        var content = this.editor ? this.editor.getValue() : this.backupContents;
 
         return new jarves.MultiValue(content, {
             layout: this.layoutSelection ? this.layoutSelection.getValue() : this.firstSelectedLayout
@@ -269,8 +269,6 @@ jarves.FieldTypes.PageContents = new Class({
     },
 
     setValue: function(value, internal) {
-        this.backupedValue = value;
-
         if (this.getField().getForm()) {
             this.setValueFromForm(value, internal);
         } else {
@@ -285,10 +283,12 @@ jarves.FieldTypes.PageContents = new Class({
             this.lastContents = contents;
         }
 
+        this.backupContents = contents;
         this.loadEditor(this.domainSelection.getValue(), this.currentNode, contents);
     },
 
     setValueFromForm: function(value, internal) {
+        this.backupContents = value ? value.content : null;
         var originValue = this.getField().getForm().getOriginValue();
 
         var typeValue = this.getField().getForm().getValue('type');
@@ -301,7 +301,7 @@ jarves.FieldTypes.PageContents = new Class({
 
         this.currentNode = originValue.id;
         this.currentDomain = originValue.domainId;
-        this.loadEditor(originValue.domainId, originValue.id, value  ? value.content : null);
+        this.loadEditor(originValue.domainId, originValue.id, value ? value.content : null);
     },
 
     onLayoutSelectFirst: function(layout) {

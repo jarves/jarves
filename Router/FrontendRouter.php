@@ -211,12 +211,10 @@ class FrontendRouter
 
         $controller = $clazz . '::handleAction';
 
-        if (!$this->editorMode && '' !== $url && '/' !== $url && $domain && $domain->getStartnodeId() == $page->getId(
-            )
-        ) {
+        if ('' !== $url && '/' !== $url && $domain && $domain->getStartnodeId() == $page->getId()) {
             //This is the start page, so add a redirect controller
             $this->routes->add(
-                'jarves_page_redirect_to_startpage',
+                'jarves_page_redirect_to_startpage_' . $domain->getId(),
                 new SyRoute(
                     $url,
                     array(
@@ -515,18 +513,6 @@ class FrontendRouter
 
         $page = null;
         $title = sprintf('Searching Page [%s]', $url);
-
-        if ($nodeId = (int)$this->getRequest()->get('_jarves_editor_node')) {
-            if ($this->getJarves()->isEditMode($nodeId)) {
-                $title = sprintf('Use Page from Editor [%s]', $nodeId);
-                $page = NodeQuery::create()->findPk($nodeId);
-                $this->editorMode = true;
-                if ($layout = $this->getRequest()->get('_jarves_editor_layout')) {
-                    $page->setLayout($layout);
-                }
-                $this->getJarves()->setCurrentPage($page);
-            }
-        }
 
         $stopwatch->start($title);
         if (!$page) {

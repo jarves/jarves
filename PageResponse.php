@@ -8,6 +8,7 @@ use Jarves\AssetHandler\JsHandler;
 use Jarves\Exceptions\BundleNotFoundException;
 use Jarves\File\FileInfo;
 use Jarves\Model\Content;
+use Jarves\Model\Node;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Jarves\Controller\PageController;
@@ -564,6 +565,22 @@ class PageResponse extends Response
     }
 
     /**
+     * @return string
+     */
+    public function getLayout(Node $node)
+    {
+        if ($nodeId = (int)$this->getJarves()->getRequest()->get('_jarves_editor_node')) {
+            if ($this->getJarves()->isEditMode($nodeId)) {
+                if ($layout = $this->getJarves()->getRequest()->get('_jarves_editor_layout')) {
+                    return $layout;
+                }
+            }
+        }
+
+        return $node->getLayout();
+    }
+
+    /**
      * Builds the html body of the current page.
      *
      * @return string
@@ -584,10 +601,12 @@ class PageResponse extends Response
             throw new \LogicException(sprintf('Theme `%s` not found.', $themeId));
         }
 
-        if (!$layout = $theme->getLayoutByKey($page->getLayout())) {
+        $layoutKey = $this->getLayout($page);
+
+        if (!$layout = $theme->getLayoutByKey($layoutKey)) {
             $this->getJarves()->getStopwatch()->stop('Build PageBody');
             throw new \LogicException(
-                sprintf('Layout for `%s` in theme `%s` not found.', $page->getLayout(), $themeId)
+                sprintf('Layout for `%s` in theme `%s` not found.', $layoutKey, $themeId)
             );
         }
         $layoutPath = $layout->getFile();

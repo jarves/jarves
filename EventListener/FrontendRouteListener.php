@@ -79,14 +79,16 @@ class FrontendRouteListener extends RouterListener
 
     public function onKernelRequest(GetResponseEvent $event)
     {
+        $request = $event->getRequest();
+
         if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
             //prepare for new master request: clear the PageResponse object
             $this->getJarves()->prepareNewMasterRequest();
 
-            if (!isset($this->loaded[$event->getRequest()->getPathInfo()])) {
-                $frontendRouter = new FrontendRouter($this->getJarves(), $event->getRequest());
+            if (!isset($this->loaded[$request->getPathInfo()])) {
+                $frontendRouter = new FrontendRouter($this->getJarves(), $request);
 
-                $this->loaded[$event->getRequest()->getPathInfo()] = true;
+                $this->loaded[$request->getPathInfo()] = true;
 
                 //check for redirects/access requirements and populates $this->routes with current page routes and its plugins
                 if ($response = $frontendRouter->loadRoutes($this->routes)) {
@@ -102,7 +104,7 @@ class FrontendRouteListener extends RouterListener
             parent::onKernelRequest($event);
 
             if ($event->getRequest()->attributes->has('_route')){
-                $name = $event->getRequest()->attributes->get('_route');
+                $name = $request->attributes->get('_route');
                 $route = $this->routes->get($name);
                 $nodeId = $route->getDefault('nodeId');
                 $node = NodeQuery::create()->findPk($nodeId);

@@ -125,6 +125,11 @@ class Jarves
         return (0 === strpos($this->getRequest()->getPathInfo(), $adminPrefix . '/'));
     }
 
+    /**
+     * @param int|null $nodeId
+     * 
+     * @return bool
+     */
     public function isEditMode($nodeId = null)
     {
         $hasRequest = $this->container->has('request');
