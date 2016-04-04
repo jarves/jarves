@@ -335,7 +335,6 @@ jarves.FieldTypes.PageContents = new Class({
 
         var targetLayout = this.layoutSelection ? this.layoutSelection.getValue() : this.firstSelectedLayout;
 
-        console.log('loadEditor', 'domain:', domainId, '=', this.currentDomain, 'node:', nodeId, '=', this.currentNode, 'layout:', targetLayout, '=',this.currentLayout);
         if (this.currentNode && this.currentNode == nodeId && this.currentLayout == targetLayout && this.getEditor()) {
             this.getEditor().setValue(contents);
             return;

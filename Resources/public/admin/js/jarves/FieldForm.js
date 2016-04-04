@@ -862,11 +862,9 @@ jarves.FieldForm = new Class({
 
         if (patch) {
             var patchValue = {};
-            console.log('patch', this.value, res);
 
             Object.each(res, function(v, k) {
                 if (!this.value || this.isDifferent(v, this.value[k])) {
-                    console.log('isDifferent', k, 'new:', v, 'old:', this.value[k]);
                     patchValue[k] = v;
                 }
             }.bind(this));
