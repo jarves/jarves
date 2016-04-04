@@ -159,6 +159,14 @@ class PageResponse extends Response
      */
     public function getFavicon()
     {
+        if ($this->getDomainHandling()) {
+            if ($domain = $this->getJarves()->getCurrentDomain()) {
+                if ($domain->getFavicon()) {
+                    return $domain->getFavicon();
+                }
+            }
+        }
+        
         return $this->favicon;
     }
 
