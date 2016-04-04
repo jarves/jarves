@@ -8,6 +8,8 @@ jarves.ContentTypes.Text = new Class({
         label: 'Rich Text'
     },
 
+    editor: null,
+
     options: {
         /**
          * Sets the height of the editor to a fix value. Default is auto.
@@ -88,7 +90,7 @@ jarves.ContentTypes.Text = new Class({
                 this.editor = editor;
                 this.ready = true;
                 if (this.value) {
-                    this.main.set('html', this.value);
+                    this.setValue(this.value);
                 }
                 editor.on('change', function(ed) {
                     this.checkChange();
@@ -111,13 +113,21 @@ jarves.ContentTypes.Text = new Class({
     },
 
     setValue: function(value) {
+        if (value) {
+            value = value.replace(/ data-mce-bogus="1"/g, '');
+        }
         this.value = value;
         this.oldData = this.value;
+
         this.main.set('html', this.value || '<p><br/></p>');
     },
 
     getValue: function() {
-        return this.main.get('html');
+        var value = this.main.get('html');
+
+        value = value.replace(/ data-mce-bogus="1"/g, '');
+
+        return value;
     },
 
     deselected: function() {

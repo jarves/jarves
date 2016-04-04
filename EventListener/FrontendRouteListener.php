@@ -2,6 +2,7 @@
 
 namespace Jarves\EventListener;
 
+use Jarves\Exceptions\AccessDeniedException;
 use Jarves\Jarves;
 use Jarves\Model\Base\NodeQuery;
 use Jarves\Router\FrontendRouter;
@@ -100,16 +101,31 @@ class FrontendRouteListener extends RouterListener
         }
 
         try {
-            //check routes in $this->route
-            parent::onKernelRequest($event);
+            if ($nodeId = (int)$this->getJarves()->getRequest()->get('_jarves_editor_node')) {
+                if ($this->getJarves()->isEditMode($nodeId)) {
+                    $node = NodeQuery::create()->joinWithDomain()->findPk($nodeId);
+                    if ($node) {
+                        $this->jarves->setCurrentPage($node);
+                        $this->jarves->setCurrentDomain($node->getDomain());
 
-            if ($event->getRequest()->attributes->has('_route')){
-                $name = $request->attributes->get('_route');
-                $route = $this->routes->get($name);
-                $nodeId = $route->getDefault('nodeId');
-                $node = NodeQuery::create()->findPk($nodeId);
-                $this->jarves->setCurrentPage($node);
-                $this->jarves->setCurrentDomain($node->getDomain());
+                        $request->attributes->set('_controller', 'Jarves\\Controller\\PageController::handleAction');
+                    }
+                } else {
+                    throw new AccessDeniedException('Access denied.');
+                }
+            } else {
+                //check routes in $this->route
+                parent::onKernelRequest($event);
+
+                if ($request->attributes->has('_route')){
+                    $name = $request->attributes->get('_route');
+                    $route = $this->routes->get($name);
+                    $nodeId = $route->getDefault('nodeId');
+
+                    $node = NodeQuery::create()->joinWithDomain()->findPk($nodeId);
+                    $this->jarves->setCurrentPage($node);
+                    $this->jarves->setCurrentDomain($node->getDomain());
+                }
             }
         } catch (MethodNotAllowedException $e) {
         } catch (NotFoundHttpException $e) {

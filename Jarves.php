@@ -127,7 +127,7 @@ class Jarves
 
     /**
      * @param int|null $nodeId
-     * 
+     *
      * @return bool
      */
     public function isEditMode($nodeId = null)
@@ -709,9 +709,7 @@ class Jarves
             $id = $nodeOrId->getId();
         }
 
-        $domainId = $nodeOrId instanceof Node ? $nodeOrId->getDomainId() : $this->getUtils()->getDomainOfPage(
-            $id
-        );
+        $domainId = $nodeOrId instanceof Node ? $nodeOrId->getDomainId() : $this->getUtils()->getDomainOfPage($id);
         $currentDomain = $domain ?: $this->getCurrentDomain();
 
         if (!$suppressStartNodeCheck && $currentDomain->getStartnodeId() === $id) {

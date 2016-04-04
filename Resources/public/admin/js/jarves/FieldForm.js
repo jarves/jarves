@@ -862,8 +862,11 @@ jarves.FieldForm = new Class({
 
         if (patch) {
             var patchValue = {};
+            console.log('patch', this.value, res);
+
             Object.each(res, function(v, k) {
                 if (!this.value || this.isDifferent(v, this.value[k])) {
+                    console.log('isDifferent', k, 'new:', v, 'old:', this.value[k]);
                     patchValue[k] = v;
                 }
             }.bind(this));
@@ -895,5 +898,37 @@ jarves.FieldForm = new Class({
 
     isDifferent: function(a, b) {
         return JSON.encode(a) !== JSON.encode(b);
+
+        if (typeOf(a) !== typeOf(b)) {
+            return true;
+        }
+
+        var changed;
+        if ('object' === typeOf(a)) {
+            changed = false;
+            if (Object.getLength(a) !== Object.getLength(b)) {
+                return true;
+            }
+            Object.each(a, function(v, k) {
+                if (changed) return false;
+                changed = this.isDifferent(v, b[k]);
+            }.bind(this));
+            return changed;
+        }
+
+        if ('array' === typeOf(a)) {
+            changed = false;
+            if (a.length !== b.length) {
+                return true;
+            }
+            Array.each(a, function(v, k) {
+                if (changed) return false;
+                changed = this.isDifferent(v, b[k]);
+            }.bind(this));
+            return changed;
+        }
+
+
+        return a !== b;
     }
 });

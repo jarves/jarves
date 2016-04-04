@@ -12,7 +12,7 @@ jarves.FieldTypes.PageContents = new Class({
     currentNode: null,
     currentDomain: null,
 
-    lastContents: null,
+    currentContents: null,
 
     lastLoadedTreeForDomainId: null,
 
@@ -131,7 +131,7 @@ jarves.FieldTypes.PageContents = new Class({
             this.domainSelection = new jarves.Select(this.headerLayout.getCell(1, 1), {
                 object: 'jarves/domain',
                 onChange: function(item) {
-                    this.loadEditor(this.domainSelection.getValue());
+                    this.loadEditor(this.domainSelection.getValue(), this.currentNode, this.currentContents);
                 }.bind(this)
             });
         }
@@ -261,7 +261,7 @@ jarves.FieldTypes.PageContents = new Class({
     },
 
     getValue: function() {
-        var content = this.editor ? this.editor.getValue() : this.backupContents;
+        var content = this.editor ? this.editor.getValue() : this.currentContents;
 
         return new jarves.MultiValue(content, {
             layout: this.layoutSelection ? this.layoutSelection.getValue() : this.firstSelectedLayout
@@ -277,18 +277,18 @@ jarves.FieldTypes.PageContents = new Class({
     },
 
     setValueDefault: function(contents, internal) {
-        if (!contents) {
-            contents = this.lastContents;
-        } else {
-            this.lastContents = contents;
-        }
+        // if (!contents) {
+        //     contents = this.lastContents;
+        // } else {
+        //     this.lastContents = contents;
+        // }
 
-        this.backupContents = contents;
+        this.currentContents = contents;
         this.loadEditor(this.domainSelection.getValue(), this.currentNode, contents);
     },
 
     setValueFromForm: function(value, internal) {
-        this.backupContents = value ? value.content : null;
+        this.currentContents = value ? value.content : null;
         var originValue = this.getField().getForm().getOriginValue();
 
         var typeValue = this.getField().getForm().getValue('type');
@@ -299,9 +299,9 @@ jarves.FieldTypes.PageContents = new Class({
 
         this.reloadLayoutSelection(value.theme || originValue.domain.theme, value.layout);
 
-        this.currentNode = originValue.id;
-        this.currentDomain = originValue.domainId;
-        this.loadEditor(originValue.domainId, originValue.id, value ? value.content : null);
+        // this.currentNode = originValue.id;
+        // this.currentDomain = originValue.domainId;
+        this.loadEditor(originValue.domainId, originValue.id, this.currentContents);
     },
 
     onLayoutSelectFirst: function(layout) {
@@ -309,7 +309,8 @@ jarves.FieldTypes.PageContents = new Class({
     },
 
     onLayoutChange: function(layout) {
-        this.reloadEditor();
+        this.currentContents = this.editor ? this.editor.getValue() : this.currentContents;
+        this.loadEditor(this.currentDomain, this.currentNode, this.currentContents);
     },
 
     reloadLayoutSelection: function(themeId, layoutId) {
@@ -327,27 +328,20 @@ jarves.FieldTypes.PageContents = new Class({
         }, this.layoutSelectionContainer);
     },
 
-    reloadEditor: function() {
-        this.loadEditor();
-    },
-
     loadEditor: function(domainId, nodeId, contents) {
         var options = {
             standalone: this.options.standalone
         };
 
-        if (!contents) {
-            contents = this.lastContents;
-        }
-
-        this.lastContents = contents;
-
         var targetLayout = this.layoutSelection ? this.layoutSelection.getValue() : this.firstSelectedLayout;
 
+        console.log('loadEditor', 'domain:', domainId, '=', this.currentDomain, 'node:', nodeId, '=', this.currentNode, 'layout:', targetLayout, '=',this.currentLayout);
         if (this.currentNode && this.currentNode == nodeId && this.currentLayout == targetLayout && this.getEditor()) {
             this.getEditor().setValue(contents);
             return;
         }
+
+        this.editor = null;
 
         var id = (Math.random() * 10 * (Math.random() * 10)).toString(36).slice(3);
 
