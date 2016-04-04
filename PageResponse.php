@@ -602,7 +602,6 @@ class PageResponse extends Response
                 )
             );
         } catch (\Exception $e) {
-            $this->getJarves()->getStopwatch()->stop('Build PageBody');
             throw new \Exception(sprintf('Cant render view `%s` of theme `%s`.', $layoutPath, $themeId), 0, $e);
         }
 
