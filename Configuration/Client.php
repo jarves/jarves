@@ -101,7 +101,7 @@ class Client extends Model
      */
     public function setAutoStart($autoStart)
     {
-        $this->autoStart = $autoStart;
+        $this->autoStart = $this->bool($autoStart);
     }
 
     /**

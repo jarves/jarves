@@ -1449,7 +1449,7 @@ jarves.getFieldCaching = function() {
                 'apc': _('APC'),
                 'files': _('Files')
             },
-            'depends': {
+            'children': {
                 'cache_params[servers]': {
                     needValue: ['memcached', 'redis'],
                     'label': 'Servers',

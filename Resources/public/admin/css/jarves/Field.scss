@@ -82,10 +82,17 @@ div.title {
     font-size: 13px;
 }
 
+.jarves-Field-info {
+    color: #828C94;
+    line-height: 14px;
+    font-weight: 400;
+}
+
 div.desc {
     padding: 3px 0 0 20px;
-    color: #74818A;
+    color: #828C94;
     line-height: 14px;
+    font-weight: 400;
     font-size: 12px;
 }
 
@@ -386,10 +393,6 @@ tr.jarves-field-main > td div.desc {
 
 .jarves-Field-group-title > div.title {
     padding-left: 0;
-    color: gray;
-}
-
-.jarves-Field-info {
     color: gray;
 }
 

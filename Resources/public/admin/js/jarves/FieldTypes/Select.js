@@ -68,7 +68,6 @@ jarves.FieldTypes.Select = new Class({
         store: false, //string
         object: false, //for object chooser
         objectIdAsUrlId: false
-
     },
 
     createLayout: function () {

@@ -96,7 +96,7 @@ services:
 
      jarves.filesystem.adapter.local:
          class: %jarves.filesystem.adapter.local.class%
-         scope: prototype
+         shared: false
          arguments: ["/"]
          calls:
              - [setJarves, ["@jarves"]]
@@ -211,7 +211,7 @@ services:
 
      jarves.model.builder.propel:
         class: %jarves.model.builder.propel.class%
-        arguments: [@jarves.filesystem.local, @jarves.objects, @kernel]
+        arguments: ["@jarves.filesystem.local", "@jarves.objects", "@kernel"]
         tags:
             - { name: jarves.model.builder, alias: propel }
 

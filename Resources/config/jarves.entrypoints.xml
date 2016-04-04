@@ -52,9 +52,9 @@
       <entryPoint path="system" type="custom" icon="#icon-cog-4">
         <label>System</label>
         <children>
-          <entryPoint path="desktop-settings" type="custom" multi="true">
-            <label>Desktop settings</label>
-          </entryPoint>
+          <!--<entryPoint path="desktop-settings" type="custom" multi="true">-->
+            <!--<label>Desktop settings</label>-->
+          <!--</entryPoint>-->
           <!--<entryPoint path="layout" type="custom" system="true" icon="#icon-code" link="true" multi="true">-->
             <!--<label>Layouts</label>-->
           <!--</entryPoint>-->
@@ -89,15 +89,15 @@
             <entryPoint path="logs" type="custom" system="true" icon="#icon-list-9" link="true">
                 <label>Logs</label>
             </entryPoint>
-          <entryPoint path="settings" type="custom" system="true" icon="#icon-cog-4" link="true" multi="true">
-            <label>Settings</label>
-          </entryPoint>
+          <entryPoint path="settings" type="custom" system="true" icon="#icon-cog-4" link="false" multi="true">
+        <label>Settings</label>
+      </entryPoint>
           <entryPoint path="development" system="true" link="true">
             <label>Development</label>
             <children>
-              <entryPoint path="database" type="custom" system="true" icon="#icon-database" link="true" multi="true">
-                <label>Database</label>
-              </entryPoint>
+              <!--<entryPoint path="database" type="custom" system="true" icon="#icon-database" link="true" multi="true">-->
+                <!--<label>Database</label>-->
+              <!--</entryPoint>-->
               <entryPoint path="fields" type="custom" system="true" icon="#icon-console" link="true">
                 <label>Fields</label>
               </entryPoint>
@@ -110,20 +110,20 @@
         <children>
           <entryPoint path="users" object="jarves/user" type="combine" system="true" icon="#icon-user-9" link="true">
             <label>Users</label>
-            <children>
-              <entryPoint path="editMe">
-                <class>\Users\Controller\Admin\EditMe</class>
-                <label>User self edit</label>
-                <children>
-                  <entryPoint path="groups">
-                    <label>Can edit groups</label>
-                  </entryPoint>
-                  <entryPoint path="username">
-                    <label>Can change username</label>
-                  </entryPoint>
-                </children>
-              </entryPoint>
-            </children>
+            <!--<children>-->
+              <!--<entryPoint path="editMe">-->
+                <!--<class>\Users\Controller\Admin\EditMe</class>-->
+                <!--<label>User self edit</label>-->
+                <!--<children>-->
+                  <!--<entryPoint path="groups">-->
+                    <!--<label>Can edit groups</label>-->
+                  <!--</entryPoint>-->
+                  <!--<entryPoint path="username">-->
+                    <!--<label>Can change username</label>-->
+                  <!--</entryPoint>-->
+                <!--</children>-->
+              <!--</entryPoint>-->
+            <!--</children>-->
           </entryPoint>
           <entryPoint path="groups" object="jarves/group" type="combine" system="true" icon="#icon-users-2" link="true">
             <label>Groups</label>

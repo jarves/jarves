@@ -17,11 +17,7 @@ var jarves_system_settings = new Class({
             var res = pResponse.data;
 
             this.langs = res.langs;
-            this.timezones = [];
-            res.timezones.each(function (timezone) {
-                this.timezones.include({l: timezone});
-            }.bind(this));
-
+            this.timezones = res.timezones;
             this._createLayout();
 
         }.bind(this)}).get();
@@ -45,15 +41,6 @@ var jarves_system_settings = new Class({
                         required: true,
                         desc: t('Appears in the administration title.')
                     },
-                    adminUrl: {
-                        type: 'text',
-                        label: 'Administration url prefix',
-                        desc: t('Default is `jarves`. Without trailing or starting slash.')
-                    },
-                    debug: {
-                        type: 'checkbox',
-                        label: 'Administration Debug Mode'
-                    },
                     email: {
                         type: 'text',
                         label: 'System Email'
@@ -68,7 +55,7 @@ var jarves_system_settings = new Class({
                         label: t('Languages'),
                         desc: t('Limit the language selection, system-wide.'),
                         itemsKey: 'code',
-                        labelTemplate: '{title} ({langtitle}, {code})',
+                        labelTemplate: '{{title}} ({{langtitle}}, {{code}})',
                         items: this.langs
                     }
                 }
@@ -78,79 +65,110 @@ var jarves_system_settings = new Class({
                 label: t('System'),
                 children: {
                     'cache[class]': {
-                        label: t('Caching driver'),
+                        label: _('Cache storage'),
                         type: 'select',
-                        desc: t('You should probably use a caching driver for external caching if you have load-balanced szenario, since this cache has to be known in every installation.'),
                         items: {
+                            'Jarves\\Cache\\Files': _('Files'),
+                            'Jarves\\Cache\\Memcached': _('Memcached'),
+                            'Jarves\\Cache\\Redis': _('Redis'),
+                            'Jarves\\Cache\\Apc': _('APC')
                         },
-                        children: {
-                        }
-                    },
-                    '__errorLog__': {
-                        type: 'childrenSwitcher',
-                        label: t('Error log'),
-                        children: {
-
-                            'displayErrors': {
-                                label: t('Display errors'),
-                                desc: t('Prints errors to the frontend clients. You should deactivate this in productive systems.'),
-                                type: 'checkbox'
-                            },
-                            'displayDetailedRestErrors': {
-                                label: t('Display REST error'),
-                                type: 'checkbox',
-                                desc: t('Display more information in REST errors, like line number, file path and backstrace.')
-                            },
-                            'logErrors': {
-                                label: t('Save errors into a log file'),
-                                type: 'checkbox',
-                                children: {
-                                    'logErrorsFile': {
-                                        needValue: 1,
-                                        label: t('Log file'),
-                                        desc: t('Example: jarves.log')
+                        'children': {
+                            'cache[options][servers]': {
+                                needValue: ['Jarves\\Cache\\Memcached', 'Jarves\\Cache\\Redis'],
+                                'label': 'Servers',
+                                'type': 'array',
+                                startWith: 1,
+                                'width': 310,
+                                'columns': [
+                                    {'label': _('IP')},
+                                    {'label': _('Port'), width: 50}
+                                ],
+                                'fields': {
+                                    ip: {
+                                        type: 'text',
+                                        width: '95%',
+                                        empty: false
+                                    },
+                                    port: {
+                                        type: 'number',
+                                        width: 50,
+                                        empty: false
                                     }
                                 }
                             },
-                            'dbErrorPrintSql': {
-                                label: t('Display the full SQL in the error log'),
-                                'default': false,
-                                type: 'checkbox'
-                            },
-                            'dbExceptionsNoStop': {
-                                label: t('Do not stop the script during an query failure'),
-                                'default': false,
-                                type: 'checkbox'
-                            },
-                            'debugLogSqls': {
-                                label: t('[Debug] Log all SQL queries'),
-                                'default': false,
-                                desc: t('Deactivate this on productive machines, otherwise it will blow up your logs!'),
-                                type: 'checkbox'
+                            'cache[options][path]': {
+                                needValue: 'Jarves\\Cache\\Files',
+                                type: 'text',
+                                label: 'Caching directory',
+                                'default': 'cache/object/'
                             }
                         }
                     },
+                    // '__errorLog__': {
+                    //     type: 'childrenSwitcher',
+                    //     label: t('Error log'),
+                    //     children: {
+                    //
+                    //         // 'displayErrors': {
+                    //         //     label: t('Display errors'),
+                    //         //     desc: t('Prints errors to the frontend clients. You should deactivate this in productive systems.'),
+                    //         //     type: 'checkbox'
+                    //         // },
+                    //         // 'displayDetailedRestErrors': {
+                    //         //     label: t('Display REST error'),
+                    //         //     type: 'checkbox',
+                    //         //     desc: t('Display more information in REST errors, like line number, file path and backstrace.')
+                    //         // },
+                    //         'logErrors': {
+                    //             label: t('Save errors into a log file'),
+                    //             type: 'checkbox',
+                    //             children: {
+                    //                 'logErrorsFile': {
+                    //                     needValue: 1,
+                    //                     label: t('Log file'),
+                    //                     desc: t('Example: jarves.log')
+                    //                 }
+                    //             }
+                    //         },
+                    //         'dbErrorPrintSql': {
+                    //             label: t('Display the full SQL in the error log'),
+                    //             'default': false,
+                    //             type: 'checkbox'
+                    //         },
+                    //         'dbExceptionsNoStop': {
+                    //             label: t('Do not stop the script during an query failure'),
+                    //             'default': false,
+                    //             type: 'checkbox'
+                    //         },
+                    //         'debugLogSqls': {
+                    //             label: t('[Debug] Log all SQL queries'),
+                    //             'default': false,
+                    //             desc: t('Deactivate this on productive machines, otherwise it will blow up your logs!'),
+                    //             type: 'checkbox'
+                    //         }
+                    //     }
+                    // },
                     'timezone': {
                         label: t('Server timezone'),
                         type: 'select',
-                        items: this.timezones,
-                        itemsKey: 'code'
+                        items: this.timezones
                     },
-                    fileGroupName: {
+                    'file[groupOwner]': {
                         label: t('File group owner'),
                         type: 'text'
                     },
-                    fileGroupPermission: {
+                    'file[groupPermission]': {
                         label: t('File group permission'),
                         type: 'select',
                         items: {rw: t('Read/Write'), r: t('Read'), '-': t('Nothing')}
                     },
-                    fileEveryonePermission: {
+                    'file[everyonePermission]': {
                         label: t('File everyone permission'),
                         type: 'select',
                         items: {rw: t('Read/Write'), r: t('Read'), '-': t('Nothing')}
                     },
-                    fileNoChangeMode: {
+                    'file[disableModeChange]': {
                         label: t('Do not change file mode by existing files'),
                         desc: t('In some circumstances it is necessary to disable the chmod call on existing files. For example if your IDE or a custom interface always changes the owner of Jarves cms files.'),
                         type: 'checkbox',
@@ -162,11 +180,11 @@ var jarves_system_settings = new Class({
                 type: 'tab',
                 label: t('Media'),
                 children: {
-                    localFileUrl: {
-                        type: 'text',
-                        label: t('Local file URL'),
-                        desc: t('For http proxy (vanish, AWS cloudfront etc) you should enter the URL here. Default is empty.')
-                    },
+                    // localFileUrl: {
+                    //     type: 'text',
+                    //     label: t('Local file URL'),
+                    //     desc: t('For http proxy (vanish, AWS cloudfront etc) you should enter the URL here. Default is empty.')
+                    // },
                     mounts: {
                         label: t('External file mount'),
                         desc: t('Here you can connect with a external cloud storage server'),
@@ -197,49 +215,50 @@ var jarves_system_settings = new Class({
                         label: t('Backend client driver'),
                         desc: t('Login, session processing etc. The user "admin" always authenticate against the Jarves cms users database.'),
                         items: {
-                            '\\Jarves\\Client\\JarvesUsers': t('Jarves cms users database')
+                            'Jarves\\Client\\JarvesUsers': t('Jarves cms users database')
                         },
                         children: {
-                            'client[config][\\Jarves\\Client\\JarvesUsers][email_login]': {
+                            'client[config][Jarves\\Client\\JarvesUsers][emailLogin]': {
                                 'label': t('Allow email login'),
                                 'type': 'checkbox',
-                                'needValue': '\\Jarves\\Client\\JarvesUsers'
+                                'needValue': 'Jarves\\Client\\JarvesUsers'
                             },
-                            'client[config][\\Jarves\\Client\\JarvesUsers][timeout]': {
+                            'client[config][Jarves\\Client\\JarvesUsers][timeout]': {
                                 label: t('Session timeout'),
                                 type: 'text',
                                 'default': '3600',
-                                'needValue': '\\Jarves\\Client\\JarvesUsers'
+                                'needValue': 'Jarves\\Client\\JarvesUsers'
                             },
-                            'client[config][\\Jarves\\Client\\JarvesUsers][passwordHashCompat]': {
-                                'type': 'checkbox',
-                                'label': t('Activate the compatibility in the authentication with older Jarves cms'),
-                                'default': 1,
-                                'needValue': '\\Jarves\\Client\\JarvesUsers',
-                                'desc': t('If you did upgrade from a older version than 1.0 than you should probably let this checkbox active.')
-                            }
+                            // 'client[config][Jarves\\Client\\JarvesUsers][passwordHashCompat]': {
+                            //     'type': 'checkbox',
+                            //     'label': t('Activate the compatibility in the authentication with older Jarves cms'),
+                            //     'default': 1,
+                            //     'needValue': 'Jarves\\Client\\JarvesUsers',
+                            //     'desc': t('If you did upgrade from a older version than 1.0 than you should probably let this checkbox active.')
+                            // }
                         }
                     },
-                    'client[store][class]': {
+                    'client[sessionStorage][class]': {
                         type: 'select',
                         label: t('Session storage'),
                         items: {
-                            '\\Jarves\\Cache\\PHPSessions': t('PHP-Sessions')
+                            'Jarves\\Client\\StoreDatabase': t('Database'),
+                            'Jarves\\Client\\StoreCache': t('Cache Storage')
                         },
                         children: {
                         }
                     },
-                    'client[store][autoStart]': {
+                    'client[autoStart]': {
                         type: 'checkbox',
                         'default': true,
                         label: t('Session auto boot'),
-                        desc: t('You can deactivate the automatic distribution of session ids via cookie if you disable this option. To track the user, you have to start then the process in your module manually.')
+                        desc: t('You can deactivate the automatic distribution of session ids if you disable this option. To track the user, you have to start then the process in your module manually.')
 
                     },
                     '__info__': {
                         'type': 'label',
                         'label': t('Frontend client handling'),
-                        'desc': t('You can overrite these settings per domain under <br />Pages -> Domain -> Client.')
+                        'desc': t('You can overwrite these settings per domain under <br />Pages -> Domain -> Client.')
                     }
                 }
             }
@@ -318,6 +337,12 @@ var jarves_system_settings = new Class({
 
         });
 
+        this.actionBar = new jarves.ButtonGroup(this.win.getSidebar());
+
+        this.saveBtn = this.actionBar.addButton(t('Save'), '#icon-checkmark-6');
+        this.saveBtn.setButtonStyle('blue');
+        this.resetBtn = this.actionBar.addButton(t('Reset'), '#icon-escape');
+
         this.fieldObject = new jarves.FieldForm(this.win.content, fields, {
             allTableItems: true,
             tabsInWindowHeader: true,
@@ -325,13 +350,6 @@ var jarves_system_settings = new Class({
         }, {
             win: this.win
         });
-
-        this.actionBar = new jarves.ButtonGroup(this.win.getSidebar());
-
-        this.saveBtn = this.actionBar.addButton(t('Save'), '#icon-checkmark-6');
-        this.saveBtn.setButtonStyle('blue');
-        this.resetBtn = this.actionBar.addButton(t('Reset'), '#icon-escape');
-
         this.load();
 
     },
