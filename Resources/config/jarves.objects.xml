@@ -205,7 +205,10 @@
           <field id="theme" type="theme">
             <label>Theme</label>
           </field>
-          <field id="titleFormat" type="text"/>
+          <field id="titleFormat" type="text">
+            <label>Title Format</label>
+            <desc>Available placeholder: %title%</desc>
+          </field>
         </fields>
       </object>
       <object id="Language">

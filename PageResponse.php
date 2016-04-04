@@ -758,7 +758,7 @@ class PageResponse extends Response
             if ($page = $this->getJarves()->getCurrentPage()) {
                 return str_replace(
                     array(
-                         '%title'
+                         '%title%'
                     ),
                     array(
                         $page->getAlternativeTitle() ? : $page->getTitle()

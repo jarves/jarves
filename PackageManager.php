@@ -90,10 +90,10 @@ class PackageManager extends ContainerAware {
         $path = $this->getPath();
 
         $domain->setPath($path);
-        $domain->setTitleFormat('%title | Node title - My Website - change me under domain settings.');
+        $domain->setTitleFormat('%title% | Node title - My Website - change me under domain settings.');
         $domain->setMaster(1);
         $domain->setLang('en');
-        $domain->setResourcecompression(1);
+        $domain->setResourceCompression(0);
         $domain->setTheme('jarvesDemoTheme');
         $domain->setSearchIndexKey(md5(time() . '-' . rand()));
         $domain->save();

@@ -11,14 +11,9 @@ class DomainCrudController extends \Jarves\Controller\ObjectCrudController {
     'label' => 'General',
     'type' => 'tab',
     'children' => array (
-      'domain' => array (
-        'type' => 'text',
-      ),
-      'path' => array (
-        'type' => 'predefined',
-        'object' => 'JarvesBundle:Domain',
-        'field' => 'path',
-      ),
+      'domain',
+      'path',
+      'titleFormat',
       'lang' => array (
         'type' => 'lang',
         'label' => 'Language'
