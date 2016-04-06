@@ -34,9 +34,12 @@ class JarvesExtension extends Extension implements PrependExtensionInterface
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('services.plugin.yml');
         $loader->load('services/content-types.yml');
         $loader->load('services/field-types.yml');
         $loader->load('services/twig.yml');
+        $loader->load('services/storage.yml');
+        $loader->load('services/crud.yml');
     }
 
 //    public function prepend(ContainerBuilder $container)

@@ -41,9 +41,8 @@
   The cache layer we use for the distributed caching.
   (The `fast caching` is auto determined (Order: APC, XCache, Files))
   -->
-  <cache>
+  <cache service="jarves.cache.backend.files">
     <!--The full classname of the storage. MUST have `Core\Cache\CacheInterface` as interface.-->
-    <class>Jarves\Cache\Files</class>
     <options/>
   </cache>
   <!--Log handling. ClientInfo and stackTrace start with level >= ERROR (400) or level=Debug(100).
@@ -60,8 +59,7 @@
     autoStart: true|false (false) If the systems starts always a session for each request and therefore sends for each
                                 visitor/request a cookie (if none is delivered).
   -->
-  <client autoStart="false">
-    <class>Jarves\Client\JarvesUsers</class>
+  <client autoStart="false" service="jarves.client.jarves_users">
     <options>
       <option key="emailLogin">true</option>
     </options>
@@ -71,7 +69,7 @@
         class: The full classname of the storage. MUST have `Core\Cache\CacheInterface` as interface.
         Define `database` for the database storage.
     -->
-    <sessionStorage class="Jarves\Client\StoreDatabase">
+    <sessionStorage service="jarves.client.store.database">
       <options/>
     </sessionStorage>
   </client>

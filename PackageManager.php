@@ -424,7 +424,11 @@ class PackageManager extends ContainerAware {
         $admin->setLastName('strator');
         $admin->setEmail('admin@localhost');
         $admin->setActivate(1);
-        $admin->hashPassword('admin');
+
+        /** @var JarvesConfig $jarvesConfig */
+        $jarvesConfig = $this->container->get('jarves.config');
+        $admin->hashPassword('admin', $jarvesConfig->getSystemConfig()->getPasswordHashKey());
+
         $liveWorkspace = WorkspaceQuery::create()->findOneById(1);
         $admin->addWorkspace($liveWorkspace);
 

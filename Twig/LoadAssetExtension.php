@@ -4,25 +4,21 @@ namespace Jarves\Twig;
 
 use Jarves\Jarves;
 use Jarves\Model\Node;
+use Jarves\PageStack;
 
 class LoadAssetExtension extends \Twig_Extension
 {
     /**
-     * @var Jarves
+     * @var PageStack
      */
-    protected $jarves;
-
-    function __construct(Jarves $jarves)
-    {
-        $this->jarves = $jarves;
-    }
+    private $pageStack;
 
     /**
-     * @return \Jarves\Jarves
+     * @param PageStack $pageStack
      */
-    public function getJarves()
+    function __construct(PageStack $pageStack)
     {
-        return $this->jarves;
+        $this->pageStack = $pageStack;
     }
 
     public function getName()
@@ -40,12 +36,12 @@ class LoadAssetExtension extends \Twig_Extension
 
     public function loadAsset($asset)
     {
-        $this->getJarves()->getPageResponse()->loadAssetFile($asset);
+        $this->pageStack->getPageResponse()->loadAssetFile($asset);
     }
 
     public function loadAssetAtBottom($asset)
     {
-        $this->getJarves()->getPageResponse()->loadAssetFileAtBottom($asset);
+        $this->pageStack->getPageResponse()->loadAssetFileAtBottom($asset);
     }
 
 }

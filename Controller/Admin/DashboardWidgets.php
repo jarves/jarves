@@ -1,13 +1,29 @@
 <?php
 
 namespace Jarves\Controller\Admin;
-use Jarves\Controller;
+
+use Jarves\Cache\Backend\AbstractCache;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Jarves\Model\NewsFeedQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Map\TableMap;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DashboardWidgets extends Controller
+class DashboardWidgets
 {
+    /**
+     * @var AbstractCache
+     */
+    protected $distributedCache;
+
+    /**
+     * @param AbstractCache $distributedCache
+     */
+    public function __construct(AbstractCache $distributedCache)
+    {
+        $this->distributedCache = $distributedCache;
+    }
+
     public function newsFeed(&$response, $params)
     {
         $items = NewsFeedQuery::create()
@@ -70,6 +86,10 @@ class DashboardWidgets extends Controller
     {
 
         $matches = array();
+        $availIdx = 0;
+        $usedIdx = 0;
+        $nameIdx = 0;
+
         if ('darwin' == strtolower(PHP_OS)) {
             $sysctl = `df -kl`;
             preg_match_all(
@@ -123,7 +143,7 @@ class DashboardWidgets extends Controller
                 'size' => $user + $avail
             );
         }
-        return array_values($result) ? : array();
+        return array_values($result) ?: array();
     }
 
     /**
@@ -139,7 +159,7 @@ class DashboardWidgets extends Controller
 
     public function latency(&$response)
     {
-        $lastLatency = $this->getFastCache()->get('core/latency');
+        $lastLatency = $this->distributedCache->get('core/latency');
 
         $result = array(
             'frontend' => 0,
@@ -158,7 +178,7 @@ class DashboardWidgets extends Controller
 
     public function latencies(&$response)
     {
-        $lastLatency = $this->getFastCache()->get('core/latency');
+        $lastLatency = $this->distributedCache->get('core/latency');
         $result = array(
             'frontend' => 0,
             'backend' => 0,

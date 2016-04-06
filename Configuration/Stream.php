@@ -6,17 +6,12 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 class Stream extends Model
 {
-    protected $attributes = ['path'];
+    protected $attributes = ['path', 'service'];
 
     /**
      * @var string
      */
-    protected $class;
-
-    /**
-     * @var string
-     */
-    protected $method;
+    protected $service;
 
     /**
      * @var string
@@ -29,19 +24,19 @@ class Stream extends Model
     protected $path;
 
     /**
-     * @param string $class
+     * @param string $service
      */
-    public function setClass($class)
+    public function setService($service)
     {
-        $this->class = $class;
+        $this->service = $service;
     }
 
     /**
      * @return string
      */
-    public function getClass()
+    public function getService()
     {
-        return $this->class;
+        return $this->service;
     }
 
     /**
@@ -75,36 +70,4 @@ class Stream extends Model
     {
         return $this->label;
     }
-
-    /**
-     * @param string $method
-     */
-    public function setMethod($method)
-    {
-        $this->method = $method;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMethod()
-    {
-        return $this->method;
-    }
-
-    public function run(&$response, array $params = array())
-    {
-        $clazz = $this->getClass();
-        $method = $this->getMethod();
-        $controller = new $clazz();
-
-        if ($controller instanceof ContainerAwareInterface) {
-            $controller->setContainer($this->getJarves()->getContainer());
-        }
-
-        $callable = array($controller, $method);
-        $parameters = array(&$response, $params);
-        call_user_func_array($callable, $parameters);
-    }
-
 }

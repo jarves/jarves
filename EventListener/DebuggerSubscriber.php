@@ -4,6 +4,7 @@ namespace Jarves\EventListener;
 
 use Jarves\Jarves;
 use Jarves\Logger\JarvesHandler;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
@@ -25,24 +26,33 @@ class DebuggerSubscriber implements EventSubscriberInterface
      */
     protected $jarvesLogHandler;
 
-    function __construct(Jarves $jarves, JarvesHandler $jarvesLogHandler)
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
+     * @param ContainerInterface $container
+     * @param JarvesHandler $jarvesLogHandler
+     */
+    function __construct(ContainerInterface $container, JarvesHandler $jarvesLogHandler)
     {
-        $this->jarves = $jarves;
         $this->jarvesLogHandler = $jarvesLogHandler;
+        $this->container = $container;
     }
 
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::TERMINATE => array('onKernelTerminate', -2048),
+            KernelEvents::TERMINATE => array('onKernelTerminate', -128),
         ];
     }
 
     public function onKernelTerminate(PostResponseEvent $event)
     {
-        if ($this->jarves->getContainer()->has('profiler')) {
+        if ($this->container->has('profiler')) {
             /** @var $profiler \Symfony\Component\HttpKernel\Profiler\Profiler */
-            $profiler = $this->jarves->getContainer()->get('profiler');
+            $profiler = $this->container->get('profiler');
 
             if ($profile = $profiler->loadProfileFromResponse($event->getResponse())) {
                 $logRequest = $this->jarvesLogHandler->getLogRequest();

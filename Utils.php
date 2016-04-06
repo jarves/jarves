@@ -3,8 +3,11 @@
 namespace Jarves;
 
 use Icap\HtmlDiff\HtmlDiff;
+use Jarves\Cache\Cacher;
+use Jarves\Filesystem\Filesystem;
 use Jarves\Model\AppLockQuery;
 use Jarves\Model\Base\NodeQuery;
+use Jarves\Model\Domain;
 use Jarves\Model\Node;
 
 class Utils
@@ -16,30 +19,51 @@ class Utils
      */
     protected $jarves;
 
-    function __construct(Jarves $jarves)
-    {
-        $this->jarves = $jarves;
-    }
+    /**
+     * @var Filesystem
+     */
+    protected $webFilesystem;
 
     /**
+     * @var Filesystem
+     */
+    protected $localFilesystem;
+
+    /**
+     * @var Cacher
+     */
+    private $cacher;
+
+    /**
+     * @var PageStack
+     */
+    private $pageStack;
+
+    /**
+     * Utils constructor.
      * @param Jarves $jarves
+     * @param PageStack $pageStack
+     * @param Filesystem $localFilesystem
+     * @param Filesystem $webFilesystem
+     * @param Cacher $cacher
      */
-    public function setJarves($jarves)
+    function __construct(Jarves $jarves, PageStack $pageStack, Filesystem $localFilesystem, Filesystem $webFilesystem, Cacher $cacher)
     {
         $this->jarves = $jarves;
+        $this->localFilesystem = $localFilesystem;
+        $this->webFilesystem = $webFilesystem;
+        $this->cacher = $cacher;
+        $this->pageStack = $pageStack;
     }
 
     /**
-     * @return Jarves
+     * @param Objects $repo
+     * @param $objectKey
+     * @param $origItem
+     * @return string
      */
-    public function getJarves()
+    protected function generateDiff(Objects $repo, $objectKey, $origItem)
     {
-        return $this->jarves;
-    }
-
-    protected function generateDiff($objectKey, $origItem)
-    {
-        $repo = $this->getJarves()->getObjects();
         $pk = $repo->getObjectPk($objectKey, $origItem);
         $currentItem = $repo->get($objectKey, $pk);
         $definition = $repo->getDefinition($objectKey);
@@ -77,24 +101,25 @@ class Utils
         $message = [];
         foreach ($changes as $changedKey => $diff) {
             if ($field = $definition->getField($changedKey)) {
-                $message[] = ($field->getLabel() ?: $field->getId()).': '.$diff;
+                $message[] = ($field->getLabel() ?: $field->getId()) . ': ' . $diff;
             }
         }
 
-        return $message ? '<div class="change">'.implode('</div><div class="change">', $message).'</div>' : '';
+        return $message ? '<div class="change">' . implode('</div><div class="change">', $message) . '</div>' : '';
     }
 
     /**
      * Adds a new news-feed entry. If not message (means null) is passed we generate a diff.
      *
+     * @param Objects $repo
      * @param string $objectKey
      * @param array $item
      * @param string $verb
      * @param string|null $message
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function newNewsFeed($objectKey, $item, $verb, $message = null)
+    public function newNewsFeed(Objects $repo, $objectKey, $item, $verb, $message = null)
     {
-        $repo = $this->getJarves()->getObjects();
         $definition = $repo->getDefinition($objectKey);
 
         $itemLabel = '';
@@ -108,13 +133,13 @@ class Utils
         }
 
         $username = '[Unknown]';
-        if ($this->getJarves()->getClient() && $this->getJarves()->getClient()->getUser()) {
-            if ($this->getJarves()->getClient()->getUser()->getFirstName() || $this->getJarves()->getClient()->getUser()->getLastName()) {
-                $username = $this->getJarves()->getClient()->getUser()->getFirstName();
+        if ($this->pageStack->getClient() && $this->pageStack->getClient()->getUser()) {
+            if ($this->pageStack->getClient()->getUser()->getFirstName() || $this->pageStack->getClient()->getUser()->getLastName()) {
+                $username = $this->pageStack->getClient()->getUser()->getFirstName();
                 if ($username) $username .= ' ';
-                $username .= $this->getJarves()->getClient()->getUser()->getLastName();
+                $username .= $this->pageStack->getClient()->getUser()->getLastName();
             } else {
-                $username = $this->getJarves()->getClient()->getUser()->getUsername();
+                $username = $this->pageStack->getClient()->getUser()->getUsername();
             }
         }
 
@@ -126,57 +151,29 @@ class Utils
         $newsFeed->setTargetPk($repo->getObjectUrlId($objectKey, $item));
         $newsFeed->setTargetLabel($itemLabel);
         $newsFeed->setCreated(time());
-        $newsFeed->setMessage(null === $message ? $this->generateDiff($objectKey, $item) : $message);
+        $newsFeed->setMessage(null === $message ? $this->generateDiff($repo, $objectKey, $item) : $message);
         $newsFeed->save();
     }
 
     public function getComposerArray($bundleClass)
     {
-        $path = $this->getJarves()->getBundleDir($bundleClass);
-        $fs = $this->getJarves()->getFileSystem();
+        $path = $this->jarves->getBundleDir($bundleClass);
+        $fs = $this->localFilesystem;
         if ($fs->has($file = $path . '/composer.json')) {
             return json_decode($fs->read($file), true);
         }
     }
 
-    /**
-     * Creates a temp folder and returns its path.
-     * Please use TempFile::createFolder() class instead.
-     *
-     * @internal
-     *
-     * @param  string $prefix
-     * @param  bool   $fullPath Returns the full path on true and the relative to the current TempFolder on false.
-     *
-     * @return string Path with trailing slash
-     */
-    public function createTempFolder($prefix = '', $fullPath = true)
-    {
-        $tmp = $this->getJarves()->getKernel()->getCacheDir();
-
-        do {
-            $path = $tmp . $prefix . dechex(time() / mt_rand(100, 500));
-        } while (is_dir($path));
-
-        mkdir($path);
-
-        if ('/' !== substr($path, -1)) {
-            $path .= '/';
-        }
-
-        return $fullPath ? $path : substr($path, strlen($tmp));
-    }
-
-    /**
-     * @param string $text
-     */
-    public function showFullDebug($text = null)
-    {
-        $exception = new \InternalErrorException();
-        $exception->setMessage($text ? : 'Debug stop.');
-
-        static::exceptionHandler($exception);
-    }
+//    /**
+//     * @param string $text
+//     */
+//    public function showFullDebug($text = null)
+//    {
+//        $exception = new \Exception();
+//        $exception->setMessage($text ?: 'Debug stop.');
+//
+//        static::exceptionHandler($exception);
+//    }
 
     /**
      * Returns Domain object
@@ -188,10 +185,10 @@ class Utils
     public function getDomain($domainId = null)
     {
         if (!$domainId) {
-            return $this->getJarves()->getCurrentDomain();
+            return $this->pageStack->getCurrentDomain();
         }
 
-        if ($domainSerialized = $this->getJarves()->getDistributedCache('core/object-domain/' . $domainId)) {
+        if ($domainSerialized = $this->cacher->getDistributedCache('core/object-domain/' . $domainId)) {
             return unserialize($domainSerialized);
         }
 
@@ -201,10 +198,86 @@ class Utils
             return false;
         }
 
-        $this->getJarves()->setDistributedCache('core/object-domain/' . $domainId, serialize($domain));
+        $this->cacher->setDistributedCache('core/object-domain/' . $domainId, serialize($domain));
 
         return $domain;
     }
+
+    /**
+     * @param        $nodeOrId
+     * @param bool $fullUrl
+     * @param bool $suppressStartNodeCheck
+     * @param Domain $domain
+     *
+     * @return string
+     */
+    public function getNodeUrl($nodeOrId, $fullUrl = false, $suppressStartNodeCheck = false, Domain $domain = null)
+    {
+        $id = $nodeOrId;
+
+        if (!$nodeOrId) {
+            $nodeOrId = $this->pageStack->getCurrentPage();
+        }
+
+        if ($nodeOrId instanceof Node) {
+            $id = $nodeOrId->getId();
+        }
+
+        $domainId = $nodeOrId instanceof Node ? $nodeOrId->getDomainId() : $this->getDomainOfPage($id);
+        $currentDomain = $domain ?: $this->pageStack->getCurrentDomain();
+
+        if (!$suppressStartNodeCheck && $currentDomain->getStartnodeId() === $id) {
+            $url = '/';
+        } else {
+            $urls = $this->getCachedPageToUrl($domainId);
+            $url = isset($urls[$id]) ? $urls[$id] : '';
+        }
+
+        //do we need to add app_dev.php/ or something?
+        $prefix = '';
+        if ($request = $this->pageStack->getRequest()) {
+            $prefix = substr(
+                $request->getBaseUrl(),
+                strlen($request->getBasePath())
+            );
+        }
+
+        if (false !== $prefix) {
+            $url = substr($prefix, 1) . $url;
+        }
+
+        if ($fullUrl || !$currentDomain || $domainId != $currentDomain->getId()) {
+            $domain = $currentDomain ?: $this->getDomain($domainId);
+
+            $domainName = $domain->getRealDomain();
+            if ($domain->getMaster() != 1) {
+                $url = $domainName . $domain->getPath() . $domain->getLang() . '/' . $url;
+            } else {
+                $url = $domainName . $domain->getPath() . $url;
+            }
+
+            $isSecure = $this->pageStack->getRequest() ? $this->pageStack->getRequest()->isSecure() : false;
+
+            $url = 'http' . ($isSecure ? 's' : '') . '://' . $url;
+        }
+
+        //crop last /
+        if (substr($url, -1) == '/') {
+            $url = substr($url, 0, -1);
+        }
+
+        //crop first /
+        if (substr($url, 0, 1) == '/') {
+            $url = substr($url, 1);
+        }
+
+        if ($url == '/') {
+            $url = '.';
+        }
+
+        return $url;
+    }
+
 
     /**
      * Returns a super fast cached Page object.
@@ -216,19 +289,19 @@ class Utils
     public function getPage($pageId = null)
     {
         if (!$pageId) {
-            return $this->getJarves()->getCurrentPage();
+            return $this->pageStack->getCurrentPage();
         }
 
-        $data = $this->getJarves()->getDistributedCache('core/object/node/' . $pageId);
+        $data = $this->cacher->getDistributedCache('core/object/node/' . $pageId);
 
         if (!$data) {
             $page = NodeQuery::create()->findPk($pageId);
-            $this->getJarves()->setDistributedCache('core/object/node/' . $pageId, serialize($page));
+            $this->cacher->setDistributedCache('core/object/node/' . $pageId, serialize($page));
         } else {
             $page = unserialize($data);
         }
 
-        return $page ? : false;
+        return $page ?: false;
     }
 
     /**
@@ -242,7 +315,7 @@ class Utils
     {
         $id2 = null;
 
-        $page2Domain = $this->getJarves()->getDistributedCache('core/node/toDomains');
+        $page2Domain = $this->cacher->getDistributedCache('core/node/toDomains');
 
         if (!is_array($page2Domain)) {
             $page2Domain = $this->updatePage2DomainCache();
@@ -270,14 +343,14 @@ class Utils
             $r2d[$item['DomainId']] = (isset($r2d[$item['DomainId']]) ? $r2d[$item['DomainId']] : '') . $item['Id'] . ',';
         }
 
-        $this->getJarves()->setDistributedCache('core/node/toDomains', $r2d);
+        $this->cacher->setDistributedCache('core/node/toDomains', $r2d);
 
         return $r2d;
     }
 
     /**
      * Returns a array map nodeId -> url
-     * 
+     *
      * @param  integer $domainId
      *
      * @return array
@@ -289,17 +362,17 @@ class Utils
 
     /**
      * Returns a array map url -> nodeId
-     * 
+     *
      * @param integer $domainId
-     * 
+     *
      * @return array
-     * 
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getCachedUrlToPage($domainId)
     {
         $cacheKey = 'core/urls/' . $domainId;
-        $urls = $this->getJarves()->getDistributedCache($cacheKey);
+        $urls = $this->cacher->getDistributedCache($cacheKey);
 
         if (!$urls) {
 
@@ -336,7 +409,7 @@ class Utils
                 $urls[$url] = $node['id'];
             }
 
-            $this->getJarves()->setDistributedCache($cacheKey, $urls);
+            $this->cacher->setDistributedCache($cacheKey, $urls);
         }
 
         return $urls;
@@ -350,11 +423,11 @@ class Utils
      */
     public function compressCss(array $files, $includePath = '')
     {
-        $webDir = realpath($this->getJarves()->getKernel()->getRootDir().'/../web') .'/';
+        $webDir = realpath($this->jarves->getRootDir() . '/../web') . '/';
         $content = '';
         foreach ($files as $assetPath) {
 
-            $cssFile = $this->getJarves()->resolvePublicWebPath($assetPath); //bundles/jarves/css/style.css
+            $cssFile = $this->jarves->resolvePublicWebPath($assetPath); //bundles/jarves/css/style.css
             $cssDir = dirname($cssFile) . '/'; //admin/css/...
             $cssDir = str_repeat('../', substr_count($includePath, '/')) . $cssDir;
 
@@ -370,7 +443,7 @@ class Utils
                         $buffer = preg_replace('/url\(\'(?!.*:\/\/)([^\/][^\)]*)\'\)/', 'url(\'' . $cssDir . '$1\')', $buffer);
                         $buffer = preg_replace('/url\(\"(?!.*:\/\/)([^\/][^\)]*)\"\)/', 'url(\"' . $cssDir . '$1\")', $buffer);
                         $buffer = preg_replace('/url\((?!.*data:image)(?!.*:\/\/)([^\/\'].*)\)/', 'url(' . $cssDir . '$1)', $buffer);
-                        
+
                         $buffer = str_replace(array('  ', '    ', "\t", "\n", "\r"), '', $buffer);
                         $buffer = str_replace(': ', ':', $buffer);
 
@@ -380,9 +453,6 @@ class Utils
                 }
             } else {
                 $content .= '/* => `' . $cssFile . '` not exist. */';
-                $this->getJarves()->getLogger()->error(
-                    sprintf('Can not find css file `%s` [%s]', $file, $assetPath)
-                );
             }
         }
 
@@ -399,7 +469,7 @@ class Utils
 
         foreach ($assets as $assetPath) {
 
-            $path = $this->getJarves()->resolveWebPath($assetPath);
+            $path = $this->jarves->resolveWebPath($assetPath);
             $files[] = '--js ' . escapeshellarg($path);
             $mtime = filemtime($path);
             $newestMTime = max($newestMTime, $mtime);
@@ -456,216 +526,16 @@ class Utils
             $content = '';
             foreach ($assets as $assetPath) {
                 $content .= "\n/* $assetPath */\n\n";
-                $path = $this->getJarves()->resolveWebPath($assetPath);
+                $path = $this->jarves->resolveWebPath($assetPath);
                 $content .= file_get_contents($path);
             }
 
             if ($content) {
-                $this->getJarves()->getWebFileSystem()->write($oFile, $content);
+                $this->webFilesystem->write($oFile, $content);
                 return true;
             }
 
             return false;
-        }
-    }
-
-    /**
-     * Stores all locked keys, so that we can release all,
-     * on process terminating.
-     *
-     * @var array
-     */
-    public $lockedKeys = array();
-
-    /**
-     * Releases all locked aquired by this process.
-     *
-     * Will be called during process shutdown. (register_shutdown_function)
-     */
-    public function releaseLocks()
-    {
-        foreach ($this->lockedKeys as $key => $value) {
-            self::appRelease($key);
-        }
-    }
-
-    /**
-     * Locks the process until the lock of $id has been acquired for this process.
-     * If no lock has been acquired for this id, it returns without waiting true.
-     *
-     * Waits max 15seconds.
-     *
-     * @param  string $id
-     * @param  integer $timeout Milliseconds
-     *
-     * @return boolean
-     */
-    public function appLock($id, $timeout = 15)
-    {
-
-        //when we'll be caleed, then we register our releaseLocks
-        //to make sure all locks are released.
-        register_shutdown_function([$this, 'releaseLocks']);
-
-        if (self::appTryLock($id, $timeout)) {
-            return true;
-        } else {
-            for ($i = 0; $i < 1000; $i++) {
-                usleep(15 * 1000); //15ms
-                if (self::appTryLock($id, $timeout)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Tries to lock given id. If the id is already locked,
-     * the function returns without waiting.
-     *
-     * @see appLock()
-     *
-     * @param  string $id
-     * @param  int $timeout Default is 30sec
-     *
-     * @return bool
-     */
-    public function appTryLock($id, $timeout = 30)
-    {
-        //already aquired by this process?
-        if ($this->lockedKeys[$id] === true) {
-            return true;
-        }
-
-        $now = ceil(microtime(true) * 1000);
-        $timeout2 = $now + $timeout;
-
-        dbDelete('system_app_lock', 'timeout <= ' . $now);
-
-        try {
-            dbInsert('system_app_lock', array('id' => $id, 'timeout' => $timeout2));
-            $this->lockedKeys[$id] = true;
-
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * Releases a lock.
-     * If you're not the owner of the lock with $id, then you'll kill it anyway.
-     *
-     * @param string $id
-     */
-    public function appRelease($id)
-    {
-        unset($this->lockedKeys[$id]);
-
-        try {
-            AppLockQuery::create()->filterById($id)->delete();
-            dbDelete('system_app_lock', array('id' => $id));
-        } catch (\Exception $e) {
-        }
-    }
-
-    /**
-     * Returns cached propel object.
-     *
-     * @param  int   $objectClassName If not defined, it returns the current page.
-     * @param  mixed $objectPk        Propel PK for $objectClassName int, string or array
-     *
-     * @return mixed Propel object
-     */
-    public function getPropelCacheObject($objectClassName, $objectPk)
-    {
-        if (is_array($objectPk)) {
-            $npk = '';
-            foreach ($objectPk as $k) {
-                $npk .= urlencode($k) . '_';
-            }
-        } else {
-            $pk = urlencode($objectPk);
-        }
-
-        $cacheKey = 'core/object-caching/' . strtolower(preg_replace('/[^\w]/', '.', $objectClassName)) . '/' . $pk;
-        if ($serialized = $this->getJarves()->getDistributedCache($cacheKey)) {
-            return unserialize($serialized);
-        }
-
-        return $this->setPropelCacheObject($objectClassName, $objectPk);
-    }
-
-    /**
-     * Returns propel object and cache it.
-     *
-     * @param int   $objectClassName If not defined, it returns the current page.
-     * @param mixed $objectPk        Propel PK for $objectClassName int, string or array
-     * @param mixed $object          Pass the object, if you did already fetch it.
-     *
-     * @return mixed Propel object
-     */
-    public function setPropelCacheObject($object2ClassName, $object2Pk, $object = false)
-    {
-        $pk = $object2Pk;
-        if ($pk === null && $object) {
-            $pk = $object->getPrimaryKey();
-        }
-
-        if (is_array($pk)) {
-            $npk = '';
-            foreach ($pk as $k) {
-                $npk .= urlencode($k) . '_';
-            }
-        } else {
-            $pk = urlencode($pk);
-        }
-
-        $cacheKey = 'core/object-caching.' . strtolower(preg_replace('/[^\w]/', '.', $object2ClassName)) . '/' . $pk;
-
-        $clazz = $object2ClassName . 'Query';
-        $object2 = $object;
-        if (!$object2) {
-            $object2 = $clazz::create()->findPk($object2Pk);
-        }
-
-        if (!$object2) {
-            return false;
-        }
-
-        $this->getJarves()->setDistributedCache($cacheKey, serialize($object2));
-
-        return $object2;
-
-    }
-
-    /**
-     * Removes a object from the cache.
-     *
-     * @param int   $objectClassName If not defined, it returns the current page.
-     * @param mixed $objectPk        Propel PK for $objectClassName int, string or array
-     */
-    public function removePropelCacheObject($objectClassName, $objectPk = null)
-    {
-        $pk = $objectPk;
-        if ($pk !== null) {
-            if (is_array($pk)) {
-                $npk = '';
-                foreach ($pk as $k) {
-                    $npk .= urlencode($k) . '_';
-                }
-            } else {
-                $pk = urlencode($pk);
-            }
-        }
-        $cacheKey = 'core/object-caching.' . strtolower(preg_replace('/[^\w]/', '.', $objectClassName));
-
-        if ($objectPk) {
-            $this->getJarves()->deleteDistributedCache($cacheKey . '/' . $pk);
-        } else {
-            $this->getJarves()->invalidateCache($cacheKey);
         }
     }
 

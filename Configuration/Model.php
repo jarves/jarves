@@ -806,7 +806,7 @@ class Model implements \ArrayAccess
     }
 
     /**
-     * @param $k             name of the property
+     * @param string $k name of the property
      * @param $printDefaults
      * @return mixed
      */
@@ -883,7 +883,6 @@ class Model implements \ArrayAccess
      */
     public function fromArray($values, $arrayKeyValue = null)
     {
-
         if ($this->arrayKey && null !== $arrayKeyValue) {
             $this->setArrayKeyValue($arrayKeyValue);
         }

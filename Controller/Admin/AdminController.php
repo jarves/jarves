@@ -13,15 +13,55 @@
 namespace Jarves\Controller\Admin;
 
 use FOS\RestBundle\Request\ParamFetcher;
+use Jarves\ACL;
+use Jarves\Configuration\Stream;
+use Jarves\ContentRender;
 use Jarves\Jarves;
 use Jarves\Model\Content;
+use Jarves\PageStack;
+use Jarves\Utils;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AdminController extends Controller
 {
+    /**
+     * @var Jarves
+     */
+    protected $jarves;
+
+    /**
+     * @var PageStack
+     */
+    protected $pageStack;
+
+    /**
+     * @var ContentRender
+     */
+    protected $contentRender;
+
+    /**
+     * @var Utils
+     */
     protected $utils;
+
+    /**
+     * @var ACL
+     */
+    protected $acl;
+
+    public function setContainer(ContainerInterface $container = null)
+    {
+        parent::setContainer($container);
+
+        $this->jarves = $this->get('jarves');
+        $this->acl = $this->get('jarves.acl');
+        $this->pageStack = $this->get('jarves.page_stack');
+        $this->contentRender = $this->get('jarves.content.render');
+        $this->utils = $this->get('jarves.utils');
+    }
 
     /**
      * @return Jarves
@@ -153,18 +193,16 @@ class AdminController extends Controller
         $contentObject->setContent($content);
 
         if ($domainId) {
-            $domain = $this->getJarves()->getUtils()->getDomain($domainId);
-            $this->getJarves()->setCurrentDomain($domain);
+            $domain = $this->utils->getDomain($domainId);
+            $this->pageStack->setCurrentDomain($domain);
         }
 
         if ($nodeId) {
-            $page = $this->getJarves()->getUtils()->getPage($nodeId);
-            $this->getJarves()->setCurrentPage($page);
+            $page = $this->utils->getPage($nodeId);
+            $this->pageStack->setCurrentPage($page);
         }
 
-        $render = $this->getJarves()->getContentRender();
-
-        return $render->renderContent($contentObject, [
+        return $this->contentRender->renderContent($contentObject, [
             'preview' => true
         ]);
     }
@@ -200,25 +238,25 @@ class AdminController extends Controller
     {
         $username = $paramFetcher->get('username');
         $password = $paramFetcher->get('password');
-        $status = $this->getJarves()->getAdminClient()->login($username, $password);
+        $status = $this->pageStack->getAdminClient()->login($username, $password);
 
-        if ($this->getJarves()->getAdminClient()->getUser()) {
-            $lastLogin = $this->getJarves()->getAdminClient()->getUser()->getLastLogin();
+        if ($this->pageStack->getAdminClient()->getUser()) {
+            $lastLogin = $this->pageStack->getAdminClient()->getUser()->getLastLogin();
             if ($status) {
-                $this->getJarves()->getAdminClient()->getUser()->setLastLogin(time());
+                $this->pageStack->getAdminClient()->getUser()->setLastLogin(time());
 
-                $email = $this->getJarves()->getAdminClient()->getUser()->getEmail();
+                $email = $this->pageStack->getAdminClient()->getUser()->getEmail();
 
                 return array(
-                    'token' => $this->getJarves()->getAdminClient()->getToken(),
-                    'userId' => $this->getJarves()->getAdminClient()->getUserId(),
-                    'username' => $this->getJarves()->getAdminClient()->getUser()->getUsername(),
+                    'token' => $this->pageStack->getAdminClient()->getToken(),
+                    'userId' => $this->pageStack->getAdminClient()->getUserId(),
+                    'username' => $this->pageStack->getAdminClient()->getUser()->getUsername(),
                     'lastLogin' => $lastLogin,
-                    'access' => $this->getJarves()->getACL()->check('JarvesBundle:entryPoint', '/admin'),
-                    'firstName' => $this->getJarves()->getAdminClient()->getUser()->getFirstName(),
-                    'lastName' => $this->getJarves()->getAdminClient()->getUser()->getLastName(),
+                    'access' => $this->acl->check('JarvesBundle:entryPoint', '/admin'),
+                    'firstName' => $this->pageStack->getAdminClient()->getUser()->getFirstName(),
+                    'lastName' => $this->pageStack->getAdminClient()->getUser()->getLastName(),
                     'emailMd5' => $email ? md5(strtolower(trim($email))) : null,
-                    'imagePath' => $this->getJarves()->getAdminClient()->getUser()->getImagePath()
+                    'imagePath' => $this->pageStack->getAdminClient()->getUser()->getImagePath()
                 );
             }
         }
@@ -238,8 +276,8 @@ class AdminController extends Controller
      */
     public function logoutUserAction()
     {
-        if ($this->getJarves()->getAdminClient()->hasSession() && $this->getJarves()->getAdminClient()->getUser()) {
-            $this->getJarves()->getAdminClient()->logout();
+        if ($this->pageStack->getAdminClient()->hasSession() && $this->pageStack->getAdminClient()->getUser()) {
+            $this->pageStack->getAdminClient()->logout();
 
             return true;
         }
@@ -259,7 +297,7 @@ class AdminController extends Controller
      */
     public function loggedInAction()
     {
-        return $this->getJarves()->getAdminClient()->getUserId() > 0;
+        return $this->pageStack->getAdminClient()->getUserId() > 0;
     }
 
     /**
@@ -294,7 +332,7 @@ class AdminController extends Controller
                     $id = strtolower($bundleConfig->getBundleName() . '/' . $stream->getPath());
                     $shortId = strtolower($bundleConfig->getName() . '/' . $stream->getPath());
                     if (false !== in_array($id, $__streams) || false !== in_array($shortId, $__streams)) {
-                        $stream->run($response, $params);
+                        $this->runStream($stream, $response, $params);
                     }
                 }
             }
@@ -302,4 +340,16 @@ class AdminController extends Controller
 
         return $response;
     }
+
+    public function runStream(Stream $stream, &$response, array $params = array())
+    {
+        $serviceName = explode(':', $stream->getService())[0];
+        $method = explode(':', $stream->getService())[1];
+        $instance = $this->get($serviceName);
+
+        $callable = array($instance, $method);
+        $parameters = array(&$response, $params);
+        call_user_func_array($callable, $parameters);
+    }
+
 }

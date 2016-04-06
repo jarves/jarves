@@ -109,8 +109,8 @@ EOF;
         $request->server->set('SCRIPT_FILENAME', '/Users/marc/bude/symfony-24/web/app_dev.php');
         $request->server->set('SCRIPT_NAME', '/symfony-24/web/app_dev.php');
         $request->getBasePath();
-        $this->getJarves()->getRequestStack()->push($request);
-        $response = $this->getJarves()->getPageResponse();
+        $this->getRequestStack()->push($request);
+        $response = $this->getPageResponse();
         $prefix = substr($this->getJarves()->getAdminPrefix(), 1);
 
         $response->addJsFile($prefix . '/admin/ui/languages');
@@ -129,8 +129,8 @@ EOF;
         $request->server->set('SCRIPT_NAME', '/symfony-24/web/app.php');
         $request->getBasePath();
 
-        $this->getJarves()->getRequestStack()->push($request);
-        $response = $this->getJarves()->getPageResponse();
+        $this->getRequestStack()->push($request);
+        $response = $this->getPageResponse();
         $prefix = substr($this->getJarves()->getAdminPrefix(), 1);
 
         $response->addJsFile($prefix . '/admin/ui/languages');

@@ -2,7 +2,7 @@
 
 namespace Jarves\Tests;
 
-use Jarves\ContainerHelperTrait;
+use Jarves\Tests\ContainerHelperTrait;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

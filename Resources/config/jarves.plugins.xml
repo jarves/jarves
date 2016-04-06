@@ -1,0 +1,10 @@
+<config>
+  <bundle>
+    <plugins>
+      <plugin id="login">
+        <label>User Login</label>
+        <controller>jarves.plugin.userlogin:login</controller>
+      </plugin>
+  </plugins>
+</bundle>
+</config>

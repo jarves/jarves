@@ -260,7 +260,7 @@ class Bundle extends Model
     {
         if (!isset($this->imported[$property])) {
             $path = $this->getBundleClass()->getPath() . '/Resources/config/' . (@static::$propertyToFile[$property] ? : 'jarves.xml');
-            $root = realpath($this->getJarves()->getKernel()->getRootDir() . '/../');
+            $root = realpath($this->getJarves()->getRootDir() . '/../');
 
             return substr($path, strlen($root) + 1);
         } else {
@@ -279,7 +279,7 @@ class Bundle extends Model
         $doc = new \DOMDocument();
         $doc->formatOutput = true;
         $doc->preserveWhiteSpace = false;
-        if (file_exists($path = $this->getJarves()->getKernel()->getRootDir() . '/../' . $xmlFile)) {
+        if (file_exists($path = $this->getJarves()->getRootDir() . '/../' . $xmlFile)) {
             $doc->load($path);
         } else {
             $configElement = $doc->createElement('config');
@@ -415,7 +415,7 @@ class Bundle extends Model
         if ('bundle' === $node->nodeName) {
             $imported = $this->importNode($node);
 
-            $root = realpath($this->getJarves()->getKernel()->getRootDir() . '/../');
+            $root = realpath($this->getJarves()->getRootDir() . '/../');
             foreach ($imported as $property) {
                 $this->imported[$property] = Tools::getRelativePath($file, $root);
             }

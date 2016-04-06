@@ -2,16 +2,18 @@
 
 namespace Jarves\ContentTypes;
 
-class TypeTray extends AbstractType
+use Jarves\ContentRender;
+
+class TypeTray extends AbstractType implements ContentRendererAwareContentType
 {
     /**
      * @var \Jarves\ContentRender
      */
-    protected $contentRenderer;
+    protected $contentRender;
 
-    function __construct($contentRenderer)
+    public function setContentRenderer(ContentRender $contentRender)
     {
-        $this->contentRenderer = $contentRenderer;
+        $this->contentRender = $contentRender;
     }
 
     public function render()
@@ -19,7 +21,7 @@ class TypeTray extends AbstractType
         if ($this->getContent()->getContent()) {
             $value = json_decode($this->getContent()->getContent(), true);
             $nodeId = $value['node']+0;
-            return $this->contentRenderer->renderSlot($nodeId);
+            return $this->contentRender->renderSlot($nodeId);
         }
     }
 }

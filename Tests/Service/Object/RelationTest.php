@@ -14,7 +14,7 @@ class RelationTest extends KernelAwareTestCase
 {
     public function testManyToOneVirtualField()
     {
-        $testItemCategory = $this->getJarves()->getObjects()->getDefinition('test/itemCategory');
+        $testItemCategory = $this->getObjects()->getDefinition('test/itemCategory');
         $field = $testItemCategory->getField('items');
         $this->assertInstanceOf('Jarves\Configuration\Field', $field);
         $this->assertEquals('items', $field->getId());
@@ -117,6 +117,7 @@ class RelationTest extends KernelAwareTestCase
             [
                 'username' => 'testNtoNRelation',
                 'password' => 'testNtoNRelationPassword',
+                'email' => 'testNtoNReatlion@localhost',
                 'groupMembership' => [$groupPk['id']]
             ]
         );
@@ -125,9 +126,8 @@ class RelationTest extends KernelAwareTestCase
         $user = $this->getObjects()->get('jarves/user', $pk);
         $this->assertEquals('testNtoNRelation', $user['username']);
 
-        $this->assertNotEquals('', $user['password']);
-        $this->assertNotEquals('testNtoNRelationPassword', $user['password']);
-        $this->assertNotEquals('', $user['passwordSalt']);
+        $this->assertFalse(isset($user['password']));
+        $this->assertFalse(isset($user['passwordSalt']));
     }
 
     public function testManyToOne()
@@ -145,7 +145,7 @@ class RelationTest extends KernelAwareTestCase
             ]
         ];
 
-        $added = $this->getJarves()->getObjects()->add('test/itemCategory', $newItemCategory);
+        $added = $this->getObjects()->add('test/itemCategory', $newItemCategory);
 
         $this->assertGreaterThan(0, $added['id']);
 

@@ -649,9 +649,9 @@ jarves.WindowEdit = new Class({
 
         this.resetBtn = this.actionGroup.addButton(t('Reset'), '#icon-escape', this.reset.bind(this));
 
-        //        if (this.classProperties.workspace) {
-        //            this.showVersionsBtn = this.actionBarGroup1.addButton(t('Versions'), '#icon-history', this.showVersions);
-        //        }
+        if (this.classProperties.workspace) {
+            this.showVersionsBtn = this.actionGroup.addButton(t('Versions'), '#icon-history', this.showVersions);
+        }
 
         if (true) {
             this.previewBtn = this.actionGroup.addButton(t('Preview'), '#icon-eye');

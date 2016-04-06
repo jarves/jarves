@@ -37,7 +37,10 @@ class FrontendCommand extends AbstractCommand
         $table->setStyle('compact');
         $table->setHeaders(['Domain', 'Type', 'Title', 'Method', 'Path', 'Controller']);
 
-        $frontendRouter = new FrontendRouter($jarves, new Request());
+
+        $frontendRouter = $this->getContainer()->get('jarves.frontend_router');
+        $frontendRouter->setRequest(new Request());
+
         $nodes = NodeQuery::create()
             ->filterByLft(1, Criteria::GREATER_THAN) //exclude root nodes of nested set
             ->orderByDomainId()

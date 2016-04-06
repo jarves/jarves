@@ -3,6 +3,7 @@
 namespace Jarves\Propel;
 
 use Jarves\Configuration\Connection;
+use Jarves\Filesystem\Filesystem;
 use Jarves\Jarves;
 use Jarves\Exceptions\FileNotWritableException;
 use Propel\Generator\Command\MigrationDiffCommand;
@@ -14,13 +15,12 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * This is not in use anymore.
  *
  * Class PropelHelper
- *
- * @package Core
  */
 class PropelHelper
 {
@@ -37,13 +37,19 @@ class PropelHelper
      * @var Jarves
      */
     protected $jarves;
+    /**
+     * @var Filesystem
+     */
+    private $cacheFilesystem;
 
     /**
      * @param Jarves $jarves
+     * @param Filesystem $cacheFilesystem
      */
-    function __construct(Jarves $jarves)
+    function __construct(Jarves $jarves, Filesystem $cacheFilesystem)
     {
         $this->jarves = $jarves;
+        $this->cacheFilesystem = $cacheFilesystem;
     }
 
     /**
@@ -84,9 +90,7 @@ class PropelHelper
      */
     public function getTempFolder()
     {
-        $kernel = $this->getJarves()->getKernel();
-
-        return $kernel->getCacheDir() . '/propel/';
+        return $this->getJarves()->getCacheDir() . '/propel/';
     }
 
     /**
@@ -94,7 +98,7 @@ class PropelHelper
      */
     public function cleanup()
     {
-        $fs = $this->getJarves()->getCacheFileSystem();
+        $fs = $this->cacheFilesystem;
         if ($fs->has('propel')) {
             $fs->delete('propel');
         }
@@ -105,7 +109,7 @@ class PropelHelper
      */
     public function checkModelXml()
     {
-        $bundles = $this->getJarves()->getKernel()->getBundles();
+        $bundles = $this->getJarves()->getBundles();
         $errors = [];
         foreach ($bundles as $bundleName => $bundle) {
 
@@ -144,7 +148,7 @@ class PropelHelper
      */
     public function generateClasses()
     {
-        $tmp = $this->getJarves()->getKernel()->getCacheDir() . '/';
+        $tmp = $this->getJarves()->getCacheDir() . '/';
 
         if (!file_exists($tmp . 'propel')) {
             self::writeConfig();
@@ -181,8 +185,8 @@ class PropelHelper
      */
     public function moveClasses()
     {
-        $fs = $this->getJarves()->getCacheFileSystem();
-        $tmp = $this->getJarves()->getKernel()->getCacheDir() . '/';
+        $fs = $this->cacheFilesystem;
+        $tmp = $this->getJarves()->getCacheDir() . '/';
         $result = '';
 
         if ($fs->has('propel-classes')) {
@@ -191,7 +195,7 @@ class PropelHelper
 
         $fs->rename('propel/build/classes', 'propel-classes');
 
-        $bundles = $this->getJarves()->getKernel()->getBundles();
+        $bundles = $this->getJarves()->getBundles();
 
         foreach ($bundles as $bundleName => $bundle) {
             $source = $tmp
@@ -211,6 +215,7 @@ class PropelHelper
 
             $result .= "$source" . "\n";
 
+            /** @var \SplFileInfo $file */
             foreach ($files as $file) {
                 $target = $bundle->getPath() . '/Model/' . basename($file->getPathname());
 
@@ -224,7 +229,7 @@ class PropelHelper
                         throw new \Exception(sprintf('Can not create directory `%s`.', dirname($target)), 0, $e);
                     }
                     if (!copy($file->getPathname(), $target)) {
-                        throw new FileNotWritableException(tf('Can not move file %s to %s', $source, $target));
+                        throw new FileNotWritableException(sprintf('Can not move file %s to %s', $source, $target));
                     }
                 }
                 unlink($file->getPathname());
@@ -284,8 +289,8 @@ EOF;
      */
     public function writeConfig()
     {
-        $fs = $this->getJarves()->getCacheFileSystem();
-        $path = $this->getJarves()->getKernel()->getCacheDir();
+        $fs = $this->cacheFilesystem;
+        $path = $this->getJarves()->getCacheDir();
 
         try {
             $fs->mkdir('propel');
@@ -429,7 +434,7 @@ EOF;
      */
     public function collectSchemas()
     {
-        $cacheDir = $this->getJarves()->getKernel()->getCacheDir() . '/propel/';
+        $cacheDir = $this->getJarves()->getCacheDir() . '/propel/';
 
         if (!is_dir($cacheDir)) {
             mkdir($cacheDir);
@@ -450,7 +455,7 @@ EOF;
 
         $jarvesBehavior = '<behavior name="\\Jarves\\Propel\\JarvesBehavior" />';
 
-        $bundles = $this->getJarves()->getKernel()->getBundles();
+        $bundles = $this->getJarves()->getBundles();
 
         foreach ($bundles as $bundleName => $bundle) {
             if (file_exists($schema = $bundle->getPath() . '/Resources/config/jarves.propel.schema.built.xml')) {
@@ -479,7 +484,7 @@ EOF;
      */
     public function getSqlDiff()
     {
-        $tmp = $this->getJarves()->getKernel()->getCacheDir() . '/';
+        $tmp = $this->getJarves()->getCacheDir() . '/';
 
         if (!file_exists($tmp . 'propel/propel.yml')) {
             self::writeConfig();
@@ -562,11 +567,11 @@ EOF;
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function writeBuildProperties()
     {
-        $fs = $this->getJarves()->getCacheFileSystem();
+        $fs = $this->cacheFilesystem;
 
         $platform = $this->getJarves()->getSystemConfig()->getDatabase()->getMainConnection()->getType();
         $platform = ucfirst($platform) . 'Platform';

@@ -40,32 +40,61 @@ class Object extends Model
     protected $table;
 
     /**
-     * The storage/persistent class that handles the actual data storage/retrievement (to a file e.g) of the object
-     * interface. Needs 'dataModel'='custom' to have any effect. This class is used by $controller
-     * (Jarves\Admin\ObjectCrud class)
+     * The storage/persisting service that handles the actual data storage/retrievement (to a file e.g) of the object
+     * interface. This class is used by $controller (Jarves\Admin\ObjectCrud class)
+     *
+     * Schema (default):
+     *   Jarves\Objects -> crudService (ObjectCrud) -> storageService (propel)
+     *
+     * Note: the service needs to have `shared: false`.
      *
      * @var string
      */
-    protected $storageClass;
+    protected $storageService = 'jarves.storage.propel';
 
     /**
-     * The controller php class or service id to use as controller which is used in jarves and external bundles to
-     * modify actual objects.
+     * Service to use as crud interface which is used in jarves and external bundles to
+     * modify actual objects. Per default Jarves\Admin\ObjectCrud (jarves.crud.object_crud) is used.
+     *
+     * This service handles a bit more than the pure storageService. For example: ACL, automatic filtering (per language) and event dispatcher.
+     * It needs to extend ObjectCrud.
+     *
+     * Schema (default):
+     *   Jarves\Objects -> crudService (ObjectCrud) -> storageService (propel)
      *
      * @var string
      */
-    protected $repositoryClass;
+    protected $crudService = 'jarves.crud.object_crud';
 
     /**
-     * Controller which builds the external API (Symfony routes for the REST API). Per default one of
+     * Service which builds the external API (Symfony routes for the REST API). Per default one of
      * Jarves\Controller\*ObjectCrudController. If you overwrite this, make sure to extend from one of those classes
      * there.
      *
-     * Example: @BundleName/Controller/MySuperCustomAPIController.php
+     * This service builds basically only the REST APIs, all action methods around ObjectCrud.
+     *
+     * class    jarves.crud.controller.object           (Jarves\Controller\ObjectCrudController)
+     * >extends jarves.crud.object_crud                 (Jarves\Admin\ObjectCrud
+     *
+     * Schema (default):
+     *   REST -> apiControllerService -> storageService (propel)
      *
      * @var string
      */
-    protected $apiController;
+    protected $apiControllerService;
+
+    /**
+     * Path to a yml definition for api controller. This is basically a yaml file containing key values
+     * that overwrite properties of $apiControllerService (which is most likely Jarves\Admin\ObjectCrud)
+     *
+     * This is used in the bundle editor and makes it very easy to modify the behavior of all REST endpoint
+     * of an object endpoint (e.g. jarves/object/jarves/node/)
+     *
+     * Example: @JarvesBundle/Resources/config/crud/node.yml
+     *
+     * @var string
+     */
+    protected $apiControllerDefinition;
 
     /**
      * Which field (the value of it) shall be used as default label for the object.
@@ -103,13 +132,6 @@ class Object extends Model
      * @var array
      */
     private $indexes;
-
-    /**
-     * The data model in the back.
-     *
-     * @var string
-     */
-    protected $dataModel = 'propel';
 
     /**
      * Whether we handle multi languages or not.
@@ -276,18 +298,6 @@ class Object extends Model
     protected $browserInterface = 'default';
 
     /**
-     * @var string custom|default
-     */
-    protected $browserDataModel = 'default';
-
-    /**
-     * The PHP class which handles the retrieving of items for the browsing rest api.
-     *
-     * @var string
-     */
-    protected $browserDataModelClass;
-
-    /**
      * @var Field[]
      */
     protected $browserOptions;
@@ -298,21 +308,24 @@ class Object extends Model
     protected $limitDataSets;
 
     /**
-     * The path of the entry point that acts as a listing window.
+     * The path of the entry point that acts as a listing window. Important for select fields, that
+     * allows the user to jump directly to the crud list/edit/add.
      *
      * @var string|null
      */
     protected $listEntryPoint;
 
     /**
-     * The path of the entry point that acts as a edit window.
+     * The path of the entry point that acts as a edit window. Important for select fields, that
+     * allows the user to jump directly to the crud list/edit/add.
      *
      * @var string|null
      */
     protected $editEntryPoint;
 
     /**
-     * The path of the entry point that acts as a add window.
+     * The path of the entry point that acts as a add window. Important for select fields, that
+     * allows the user to jump directly to the crud list/edit/add.
      *
      * @var string|null
      */
@@ -531,38 +544,6 @@ class Object extends Model
     }
 
     /**
-     * @param string $browserDataModel
-     */
-    public function setBrowserDataModel($browserDataModel)
-    {
-        $this->browserDataModel = $browserDataModel;
-    }
-
-    /**
-     * @return string
-     */
-    public function getBrowserDataModel()
-    {
-        return $this->browserDataModel;
-    }
-
-    /**
-     * @param string $browserDataModelClass
-     */
-    public function setBrowserDataModelClass($browserDataModelClass)
-    {
-        $this->browserDataModelClass = $browserDataModelClass;
-    }
-
-    /**
-     * @return string
-     */
-    public function getBrowserDataModelClass()
-    {
-        return $this->browserDataModelClass;
-    }
-
-    /**
      * @param string $browserInterface
      */
     public function setBrowserInterface($browserInterface)
@@ -595,43 +576,43 @@ class Object extends Model
     }
 
     /**
-     * @param string $storageClass
+     * @param string $storageService
      */
-    public function setStorageClass($storageClass)
+    public function setStorageService($storageService)
     {
-        $this->storageClass = $storageClass;
+        $this->storageService = $storageService;
     }
 
     /**
      * @return string
      */
-    public function getStorageClass()
+    public function getStorageService()
     {
-        return $this->storageClass;
+        return $this->storageService;
     }
 
     /**
-     * @param string $repositoryClass
+     * @param string $crudService
      */
-    public function setRepositoryClass($repositoryClass)
+    public function setCrudService($crudService)
     {
-        $this->repositoryClass = $repositoryClass;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRepositoryClass()
-    {
-        return $this->repositoryClass;
+        $this->crudService = $crudService;
     }
 
     /**
      * @return string
      */
-    public function getApiController()
+    public function getCrudService()
     {
-        return $this->apiController;
+        return $this->crudService;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiControllerService()
+    {
+        return $this->apiControllerService;
     }
 
     /**
@@ -639,39 +620,39 @@ class Object extends Model
      */
     public function getFinalApiController() {
 
-        if (null === $this->apiController) {
+        if (null === $this->apiControllerService) {
 
-            $defaultResource = '@JarvesBundle/Controller/AutomaticObjectCrudController.php';
-            $defaultResourceNested = '@JarvesBundle/Controller/AutomaticNestedObjectCrudController.php';
+            $defaultService = 'jarves.crud.controller.object';
+            $defaultNestedService = 'jarves.crud.controller.nested_object';
 
-            return $this->isNested() ? $defaultResourceNested : $defaultResource;
+            return $this->isNested() ? $defaultNestedService : $defaultService;
         }
 
-        return $this->apiController;
+        return $this->apiControllerService;
     }
 
     /**
-     * @param string $apiController
+     * @param string $apiControllerService
      */
-    public function setApiController($apiController)
+    public function setApiControllerService($apiControllerService)
     {
-        $this->apiController = $apiController;
-    }
-
-    /**
-     * @param string $dataModel
-     */
-    public function setDataModel($dataModel)
-    {
-        $this->dataModel = $dataModel;
+        $this->apiControllerService = $apiControllerService;
     }
 
     /**
      * @return string
      */
-    public function getDataModel()
+    public function getApiControllerDefinition()
     {
-        return $this->dataModel;
+        return $this->apiControllerDefinition;
+    }
+
+    /**
+     * @param string $apiControllerDefinition
+     */
+    public function setApiControllerDefinition($apiControllerDefinition)
+    {
+        $this->apiControllerDefinition = $apiControllerDefinition;
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Jarves\Extractor\Handler;
 
 use Jarves\Jarves;
+use Jarves\Objects;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\Routing\Route;
@@ -13,15 +14,25 @@ class ObjectCrudHandler implements HandlerInterface
      * @var Jarves
      */
     protected $jarves;
+    /**
+     * @var Objects
+     */
+    private $objects;
 
-    function __construct(Jarves $jarves)
+    /**
+     * ObjectCrudHandler constructor.
+     * @param Jarves $jarves
+     * @param Objects $objects
+     */
+    function __construct(Jarves $jarves, Objects $objects)
     {
         $this->jarves = $jarves;
+        $this->objects = $objects;
     }
 
     public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method)
     {
-        if (!($objectName = $route->getDefault('_jarves_object')) || !$object = $this->jarves->getObjects()->getDefinition($objectName)) {
+        if (!($objectName = $route->getDefault('_jarves_object')) || !$object = $this->objects->getDefinition($objectName)) {
             return;
         }
 
@@ -38,7 +49,7 @@ class ObjectCrudHandler implements HandlerInterface
             );
         } else {
             $objectKey = $route->getDefault('_jarves_object_section') ? : $route->getDefault('_jarves_object');
-            $objectSection = $this->jarves->getObjects()->getDefinition($objectKey);
+            $objectSection = $this->objects->getDefinition($objectKey);
             $annotation->setSection(
                 sprintf(
                     'Object %s',
@@ -53,7 +64,7 @@ class ObjectCrudHandler implements HandlerInterface
             $fields = [];
             foreach ($object->getFields() as $field) {
                 if ('object' === $field->getId()) {
-                    $foreignObject = $this->jarves->getObjects()->getDefinition($field->getObject());
+                    $foreignObject = $this->objects->getDefinition($field->getObject());
                     foreach ($foreignObject->getFields() as $fField) {
                         $filters[] = $field->getId().'.'.$fField->getId();
                     }
@@ -75,7 +86,7 @@ class ObjectCrudHandler implements HandlerInterface
         $isRelationRoute = $route->getDefault('_jarves_object_relation');
         $requirePk = $route->getDefault('_jarves_object_requirePk');
 
-        $method = explode('::', $route->getDefault('_controller'))[1];
+        $method = explode(':', $route->getDefault('_controller'))[1];
 
 //        maybe in version 1.1
 //        if ($isRelationRoute) {

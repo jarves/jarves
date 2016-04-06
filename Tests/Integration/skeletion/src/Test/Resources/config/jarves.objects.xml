@@ -4,7 +4,6 @@
       <object id="Test">
         <table>test_test</table>
         <labelField>name</labelField>
-        <dataModel>propel</dataModel>
         <browserColumns>
           <field id="name">
             <type>text</type>
@@ -26,7 +25,6 @@
       <object id="ContentElementItem">
           <table>test_content_element_item</table>
           <labelField>name</labelField>
-          <dataModel>propel</dataModel>
           <fields>
               <field id="id" type="number" primaryKey="true" autoIncrement="true" />
               <field id="name" type="text" />
@@ -58,8 +56,6 @@
         <label>title</label>
         <table>test_item</table>
         <labelField>title</labelField>
-        <dataModel>propel</dataModel>
-        <workspace>true</workspace>
         <fields>
           <field id="id" primaryKey="true" autoIncrement="true">
             <type>number</type>
@@ -85,9 +81,7 @@
         <label>ItemCategory</label>
         <table>test_item_category</table>
         <labelField>name</labelField>
-        <dataModel>propel</dataModel>
         <multiLanguage>false</multiLanguage>
-        <workspace>true</workspace>
         <fields>
           <field id="id" primaryKey="true" autoIncrement="true">
             <type>number</type>

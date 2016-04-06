@@ -49,6 +49,9 @@ class CreateTest extends KernelAwareTestCase
         $this->assertEquals(0, $count);
     }
 
+    /**
+     * @group test
+     */
     public function testAdd()
     {
         $date = ('+'. rand(2, 30) . ' days +' . rand(2, 24) . ' hours');
@@ -90,7 +93,8 @@ class CreateTest extends KernelAwareTestCase
         $values = array(
             'title' => 'Test page',
             'domain' => $domain->getId(),
-            'type' => 0
+            'type' => 0,
+            'urn' => 'nothing'
         );
 
         $pk = $this->getObjects()->add(
@@ -109,7 +113,7 @@ class CreateTest extends KernelAwareTestCase
 
         $ori = clone NodeQuery::create()->findOneById($nodePk['id']);
         $this->getObjects()->patch('jarves/node', $nodePk, [
-           'title' => 'Test page changed'
+            'title' => 'Test page changed'
         ]);
 
         $node = NodeQuery::create()->findOneById($nodePk['id']);

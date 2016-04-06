@@ -2,7 +2,11 @@
 
 namespace Jarves\Controller;
 
+use Jarves\ACL;
 use Jarves\Admin\AdminAssets;
+use Jarves\Jarves;
+use Jarves\JarvesConfig;
+use Jarves\PageStack;
 use Jarves\PluginController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -23,12 +27,22 @@ class AdminLoginController extends PluginController
      */
     public function showLoginAction(Request $request)
     {
-        $adminAssets = new AdminAssets($this->getJarves());
+        /** @var PageStack $pageStack */
+        $pageStack = $this->get('jarves.page_stack');
+        /** @var Jarves $jarves */
+        $jarves = $this->get('jarves');
+        /** @var ACL $acl */
+        $acl = $this->get('jarves.acl');
+
+        /** @var JarvesConfig $jarvesConfig */
+        $jarvesConfig= $this->get('jarves.config');
+
+        $adminAssets = new AdminAssets($jarves, $pageStack, $acl);
         $adminAssets->addMainResources();
         $adminAssets->addLanguageResources();
         $adminAssets->addSessionScripts();
 
-        $response = $this->getJarves()->getPageResponse();
+        $response = $pageStack->getPageResponse();
         $response->addJs(
             "
         tinymce.baseURL =  _path+'bundles/jarves/tinymce',
@@ -41,7 +55,7 @@ class AdminLoginController extends PluginController
         $response->setResourceCompression(false);
         $response->setDomainHandling(false);
 
-        $response->setTitle($this->getJarves()->getSystemConfig()->getSystemTitle() . ' | Jarves cms Administration');
+        $response->setTitle($jarvesConfig->getSystemConfig()->getSystemTitle() . ' | Jarves cms Administration');
         $response->prepare($request);
         return $response;
     }

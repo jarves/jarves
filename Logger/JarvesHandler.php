@@ -5,16 +5,11 @@ namespace Jarves\Logger;
 use Jarves\Jarves;
 use Jarves\Model\Log;
 use Jarves\Model\LogRequest;
+use Jarves\PageStack;
 use Monolog\Handler\AbstractProcessingHandler;
 
 class JarvesHandler extends AbstractProcessingHandler
 {
-
-    /**
-     * @var Jarves
-     */
-    protected $jarves;
-
     /**
      * @var bool
      */
@@ -31,21 +26,17 @@ class JarvesHandler extends AbstractProcessingHandler
     protected $logs = [];
 
     protected $logRequest;
+    /**
+     * @var PageStack
+     */
+    private $pageStack;
 
     /**
-     * @param Jarves $jarves
+     * @param PageStack $pageStack
      */
-    function __construct(Jarves $jarves)
+    public function __construct(PageStack $pageStack)
     {
-        $this->jarves = $jarves;
-    }
-
-    /**
-     * @return Jarves
-     */
-    public function getJarves()
-    {
-        return $this->jarves;
+        $this->pageStack = $pageStack;
     }
 
     /**
@@ -147,7 +138,7 @@ class JarvesHandler extends AbstractProcessingHandler
      */
     public function getLogRequest()
     {
-        if (!$this->logRequest && $this->jarves->getRequest()) {
+        if (!$this->logRequest && $this->pageStack->getRequest()) {
 //            if (!$this->jarves->has('profiler')) {
 //                $id = md5(mt_rand() . ':' . uniqid());
 //            } else {
@@ -164,12 +155,12 @@ class JarvesHandler extends AbstractProcessingHandler
             $this->logRequest = new LogRequest();
             $this->logRequest->setId(md5(mt_rand() . ':' . uniqid()));
             $this->logRequest->setDate(microtime(true));
-            $this->logRequest->setIp($this->jarves->getRequest()->getClientIp());
-            $this->logRequest->setPath(substr($this->jarves->getRequest()->getPathInfo(), 0, 254));
+            $this->logRequest->setIp($this->pageStack->getRequest()->getClientIp());
+            $this->logRequest->setPath(substr($this->pageStack->getRequest()->getPathInfo(), 0, 254));
             $this->logRequest->setUsername(
-                $this->jarves->getClient() && $this->jarves->getClient()->hasSession()
-                && $this->jarves->getClient()->getUser()
-                    ? $this->jarves->getClient()->getUser()->getUsername()
+                $this->pageStack->getClient() && $this->pageStack->getClient()->hasSession()
+                && $this->pageStack->getClient()->getUser()
+                    ? $this->pageStack->getClient()->getUser()->getUsername()
                     : 'Guest'
             );
 

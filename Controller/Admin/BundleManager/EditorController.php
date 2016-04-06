@@ -4,25 +4,61 @@ namespace Jarves\Controller\Admin\BundleManager;
 
 use FOS\RestBundle\Request\ParamFetcher;
 use Jarves\Configuration\Configs;
-use Jarves\ContainerHelperTrait;
+use Jarves\Configuration\ConfigurationOperator;
 use Jarves\Exceptions\BundleNotFoundException;
-use Jarves\Exceptions\ModelBuildException;
 use Jarves\Configuration\Asset;
 use Jarves\Configuration\Assets;
 use Jarves\Configuration\Model;
-use Jarves\Configuration\Object;
 use Jarves\Exceptions\ClassNotFoundException;
 use Jarves\Exceptions\FileAlreadyExistException;
+use Jarves\Filesystem\Filesystem;
+use Jarves\Jarves;
+use Jarves\Objects;
 use Jarves\Tools;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Jarves\Utils;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-class EditorController extends ContainerAware
+class EditorController extends Controller
 {
-    use ContainerHelperTrait;
+    /**
+     * @var Jarves
+     */
+    private $jarves;
+
+    /**
+     * @var Filesystem
+     */
+    private $localFilesystem;
+
+    /**
+     * @var Objects
+     */
+    private $objects;
+
+    /**
+     * @var Utils
+     */
+    private $utils;
+
+    /**
+     * @var ConfigurationOperator
+     */
+    protected $configurationOperator;
+
+    public function setContainer(ContainerInterface $container = null)
+    {
+        parent::setContainer($container);
+
+        $this->jarves = $this->container->get('jarves');
+        $this->localFilesystem = $this->container->get('jarves.filesystem.local');
+        $this->objects = $this->container->get('jarves.objects');
+        $this->utils = $this->container->get('jarves.utils');
+        $this->configurationOperator = $this->container->get('jarves.configuration_operator');
+    }
 
     /**
      * @ApiDoc(
@@ -36,22 +72,24 @@ class EditorController extends ContainerAware
      *
      * @param ParamFetcher $paramFetcher
      *
-     * @return array
+     * @return array|null
      */
     public function getConfigAction(ParamFetcher $paramFetcher)
     {
         $bundle = $paramFetcher->get('bundle');
-        if ($this->getJarves()->getBundleDir($bundle)) {
-            $config = $this->getJarves()->getUtils()->getComposerArray($bundle);
-            $config['_path'] = $this->getJarves()->getBundleDir($bundle);
+        if ($this->jarves->getBundleDir($bundle)) {
+            $config = $this->utils->getComposerArray($bundle);
+            $config['_path'] = $this->jarves->getBundleDir($bundle);
 
             return $config;
         }
+
+        return null;
     }
 
     protected function getConfig($bundle)
     {
-        $configs = new Configs($this->getJarves());
+        $configs = new Configs($this->jarves);
         $configs->loadBundles([$bundle]);
 
         return $configs->getConfig($bundle);
@@ -73,9 +111,9 @@ class EditorController extends ContainerAware
      */
     public function saveConfigAction($bundle)
     {
-        if ($this->getJarves()->getBundleDir($bundle)) {
-            $config = $this->getJarves()->getUtils()->getComposerArray($bundle);
-            $config['_path'] = $this->getJarves()->getBundleDir($bundle);
+        if ($this->jarves->getBundleDir($bundle)) {
+            $config = $this->utils->getComposerArray($bundle);
+            $config['_path'] = $this->jarves->getBundleDir($bundle);
 
             return $config;
         }
@@ -98,7 +136,7 @@ class EditorController extends ContainerAware
      */
     public function getBasicAction($bundle)
     {
-        $config = $this->getJarves()->getConfig($bundle);
+        $config = $this->jarves->getConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -146,12 +184,12 @@ class EditorController extends ContainerAware
     public function setBasicAction(ParamFetcher $paramFetcher)
     {
         $bundle = $paramFetcher->get('bundle');
-        $events = $paramFetcher->get('events') ? : null;
-        $listeners = $paramFetcher->get('listeners') ? : null;
-        $adminAssets = $paramFetcher->get('adminAssets') ? : null;
-        $falDrivers = $paramFetcher->get('falDrivers') ? : null;
+        $events = $paramFetcher->get('events') ?: null;
+        $listeners = $paramFetcher->get('listeners') ?: null;
+        $adminAssets = $paramFetcher->get('adminAssets') ?: null;
+        $falDrivers = $paramFetcher->get('falDrivers') ?: null;
 
-        $config = $this->getJarves()->getConfig($bundle);
+        $config = $this->jarves->getConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -171,80 +209,81 @@ class EditorController extends ContainerAware
             $config->setAdminAssets($items);
         }
 
-        return $config->saveFileBased('events')
-        && $config->saveFileBased('listeners')
-        && $config->saveFileBased('adminAssets');
+        return $this->configurationOperator->saveFileBased($config, 'events')
+        && $this->configurationOperator->saveFileBased($config, 'listeners')
+        && $this->configurationOperator->saveFileBased($config, 'adminAssets');
     }
 
-    /**
-     * @ApiDoc(
-     *  section="Bundle Editor",
-     *  description="Returns all php classes that use the window framework class as parents. So in fact, returns
-     * all framework window classes."
-     * )
-     *
-     * @Rest\QueryParam(name="bundle", requirements=".*", strict=true, description="The bundle name")
-     *
-     * @Rest\Get("/admin/system/bundle/editor/windows")
-     *
-     * @param ParamFetcher $paramFetcher
-     * @throws BundleNotFoundException
-     *
-     * @return array
-     */
-    public function getWindowsAction(ParamFetcher $paramFetcher)
-    {
-        $bundle = $paramFetcher->get('bundle');
-        if (!$this->getJarves()->getBundleDir($bundle)) {
-            return [];
-        }
-
-        $windows = array();
-
-        $bundle = $this->getJarves()->getBundle($oriName = $bundle);
-        if (!$bundle) {
-            throw new BundleNotFoundException(sprintf('Bundle `%s` not found.', $oriName));
-        }
-        $path = $bundle->getPath() . '/Controller/';
-
-        if (!file_exists($path)) {
-            return [];
-        }
-
-        $finder = Finder::create()
-            ->in($path)
-            ->name('*Controller.php');
-
-        $root = $this->getJarves()->getRoot();
-
-        foreach ($finder as $class) {
-            $content = file_get_contents($class->getPathname());
-
-            if (preg_match(
-                '/class[\s\t]+([a-zA-Z0-9_]+)[\s\t]/',
-                $content,
-                $matches
-            )
-            ) {
-                $clazz = $matches[1];
-                preg_match('/namespace ([a-zA-Z0-9_\\\\]*)/', $content, $namespace);
-                if (isset($namespace[1]) && $namespace[1]) {
-                    $clazz = $namespace[1] . '\\' . $clazz;
-
-                    $clazz = '\\' . $clazz;
-
-                    if (class_exists($clazz)) {
-                        $reflection = new \ReflectionClass($clazz);
-                        if (!$reflection->isAbstract() && $reflection->isSubclassOf('\Jarves\Admin\ObjectCrudInterface')) {
-                            $windows[Tools::getRelativePath($class->getPathname(), $root)] = $clazz;
-                        }
-                    }
-                }
-            }
-        }
-
-        return $windows;
-    }
+//    /**
+//     * @ApiDoc(
+//     *  section="Bundle Editor",
+//     *  description="Returns all php classes that use the window framework class as parents. So in fact, returns
+//     * all framework window classes."
+//     * )
+//     *
+//     * @Rest\QueryParam(name="bundle", requirements=".*", strict=true, description="The bundle name")
+//     *
+//     * @Rest\Get("/admin/system/bundle/editor/windows")
+//     *
+//     * @param ParamFetcher $paramFetcher
+//     * @throws BundleNotFoundException
+//     *
+//     * @return array
+//     */
+//    public function getWindowsAction(ParamFetcher $paramFetcher)
+//    {
+//        $bundle = $paramFetcher->get('bundle');
+//        if (!$this->jarves->getBundleDir($bundle)) {
+//            return [];
+//        }
+//
+//        $windows = array();
+//
+//        $bundle = $this->jarves->getBundle($oriName = $bundle);
+//        if (!$bundle) {
+//            throw new BundleNotFoundException(sprintf('Bundle `%s` not found.', $oriName));
+//        }
+//        $path = $bundle->getPath() . '/Controller/';
+//
+//        if (!file_exists($path)) {
+//            return [];
+//        }
+//
+//        $finder = Finder::create()
+//            ->in($path)
+//            ->name('*Controller.php');
+//
+//        $root = $this->jarves->getRoot();
+//
+//        /** @var \SplFileInfo $class */
+//        foreach ($finder as $class) {
+//            $content = file_get_contents($class->getPathname());
+//
+//            if (preg_match(
+//                '/class[\s\t]+([a-zA-Z0-9_]+)[\s\t]/',
+//                $content,
+//                $matches
+//            )
+//            ) {
+//                $clazz = $matches[1];
+//                preg_match('/namespace ([a-zA-Z0-9_\\\\]*)/', $content, $namespace);
+//                if (isset($namespace[1]) && $namespace[1]) {
+//                    $clazz = $namespace[1] . '\\' . $clazz;
+//
+//                    $clazz = '\\' . $clazz;
+//
+//                    if (class_exists($clazz)) {
+//                        $reflection = new \ReflectionClass($clazz);
+//                        if (!$reflection->isAbstract() && $reflection->isSubclassOf('\Jarves\Admin\ObjectCrudInterface')) {
+//                            $windows[Tools::getRelativePath($class->getPathname(), $root)] = $clazz;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        return $windows;
+//    }
 
     /**
      * @ApiDoc(
@@ -262,7 +301,7 @@ class EditorController extends ContainerAware
     public function getPluginsAction(ParamFetcher $paramFetcher)
     {
         $bundle = $paramFetcher->get('bundle');
-        $config = $this->getJarves()->getConfig($bundle);
+        $config = $this->jarves->getConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -287,9 +326,9 @@ class EditorController extends ContainerAware
     public function savePluginsAction(ParamFetcher $paramFetcher)
     {
         $bundle = $paramFetcher->get('bundle');
-        $plugins = $paramFetcher->get('plugins') ? : null;
+        $plugins = $paramFetcher->get('plugins') ?: null;
 
-        $config = $this->getJarves()->getConfig($bundle);
+        $config = $this->jarves->getConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -300,7 +339,7 @@ class EditorController extends ContainerAware
 
         $config->propertyFromArray('plugins', $plugins);
 
-        return $config->saveFileBased('plugins');
+        return $this->configurationOperator->saveFileBased($config, 'plugins');
     }
 
     /**
@@ -319,7 +358,7 @@ class EditorController extends ContainerAware
     public function getThemesAction(ParamFetcher $paramFetcher)
     {
         $bundle = $paramFetcher->get('bundle');
-        $config = $this->getJarves()->getConfig($bundle);
+        $config = $this->jarves->getConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -345,9 +384,9 @@ class EditorController extends ContainerAware
     public function setThemesAction(ParamFetcher $paramFetcher)
     {
         $bundle = $paramFetcher->get('bundle');
-        $themes = $paramFetcher->get('themes') ? : null;
+        $themes = $paramFetcher->get('themes') ?: null;
 
-        $config = $this->getJarves()->getConfig($bundle);
+        $config = $this->jarves->getConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -358,7 +397,7 @@ class EditorController extends ContainerAware
 
         $config->propertyFromArray('themes', $themes);
 
-        return $config->saveFileBased('themes');
+        return $this->configurationOperator->saveFileBased($config, 'themes');
     }
 
     /**
@@ -377,9 +416,9 @@ class EditorController extends ContainerAware
     public function getDocuAction(ParamFetcher $paramFetcher)
     {
         $bundle = $paramFetcher->get('bundle');
-        $path = $this->getJarves()->getBundleDir($bundle) . 'Resources/doc/index.md';
+        $path = $this->jarves->getBundleDir($bundle) . 'Resources/doc/index.md';
 
-        $fs = $this->getJarves()->getFileSystem();
+        $fs = $this->localFilesystem;
 
         return $fs->read($path);
     }
@@ -403,9 +442,9 @@ class EditorController extends ContainerAware
         $bundle = $paramFetcher->get('bundle');
         $content = $paramFetcher->get('content');
 
-        $path = $this->getJarves()->getBundleDir($bundle) . 'Resources/doc/index.md';
+        $path = $this->jarves->getBundleDir($bundle) . 'Resources/doc/index.md';
 
-        $fs = $this->getJarves()->getFileSystem();
+        $fs = $this->localFilesystem;
 
         return $fs->read($path, $content);
     }
@@ -422,6 +461,8 @@ class EditorController extends ContainerAware
      *
      * @param string $bundle
      * @return array
+     *
+     * @throws BundleNotFoundException
      */
     public function getObjectsAction($bundle)
     {
@@ -451,8 +492,8 @@ class EditorController extends ContainerAware
      * @param string $bundle
      * @param array $objects
      * @param array $objectAttributes
-     *
      * @return bool
+     * @throws BundleNotFoundException
      */
     public function setObjectsAction($bundle, $objects = null, $objectAttributes = null)
     {
@@ -468,7 +509,8 @@ class EditorController extends ContainerAware
         $config->propertyFromArray('objects', $objects);
         $config->propertyFromArray('objectAttributes', $objectAttributes);
 
-        return $config->saveFileBased('objects') && $config->saveFileBased('objectAttributes');
+        return $this->configurationOperator->saveFileBased($config, 'objects') &&
+        $this->configurationOperator->saveFileBased($config, 'objectAttributes');
     }
 
     /**
@@ -487,7 +529,7 @@ class EditorController extends ContainerAware
     public function getModelAction(ParamFetcher $paramFetcher)
     {
         $bundle = $paramFetcher->get('bundle');
-        $path = $this->getJarves()->getBundleDir($bundle) . 'Resources/config/jarves.propel.schema.xml';
+        $path = $this->jarves->getBundleDir($bundle) . 'Resources/config/jarves.propel.schema.xml';
 
         return [
             'path' => $path,
@@ -515,29 +557,28 @@ class EditorController extends ContainerAware
         $bundle = $paramFetcher->get('bundle');
         $model = $paramFetcher->get('model');
 
-        $path = $this->getJarves()->getBundleDir($bundle) . 'Resources/config/jarves.propel.schema.xml';
-        $fs = $this->getFileSystem();
+        $path = $this->jarves->getBundleDir($bundle) . 'Resources/config/jarves.propel.schema.xml';
 
-        return $fs->write($path, $model);
+        return $this->localFilesystem->write($path, $model);
     }
 
-    /**
-     * @ApiDoc(
-     *  section="Bundle Editor",
-     *  description="Builds all model files and updates their model schema"
-     * )
-     *
-     * @Rest\Post("/admin/system/bundle/editor/model/build")
-     *
-     * @return boolean
-     * @throws ModelBuildException
-     */
-    public function setModelFromObjectsAction()
-    {
-        $modelBuilder = $this->getJarves()->getModelBuilder();
-        $modelBuilder->build();
-        return true;
-    }
+//    /**
+//     * @ApiDoc(
+//     *  section="Bundle Editor",
+//     *  description="Builds all model files and updates their model schema"
+//     * )
+//     *
+//     * @Rest\Post("/admin/system/bundle/editor/model/build")
+//     *
+//     * @return boolean
+//     * @throws ModelBuildException
+//     */
+//    public function setModelFromObjectsAction()
+//    {
+//        $modelBuilder = $this->jarves->getModelBuilder();
+//        $modelBuilder->build();
+//        return true;
+//    }
 
     /**
      * @ApiDoc(
@@ -555,7 +596,7 @@ class EditorController extends ContainerAware
     public function getEntryPointsAction(ParamFetcher $paramFetcher)
     {
         $bundle = $paramFetcher->get('bundle');
-        $config = $this->getJarves()->getConfig($bundle);
+        $config = $this->jarves->getConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -582,16 +623,16 @@ class EditorController extends ContainerAware
     public function setEntryPointsAction(ParamFetcher $paramFetcher)
     {
         $bundle = $paramFetcher->get('bundle');
-        $entryPoints = $paramFetcher->get('entryPoints') ? : null;
+        $entryPoints = $paramFetcher->get('entryPoints') ?: null;
 
-        $config = $this->getJarves()->getConfig($bundle);
+        $config = $this->jarves->getConfig($bundle);
         if (!$config) {
             return null;
         }
 
         $config->propertyFromArray('entryPoints', $entryPoints);
 
-        return $config->saveFileBased('entryPoints');
+        return $this->configurationOperator->saveFileBased($config, 'entryPoints');
     }
 
     /**
@@ -674,7 +715,7 @@ class EditorController extends ContainerAware
         }
 
         $reflection = new \ReflectionClass($class);
-        $root = realpath($this->getJarves()->getKernel()->getRootDir() . '/../');
+        $root = realpath($this->jarves->getRootDir() . '/../');
         $path = substr($reflection->getFileName(), strlen($root) + 1);
 
         $content = explode("\n", file_get_contents($reflection->getFileName()));
@@ -760,11 +801,11 @@ class EditorController extends ContainerAware
     public function setWindowDefinitionAction(ParamFetcher $paramFetcher)
     {
         $class = $paramFetcher->get('class');
-        $list = $paramFetcher->get('list') ? : null;
-        $add = $paramFetcher->get('add') ? : null;
-        $general = $paramFetcher->get('general') ? : null;
-        $methods = $paramFetcher->get('methods') ? : null;
-        $fields = $paramFetcher->get('fields') ? : null;
+        $list = $paramFetcher->get('list') ?: null;
+        $add = $paramFetcher->get('add') ?: null;
+        $general = $paramFetcher->get('general') ?: null;
+        $methods = $paramFetcher->get('methods') ?: null;
+        $fields = $paramFetcher->get('fields') ?: null;
 
         if (substr($class, 0, 1) != '\\') {
             $class = '\\' . $class;
@@ -778,7 +819,7 @@ class EditorController extends ContainerAware
         $class2Name = $lSlash !== -1 ? substr($class, $lSlash + 1) : $class;
 
         $parentClass = '\Jarves\Controller\ObjectCrudController';
-        $objectDefinition = $this->getJarves()->getObjects()->getDefinition($general['object']);
+        $objectDefinition = $this->objects->getDefinition($general['object']);
         if ($objectDefinition->isNested()) {
             $parentClass = '\Jarves\Controller\NestedObjectCrudController';
         }
@@ -828,7 +869,7 @@ class EditorController extends ContainerAware
 
         $sourcecode = str_replace("\r", '', $sourcecode);
 
-        $fs = $this->getJarves()->getFileSystem();
+        $fs = $this->localFilesystem;
 
         return $fs->write($path, $sourcecode);
     }
@@ -868,7 +909,7 @@ class EditorController extends ContainerAware
         }
 
         $reflection = new \ReflectionClass($parentClass);
-        $root = realpath($this->getJarves()->getKernel()->getRootDir() . '/../');
+        $root = realpath($this->jarves->getRootDir() . '/../');
 //        $parentPath = substr($reflection->getFileName(), strlen($root) + 1);
 
         $parentContent = explode("\n", file_get_contents($reflection->getFileName()));
@@ -943,14 +984,14 @@ class EditorController extends ContainerAware
         }
 
         $actualPath = str_replace('\\', '/', substr($class, 1)) . '.php';
-        $actualPath = $this->getJarves()->getBundleDir($bundle) . $actualPath;
+        $actualPath = $this->jarves->getBundleDir($bundle) . $actualPath;
 
         if (file_exists($actualPath) && !$force) {
             throw new FileAlreadyExistException(sprintf('File already exist, %s', $actualPath));
         }
 
         $sourcecode = "<?php\n\n";
-        $bundle = $this->getJarves()->getBundle($bundle);
+        $bundle = $this->jarves->getBundle($bundle);
 
         $lSlash = strrpos($class, '\\');
         $class2Name = $lSlash !== -1 ? substr($class, $lSlash + 1) : $class;
@@ -968,7 +1009,7 @@ class EditorController extends ContainerAware
 
         $sourcecode .= "}\n";
 
-        $fs = $this->getJarves()->getFileSystem();
+        $fs = $this->localFilesystem;
 
         return $fs->write($actualPath, $sourcecode);
     }

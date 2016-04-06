@@ -31,9 +31,9 @@
       <event key="core/object/modify" subject="jarves/user">
         <clearCache>core/object-caching</clearCache>
       </event>
-      <event key="core/bundle/schema-update">
-        <serviceCall>jarves.propelHelper::updateSchema</serviceCall>
-      </event>
+      <!--<event key="core/bundle/schema-update">-->
+        <!--<serviceCall>jarves.propelHelper::updateSchema</serviceCall>-->
+      <!--</event>-->
     </listeners>
   </bundle>
 </config>

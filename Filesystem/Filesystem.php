@@ -18,10 +18,13 @@ class Filesystem implements FilesystemInterface
      * @var AdapterInterface
      */
     protected $adapter;
+
     /**
+     * @param string|null $path
+     *
      * @return AdapterInterface
      */
-    public function getAdapter()
+    public function getAdapter($path = null)
     {
         return $this->adapter;
     }
@@ -116,7 +119,7 @@ class Filesystem implements FilesystemInterface
      *
      * @param FileInfoInterface|FileInfoInterface[] $fileInfo
      *
-     * @return FileInfoInterface|FileInfoInterface[]
+     * @return FileInfoInterface|FileInfoInterface[]|File
      */
     public function wrap($fileInfo)
     {
@@ -151,6 +154,7 @@ class Filesystem implements FilesystemInterface
             if ($fileInfo instanceof File) {
                 return $fileInfo; //it's already a `File`, return it.
             }
+
             $path = $fileInfo->getPath();
             $fileObj = FileQuery::create()->orderById()->filterByPath($path)->groupByPath()->findOne();
             if (!$fileObj) {
@@ -193,7 +197,10 @@ class Filesystem implements FilesystemInterface
         return $file;
     }
 
-    public function search()
+    /**
+     * @return array
+     */
+    public function search($path, $q, $depth)
     {
         //todo
         return [];
@@ -289,13 +296,13 @@ class Filesystem implements FilesystemInterface
     public function move($source, $target)
     {
         $fs = $this->getAdapter($source);
-        return $fs->move($this->normalizePath($source), $this->normalizePath($target), 'move');
+        return $fs->move($this->normalizePath($source), $this->normalizePath($target));
     }
 
     public function copy($source, $target)
     {
         $fs = $this->getAdapter($source);
-        return $fs->copy($this->normalizePath($source), $this->normalizePath($target), 'copy');
+        return $fs->copy($this->normalizePath($source), $this->normalizePath($target));
     }
 
     /**
@@ -343,7 +350,17 @@ class Filesystem implements FilesystemInterface
 
         $items = $this->wrap($items);
 
-        usort($items, function($a, $b){
+
+        usort(
+            $items,
+
+            /**
+             * @param FileInfoInterface $a
+             * @param FileInfoInterface $b
+             *
+             * @return mixed
+             */
+            function($a, $b){
                 return strnatcasecmp($a ? $a->getPath() : '', $b ? $b->getPath() : '');
             });
 
@@ -358,7 +375,7 @@ class Filesystem implements FilesystemInterface
      * @param integer $width
      * @param int     $height
      *
-     * @return \PHPImageWorkshop\Jarves\ImageWorkshopLayer
+     * @return \PHPImageWorkshop\ImageWorkshop
      */
     public function getResizeMax($path, $width, $height)
     {

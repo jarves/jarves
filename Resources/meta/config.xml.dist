@@ -38,7 +38,7 @@
   -->
   <cache>
     <!--The full classname of the storage. MUST have `Core\Cache\CacheInterface` as interface.-->
-    <class>Jarves\Cache\Files</class>
+    <class>Jarves\Cache\Backend\Files</class>
     <options/>
   </cache>
   <!--Log handling. ClientInfo and stackTrace start with level >= ERROR (400) or level=Debug(100).

@@ -3,15 +3,10 @@
 namespace Jarves;
 
 use Jarves\Admin\ObjectCrud;
-use Jarves\Configuration\Condition;
-use Jarves\Exceptions\AccessDeniedException;
-use Jarves\Exceptions\BundleNotFoundException;
-use Jarves\Exceptions\InvalidArgumentException;
 use Jarves\Exceptions\ObjectNotFoundException;
 use Jarves\Propel\WorkspaceManager;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\EventDispatcher\GenericEvent;
-use Symfony\Component\HttpFoundation\Request;
+use Jarves\Storage\AbstractStorage;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Objects
 {
@@ -27,28 +22,21 @@ class Objects
      */
     protected $jarves;
 
-    function __construct($jarves)
-    {
-        $this->jarves = $jarves;
-    }
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
 
     /**
      * @param Jarves $jarves
+     * @param ContainerInterface $container
      */
-    public function setJarves(Jarves $jarves)
+    function __construct(Jarves $jarves, ContainerInterface $container)
     {
         $this->jarves = $jarves;
+        $this->container = $container;
     }
 
-    /**
-     * @return Jarves
-     */
-    public function getJarves()
-    {
-        return $this->jarves;
-    }
-
-    
 
     /**
      * Translates the internal url to the real path.
@@ -189,6 +177,7 @@ class Objects
 
         $params = array();
 
+        $objectIds = null;
         if ($questionPos !== false) {
             parse_str(substr($internalUrl, $questionPos + 1), $params);
 
@@ -231,11 +220,9 @@ class Objects
         $bundleName = $temp[0];
         $name = $temp[1];
 
-        $config = $this->getJarves()->getConfig($bundleName);
+        $config = $this->jarves->getConfig($bundleName);
 
-        if ($config) {
-            return $config->getObject($name);
-        }
+        return $config ? $config->getObject($name) : null;
     }
 
     /**
@@ -245,17 +232,19 @@ class Objects
      *
      * @param  string $objectKey
      *
-     * @return string
+     * @return string|null
      */
     public function getName($objectKey)
     {
         $objectKey = Objects::normalizeObjectKey($objectKey);
         $temp = explode('/', $objectKey);
-        $config = $this->getJarves()->getConfig($temp[0]);
+        $config = $this->jarves->getConfig($temp[0]);
 
         if ($config && ($object = $config->getObject($temp[1]))) {
             return $object->getId();
         }
+
+        return null;
     }
 
     /**
@@ -269,7 +258,7 @@ class Objects
     public function getBundleName($objectKey) {
         $objectKey = Objects::normalizeObjectKey($objectKey);
         $temp = explode('/', $objectKey);
-        $config = $this->getJarves()->getConfig($temp[0]);
+        $config = $this->jarves->getConfig($temp[0]);
 
         return $config ? $config->getBundleName() : null;
     }
@@ -288,7 +277,7 @@ class Objects
     {
         $objectKey = Objects::normalizeObjectKey($objectKey);
         $temp = explode('/', $objectKey);
-        $config = $this->getJarves()->getConfig($temp[0]);
+        $config = $this->jarves->getConfig($temp[0]);
 
         return $config ? $config->getBundleClass()->getNamespace() : null;
     }
@@ -514,7 +503,7 @@ class Objects
      *
      * @param $internalUrl
      *
-     * @return object
+     * @return array
      */
     public function getFromUrl($internalUrl)
     {
@@ -610,6 +599,8 @@ class Objects
      * Removes all items.
      *
      * @param string $objectKey
+     *
+     * @return bool
      */
     public function clear($objectKey)
     {
@@ -678,7 +669,6 @@ class Objects
      *
      * @return mixed
      *
-     * @throws \NoFieldWritePermission
      * @throws \Jarves\Exceptions\InvalidArgumentException
      */
     public function add(
@@ -703,7 +693,8 @@ class Objects
 
     /**
      * Returns the controller to be used to call each update and query at. This controller handles a bit more than
-     * the pure storageController. For example: ACL, automatic filtering (per language) and event dispatcher. It need to extend ObjectCrud.
+     * the pure storageController. For example: ACL, automatic filtering (per language) and event dispatcher.
+     * It needs to extend ObjectCrud.
      *
      * @param string $objectKey
      * @param array $options
@@ -716,50 +707,38 @@ class Objects
         }
         $definition = $this->getDefinition($objectKey);
 
-        if ($repositoryId = $definition->getRepositoryClass()) {
-            if (class_exists($repositoryId)) {
-                $repository = new $repositoryId();
-            } else {
-                $repository = $this->getJarves()->getContainer()->get($repositoryId);
-            }
-        } else {
-            $repository = new ObjectCrud();
-        }
+        $crud = $this->container->get($definition->getCrudService());
 
-        if ($repository instanceof ContainerAwareInterface) {
-            $repository->setContainer($this->getJarves()->getContainer());
-        }
-
-        $repository->setPermissionCheck(false);
+        $crud->setPermissionCheck(false);
         if (isset($options['permissionCheck'])) {
-            $repository->setPermissionCheck($options['permissionCheck']);
+            $crud->setPermissionCheck($options['permissionCheck']);
         }
 
-        $repository->setWithNewsFeed(false);
+        $crud->setWithNewsFeed(false);
         if (isset($options['newsFeed'])) {
-            $repository->setWithNewsFeed($options['newsFeed']);
+            $crud->setWithNewsFeed($options['newsFeed']);
         }
 
         if (isset($options['domain'])) {
-            $repository->setDomain($options['domain']);
+            $crud->setDomain($options['domain']);
         }
 
         if (isset($options['lang'])) {
-            $repository->setLanguage($options['lang']);
+            $crud->setLanguage($options['lang']);
         }
 
         if ($definition->getMultiLanguage()) {
-            $repository->setMultiLanguage(true);
+            $crud->setMultiLanguage(true);
         }
 
         if ($definition->getDomainDepended()) {
-            $repository->setDomainDepended(true);
+            $crud->setDomainDepended(true);
         }
 
-        $repository->setObject($objectKey);
-        $repository->initialize();
+        $crud->setObject($objectKey);
+        $crud->initialize();
 
-        return $repository;
+        return $crud;
     }
 
     /**
@@ -767,7 +746,7 @@ class Objects
      *
      * @param string $objectKey
      *
-     * @return \Jarves\ORM\ORMAbstract
+     * @return AbstractStorage
      *
      * @throws ObjectNotFoundException
      * @throws \Exception
@@ -781,18 +760,13 @@ class Objects
                 throw new ObjectNotFoundException(sprintf('Object `%s` not found.', $objectKey));
             }
 
-            if ('custom' === $definition->getDataModel()) {
-                if (!class_exists($className = $definition->getStorageClass())) {
-                    throw new \Exception(sprintf('Class for %s "%s" not found.', $objectKey, $definition->getStorageClass()));
-                }
+            $storageService = $definition->getStorageService();
 
-                $this->instances[$objectKey] = new $className($objectKey, $definition, $this->getJarves());
-            } else {
-                $clazz = sprintf('\\Jarves\\ORM\\%s', ucfirst($definition->getDataModel()));
-                if (class_exists($clazz) || class_exists($clazz = $definition->getDataModel())) {
-                    $this->instances[$objectKey] = new $clazz(static::normalizeObjectKey($objectKey), $definition, $this->getJarves());
-                }
-            }
+            /** @var  $instance */
+            $instance = $this->container->get($storageService);
+            $instance->configure($objectKey, $definition);
+
+            $this->instances[$objectKey] = $instance;
         }
 
         return $this->instances[$objectKey];
@@ -853,6 +827,7 @@ class Objects
      * Removes a object item per url.
      *
      * @param  string $objectUrl
+     * @param array $options
      *
      * @return bool
      */
@@ -1066,35 +1041,35 @@ class Objects
         return $this->getParent($objectKey, $objectIds[0]);
     }
 
-    /**
-     * @param  string $objectUrl
-     * @param  array  $options
-     *
-     * @return array
-     */
-    public function getVersionsFromUrl($objectUrl, $options = null)
-    {
-        list($objectKey, $objectId) = Objects::parseUrl($objectUrl);
+//    /**
+//     * @param  string $objectUrl
+//     * @param  array  $options
+//     *
+//     * @return array
+//     */
+//    public function getVersionsFromUrl($objectUrl, $options = null)
+//    {
+//        list($objectKey, $objectId) = Objects::parseUrl($objectUrl);
+//
+//        return $this->getVersions($objectKey, $objectId[0], $options);
+//    }
 
-        return $this->getVersions($objectKey, $objectId[0], $options);
-    }
-
-    /**
-     * @param  string $objectKey
-     * @param  mixed  $pk
-     * @param  array  $options
-     *
-     * @todo implement it
-     *
-     * @return array
-     */
-    public function getVersions($objectKey, $pk, $options = null)
-    {
-        $obj = $this->getStorageController($objectKey);
-        $pk2 = $obj->normalizePrimaryKey($pk);
-
-        return $obj->getVersions($pk2, $options);
-    }
+//    /**
+//     * @param  string $objectKey
+//     * @param  mixed  $pk
+//     * @param  array  $options
+//     *
+//     * @todo implement it
+//     *
+//     * @return array
+//     */
+//    public function getVersions($objectKey, $pk, $options = null)
+//    {
+//        $obj = $this->getStorageController($objectKey);
+//        $pk2 = $obj->normalizePrimaryKey($pk);
+//
+//        return $obj->getVersions($pk2, $options);
+//    }
 
     /**
      * Returns always a array with primary key and value pairs from a single pk.
@@ -1239,42 +1214,6 @@ class Objects
         list($targetObjectKey, $targetObjectIds, ) = $this->parseUrl($targetObjectUrl);
 
         return $this->move($objectKey, $objectIds[0], $targetObjectIds[0], $position, $targetObjectKey, $options);
-    }
-
-    /**
-     * Checks whether the conditions in $condition are complied with the given object url.
-     *
-     * @param  string $objectUrl
-     * @param  array  $condition
-     *
-     * @return bool
-     */
-    public function satisfyFromUrl($objectUrl, $condition)
-    {
-        $object = $this->getFromUrl($objectUrl);
-
-        return $this->satisfy($object, $condition);
-
-    }
-
-    /**
-     * Checks whether the conditions in $condition are complied with the given object item.
-     *
-     * @static
-     *
-     * @param array $objectItem
-     * @param \Jarves\Configuration\Condition|array $condition
-     * @param string $objectKey
-     *
-     * @return bool
-     */
-    public function satisfy(&$objectItem, $condition, $objectKey = null)
-    {
-        if (is_array($condition)) {
-            return Condition::create($condition)->satisfy($objectItem, $objectKey);
-        } else if($condition instanceof Condition) {
-            return $condition->satisfy($objectItem, $objectKey);
-        }
     }
 
     /**

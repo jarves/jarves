@@ -3,13 +3,14 @@
 - Preparing the database and models:
 
 ```bash
-  Tests/Integration/skeletion/app/console jarves:configuration:database --help
+  php Tests/Integration/skeletion/app/console jarves:configuration:database --help
   
-  Tests/Integration/skeletion/app/console propel:model:build
-  Tests/Integration/skeletion/app/console propel:migration:diff
-  Tests/Integration/skeletion/app/console propel:migration:up
+  php Tests/Integration/skeletion/app/console propel:model:build
+  php Tests/Integration/skeletion/app/console propel:migration:diff
+  php Tests/Integration/skeletion/app/console propel:migration:up
   
-  Tests/Integration/skeletion/app/console jarves:install:demo localhost /
+  php Tests/Integration/skeletion/app/console jarves:install:demo localhost /
+  rm -rf Tests/Integration/skeletion/app/cache/*
 ```
 
 - Fire `phpunit`.

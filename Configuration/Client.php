@@ -10,12 +10,12 @@ class Client extends Model
                                 visitor/request a cookie (if none is delivered).
   ';
 
-    protected $attributes = ['autoStart'];
+    protected $attributes = ['autoStart', 'service'];
 
     /**
      * @var string
      */
-    protected $class = '\Jarves\Client\JarvesUsers';
+    protected $service = 'jarves.client.jarves_users';
 
     /**
      * @var bool
@@ -62,19 +62,19 @@ class Client extends Model
     }
 
     /**
-     * @param string $class
+     * @param string $service
      */
-    public function setClass($class)
+    public function setService($service)
     {
-        $this->class = $class;
+        $this->service = $service;
     }
 
     /**
      * @return string
      */
-    public function getClass()
+    public function getService()
     {
-        return $this->class;
+        return $this->service;
     }
 
     /**

@@ -12,12 +12,17 @@
 
 namespace Jarves;
 
+use Jarves\Cache\Cacher;
+use Jarves\ContentTypes\AbstractType;
+use Jarves\ContentTypes\ContentRendererAwareContentType;
 use Jarves\Model\Base\ContentQuery;
 use Jarves\Model\Content;
 use Jarves\ContentTypes\TypeNotFoundException;
 use Jarves\Model\ContentInterface;
 use Propel\Runtime\Map\TableMap;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
+use Symfony\Component\Templating\EngineInterface;
 
 class ContentRender
 {
@@ -39,29 +44,77 @@ class ContentRender
     private $stopwatch;
 
     /**
+     * @var EditMode
+     */
+    private $editMode;
+
+    /**
+     * @var Cacher
+     */
+    private $cacher;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
+     * @var PageStack
+     */
+    private $pageStack;
+
+    /**
+     * @var AbstractType[]
+     */
+    protected $types = [];
+
+    /**
+     * @var EngineInterface
+     */
+    private $templating;
+
+    /**
      * @param Jarves $jarves
      * @param StopwatchHelper $stopwatch
+     * @param EditMode $editMode
+     * @param Cacher $cacher
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param PageStack $pageStack
+     * @param EngineInterface $templating
      */
-    function __construct(Jarves $jarves, StopwatchHelper $stopwatch)
+    function __construct(Jarves $jarves, StopwatchHelper $stopwatch, EditMode $editMode, Cacher $cacher,
+                         EventDispatcherInterface $eventDispatcher, PageStack $pageStack, EngineInterface $templating)
     {
         $this->jarves = $jarves;
         $this->stopwatch = $stopwatch;
+        $this->editMode = $editMode;
+        $this->cacher = $cacher;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->pageStack = $pageStack;
+        $this->templating = $templating;
     }
 
     /**
-     * @param Jarves $jarves
+     * @param string $type
+     * @param AbstractType $contentType
      */
-    public function setJarves(Jarves $jarves)
+    public function addType($type, $contentType)
     {
-        $this->jarves = $jarves;
+        $this->types[$type] = $contentType;
+
+        if ($contentType instanceof ContentRendererAwareContentType) {
+            $contentType->setContentRenderer($this);
+        }
     }
 
     /**
-     * @return Jarves
+     * @param string $type
+     *
+     * @return AbstractType
      */
-    public function getJarves()
+    public function getTypeRenderer($type)
     {
-        return $this->jarves;
+        return isset($this->types[$type]) ? $this->types[$type] : $this->types[strtolower($type)];
     }
 
     /**
@@ -74,12 +127,12 @@ class ContentRender
     public function renderSlot($nodeId = null, $slotId = 1, $params = array())
     {
         $params['id'] = $slotId;
-        if ($this->getJarves()->isEditMode()) {
+        if ($this->editMode->isEditMode()) {
             return '<div class="jarves-slot" params="' . htmlspecialchars(json_encode($params)) . '"></div>';
         }
 
         if (!$nodeId) {
-            $nodeId = $this->jarves->getCurrentPage()->getId();
+            $nodeId = $this->pageStack->getCurrentPage()->getId();
         }
 
         $contents = $this->getSlotContents($nodeId, $slotId);
@@ -96,12 +149,12 @@ class ContentRender
     public function renderSingleSlot($nodeId = null, $slotId = 1, $params = array())
     {
         $params['id'] = $slotId;
-        if ($this->getJarves()->isEditMode()) {
+        if ($this->editMode->isEditMode()) {
             return '<div class="jarves-slot jarves-single-slot" params="' . htmlspecialchars(json_encode($params)) . '"></div>';
         }
 
         if (!$nodeId) {
-            $nodeId = $this->jarves->getCurrentPage()->getId();
+            $nodeId = $this->pageStack->getCurrentPage()->getId();
         }
 
         $contents = $this->getSlotContents($nodeId, $slotId);
@@ -116,7 +169,7 @@ class ContentRender
     public function getSlotContents($nodeId, $slotId)
     {
         $cacheKey = 'core/contents/' . $nodeId . '.' . $slotId;
-        $cache = $this->getJarves()->getDistributedCache($cacheKey);
+        $cache = $this->cacher->getDistributedCache($cacheKey);
         $contents = null;
 
         if ($cache) {
@@ -129,7 +182,7 @@ class ContentRender
             ->orderByRank()
             ->find();
 
-        $this->getJarves()->setDistributedCache($cacheKey, serialize($contents));
+        $this->cacher->setDistributedCache($cacheKey, serialize($contents));
 
         return $contents;
     }
@@ -145,8 +198,7 @@ class ContentRender
      * @param array $contents
      * @param array $slotProperties
      *
-     * @return string
-     * @internal
+     * @return string|null
      */
     public function renderContents(&$contents, $slotProperties)
     {
@@ -178,7 +230,7 @@ class ContentRender
                 $access = false;
                 $groups = ',' . $content->getAccessFromGroups() . ',';
 
-                $userGroups = $this->getJarves()->getClient()->getUser()->getUserGroups();
+                $userGroups = $this->pageStack->getClient()->getUser()->getUserGroups();
 
                 foreach ($userGroups as $group) {
                     if (strpos($groups, ',' . $group->getGroupId() . ',') !== false) {
@@ -188,7 +240,7 @@ class ContentRender
                 }
 
                 if (!$access) {
-                    $adminGroups = $this->getJarves()->getClient()->getUser()->getUserGroups();
+                    $adminGroups = $this->pageStack->getClient()->getUser()->getUserGroups();
                     foreach ($adminGroups as $group) {
                         if (strpos($groups, ',' . $group->getGroupId() . ',') !== false) {
                             $access = true;
@@ -216,7 +268,7 @@ class ContentRender
         $i = 0;
 
         //$oldContent = $tpl->getTemplateVars('content');
-        $this->getJarves()->getEventDispatcher()->dispatch('core/render/slot/pre', new GenericEvent($data));
+        $this->eventDispatcher->dispatch('core/render/slot/pre', new GenericEvent($data));
 
         $html = '';
 
@@ -239,50 +291,41 @@ class ContentRender
         }
 
         $argument = array($data, &$html);
-        $this->getJarves()->getEventDispatcher()->dispatch('core/render/slot', new GenericEvent($argument));
+        $this->eventDispatcher->dispatch('core/render/slot', new GenericEvent($argument));
 
 //        if ($slotProperties['assign'] != "") {
 //            //Jarves::getInstance()->assign($slotProperties['assign'], $html);
 //            return '';
 //        }
 
-        $this->stopwatch->stop($title, 'Jarves');
+        $this->stopwatch->stop($title);
 
         return $html;
-    }
-
-    /**
-     * @param string $type
-     * @return ContentTypes\TypeInterface
-     */
-    public function getTypeRenderer($type)
-    {
-        $contentTypes = $this->getJarves()->getContentTypes();
-        return $contentTypes->getType($type);
     }
 
     /**
      * Build HTML for given content.
      *
      * @param ContentInterface $content
-     * @param array   $parameters
-     *
+     * @param array $parameters
      * @return string
-     * @throws ContentTypes\TypeNotFoundException
+     * @throws TypeNotFoundException
      */
-    public function renderContent($content, $parameters = array())
+    public function renderContent(ContentInterface $content, $parameters = array())
     {
         $type = $content->getType() ?: 'text';
         $title = sprintf('Content %d [%s]', $content->getId(), $type);
         $this->stopwatch->start($title, 'Jarves');
 
         $typeRenderer = $this->getTypeRenderer($type);
+
         if (!$typeRenderer) {
             $this->stopwatch->stop($title);
             throw new TypeNotFoundException(sprintf(
-                'Type renderer for `%s` not found. [%s]',
-                $content->getType(),
-                json_encode($content)
+                'Type renderer for `%s` not found. [%s] %s',
+                $type,
+                json_encode($content),
+                json_encode(array_keys($this->types))
             ));
         }
         $typeRenderer->setContent($content);
@@ -294,7 +337,7 @@ class ContentRender
         $data['parameter'] = $parameters;
         $data['html'] = $html;
 
-        $this->getJarves()->getEventDispatcher()->dispatch('core/render/content/pre', new GenericEvent($data));
+        $this->eventDispatcher->dispatch('core/render/content/pre', new GenericEvent($data));
 
         $unsearchable = false;
         if ((!is_array($content->getAccessFromGroups()) && $content->getAccessFromGroups() != '') ||
@@ -311,8 +354,7 @@ class ContentRender
                 $result = '<!--unsearchable-begin-->' . $data['html'] . '<!--unsearchable-end-->';
             }
         } else {
-            $template = $this->getJarves()->getTemplating();
-            $result = $template->render($content->getTemplate(), $data);
+            $result = $this->templating->render($content->getTemplate(), $data);
 
             if ($unsearchable) {
                 $result = '<!--unsearchable-begin-->' . $result . '<!--unsearchable-end-->';
@@ -320,7 +362,7 @@ class ContentRender
         }
 
         $argument = array(&$result, $data);
-        $this->getJarves()->getEventDispatcher()->dispatch('core/render/content', new GenericEvent($argument));
+        $this->eventDispatcher->dispatch('core/render/content', new GenericEvent($argument));
 
         $this->stopwatch->stop($title);
         return $result;

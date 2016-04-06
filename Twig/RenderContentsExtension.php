@@ -2,27 +2,22 @@
 
 namespace Jarves\Twig;
 
-use Jarves\Jarves;
-use Jarves\Model\Node;
+use Jarves\ContentRender;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class RenderContentsExtension extends \Twig_Extension
 {
     /**
-     * @var Jarves
+     * @var ContainerInterface
      */
-    protected $jarves;
-
-    function __construct(Jarves $jarves)
-    {
-        $this->jarves = $jarves;
-    }
+    private $container;
 
     /**
-     * @return \Jarves\Jarves
+     * @param ContainerInterface $container
      */
-    public function getJarves()
+    public function __construct(ContainerInterface $container)
     {
-        return $this->jarves;
+        $this->container = $container;
     }
 
     public function getName()
@@ -39,7 +34,7 @@ class RenderContentsExtension extends \Twig_Extension
 
     public function renderContents($contents, $view = '')
     {
-        return $this->getJarves()->getContentRender()->renderContents($contents, $view);
+        return $this->container->get('jarves.content.render')->renderContents($contents, $view);
     }
 
 }

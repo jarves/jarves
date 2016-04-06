@@ -2,8 +2,27 @@
 
 namespace Jarves\AssetHandler;
 
+use Jarves\Filesystem\Filesystem;
+use Jarves\Jarves;
+
 class JsHandler extends AbstractHandler implements LoaderHandlerInterface
 {
+    /**
+     * @var Filesystem
+     */
+    protected $webFilesystem;
+
+    /**
+     * CssHandler constructor.
+     * @param Jarves $jarves
+     * @param Filesystem $webFilesystem
+     */
+    public function __construct(Jarves $jarves, Filesystem $webFilesystem)
+    {
+        parent::__construct($jarves);
+        $this->webFilesystem = $webFilesystem;
+    }
+
     protected function getTag(AssetInfo $assetInfo)
     {
         if ($assetInfo->getPath()) {
@@ -101,7 +120,7 @@ EOF
         $md5Line = '/* ' . md5($md5String) . " */\n";
 
         $oFile = 'cache/compressed-js/' . md5($md5String) . '.js';
-        $handle = @fopen($this->getJarves()->getKernel()->getRootDir() . '/../web/' . $oFile, 'r');
+        $handle = @fopen($this->getJarves()->getRootDir() . '/../web/' . $oFile, 'r');
         if ($handle) {
             $line = fgets($handle);
             fclose($handle);
@@ -124,7 +143,7 @@ EOF
             }
 
             $content = $md5Line . $content;
-            $this->getJarves()->getWebFileSystem()->write($oFile, $content);
+            $this->webFilesystem->write($oFile, $content);
         }
 
         $assetInfo = new AssetInfo();

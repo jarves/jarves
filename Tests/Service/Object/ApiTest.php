@@ -99,25 +99,25 @@ class ApiTest extends KernelAwareTestCase
         $arrayItem1 = $this->getObjects()->get('Test\Item', $item1->getId());
         $arrayItem2 = $this->getObjects()->get('Test\Item', $item2->getId());
 
-        $this->assertTrue($this->getObjects()->satisfy($arrayItem1, $condition1));
-        $this->assertTrue($this->getObjects()->satisfy($arrayItem1, $condition2));
-        $this->assertFalse($this->getObjects()->satisfy($arrayItem1, $condition3));
+        $this->assertTrue($this->getConditionOperator()->satisfy($condition1, $arrayItem1));
+        $this->assertTrue($this->getConditionOperator()->satisfy($condition2, $arrayItem1));
+        $this->assertFalse($this->getConditionOperator()->satisfy($condition3, $arrayItem1));
 
-        $this->assertFalse($this->getObjects()->satisfy($arrayItem2, $condition1));
-        $this->assertTrue($this->getObjects()->satisfy($arrayItem2, $condition2));
-        $this->assertTrue($this->getObjects()->satisfy($arrayItem2, $condition3));
+        $this->assertFalse($this->getConditionOperator()->satisfy($condition1, $arrayItem2));
+        $this->assertTrue($this->getConditionOperator()->satisfy($condition2, $arrayItem2));
+        $this->assertTrue($this->getConditionOperator()->satisfy($condition3, $arrayItem2));
 
-        $this->assertFalse($this->getObjects()->satisfy($arrayItem1, $condition4));
-        $this->assertTrue($this->getObjects()->satisfy($arrayItem2, $condition4));
+        $this->assertFalse($this->getConditionOperator()->satisfy($condition4, $arrayItem1));
+        $this->assertTrue($this->getConditionOperator()->satisfy($condition4, $arrayItem2));
 
-        $this->assertTrue($this->getObjects()->satisfy($arrayItem1, $condition5));
-        $this->assertTrue($this->getObjects()->satisfy($arrayItem2, $condition5));
+        $this->assertTrue($this->getConditionOperator()->satisfy($condition5, $arrayItem1));
+        $this->assertTrue($this->getConditionOperator()->satisfy($condition5, $arrayItem2));
 
-        $this->assertTrue($this->getObjects()->satisfy($arrayItem1, $condition6));
-        $this->assertTrue($this->getObjects()->satisfy($arrayItem2, $condition6));
+        $this->assertTrue($this->getConditionOperator()->satisfy($condition6, $arrayItem1));
+        $this->assertTrue($this->getConditionOperator()->satisfy($condition6, $arrayItem2));
 
-        $this->assertFalse($this->getObjects()->satisfy($arrayItem1, $condition7));
-        $this->assertFalse($this->getObjects()->satisfy($arrayItem2, $condition7));
+        $this->assertFalse($this->getConditionOperator()->satisfy($condition7, $arrayItem1));
+        $this->assertFalse($this->getConditionOperator()->satisfy($condition7, $arrayItem2));
 
     }
 

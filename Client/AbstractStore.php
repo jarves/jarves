@@ -16,7 +16,7 @@ abstract class AbstractStore implements SessionStorageInterface {
      */
     protected $storage;
 
-    function __construct(SessionStorage $storage, ClientAbstract $client)
+    public function configure(SessionStorage $storage, ClientAbstract $client)
     {
         $this->storage = $storage;
         $this->client = $client;

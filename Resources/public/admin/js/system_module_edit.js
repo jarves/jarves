@@ -28,7 +28,7 @@ var jarves_system_module_edit = new Class({
         this.buttons['objects'] = this.topNavi.addButton(t('Objects'), '', this.viewType.bind(this, 'objects'));
         this.buttons['model'] = this.topNavi.addButton(t('Model'), '', this.viewType.bind(this, 'model'));
 
-        this.buttons['windows'] = this.topNavi.addButton(t('Windows'), '', this.viewType.bind(this, 'windows'));
+        // this.buttons['crud'] = this.topNavi.addButton(t('CRUD'), '', this.viewType.bind(this, 'crud'));
         this.buttons['plugins'] = this.topNavi.addButton(t('Plugins'), '', this.viewType.bind(this, 'plugins'));
 
         this.buttons['docu'] = this.topNavi.addButton(t('Docu'), '', this.viewType.bind(this, 'docu'));
@@ -79,13 +79,8 @@ var jarves_system_module_edit = new Class({
         }).inject(tr);
 
         new Element('th', {
-            text: t('PHP Class'),
+            text: t('Controller/Service'),
             style: 'width: 250px;'
-        }).inject(tr);
-
-        new Element('th', {
-            text: t('Class method'),
-            style: 'width: 150px;'
         }).inject(tr);
 
         new Element('th', {
@@ -124,8 +119,7 @@ var jarves_system_module_edit = new Class({
 
             var plugin = {
                 'id': pluginTr.pluginId.getValue(),
-                'class': pluginTr.pluginPhpClass.getValue(),
-                'method': pluginTr.pluginPhpMethod.getValue(),
+                'controller': pluginTr.pluginController.getValue(),
                 'label': pluginTr.pluginLabel.getValue(),
                 options: pluginTr.pluginOptions,
                 routes: pluginTr.pluginRoutes
@@ -166,8 +160,7 @@ var jarves_system_module_edit = new Class({
         }).inject(this.pluginTBody);
 
         var idTd = new Element('td').inject(tr);
-        var classTd = new Element('td').inject(tr);
-        var methodTd = new Element('td').inject(tr);
+        var controllerTd = new Element('td').inject(tr);
         var titleTd = new Element('td').inject(tr);
         var actionTd = new Element('td').inject(tr);
 
@@ -179,21 +172,13 @@ var jarves_system_module_edit = new Class({
 
         tr.pluginId = new jarves.Field({
             type: 'text',
-            modifier: 'phpclass',
             noWrapper: true
         }, idTd);
 
-        tr.pluginPhpClass = new jarves.Field({
+        tr.pluginController = new jarves.Field({
             type: 'text',
-            modifier: 'phpclass',
             noWrapper: true
-        }, classTd);
-
-        tr.pluginPhpMethod = new jarves.Field({
-            type: 'text',
-            modifier: 'phpmethod',
-            noWrapper: true
-        }, methodTd);
+        }, controllerTd);
 
         tr.pluginLabel = new jarves.Field({
             type: 'text',
@@ -201,9 +186,8 @@ var jarves_system_module_edit = new Class({
         }, titleTd);
 
         tr.pluginId.setValue(pKey ? pKey : '');
-        tr.pluginPhpClass.setValue(pPlugin && pPlugin['class'] ? pPlugin['class'] : clazz);
-        tr.pluginPhpMethod.setValue(pPlugin && pPlugin.method ? pPlugin.method : '');
-        tr.pluginLabel.setValue(pPlugin && pPlugin.label) ? pPlugin.label : '';
+        tr.pluginController.setValue(pPlugin && pPlugin['controller'] ? pPlugin['controller'] : clazz);
+        tr.pluginLabel.setValue(pPlugin && pPlugin.label ? pPlugin.label : '');
 
         new jarves.Button(t('Options')).addEvent('click', function() {
             var dialog = new jarves.Dialog(this.win, {
@@ -401,7 +385,7 @@ var jarves_system_module_edit = new Class({
         if (this.lr) {
             this.lr.cancel();
         }
-        this.lr = new Request.JSON({url: _pathAdmin + 'admin/system/bundle/editor/windows', noCache: 1,
+        this.lr = new Request.JSON({url: _pathAdmin + 'admin/system/bundle/editor/cruds', noCache: 1,
             onComplete: function(pResult) {
                 this.win.setLoading(false);
                 this._renderWindows(pResult.data);
@@ -410,12 +394,12 @@ var jarves_system_module_edit = new Class({
 
     _renderWindows: function(pWindows) {
 
-        this.panes['windows'].empty();
+        this.panes['crud'].empty();
 
         var p = new Element('div', {
             'class': 'jarves-system-modules-edit-pane',
             style: 'bottom: 40px;'
-        }).inject(this.panes['windows']);
+        }).inject(this.panes['crud']);
         this.windowsPaneItems = p;
 
         this.windowsTBody = new Element('table', {
@@ -1023,8 +1007,8 @@ var jarves_system_module_edit = new Class({
             var applyBtn = new jarves.Button(t('Apply'));
 
             var fieldObject = new jarves.FieldForm(dialog.content, this.entryPointSettingsFields, {
-                allTableItems: true,
-                tableItemLabelWidth: 300,
+                // allTableItems: true,
+                // tableItemLabelWidth: 300,
                 saveButton: applyBtn
             });
 
@@ -1315,7 +1299,7 @@ var jarves_system_module_edit = new Class({
         this.saveBtn = buttonBar.addButton(t('Save'), this.saveGeneral.bind(this));
         this.saveBtn.setButtonStyle('blue');
 
-        this.generalFieldsObj = new jarves.FieldForm(p, fields, {allTableItems: 1, saveButton: this.saveBtn});
+        this.generalFieldsObj = new jarves.FieldForm(p, fields, {/*allTableItems: 1, */saveButton: this.saveBtn});
 
         var value = pConfig;
 
@@ -2172,37 +2156,35 @@ var jarves_system_module_edit = new Class({
                     'desc': {
                         label: t('Description')
                     },
-                    listEntryPoint: {
-                        label: t('Listing window entry point'),
-                        type: 'object',
-                        object: 'jarves/entryPoint'
-                    },
-                    editEntryPoint: {
-                        label: t('Edit window entry point'),
-                        type: 'object',
-                        object: 'jarves/entryPoint'
-                    },
-                    addEntryPoint: {
-                        label: t('Add window entry point'),
-                        type: 'object',
-                        object: 'jarves/entryPoint'
-                    },
-                    dataModel: {
-                        type: 'select',
-                        label: t('Class'),
-                        inputWidth: 200,
-                        'default': 'propel',
-                        returnDefault: true,
-                        items: {
-                            'propel': t('Propel ORM'),
-                            'custom': t('Custom class')
-                        },
+                    '__entryPoints__': {
+                        type: 'label',
+                        label: 'Note to entry points below',
+                        desc: 'If you have crud entry points for this object defined, you shoud link it here. When the crud is from type `combined`, then all three entrypoints have the same value. When defined a object select box transform into a managed object select box, which allows the user to jump directly to the crud window',
                         children: {
-                            'class': {
-                                needValue: 'custom',
-                                label: t('Class name'),
-                                desc: t('Class that extends from \\Jarves\\ORM\\ORMAbstract.')
+                            listEntryPoint: {
+                                label: t('Listing window entry point'),
+                                type: 'object',
+                                object: 'jarves/entryPoint'
                             },
+                            editEntryPoint: {
+                                label: t('Edit window entry point'),
+                                type: 'object',
+                                object: 'jarves/entryPoint'
+                            },
+                            addEntryPoint: {
+                                label: t('Add window entry point'),
+                                type: 'object',
+                                object: 'jarves/entryPoint'
+                            },
+                        }
+                    },
+                    storageService: {
+                        type: 'text',
+                        label: t('Storage Service'),
+                        inputWidth: 200,
+                        'default': 'jarves.storage.propel',
+                        returnDefault: true,
+                        children: {
                             table: {
                                 label: t('Table name'),
                                 modifier: 'underscore|trim',
@@ -2321,24 +2303,17 @@ var jarves_system_module_edit = new Class({
                                     }
                                 }
                             },
-                            'fieldDataModel': {
-                                label: t('Data source'),
-                                type: 'select',
-                                inputWidth: 150,
-                                'default': 'default',
-                                items: {
-                                    'default': 'Framework',
-                                    'custom': 'Custom class'
-                                },
-                                'default': 'default',
-                                children: {
-                                    fieldDataModelClass: {
-                                        label: t('PHP Class'),
-                                        needValue: 'custom',
-                                        desc: t('A class that extends from \\Admin\\FieldModel\\Field. Entry point is admin/backend/field-object?uri=...')
-                                    }
-                                }
-                            },
+                            // 'fieldDataModel': {
+                            //     label: t('Data source'),
+                            //     type: 'select',
+                            //     inputWidth: 150,
+                            //     'default': 'default',
+                            //     items: {
+                            //         'default': 'Framework',
+                            //         'custom': 'Custom class'
+                            //     },
+                            //     'default': 'default'
+                            // },
                             'fieldLabel': {
                                 type: 'text',
                                 label: t('Label field (optional)'),
@@ -2382,24 +2357,24 @@ var jarves_system_module_edit = new Class({
                                 }
                             },
 
-                            treeDataModel: {
-                                needValue: 1,
-                                label: t('Data model'),
-                                inputWidth: 150,
-                                items: {
-                                    'default': 'Framework',
-                                    'custom': 'Custom class'
-                                },
-                                'default': 'default',
-                                type: 'select',
-                                children: {
-                                    treeDataModelClass: {
-                                        label: t('PHP Class'),
-                                        needValue: 'custom',
-                                        desc: t('A class that extends from \\Admin\\FieldModel\\Tree. Entry point admin/object-tree?uri=...')
-                                    }
-                                }
-                            },
+                            // treeDataModel: {
+                            //     needValue: 1,
+                            //     label: t('Data model'),
+                            //     inputWidth: 150,
+                            //     items: {
+                            //         'default': 'Framework',
+                            //         'custom': 'Custom class'
+                            //     },
+                            //     'default': 'default',
+                            //     type: 'select',
+                            //     children: {
+                            //         treeDataModelClass: {
+                            //             label: t('PHP Class'),
+                            //             needValue: 'custom',
+                            //             desc: t('A class that extends from \\Admin\\FieldModel\\Tree. Entry point admin/object-tree?uri=...')
+                            //         }
+                            //     }
+                            // },
 
                             'treeLabel': {
                                 type: 'text',
@@ -2543,12 +2518,14 @@ var jarves_system_module_edit = new Class({
                                     browserInterfaceOptions: {
                                         label: t('UI properties'),
                                         needValue: 'custom',
+                                        width: 'auto',
                                         desc: t('You can allow extensions to set some properties when providing your object chooser.'),
                                         type: 'fieldTable'
                                     },
                                     browserOptions: {
                                         label: t('Browser options'),
                                         type: 'fieldTable',
+                                        width: 'auto',
                                         needValue: 'custom',
                                         withoutChildren: true,
                                         addLabel: t('Add option')
@@ -2558,29 +2535,30 @@ var jarves_system_module_edit = new Class({
                             browserColumns: {
                                 label: t('Columns in the chooser table'),
                                 type: 'fieldTable',
+                                width: 'auto',
                                 asFrameworkColumn: true,
                                 withoutChildren: true,
                                 tableItemLabelWidth: 200,
                                 addLabel: t('Add column')
                             },
-                            'browserDataModel': {
-                                type: 'select',
-                                label: t('Data source'),
-                                inputWidth: 150,
-                                'default': 'default',
-                                items: {
-                                    'default': 'Default',
-                                    'custom': 'Custom PHP class',
-                                    'none': 'None'
-                                },
-                                children: {
-                                    browserDataModelClass: {
-                                        label: t('PHP Class'),
-                                        needValue: 'custom',
-                                        desc: t('A class that extends from \\Admin\\FieldModel\\Browse. Entry point admin/objects?uri=...')
-                                    }
-                                }
-                            }
+                            // 'browserDataModel': {
+                            //     type: 'select',
+                            //     label: t('Data source'),
+                            //     inputWidth: 150,
+                            //     'default': 'default',
+                            //     items: {
+                            //         'default': 'Default',
+                            //         'custom': 'Custom PHP class',
+                            //         'none': 'None'
+                            //     },
+                            //     children: {
+                            //         browserDataModelClass: {
+                            //             label: t('PHP Class'),
+                            //             needValue: 'custom',
+                            //             desc: t('A class that extends from \\Admin\\FieldModel\\Browse. Entry point admin/objects?uri=...')
+                            //         }
+                            //     }
+                            // }
                         }
                     }
                 }
@@ -2593,7 +2571,7 @@ var jarves_system_module_edit = new Class({
             width: '100%'
         }).inject(this.dialog.content);
 
-        var kaParseObj = new jarves.FieldForm(tbody, kaFields, {allTableItems: true, tableItemLabelWidth: 220}, {win: this.win});
+        var kaParseObj = new jarves.FieldForm(tbody, kaFields, {} /*{allTableItems: true, tableItemLabelWidth: 220}*/, {win: this.win});
 
         new jarves.Button(t('Cancel')).addEvent('click', this.cancelObjectSettings.bind(this)).inject(this.dialog.bottom);
 
@@ -2611,10 +2589,10 @@ var jarves_system_module_edit = new Class({
 
             .setButtonStyle('blue').inject(this.dialog.bottom);
 
-        //switcher
-        if (definition.table) {
-            definition.__dataModel__ = 'table';
-        }
+        // //switcher
+        // if (definition.table) {
+        //     definition.__dataModel__ = 'table';
+        // }
 
         if (definition) {
             kaParseObj.setValue(definition);
@@ -2657,7 +2635,7 @@ var jarves_system_module_edit = new Class({
         tr.store('key', iKey);
 
         var fieldsBtn = new jarves.Button(t('Fields')).inject(actions);
-
+        var crudBtn = new jarves.Button(t('CRUD')).inject(actions);
         new jarves.Button(t('Settings')).addEvent('click', this.openObjectSettings.bind(this, tr)).inject(actions);
 
 //        if (pDefinition) {
@@ -3002,7 +2980,7 @@ var jarves_system_module_edit = new Class({
 
         };
 
-        var kaParseObj = new jarves.FieldForm(tbody, kaFields, {allTableItems: true}, {win: this.win});
+        var kaParseObj = new jarves.FieldForm(tbody, kaFields, {/*allTableItems: true*/}, {win: this.win});
 
         this.objectWizardCloseBtn = new jarves.Button(t('Cancel')).addEvent('click', function() {
             this.dialog.close();
@@ -3048,6 +3026,7 @@ var jarves_system_module_edit = new Class({
                         label: t('Admin assets'),
                         desc: t('Will be loaded during the login. Relative to /web/.'),
                         type: 'array',
+                        width: 'auto',
                         columns: [
                             {label: t('Type'), width: 80},
                             t('Path'),
@@ -3060,7 +3039,7 @@ var jarves_system_module_edit = new Class({
                                 type: 'select',
                                 items: {'asset': 'Asset', 'assets': 'Assets'}
                             },
-                            path: {
+                            src: {
                                 type: 'text'
                             },
                             compression: {
@@ -3083,6 +3062,7 @@ var jarves_system_module_edit = new Class({
                 children: {
                     caches: {
                         label: t('Cache keys'),
+                        width: 'auto',
                         desc: t('Define here all cache keys your extension use, so we can delete all properly if needed. You can optional define a method, if you have stored this cache not through our cache layer and want to do own stuff.'),
                         type: 'array',
                         columns: [
@@ -3108,6 +3088,7 @@ var jarves_system_module_edit = new Class({
                     events: {
                         type: 'array',
                         label: t('Define events'),
+                        width: 'auto',
                         desc: t('Here you can define events, where others can attach to.'),
                         columns: [
                             {label: t('Key'), width: '40%'},
@@ -3129,6 +3110,7 @@ var jarves_system_module_edit = new Class({
                         label: t('Event listener'),
                         desc: t('You can attach here directly your action to an event.'),
                         type: 'array',
+                        width: 'auto',
                         columns: [
                             {label: t('Key'), width: '35%'},
                             {label: t('Subject'), width: '35%'},
@@ -3201,6 +3183,7 @@ var jarves_system_module_edit = new Class({
                     falDriver: {
                         type: 'array',
                         label: t('CDN Driver'),
+                        width: 'auto',
                         desc: t('Here you can define driver for the file abstraction layer. The class has to be in module/&lt;extKey&gt;/&lt;class&gt;.class.php'),
                         asHash: 1,
                         columns: [
@@ -3226,7 +3209,7 @@ var jarves_system_module_edit = new Class({
                     }
                 }
             }
-        }
+        };
 
         if (this.lr) {
             this.lr.cancel();
@@ -3238,7 +3221,7 @@ var jarves_system_module_edit = new Class({
             style: 'bottom: 40px;'
         }).inject(this.panes['extras']);
 
-        this.extraFieldsObj = new jarves.FieldForm(this.extrasPane, extrasFields, {allTableItems: 1, tableItemLabelWidth: 270});
+        this.extraFieldsObj = new jarves.FieldForm(this.extrasPane, extrasFields); //, {allTableItems: 1, tableItemLabelWidth: 270});
 
         var buttonBar = new jarves.ButtonBar(this.panes['extras']);
         this.saveBtn = buttonBar.addButton(t('Save'), this.saveExtras.bind(this));
@@ -3297,7 +3280,7 @@ var jarves_system_module_edit = new Class({
                 return this.loadLinks();
             case 'model':
                 return this.loadDb();
-            case 'windows':
+            case 'crud':
                 return this.loadWindows();
             case 'docu':
                 return this.loadDocu();

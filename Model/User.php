@@ -16,13 +16,14 @@ class User extends BaseUser
      * If the salt is not already set, this generates one.
      *
      * @param string $password plain password
+     * @param string $passwordHashKey from the system configuration
      *
      */
-    public function hashPassword($password)
+    public function hashPassword($password, $passwordHashKey)
     {
         $this->setPasswordSalt(ClientAbstract::getSalt());
 
-        $password = ClientAbstract::getHashedPassword($password, $this->getPasswordSalt());
+        $password = ClientAbstract::getHashedPassword($password, $this->getPasswordSalt(), $passwordHashKey);
 
         $this->setPassword($password);
     }

@@ -15,13 +15,22 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
  * RestController for the entry points which are from type store or framework window.
  *
  */
-abstract class ObjectCrudController extends ObjectCrud
+class ObjectCrudController extends ObjectCrud
 {
-    protected $obj;
-
-    protected function detectObjectKeyFromPathInfo()
+    public function getObject()
     {
-        $request = $this->getRequest();
+        return parent::getObject() ?: $this->detectObjectKeyFromRoute();
+    }
+
+    /**
+     * When ObjectCrudController is without custom sub class used, then we need to get the object information
+     * from the route, defined in Jarves\Router\RestApiLoader
+     *
+     * @return string
+     */
+    protected function detectObjectKeyFromRoute()
+    {
+        $request = $this->requestStack->getCurrentRequest();
         Return $request ? Objects::normalizeObjectKey($request->attributes->get('_jarves_object')) : '';
     }
 
@@ -37,8 +46,7 @@ abstract class ObjectCrudController extends ObjectCrud
      */
     public function getInfoAction()
     {
-        $obj = $this->getObj();
-        $info = $obj->getInfo();
+        $info = $this->getInfo();
         $info['_isClassDefinition'] = true;
 
         return $info;
@@ -92,8 +100,7 @@ abstract class ObjectCrudController extends ObjectCrud
     {
         $primaryKey = [];
 
-        $obj = $this->getObj();
-        foreach ($obj->getPrimary() as $pk) {
+        foreach ($this->getPrimary() as $pk) {
             $primaryKey[$pk] = Tools::urlDecode($request->attributes->get($pk));
         }
 
@@ -119,12 +126,10 @@ abstract class ObjectCrudController extends ObjectCrud
      */
     public function getItemAction(Request $request, $fields = null, $withAcl = null)
     {
-        $obj = $this->getObj();
-
         $primaryKey = $this->extractPrimaryKey($request);
         $withAcl = filter_var($withAcl, FILTER_VALIDATE_BOOLEAN);
 
-        return $obj->getItem($primaryKey, $fields, $withAcl);
+        return $this->getItem($primaryKey, $fields, $withAcl);
     }
 
     /**
@@ -152,12 +157,10 @@ abstract class ObjectCrudController extends ObjectCrud
      */
     public function getItemsAction(ParamFetcher $paramFetcher)
     {
-        $obj = $this->getObj();
+        $this->setLanguage($paramFetcher->get('lang'));
+        $this->setDomain($paramFetcher->get('domain'));
 
-        $obj->setLanguage($paramFetcher->get('lang'));
-        $obj->setDomain($paramFetcher->get('domain'));
-
-        return $obj->getItems(
+        return $this->getItems(
             $paramFetcher->get('filter'),
             $paramFetcher->get('limit'),
             $paramFetcher->get('offset'),
@@ -181,11 +184,9 @@ abstract class ObjectCrudController extends ObjectCrud
      */
     public function updateItemAction(Request $request)
     {
-        $obj = $this->getObj();
-
         $primaryKey = $this->extractPrimaryKey($request);
 
-        return $obj->update($primaryKey, $request);
+        return $this->update($primaryKey, $request);
     }
 
     /**
@@ -202,11 +203,9 @@ abstract class ObjectCrudController extends ObjectCrud
      */
     public function patchItemAction(Request $request)
     {
-        $obj = $this->getObj();
-
         $primaryKey = $this->extractPrimaryKey($request);
 
-        return $obj->patch($primaryKey, $request);
+        return $this->patch($primaryKey, $request);
     }
 
     /**
@@ -227,9 +226,7 @@ abstract class ObjectCrudController extends ObjectCrud
      */
     public function getCountAction($filter = null, $q = null)
     {
-        $obj = $this->getObj();
-
-        return $obj->getCount($filter, $q);
+        return $this->getCount($filter, $q);
     }
 
     /**
@@ -246,11 +243,9 @@ abstract class ObjectCrudController extends ObjectCrud
      */
     public function removeItemAction(Request $request)
     {
-        $obj = $this->getObj();
-
         $primaryKey = $this->extractPrimaryKey($request);
 
-        return $obj->remove($primaryKey);
+        return $this->remove($primaryKey);
     }
 
     /**
@@ -269,11 +264,10 @@ abstract class ObjectCrudController extends ObjectCrud
      */
     public function removeMultipleAction(Request $request)
     {
-        $obj = $this->getObj();
         $res = true;
 
         foreach ((array)$request->get('pks') as $pk) {
-            $res &= $obj->remove($pk);
+            $res &= $this->remove($pk);
         }
 
         return $res;
@@ -294,9 +288,7 @@ abstract class ObjectCrudController extends ObjectCrud
      */
     public function addItemAction(Request $request, ParamFetcher $paramFetcher)
     {
-        $obj = $this->getObj();
-
-        return $obj->add($request);
+        return $this->add($request);
     }
 
     /**
@@ -313,8 +305,7 @@ abstract class ObjectCrudController extends ObjectCrud
      */
     public function addMultipleItemAction(Request $request)
     {
-        $obj = $this->getObj();
-        return $obj->addMultiple($request);
+        return $this->addMultiple($request);
     }
 
     /**
@@ -330,35 +321,9 @@ abstract class ObjectCrudController extends ObjectCrud
      */
     public function getItemPositionAction(Request $request)
     {
-        $obj = $this->getObj();
-
         $primaryKey = $this->extractPrimaryKey($request);
 
-        return $obj->getPosition($primaryKey);
-    }
-
-    /**
-     * Returns the class object, depended on the current entryPoint.
-     *
-     * @return ObjectCrudController
-     * @throws \Exception
-     */
-    public function getObj()
-    {
-        $obj = $this;
-        $obj->setJarves($this->container->get('jarves'));
-        $obj->setRequest($this->container->get('request'));
-        $obj->initialize();
-
-        return $obj;
-    }
-
-    /**
-     * @param ObjectCrudController $obj
-     */
-    public function setObj($obj)
-    {
-        $this->obj = $obj;
+        return $this->getPosition($primaryKey);
     }
 
 }

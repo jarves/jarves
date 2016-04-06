@@ -150,10 +150,10 @@ class SystemConfigTest extends KernelAwareTestCase
   <!--
   The cache layer we use for the distributed caching.
   (The `fast caching` is auto determined (Order: APC, XCache, Files))
+
+  service: MUST have `Core\Cache\CacheInterface` as interface
   -->
-  <cache>
-    <!--The full classname of the storage. MUST have `Core\Cache\CacheInterface` as interface.-->
-    <class>\Vendor\Other\CacheClass</class>
+  <cache service="vendor.other.cache">
     <options>
       <option key="servers">
         <option>127.0.0.1</option>
@@ -166,7 +166,7 @@ class SystemConfigTest extends KernelAwareTestCase
 </config>';
         $config5 = new SystemConfig();
         $cache = new Cache();
-        $cache->setClass('\Vendor\Other\CacheClass');
+        $cache->setService('vendor.other.cache');
         $cache->setOption('servers', array('127.0.0.1', '192.168.0.1'));
         $cache->setOption('compression', 'true');
         $cache->setOption('foo', 'bar');
@@ -191,8 +191,7 @@ class SystemConfigTest extends KernelAwareTestCase
     autoStart: true|false (false) If the systems starts always a session for each request and therefore sends for each
                                 visitor/request a cookie (if none is delivered).
   -->
-  <client>
-    <class>Vendor\Custom\ClientHandling</class>
+  <client service="vendor.custom.client_handling">
     <options>
       <option key="server">127.0.0.1</option>
       <option key="cert">false</option>
@@ -200,31 +199,30 @@ class SystemConfigTest extends KernelAwareTestCase
     <!--
         A class that handles the actual data storage.
 
-        class: The full classname of the storage. MUST have `Core\Cache\CacheInterface` as interface.
-        Define `database` for the database storage.
+        service: MUST have `Core\Cache\CacheInterface` as interface
     -->
-    <sessionStorage class="Vendor\MyOwn\Storage"/>
+    <sessionStorage service="vendor.own.storage"/>
   </client>
 </config>';
 
         $config = new SystemConfig();
         $client = new Client();
-        $client->setClass('Vendor\Custom\ClientHandling');
+        $client->setService('vendor.custom.client_handling');
         $client->setOption('server', '127.0.0.1');
         $client->setOption('cert', 'false');
         $config->setClient($client);
         $sessionStorage = new SessionStorage();
-        $sessionStorage->setClass('Vendor\MyOwn\Storage');
+        $sessionStorage->setService('vendor.own.storage');
         $client->setSessionStorage($sessionStorage);
         $this->assertEquals($xml, $config->toXml());
 
         $reverse = new SystemConfig($xml);
         $this->assertInstanceOf('Jarves\Configuration\Client', $reverse->getClient());
-        $this->assertEquals('Vendor\Custom\ClientHandling', $reverse->getClient()->getClass());
+        $this->assertEquals('vendor.custom.client_handling', $reverse->getClient()->getService());
         $this->assertEquals('127.0.0.1', $reverse->getClient()->getOption('server'));
         $this->assertEquals('false', $reverse->getClient()->getOption('cert'));
         $this->assertInstanceOf('Jarves\Configuration\SessionStorage', $reverse->getClient()->getSessionStorage());
-        $this->assertEquals('Vendor\MyOwn\Storage', $reverse->getClient()->getSessionStorage()->getClass());
+        $this->assertEquals('vendor.own.storage', $reverse->getClient()->getSessionStorage()->getService());
         $this->assertEquals($xml, $reverse->toXml());
     }
 
@@ -247,14 +245,14 @@ class SystemConfigTest extends KernelAwareTestCase
         $file->setGroupOwner('www-data');
 
         $cache = new Cache();
-        $cache->setClass('Jarves\Cache\Files');
+        $cache->setService('jarves.cache.backend.files');
 
         $client = new Client();
-        $client->setClass('Jarves\Client\JarvesUsers');
+        $client->setService('jarves.client.jarves_users');
         $client->setOption('emailLogin', true);
 
         $sessionStorage = new SessionStorage();
-        $sessionStorage->setClass('Jarves\Client\StoreDatabase');
+        $sessionStorage->setService('jarves.client.store.database');
         $client->setSessionStorage($sessionStorage);
 
         $config->setSystemTitle('Fresh Installation');
@@ -283,12 +281,12 @@ class SystemConfigTest extends KernelAwareTestCase
         $this->assertEquals('www-data', $reverse->getFile()->getGroupOwner());
         $this->assertFalse($reverse->getFile()->getDisableModeChange());
 
-        $this->assertEquals('Jarves\Cache\Files', $reverse->getCache()->getClass());
+        $this->assertEquals('jarves.cache.backend.files', $reverse->getCache()->getService());
 
-        $this->assertEquals('Jarves\Client\JarvesUsers', $reverse->getClient()->getClass());
+        $this->assertEquals('jarves.client.jarves_users', $reverse->getClient()->getService());
         $this->assertEquals('true', $reverse->getClient()->getOption('emailLogin'));
 
-        $this->assertEquals('Jarves\Client\StoreDatabase', $reverse->getClient()->getSessionStorage()->getClass());
+        $this->assertEquals('jarves.client.store.database', $reverse->getClient()->getSessionStorage()->getService());
         $this->assertEquals('Fresh Installation', $reverse->getSystemTitle());
         $this->assertEquals('Europe/Berlin', $reverse->getTimezone());
     }

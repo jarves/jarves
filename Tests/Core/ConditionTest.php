@@ -3,14 +3,14 @@
 namespace Jarves\Tests\Jarves;
 
 use Jarves\Configuration\Condition;
-use Jarves\Tests\TestCase;
+use Jarves\Tests\KernelAwareTestCase;
 
-class ConditionTest extends TestCase
+class ConditionTest extends KernelAwareTestCase
 {
     public function testExtractFields()
     {
         $condition = Condition::create(['title', '=', 'test title']);
-        $fields = $condition->extractFields();
+        $fields = $this->getConditionOperator()->extractFields($condition);
 
         $this->assertEquals(['title'], $fields);
     }

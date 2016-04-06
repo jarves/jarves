@@ -3,18 +3,22 @@
 namespace Jarves\EventListener;
 
 use Jarves\Jarves;
+use Jarves\PageResponseFactory;
+use Jarves\PageStack;
 use Jarves\PluginResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Class PluginSubRequest
  *
  * This converts a PluginResponse to a PageResponse.
  */
-class PluginResponseListener {
+class PluginResponseListener
+{
 
     /**
      * @var Jarves
@@ -26,26 +30,37 @@ class PluginResponseListener {
      */
     protected $frontendRouteListener;
 
-    function __construct(Jarves $jarves, FrontendRouteListener $frontendRouteListener)
-    {
-        $this->jarves = $jarves;
-        $this->frontendRouteListener = $frontendRouteListener;
-    }
+    /**
+     * @var KernelInterface
+     */
+    private $kernel;
 
     /**
+     * @var PageStack
+     */
+    private $pageStack;
+
+    /**
+     * @var PageResponseFactory
+     */
+    private $pageResponseFactory;
+
+    /**
+     * PluginResponseListener constructor.
      * @param Jarves $jarves
+     * @param PageStack $pageStack
+     * @param FrontendRouteListener $frontendRouteListener
+     * @param KernelInterface $kernel
+     * @param PageResponseFactory $pageResponseFactory
      */
-    public function setJarves(Jarves $jarves)
+    function __construct(Jarves $jarves, PageStack $pageStack, FrontendRouteListener $frontendRouteListener,
+                         KernelInterface $kernel, PageResponseFactory $pageResponseFactory)
     {
         $this->jarves = $jarves;
-    }
-
-    /**
-     * @return Jarves
-     */
-    public function getJarves()
-    {
-        return $this->jarves;
+        $this->pageStack = $pageStack;
+        $this->frontendRouteListener = $frontendRouteListener;
+        $this->kernel = $kernel;
+        $this->pageResponseFactory = $pageResponseFactory;
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
@@ -53,7 +68,7 @@ class PluginResponseListener {
         $response = $event->getResponse();
         if (null !== $response && $response instanceof PluginResponse) {
             $response->setControllerRequest($event->getRequest());
-            $response = $this->getJarves()->getPageResponse()->setPluginResponse($response);
+            $response = $this->pageStack->getPageResponse()->setPluginResponse($response);
 
             if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
                 $response->setRenderFrontPage(true);
@@ -79,14 +94,13 @@ class PluginResponseListener {
             if ($data instanceof PluginResponse) {
                 $response = $data;
             } else {
-                $response = new PluginResponse($data);
+                $response = $this->pageResponseFactory->createPluginResponse($data);
             }
             $response->setControllerRequest($event->getRequest());
             $event->setResponse($response);
         } else {
             $foundRoute = false;
 
-//            $router = $this->getJarves()->getRouter();
             $routes = $this->frontendRouteListener->getRoutes();
 
             foreach ($routes as $idx => $route) {
@@ -99,9 +113,9 @@ class PluginResponseListener {
             }
             if ($foundRoute) {
                 //we've remove the route and fire now again a sub request
-                $request = clone $this->getJarves()->getRequest();
+                $request = clone $this->pageStack->getRequest();
                 $request->attributes = new ParameterBag();
-                $response = $this->getJarves()->getKernel()->handle(
+                $response = $this->kernel->handle(
                     $request,
                     HttpKernelInterface::SUB_REQUEST
                 );

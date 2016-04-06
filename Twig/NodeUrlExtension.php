@@ -4,26 +4,23 @@ namespace Jarves\Twig;
 
 use Jarves\Jarves;
 use Jarves\Model\Node;
+use Jarves\Utils;
 
 class NodeUrlExtension extends \Twig_Extension
 {
     /**
-     * @var Jarves
+     * @var Utils
      */
-    protected $jarves;
-
-    function __construct(Jarves $jarves)
-    {
-        $this->jarves = $jarves;
-    }
+    private $utils;
 
     /**
-     * @return \Jarves\Jarves
+     * @param Utils $utils
      */
-    public function getJarves()
+    function __construct(Utils $utils)
     {
-        return $this->jarves;
+        $this->utils = $utils;
     }
+
 
     public function getName()
     {
@@ -46,7 +43,6 @@ class NodeUrlExtension extends \Twig_Extension
 
     public function getUrl($nodeOrId = false)
     {
-        return $this->getJarves()->getNodeUrl($nodeOrId);
+        return $this->utils->getNodeUrl($nodeOrId);
     }
-
 }

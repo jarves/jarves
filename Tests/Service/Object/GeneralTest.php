@@ -17,6 +17,6 @@ class GeneralTest extends KernelAwareTestCase
 
         $objectClass = $this->getObjects()->getStorageController('Test\\Test');
         $this->assertNotEmpty($objectClass);
-        $this->assertInstanceOf('Jarves\ORM\ORMAbstract', $objectClass);
+        $this->assertInstanceOf('Jarves\Storage\AbstractStorage', $objectClass);
     }
 }

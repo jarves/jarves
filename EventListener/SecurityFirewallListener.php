@@ -2,15 +2,11 @@
 
 namespace Jarves\EventListener;
 
-use FOS\RestBundle\Util\Codes;
-use FOS\RestBundle\Util\FormatNegotiatorInterface;
-use Jarves\Jarves;
+use Jarves\ACL;
+use Jarves\PageStack;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestMatcher;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class SecurityFirewallListener
 {
@@ -26,12 +22,15 @@ class SecurityFirewallListener
 
     public function onKernelRequest(GetResponseEvent $event)
     {
-        /** @var Jarves $jarvesCms */
-        $jarvesCms = $this->container->get('jarves');
+        /** @var PageStack $pageStack */
+        $pageStack = $this->container->get('jarves.page_stack');
 
-        if ($jarvesCms->isAdmin()) {
+        /** @var ACL $acl */
+        $acl = $this->container->get('jarves.acl');
+
+        if ($pageStack->isAdmin()) {
             $whiteList = [
-                '/',
+                '',
                 '/admin/backend/css',
                 '/admin/backend/script',
                 '/admin/ui/languages',
@@ -41,14 +40,14 @@ class SecurityFirewallListener
                 '/admin/logged-in'
             ];
 
-            $adminPrefix = $jarvesCms->getAdminPrefix();
+            $adminPrefix = $pageStack->getAdminPrefix();
 
             $url = substr($event->getRequest()->getPathInfo(), strlen($adminPrefix));
             if (in_array($url, $whiteList)) {
                 return;
             }
 
-            if (!$jarvesCms->getAdminClient()->getUser() || !$jarvesCms->getAcl()->check('JarvesBundle:EntryPoint', $url)) {
+            if (!$pageStack->getAdminClient()->getUser() || !$acl->check('JarvesBundle:EntryPoint', $url)) {
                 $response = new Response(json_encode(
                     [
                         'status' => 403,

@@ -2,8 +2,36 @@
 
 namespace Jarves\AssetHandler;
 
+use Jarves\Filesystem\Filesystem;
+use Jarves\Jarves;
+use Jarves\Utils;
+
 class CssHandler extends AbstractHandler
 {
+    /**
+     * @var Filesystem
+     */
+    protected $webFilesystem;
+
+    /**
+     * @var Utils
+     */
+    protected $utils;
+
+    /**
+     * CssHandler constructor.
+     * @param Jarves $jarves
+     * @param Filesystem $webFilesystem
+     * @param Utils $utils
+     */
+    public function __construct(Jarves $jarves, Filesystem $webFilesystem, Utils $utils)
+    {
+        parent::__construct($jarves);
+        $this->webFilesystem = $webFilesystem;
+        $this->jarves = $jarves;
+        $this->utils = $utils;
+    }
+
     protected function getTag(AssetInfo $assetInfo)
     {
         if ($assetInfo->getPath()) {
@@ -100,7 +128,7 @@ EOF
         $md5Line = '/* ' . md5($md5String) . " */\n";
 
         $oFile = 'cache/compressed-css/' . md5($md5String) . '.css';
-        $handle = @fopen($this->getJarves()->getKernel()->getRootDir() . '/../web/' . $oFile, 'r');
+        $handle = @fopen($this->getJarves()->getRootDir() . '/../web/' . $oFile, 'r');
         if ($handle) {
             $line = fgets($handle);
             fclose($handle);
@@ -110,12 +138,12 @@ EOF
         }
 
         if (!$fileUpToDate) {
-            $content = $this->getJarves()->getUtils()->compressCss(
+            $content = $this->utils->compressCss(
                 $files,
                 'cache/compressed-css/'
             );
             $content = $md5Line . $content;
-            $this->getJarves()->getWebFileSystem()->write($oFile, $content);
+            $this->webFilesystem->write($oFile, $content);
         }
 
         $assetInfo = new AssetInfo();

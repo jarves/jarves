@@ -6,7 +6,7 @@ use Jarves\Configuration\Configs;
 use Jarves\Configuration\Field;
 use Jarves\Configuration\Object;
 use Jarves\Exceptions\ModelBuildException;
-use Jarves\ORM\ORMAbstract;
+use Jarves\Storage\AbstractStorage;
 use Jarves\Tools;
 
 class TypeContentElements extends AbstractType
@@ -44,7 +44,7 @@ class TypeContentElements extends AbstractType
             $contentsObject->setTable(
                 $object->getTable() . '_' . Tools::camelcase2Underscore($this->getFieldDefinition()->getId())
             );
-            $contentsObject->setDataModel($object->getDataModel());
+            $contentsObject->setStorageService($object->getStorageService());
         }
 
         $fields = [
@@ -74,7 +74,7 @@ class TypeContentElements extends AbstractType
         if (!$contentsObject->hasRelation('ForeignObject')) {
             $relation = new RelationDefinition();
             $relation->setName('ForeignObject');
-            $relation->setType(ORMAbstract::MANY_TO_ONE);
+            $relation->setType(AbstractStorage::MANY_TO_ONE);
             $relation->setForeignObjectKey($object->getKey());
             $relation->setRefName(ucfirst($this->getFieldDefinition()->getId()));
 
@@ -122,7 +122,7 @@ class TypeContentElements extends AbstractType
         if (!$object->hasRelation($this->getFieldDefinition()->getId())) {
             $relation = new RelationDefinition();
             $relation->setName(ucfirst($this->getFieldDefinition()->getId()));
-            $relation->setType(ORMAbstract::ONE_TO_MANY);
+            $relation->setType(AbstractStorage::ONE_TO_MANY);
             $relation->setForeignObjectKey($contentsObject->getKey());
             $relation->setRefName('ForeignObject');
 

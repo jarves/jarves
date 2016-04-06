@@ -13,7 +13,7 @@ class PropelBuilderTest extends KernelAwareTestCase
      */
     protected function getBuilder()
     {
-        $modelBuilder = $this->getJarves()->getModelBuilder();
+        $modelBuilder = $this->getModelBuilder();
 
         return $modelBuilder->getBuilder('propel');
     }
@@ -30,7 +30,7 @@ class PropelBuilderTest extends KernelAwareTestCase
         $object = new Object($xml, $this->getJarves());
         $testBundle->addObject($object);
 
-        $modelBuilder = $this->getJarves()->getModelBuilder();
+        $modelBuilder = $this->getModelBuilder();
 
         $this->getJarves()->getConfigs()->boot();
         $modelBuilder->bootBuildTime();
@@ -46,7 +46,7 @@ class PropelBuilderTest extends KernelAwareTestCase
     {
         $xml = '
 <object id="Object1">
-  <dataModel>propel</dataModel>
+  <storageService>jarves.storage.propel</storageService>
 </object>
 ';
         $this->getSchema($xml);
@@ -60,7 +60,7 @@ class PropelBuilderTest extends KernelAwareTestCase
     {
         $xml = '
 <object id="Object1">
-  <dataModel>propel</dataModel>
+  <storageService>jarves.storage.propel</storageService>
   <table>test_object1</table>
 </object>
 ';
@@ -71,7 +71,7 @@ class PropelBuilderTest extends KernelAwareTestCase
     {
         $xml = '
 <object id="Object1">
-  <dataModel>propel</dataModel>
+  <storageService>jarves.storage.propel</storageService>
   <table>test_object1</table>
   <fields>
     <field id="id" type="number" autoIncrement="true" primaryKey="true"/>
@@ -98,7 +98,7 @@ class PropelBuilderTest extends KernelAwareTestCase
     {
         $xml = '
 <object id="Object1">
-  <dataModel>propel</dataModel>
+  <storageService>jarves.storage.propel</storageService>
   <table>test_object1</table>
   <fields>
     <field id="id" type="number" autoIncrement="true" primaryKey="true"/>
@@ -133,7 +133,7 @@ class PropelBuilderTest extends KernelAwareTestCase
     {
         $xml = '
 <object id="Object1">
-  <dataModel>propel</dataModel>
+  <storageService>jarves.storage.propel</storageService>
   <table>test_object1</table>
   <fields>
     <field id="id" type="number" autoIncrement="true" primaryKey="true"/>
@@ -171,7 +171,7 @@ class PropelBuilderTest extends KernelAwareTestCase
     {
         $xml = '
 <object id="Object1">
-  <dataModel>propel</dataModel>
+  <storageService>jarves.storage.propel</storageService>
   <table>test_object1</table>
   <fields>
     <field id="id" type="number" autoIncrement="true" primaryKey="true"/>
@@ -204,7 +204,7 @@ class PropelBuilderTest extends KernelAwareTestCase
     {
         $xml = '
 <object id="ObjectOne">
-  <dataModel>propel</dataModel>
+  <storageService>jarves.storage.propel</storageService>
   <table>test_object_one</table>
   <fields>
     <field id="id" type="number" autoIncrement="true" primaryKey="true"/>

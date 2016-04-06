@@ -42,7 +42,7 @@ class JarvesUsers extends ClientAbstract
 
         if (isset($row['id']) && $row['id'] > 0) {
 
-            $hash = self::getHashedPassword($password, $row['password_salt'], $this->getJarves());
+            $hash = self::getHashedPassword($password, $row['password_salt'], $this->jarvesConfig->getSystemConfig()->getPasswordHashKey());
 
             if (!$hash || $hash != $row['password']) {
                 return false;

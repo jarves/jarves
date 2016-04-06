@@ -5,15 +5,31 @@ namespace Jarves\Admin\FieldTypes;
 use Jarves\Client\ClientAbstract;
 use Jarves\Configuration\Configs;
 use Jarves\Configuration\Object;
+use Jarves\JarvesConfig;
 
 class TypeUserPassword extends AbstractType
 {
     protected $name = 'UserPassword';
 
+    /**
+     * @var JarvesConfig
+     */
+    private $jarvesConfig;
+
+    /**
+     * @param JarvesConfig $jarvesConfig
+     */
+    public function __construct(JarvesConfig $jarvesConfig)
+    {
+        $this->jarvesConfig = $jarvesConfig;
+    }
+
     public function isDiffAllowed()
     {
         return false;
     }
+
+
 
     public function getColumns()
     {
@@ -42,7 +58,9 @@ class TypeUserPassword extends AbstractType
     {
         $salt = ClientAbstract::getSalt();
         $data[$this->getFieldDefinition()->getId().'Salt'] = $salt;
-        $data[$this->getFieldDefinition()->getId()] = ClientAbstract::getHashedPassword($this->getValue(), $salt);
+
+        $passwordHashKey = $this->jarvesConfig->getSystemConfig()->getPasswordHashKey();
+        $data[$this->getFieldDefinition()->getId()] = ClientAbstract::getHashedPassword($this->getValue(), $salt, $passwordHashKey);
     }
 
     /**
@@ -50,7 +68,6 @@ class TypeUserPassword extends AbstractType
      */
     public function bootRunTime(Object $object, Configs $configs)
     {
-
     }
 
 

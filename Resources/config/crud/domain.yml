@@ -1,0 +1,27 @@
+fields:
+    __General__:
+        label: General
+        type: tab
+        children:
+            - domain
+            - path
+            - titleFormat
+            - lang
+            - master
+            - startnode
+            - theme
+    __Extra__:
+        label: Extra
+        type: tab
+        children:
+           - resourceCompression
+           - favicon
+           - robots
+           - email
+           - alias
+           - redirect
+add: false
+edit: false
+remove: false
+object: jarves/domain
+titleField: domain

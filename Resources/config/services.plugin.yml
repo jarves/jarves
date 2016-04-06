@@ -1,0 +1,7 @@
+parameters:
+     jarves.plugin.userlogin.class: Jarves\Controller\Plugin\UserLogin
+
+services:
+  jarves.plugin.userlogin:
+       class: %jarves.plugin.userlogin.class%
+       arguments: ["@jarves", "@templating"]

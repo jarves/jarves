@@ -57,45 +57,21 @@
             <assets src="@JarvesBundle/admin/css/jarves/Field/*" />
         </adminAssets>
         <streams>
-            <stream path="load">
-                <class>Jarves\Controller\Admin\DashboardWidgets</class>
-                <method>load</method>
-            </stream>
+            <stream path="load" service="jarves.dashboard.widget:load" />
 
-            <stream path="space">
-                <class>Jarves\Controller\Admin\DashboardWidgets</class>
-                <method>space</method>
-            </stream>
+            <stream path="space" service="jarves.dashboard.widget:space" />
 
-            <stream path="uptime">
-                <class>Jarves\Controller\Admin\DashboardWidgets</class>
-                <method>uptime</method>
-            </stream>
+            <stream path="uptime" service="jarves.dashboard.widget:uptime" />
 
-            <stream path="analytics">
-                <class>Jarves\Controller\Admin\DashboardWidgets</class>
-                <method>analytics</method>
-            </stream>
+            <stream path="analytics" service="jarves.dashboard.widget:analytics" />
 
-            <stream path="latency">
-                <class>Jarves\Controller\Admin\DashboardWidgets</class>
-                <method>latency</method>
-            </stream>
+            <stream path="latency" service="jarves.dashboard.widget:latency" />
 
-            <stream path="latencies">
-                <class>Jarves\Controller\Admin\DashboardWidgets</class>
-                <method>latencies</method>
-            </stream>
+            <stream path="latencies" service="jarves.dashboard.widget:latencies" />
 
-            <stream path="apc">
-                <class>Jarves\Controller\Admin\DashboardWidgets</class>
-                <method>apc</method>
-            </stream>
+            <stream path="apc" service="jarves.dashboard.widget:apc" />
 
-            <stream path="newsFeed">
-                <class>Jarves\Controller\Admin\DashboardWidgets</class>
-                <method>newsFeed</method>
-            </stream>
+            <stream path="newsFeed" service="jarves.dashboard.widget:newsFeed" />
 
         </streams>
     </bundle>

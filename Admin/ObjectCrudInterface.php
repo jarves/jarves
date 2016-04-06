@@ -2,8 +2,6 @@
 
 namespace Jarves\Admin;
 
-use Symfony\Component\HttpFoundation\Request;
-
 interface ObjectCrudInterface {
 
     public function getCount($filter, $query = '');

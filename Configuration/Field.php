@@ -317,7 +317,10 @@ class Field extends Model
     public function toArray($printDefaults = false)
     {
         $array = parent::toArray($printDefaults);
-        $array['selection'] = $this->getFieldType()->getSelection();
+
+        if ($this->getType()) {
+            $array['selection'] = $this->getFieldType()->getSelection();
+        }
 
         return $array;
     }
@@ -333,36 +336,36 @@ class Field extends Model
         if (null === $this->fieldType) {
             $type = $this->getType();
             $field = null;
-            if ('predefined' === strtolower($type)) {
-                $object = $this->getJarves()->getObjects()->getDefinition($this->getObject());
-                if (!$object && $this->getObjectDefinition()) {
-                    $object = $this->getObjectDefinition();
-                }
-                if (null === $object) {
-                    throw new ObjectNotFoundException(
-                        sprintf(
-                            'Object `%s` for predefined field `%s` not found.',
-                            $this->getObject(),
-                            $this->getId()
-                        )
-                    );
-                }
-                if (!$fieldId = $this->getField()) {
-                    $fieldId = $this->getId();
-                }
-
-                if (!$field = $object->getField($fieldId)) {
-                    throw new ObjectFieldNotFoundException(
-                        sprintf(
-                            'Field `%s` of Object `%s` for predefined field `%s` not found.',
-                            $fieldId,
-                            $object->getKey(),
-                            $this->getId()
-                        )
-                    );
-                }
-                $type = $field->getType();
-            }
+//            if ('predefined' === strtolower($type)) {
+//                $object = $this->getJarves()->getObjects()->getDefinition($this->getObject());
+//                if (!$object && $this->getObjectDefinition()) {
+//                    $object = $this->getObjectDefinition();
+//                }
+//                if (null === $object) {
+//                    throw new ObjectNotFoundException(
+//                        sprintf(
+//                            'Object `%s` for predefined field `%s` not found.',
+//                            $this->getObject(),
+//                            $this->getId()
+//                        )
+//                    );
+//                }
+//                if (!$fieldId = $this->getField()) {
+//                    $fieldId = $this->getId();
+//                }
+//
+//                if (!$field = $object->getField($fieldId)) {
+//                    throw new ObjectFieldNotFoundException(
+//                        sprintf(
+//                            'Field `%s` of Object `%s` for predefined field `%s` not found.',
+//                            $fieldId,
+//                            $object->getKey(),
+//                            $this->getId()
+//                        )
+//                    );
+//                }
+//                $type = $field->getType();
+//            }
             try {
                 $this->fieldType = $this->getJarves()->getFieldTypes()->newType($type);
             } catch (\Exception $e) {
@@ -523,7 +526,7 @@ class Field extends Model
         if (null !== $this->children) {
             $children = [];
             foreach ($this->children as $child) {
-                $children[$child->getId()] = $child->toArray();
+                $children[$child->getId()] = $child;
             }
 
             return $children;

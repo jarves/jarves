@@ -17,22 +17,6 @@ class Utils
         $this->jarves = $jarves;
     }
 
-    /**
-     * @param Jarves $jarves
-     */
-    public function setJarves($jarves)
-    {
-        $this->jarves = $jarves;
-    }
-
-    /**
-     * @return Jarves
-     */
-    public function getJarves()
-    {
-        return $this->jarves;
-    }
-
     public function clearCache()
     {
 //        \Jarves\TempFile::remove('cache-object');
@@ -41,7 +25,7 @@ class Utils
 //        \Jarves\WebFile::remove('cache');
 //        \Jarves\WebFile::createFolder('cache');
 
-        foreach ($this->getJarves()->getKernel()->getBundles() as $bundleName => $bundle) {
+        foreach ($this->jarves->getBundles() as $bundleName => $bundle) {
             $this->clearBundleCache($bundleName);
         }
 
@@ -50,11 +34,11 @@ class Utils
 
     public function clearBundleCache($bundleName)
     {
-        $config = $this->getJarves()->getKernel()->getBundle($bundleName);
+        $config = $this->jarves->getBundle($bundleName);
 
-        if ($config) {
-            $this->getJarves()->invalidateCache(strtolower($config->getName()));
-        }
+//        if ($config) {
+//            $this->jarves->invalidateCache(strtolower($config->getName()));
+//        }
     }
 
     /**
@@ -84,7 +68,7 @@ class Utils
         }
 
         //$bundleName = ucfirst($bundleName) . 'Bundle';
-        $config = $this->getJarves()->getConfig($bundleName);
+        $config = $this->jarves->getConfig($bundleName);
 
         if (!$path && $config) {
             //root

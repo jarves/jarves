@@ -53,45 +53,6 @@ class Event extends Model
      */
     protected $condition;
 
-    public function call($event)
-    {
-        if ($this->getCalls()) {
-            foreach ($this->getCalls() as $call) {
-                call_user_func_array($call, [$event]);
-            }
-        }
-        if ($this->getClearCaches()) {
-            foreach ($this->getClearCaches() as $cacheKey) {
-                $this->getJarves()->invalidateCache($cacheKey);
-            }
-        }
-        if ($this->getServiceCalls()) {
-            foreach ($this->getServiceCalls() as $serviceCall) {
-                list($service, $method) = explode('::', $serviceCall);
-                if ($this->getJarves()->has($service)) {
-                    $service = $this->getJarves()->get($service);
-                    $service->$method($event);
-                }
-            }
-        }
-    }
-
-    public function isCallable(GenericEvent $event)
-    {
-        if ($this->getSubject() && $event->getSubject() != $this->getSubject() ){
-            return false;
-        }
-
-        if ($this->getCondition()) {
-            $args = $event->getArguments() ?: [];
-            if ($this->getCondition() && !$this->getCondition()->satisfy($args)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     /**
      * @param string $key
      */

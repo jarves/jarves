@@ -4,25 +4,21 @@ namespace Jarves\Twig;
 
 use Jarves\Jarves;
 use Jarves\Model\Base\Node;
+use Jarves\Navigation;
 
 class NavigationExtension extends \Twig_Extension
 {
     /**
-     * @var Jarves
+     * @var Navigation
      */
-    protected $jarves;
-
-    function __construct(Jarves $jarves)
-    {
-        $this->jarves = $jarves;
-    }
+    private $navigation;
 
     /**
-     * @return \Jarves\Jarves
+     * @param Navigation $navigation
      */
-    public function getJarves()
+    function __construct(Navigation $navigation)
     {
-        return $this->jarves;
+        $this->navigation = $navigation;
     }
 
     public function getName()
@@ -34,18 +30,18 @@ class NavigationExtension extends \Twig_Extension
     {
         return array(
             'navigationLevel' => new \Twig_Function_Method($this, 'navigationLevel', [
-                    'is_safe' => ['html']
+                    'is_safe' => ['html'],
+                    'needs_environment' => true
                 ]),
             'navigationNode' => new \Twig_Function_Method($this, 'navigationNode', [
-                    'is_safe' => ['html']
+                    'is_safe' => ['html'],
+                    'needs_environment' => true
                 ])
         );
     }
 
-    public function navigationNode($nodeOrId, $view = 'JarvesBundle:Default:navigation.html.twig')
+    public function navigationNode(\Twig_Environment $twig, $nodeOrId, $view = 'JarvesBundle:Default:navigation.html.twig')
     {
-        $navigation = $this->getJarves()->getNavigation();
-
         $id = $nodeOrId;
         if ($id instanceof Node) {
             $id = $nodeOrId->getId();
@@ -56,19 +52,17 @@ class NavigationExtension extends \Twig_Extension
             'template' => $view
         ];
 
-        return $navigation->get($options);
+        return $this->navigation->getRendered($options, $twig);
     }
 
-    public function navigationLevel($level, $view = 'JarvesBundle:Default/navigation.html.twig')
+    public function navigationLevel(\Twig_Environment $twig, $level, $view = 'JarvesBundle:Default:navigation.html.twig')
     {
-        $navigation = $this->getJarves()->getNavigation();
-
         $options = [
             'level' => $level,
             'template' => $view
         ];
 
-        return $navigation->get($options);
+        return $this->navigation->getRendered($options, $twig);
     }
 
 }
