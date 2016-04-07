@@ -46,7 +46,7 @@ Requirements
 1. PHP 5.5+
 2. *nix OS (Linux, BSD, OSX)
 3. PHP extensions: PDO, mbstring, gd, zip
-4. MySQL, PostgreSQL or SQLite (completely tested through unit tests)
+4. MySQL, PostgreSQL or SQLite
 
 
 Features
