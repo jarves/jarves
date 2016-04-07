@@ -2993,12 +2993,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jarves/jarves-publication.git",
-                "reference": "e89b7afdf79b15af5469b8e16bed1d43a63fc1b3"
+                "reference": "2af692f00c959422ba8c365474f9e7a1cb021c48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jarves/jarves-publication/zipball/e89b7afdf79b15af5469b8e16bed1d43a63fc1b3",
-                "reference": "e89b7afdf79b15af5469b8e16bed1d43a63fc1b3",
+                "url": "https://api.github.com/repos/jarves/jarves-publication/zipball/2af692f00c959422ba8c365474f9e7a1cb021c48",
+                "reference": "2af692f00c959422ba8c365474f9e7a1cb021c48",
                 "shasum": ""
             },
             "type": "library",
@@ -3025,7 +3025,7 @@
                 "blog",
                 "news"
             ],
-            "time": "2016-04-07 00:44:44"
+            "time": "2016-04-07 11:40:50"
         },
         {
             "name": "mockery/mockery",
