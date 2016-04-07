@@ -13,4 +13,4 @@
   rm -rf Tests/Integration/skeletion/app/cache/*
 ```
 
-- Fire `phpunit`.
+- Fire `vendor/bin/phpunit`.

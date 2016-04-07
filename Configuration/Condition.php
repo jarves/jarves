@@ -74,7 +74,7 @@ class Condition extends Model
      */
     public function setTableName($tableName)
     {
-        $this->tableNameSet = null;
+        $this->tableNameSet = true;
         $this->tableName = $tableName;
     }
 

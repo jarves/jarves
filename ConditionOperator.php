@@ -132,17 +132,23 @@ class ConditionOperator
             }
         }
 
-        if (is_array($condition->getSelect())) {
-            if (null !== $usedFieldNames) {
-                $usedFieldNames = array_merge($usedFieldNames, array_keys($condition->getSelect()));
-            }
-            $selected = implode(', ', $condition->getSelect());
-        } else {
-            if (null !== $usedFieldNames) {
-                $usedFieldNames[] = $condition->getSelect();
-            }
-            $selected = $tableName.'.'.$condition->getSelect();
+        if ($condition->isTableNameSet()) {
+            $tableName = $condition->getTableName();
         }
+
+        $selected = [];
+        foreach ($condition->getSelect() as $select) {
+            if (false === strpos($select, '.')) {
+                $select = $tableName . '.' . $select;
+            }
+
+            if (null !== $usedFieldNames) {
+                $usedFieldNames[] = $select;
+            }
+
+            $selected[] = $select;
+        }
+        $selected = implode(', ', $selected);
 
         $joins = '';
 

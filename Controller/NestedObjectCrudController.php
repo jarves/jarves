@@ -13,7 +13,7 @@ class NestedObjectCrudController extends ObjectCrudController
      *    description="Adds a new item (nested set)"
      * )
      *
-     * @Rest\RequestParam(name="_pk", strict=false, description="The target object item's primaryKey as url encoded string. Only for nested sets.")
+     * @Rest\RequestParam(name="_pk", map=true, strict=false, description="The target object item's primaryKey as url encoded string. Only for nested sets.")
      * @Rest\RequestParam(name="_position", requirements=".*", strict=false, description="The position we place this new entry relative to _pk given position. `first` (child), `last` (child), `prev` (sibling), `next` (sibling).")
      * @Rest\RequestParam(name="_targetObjectKey", requirements=".*", strict=false, description="The target object key. Only for nested sets.")
      *
@@ -35,7 +35,7 @@ class NestedObjectCrudController extends ObjectCrudController
      *    description="Adds multiple %object% items #todo-doc"
      * )
      *
-     * @Rest\RequestParam(name="_pk", strict=false, description="The target object item's primaryKey as url encoded string. Only for nested sets.")
+     * @Rest\RequestParam(name="_pk", map=true, strict=false, description="The target object item's primaryKey as url encoded string. Only for nested sets.")
      * @Rest\RequestParam(name="_position", requirements=".*", strict=false, description="The position we place this new entry relative to _pk given position. `first` (child), `last` (child), `prev` (sibling), `next` (sibling).")
      * @Rest\RequestParam(name="_targetObjectKey", requirements=".*", strict=false, description="The target object key. Only for nested sets.")
      *
@@ -84,7 +84,7 @@ class NestedObjectCrudController extends ObjectCrudController
      * )
      *
      * @Rest\QueryParam(name="fields", requirements=".+", description="Comma separated list of field names")
-     * @Rest\QueryParam(name="filter", requirements=".*", description="Simple filtering per field")
+     * @Rest\QueryParam(name="filter", map=true, requirements=".*", description="Simple filtering per field")
      * @Rest\QueryParam(name="limit", requirements="[0-9]+", description="Limits the result")
      * @Rest\QueryParam(name="offset", requirements="[0-9]+", description="Offsets the result")
      * @Rest\QueryParam(name="scope", requirements=".*", description="Nested set scope")
@@ -120,7 +120,7 @@ class NestedObjectCrudController extends ObjectCrudController
      * )
      *
      * @Rest\QueryParam(name="fields", requirements=".+", description="Comma separated list of field names")
-     * @Rest\QueryParam(name="filter", requirements=".*", description="Simple filtering per field")
+     * @Rest\QueryParam(name="filter", map=true, requirements=".*", description="Simple filtering per field")
      * @Rest\QueryParam(name="limit", requirements="[0-9]+", description="Limits the result")
      * @Rest\QueryParam(name="offset", requirements="[0-9]+", description="Offsets the result")
      * @Rest\QueryParam(name="scope", requirements=".*", description="Nested set scope")
@@ -161,7 +161,7 @@ class NestedObjectCrudController extends ObjectCrudController
      *    description="Returns a branch direct children count (nested set)"
      * )
      *
-     * @Rest\QueryParam(name="filter", requirements=".*", description="Simple filtering per field")
+     * @Rest\QueryParam(name="filter", map=true, requirements=".*", description="Simple filtering per field")
      * @Rest\QueryParam(name="scope", requirements=".*", description="Nested set scope")
      *
      * @Rest\View()

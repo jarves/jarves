@@ -177,8 +177,8 @@ class Controller extends SymfonyController
 //     *
 //     * @Rest\QueryParam(name="limit", requirements="[0-9]+", description="Limits the result")
 //     * @Rest\QueryParam(name="offset", requirements="[0-9]+", description="Offsets the result")
-//     * @Rest\QueryParam(name="order", requirements=".+", description="Order the result")
-//     * @Rest\QueryParam(name="filter", requirements=".+", description="Filter the result")
+//     * @Rest\QueryParam(name="order", map=true, requirements=".+", description="Order the result")
+//     * @Rest\QueryParam(name="filter", map=true, requirements=".+", description="Filter the result")
 //     *
 //     * @Rest\Get("/admin/object-browser/{objectKey}", requirements={"objectKey" = "[a-zA-Z0-9-_]+/[a-zA-Z0-9-_]+"})
 //     *
@@ -270,7 +270,7 @@ class Controller extends SymfonyController
 //     *  description="General object items output for the object browser"
 //     * )
 //     *
-//     * @Rest\QueryParam(name="filter", requirements=".+", description="Filter the result")
+//     * @Rest\QueryParam(name="filter", map=true, requirements=".+", description="Filter the result")
 //     *
 //     * @Rest\Get("/admin/object-browser-count/{objectKey}", requirements={"objectKey" = "[a-zA-Z0-9-_]+/[a-zA-Z0-9-_]+"})
 //     *

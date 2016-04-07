@@ -168,7 +168,7 @@ class FileRESTTest extends KernelAwareTestCase
         $this->assertEquals(true, $response['data']);
 
         $response = $this->restCall('/jarves/admin/file?path=' . $testDirPath);
-        $this->assertcount(1, $response['data']);
+        $this->assertCount(1, $response['data']);
         $file = $response['data'][0];
         $newPath = $testDirPath . '/' . basename($testPath);
         $this->assertEquals($newPath, $file['path']);

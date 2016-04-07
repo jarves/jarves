@@ -60,13 +60,12 @@ Add following composer dependencies to the root `composer.json`:
 
    "require": [
 
-
         "propel/propel-bundle": "2.0.x-dev@dev",
         "propel/propel": "dev-master",
         "sybio/image-workshop": ">=2",
         "michelf/php-markdown": ">=1.3",
         "composer\/composer": "1.0.0",
-        "friendsofsymfony/rest-bundle": "^2.0.0",
+        "friendsofsymfony/rest-bundle": "^2.0.0-BETA2",
         "nelmio/api-doc-bundle": "~2.5",
         "icap/html-diff": ">=1.0.1",
         "leafo/scssphp": ">=0.6.1"
@@ -96,22 +95,20 @@ Composer.json should look like:
         ]
     },
     "require": {
-        "php": ">=5.3.9",
-        "symfony/symfony": "2.8.*",
-        "doctrine/orm": "^2.4.8",
-        "doctrine/doctrine-bundle": "~1.4",
-        "symfony/swiftmailer-bundle": "~2.3",
-        "symfony/monolog-bundle": "~2.4",
-        "sensio/distribution-bundle": "~5.0",
-        "sensio/framework-extra-bundle": "^3.0.2",
-        "incenteev/composer-parameter-handler": "~2.0",
+        "php": ">=5.6",
+        "symfony/symfony": "^3.0",
+        "twig/extensions": ">=1.0",
+        "symfony/monolog-bundle": ">=2.8",
+        "sensio/distribution-bundle": ">=2.3",
+        "sensio/framework-extra-bundle": ">=2.3",
+        "incenteev/composer-parameter-handler": ">=2.0",
 
         "propel/propel-bundle": "2.0.x-dev@dev",
         "propel/propel": "dev-master",
         "sybio/image-workshop": ">=2",
         "michelf/php-markdown": ">=1.3",
         "composer\/composer": "1.0.0",
-        "friendsofsymfony/rest-bundle": "^2.0.0",
+        "friendsofsymfony/rest-bundle": "^2.0.0-BETA2",
         "nelmio/api-doc-bundle": "~2.5",
         "icap/html-diff": ">=1.0.1",
         "leafo/scssphp": ">=0.6.1"

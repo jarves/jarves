@@ -7,7 +7,10 @@ class ConditionSubSelect extends Condition
     CONST DESC = 'DESC';
     CONST ASC = 'ASC';
 
-    protected $select;
+    /**
+     * @var array
+     */
+    protected $select = [];
 
     protected $order;
 
@@ -70,9 +73,12 @@ class ConditionSubSelect extends Condition
         return $this->tableNameSelect;
     }
 
+    /**
+     * @param array|string $select
+     */
     public function select($select)
     {
-        $this->select = $select;
+        $this->select = (array)$select;
     }
 
     public function orderBy($field, $order = ConditionSubSelect::ASC)
@@ -80,6 +86,9 @@ class ConditionSubSelect extends Condition
         $this->order = [$field, $order];
     }
 
+    /**
+     * @return array
+     */
     public function getSelect()
     {
         return $this->select;

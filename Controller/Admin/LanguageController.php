@@ -82,7 +82,7 @@ class LanguageController extends Controller
      *
      * @Rest\QueryParam(name="bundle", requirements=".+", strict=true, description="The bundle name")
      * @Rest\QueryParam(name="lang", requirements="[a-z]{2,3}", strict=true, description="The language code")
-     * @Rest\RequestParam(name="langs", description="The language messages")
+     * @Rest\RequestParam(name="langs", map=true, description="The language messages")
      *
      * @Rest\Post("/admin/system/bundle/editor/language")
      *

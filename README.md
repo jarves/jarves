@@ -43,10 +43,11 @@ This is how a more details news extension looks like: https://github.com/jarves/
 Requirements
 ------------
 
-1. PHP 5.5+
-2. *nix OS (Linux, BSD, OSX)
-3. PHP extensions: PDO, mbstring, gd, zip
-4. MySQL, PostgreSQL or SQLite
+1. PHP 5.6+
+2. Symfony 3
+3. *nix OS (Linux, BSD, OSX)
+4. PHP extensions: PDO, mbstring, gd, zip
+5. MySQL, PostgreSQL or SQLite
 
 
 Features

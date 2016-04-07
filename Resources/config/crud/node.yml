@@ -176,4 +176,3 @@ addMultipleFields:
 addMultiple: true
 object: jarves/node
 titleField: Node
-multiLanguage: true

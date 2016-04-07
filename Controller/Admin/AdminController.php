@@ -306,8 +306,8 @@ class AdminController extends Controller
      *  description="Returns a stream value collection"
      * )
      *
-     * @Rest\QueryParam(name="streams", requirements=".+", strict=true, description="List of stream ids")
-     * @Rest\QueryParam(name="params", description="Params")
+     * @Rest\QueryParam(name="streams", map=true, requirements=".+", strict=true, description="List of stream ids")
+     * @Rest\QueryParam(name="params", map=true, description="Params")
      *
      * @Rest\Get("/admin/stream")
      *

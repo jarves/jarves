@@ -99,19 +99,19 @@ class Propel extends AbstractStorage
         $result = new Condition(null, $this->jarves);
         $sub = new ConditionSubSelect(null, $this->jarves);
 
-        $sub->select('lft');
-        $sub->setTableName('parent');
-        $sub->addSelfJoin('parent', '%table%.lft BETWEEN parent.lft+1 AND parent.rgt-1');
+        $sub->select('sub.lft');
+        $sub->addSelfJoin('sub', 'sub.lft BETWEEN %table%.lft+1 AND %table%.rgt-1');
 
         $sub->setRules($condition->getRules());
 
-        $result->addAnd(
-            [
-                'lft',
-                '>',
-                $sub
-            ]
-        );
+        $subCondition = new Condition();
+        $subCondition->addAnd([
+            'lft',
+            'IN',
+            $sub
+        ]);
+
+        $result->addAnd($subCondition);
 
         return $result;
     }
