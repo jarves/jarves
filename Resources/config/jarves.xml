@@ -20,12 +20,18 @@
       <event key="core/object/modify" subject="jarves/domain">
         <clearCache>core/domains.created</clearCache>
         <clearCache>core/domains</clearCache>
+        <clearCache>core/object-domain</clearCache>
+        <clearCache>core/node/toDomains</clearCache>
+        <clearCache>core/urls</clearCache>
       </event>
       <event key="core/object/modify" subject="jarves/content">
         <clearCache>core/contents</clearCache>
       </event>
       <event key="core/object/modify" subject="jarves/node">
+        <clearCache>core/object/node</clearCache>
         <clearCache>core/contents</clearCache>
+        <clearCache>core/node/toDomains</clearCache>
+        <clearCache>core/urls</clearCache>
         <clearCache>core/navigation</clearCache>
       </event>
       <event key="core/object/modify" subject="jarves/user">
