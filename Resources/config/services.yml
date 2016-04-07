@@ -170,6 +170,7 @@ services:
 
      jarves.paramFetcher.listener:
         class: "%jarves.paramFetcher.listener.class%"
+        scope: request
         arguments: ["@jarves.page_stack", "@fos_rest.request.param_fetcher"]
         tags:
             - { name: kernel.event_listener, event: kernel.controller, prioarity: 6 }
