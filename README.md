@@ -11,6 +11,7 @@ other rock-solid libraries.
 
 [![Build Status](https://travis-ci.org/jarves/jarves.png?branch=master)](https://travis-ci.org/jarves/jarves)
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/jarves/jarves)
+[![PPM Compatible](https://raw.githubusercontent.com/php-pm/ppm-badge/master/ppm-badge.png)](https://github.com/php-pm/php-pm)
 
 
 ## Status
