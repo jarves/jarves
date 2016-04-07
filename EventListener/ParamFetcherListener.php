@@ -3,27 +3,123 @@
 namespace Jarves\EventListener;
 
 use FOS\RestBundle\EventListener\ParamFetcherListener as FosParamFetcherListener;
+use FOS\RestBundle\FOSRestBundle;
+use FOS\RestBundle\Request\ParamFetcherInterface;
 use Jarves\Jarves;
+use Jarves\PageStack;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-class ParamFetcherListener extends FosParamFetcherListener
+/**
+ * Jarves administration needs the paramFetcher functionality of the fos_rest bundle. We need our own ParamFetcherListener
+ * because we don't want to activate it globally.
+ */
+class ParamFetcherListener
 {
-    /**
-     * @var Jarves
-     */
-    protected $container;
 
-    public function __construct(ContainerInterface $container)
+    /**
+     * @var PageStack
+     */
+    private $pageStack;
+
+    /**
+     * @var ParamFetcherInterface
+     */
+    private $paramFetcher;
+
+    protected $setParamsAsAttributes = true;
+
+    /**
+     * @param PageStack $pageStack
+     * @param ParamFetcherInterface $paramFetcher
+     */
+    public function __construct(PageStack $pageStack, ParamFetcherInterface $paramFetcher)
     {
-        $this->container = $container;
-        parent::__construct($container, true);
+        $this->pageStack = $pageStack;
+        $this->paramFetcher = $paramFetcher;
     }
 
     public function onKernelController(FilterControllerEvent $event)
     {
-        if ($this->container->get('jarves.page_stack')->isAdmin()) {
-            parent::onKernelController($event);
+        if ($this->pageStack->isAdmin()) {
+            $this->paramFetcherOnKernelController($event);
         }
+    }
+
+    /**
+     * Core controller handler.
+     *
+     * @param FilterControllerEvent $event
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function paramFetcherOnKernelController(FilterControllerEvent $event)
+    {
+        $request = $event->getRequest();
+
+        if (!$request->attributes->get(FOSRestBundle::ZONE_ATTRIBUTE, true)) {
+            return;
+        }
+
+        $controller = $event->getController();
+
+        if (is_callable($controller) && method_exists($controller, '__invoke')) {
+            $controller = [$controller, '__invoke'];
+        }
+
+        $this->paramFetcher->setController($controller);
+        $attributeName = $this->getAttributeName($controller);
+        $request->attributes->set($attributeName, $this->paramFetcher);
+
+        if ($this->setParamsAsAttributes) {
+            $params = $this->paramFetcher->all();
+            foreach ($params as $name => $param) {
+                if ($request->attributes->has($name) && null !== $request->attributes->get($name)) {
+                    $msg = sprintf("ParamFetcher parameter conflicts with a path parameter '$name' for route '%s'", $request->attributes->get('_route'));
+                    throw new \InvalidArgumentException($msg);
+                }
+
+                $request->attributes->set($name, $param);
+            }
+        }
+    }
+
+    /**
+     * Determines which attribute the ParamFetcher should be injected as.
+     *
+     * @param callable $controller The controller action as an "array" callable.
+     *
+     * @return string
+     */
+    private function getAttributeName(callable $controller)
+    {
+        list($object, $name) = $controller;
+        $method = new \ReflectionMethod($object, $name);
+        foreach ($method->getParameters() as $param) {
+            if ($this->isParamFetcherType($param)) {
+                return $param->getName();
+            }
+        }
+
+        // If there is no typehint, inject the ParamFetcher using a default name.
+        return 'paramFetcher';
+    }
+
+    /**
+     * Returns true if the given controller parameter is type-hinted as
+     * an instance of ParamFetcher.
+     *
+     * @param \ReflectionParameter $controllerParam A parameter of the controller action.
+     *
+     * @return bool
+     */
+    private function isParamFetcherType(\ReflectionParameter $controllerParam)
+    {
+        $type = $controllerParam->getClass();
+        if (null === $type) {
+            return false;
+        }
+
+        return $type->implementsInterface(ParamFetcherInterface::class);
     }
 }

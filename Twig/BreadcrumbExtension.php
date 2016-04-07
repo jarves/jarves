@@ -52,7 +52,7 @@ class BreadcrumbExtension extends \Twig_Extension
         );
     }
 
-    public function breadcrumb(\Twig_Environment $twig, $view = 'JarvesBundle:Default/breadcrumb.html.twig')
+    public function breadcrumb(\Twig_Environment $twig, $view = 'JarvesBundle:Default:breadcrumb.html.twig')
     {
         $breadcrumbs = [];
         $page = $this->pageStack->getCurrentPage();

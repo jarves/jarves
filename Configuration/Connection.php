@@ -136,6 +136,9 @@ class Connection extends Model
     public function setType($type)
     {
         $this->type = str_replace('pdo_', '', $type);
+        if (!$this->type) {
+            $this->type = 'mysql';
+        }
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Jarves;
 
 use Jarves\Configuration\Model;
 use Jarves\Configuration\SystemConfig;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class JarvesConfig
 {
@@ -21,15 +22,21 @@ class JarvesConfig
      * @var string
      */
     private $environment;
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
 
     /**
      * @param string $rootDir
      * @param string $environment
+     * @param ContainerInterface $container
      */
-    public function __construct($rootDir, $environment)
+    public function __construct($rootDir, $environment, ContainerInterface $container)
     {
         $this->rootDir = $rootDir;
         $this->environment = $environment;
+        $this->container = $container;
     }
 
     /**
@@ -68,10 +75,10 @@ class JarvesConfig
                 file_put_contents($cacheFile, $systemConfigHash . "\n" . serialize($this->systemConfig));
             }
 
-//            if (!$this->systemConfig->getDatabase()) {
-//                $database = $this->container->get('jarves.configuration.database');
-//                $this->systemConfig->setDatabase($database);
-//            }
+            if (!$this->systemConfig->getDatabase()) {
+                $database = $this->container->get('jarves.configuration.database');
+                $this->systemConfig->setDatabase($database);
+            }
         }
 
         return $this->systemConfig;

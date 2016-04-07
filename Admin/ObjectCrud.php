@@ -523,11 +523,15 @@ class ObjectCrud implements ObjectCrudInterface
             if (!$this->table) {
                 $this->table = $this->objectDefinition->getTable();
             }
+
             if (!$this->fields) {
                 $this->fields = $this->objectDefinition->getFields();
-                $this->prepareFieldItem($this->fields);
-                $this->translateFields($this->fields);
             }
+
+            //we need to call it, no matter if it's already defined, because of multiLanguage field.
+            $this->prepareFieldItem($this->fields);
+            $this->translateFields($this->fields);
+
             if (!isset($this->titleField)) {
                 $this->titleField = $this->objectDefinition->getLabel();
             }
