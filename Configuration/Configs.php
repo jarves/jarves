@@ -264,7 +264,9 @@ class Configs implements \IteratorAggregate
 
     /**
      * @param string $objectKey
-     * @return \Jarves\Configuration\Object
+     * @return Object
+     *
+     * @throws BundleNotFoundException
      */
     public function getObject($objectKey)
     {

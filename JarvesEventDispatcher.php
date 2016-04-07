@@ -63,6 +63,8 @@ class JarvesEventDispatcher
      */
     public function registerBundleEvents(Configuration\Configs $configs)
     {
+        $this->detachEvents();
+
         foreach ($configs->getConfigs() as $bundleConfig) {
             if ($events = $bundleConfig->getListeners()) {
                 foreach ($events as $event) {

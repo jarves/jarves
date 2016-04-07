@@ -13,6 +13,7 @@ use Jarves\Exceptions\ClassNotFoundException;
 use Jarves\Exceptions\FileAlreadyExistException;
 use Jarves\Filesystem\Filesystem;
 use Jarves\Jarves;
+use Jarves\JarvesBundle;
 use Jarves\Objects;
 use Jarves\Tools;
 use Jarves\Utils;
@@ -21,6 +22,7 @@ use Symfony\Component\Finder\Finder;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class EditorController extends Controller
 {
@@ -53,11 +55,25 @@ class EditorController extends Controller
     {
         parent::setContainer($container);
 
-        $this->jarves = $this->container->get('jarves');
-        $this->localFilesystem = $this->container->get('jarves.filesystem.local');
-        $this->objects = $this->container->get('jarves.objects');
-        $this->utils = $this->container->get('jarves.utils');
-        $this->configurationOperator = $this->container->get('jarves.configuration_operator');
+        $this->jarves = $this->get('jarves');
+        $this->localFilesystem = $this->get('jarves.filesystem.local');
+        $this->objects = $this->get('jarves.objects');
+        $this->utils = $this->get('jarves.utils');
+        $this->configurationOperator = $this->get('jarves.configuration_operator');
+    }
+
+    /**
+     * Reload all changed configurations into ram.
+     */
+    protected function reconfigureJarves()
+    {
+        /** @var KernelInterface $kernel */
+        $kernel = $this->get('kernel');
+
+        /** @var JarvesBundle $jarvesBundle */
+        $jarvesBundle = $kernel->getBundle('JarvesBundle');
+
+        $jarvesBundle->configure();
     }
 
     /**
@@ -85,14 +101,6 @@ class EditorController extends Controller
         }
 
         return null;
-    }
-
-    protected function getConfig($bundle)
-    {
-        $configs = new Configs($this->jarves);
-        $configs->loadBundles([$bundle]);
-
-        return $configs->getConfig($bundle);
     }
 
     /**
@@ -189,7 +197,7 @@ class EditorController extends Controller
         $adminAssets = $paramFetcher->get('adminAssets') ?: null;
         $falDrivers = $paramFetcher->get('falDrivers') ?: null;
 
-        $config = $this->jarves->getConfig($bundle);
+        $config = $this->jarves->getOrCreateConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -209,9 +217,13 @@ class EditorController extends Controller
             $config->setAdminAssets($items);
         }
 
-        return $this->configurationOperator->saveFileBased($config, 'events')
+        $result = $this->configurationOperator->saveFileBased($config, 'events')
         && $this->configurationOperator->saveFileBased($config, 'listeners')
         && $this->configurationOperator->saveFileBased($config, 'adminAssets');
+
+        $this->reconfigureJarves();
+
+        return $result;
     }
 
 //    /**
@@ -328,7 +340,7 @@ class EditorController extends Controller
         $bundle = $paramFetcher->get('bundle');
         $plugins = $paramFetcher->get('plugins') ?: null;
 
-        $config = $this->jarves->getConfig($bundle);
+        $config = $this->jarves->getOrCreateConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -339,7 +351,10 @@ class EditorController extends Controller
 
         $config->propertyFromArray('plugins', $plugins);
 
-        return $this->configurationOperator->saveFileBased($config, 'plugins');
+        $result = $this->configurationOperator->saveFileBased($config, 'plugins');
+        $this->reconfigureJarves();
+
+        return $result;
     }
 
     /**
@@ -358,6 +373,7 @@ class EditorController extends Controller
     public function getThemesAction(ParamFetcher $paramFetcher)
     {
         $bundle = $paramFetcher->get('bundle');
+
         $config = $this->jarves->getConfig($bundle);
         if (!$config) {
             return null;
@@ -386,7 +402,7 @@ class EditorController extends Controller
         $bundle = $paramFetcher->get('bundle');
         $themes = $paramFetcher->get('themes') ?: null;
 
-        $config = $this->jarves->getConfig($bundle);
+        $config = $this->jarves->getOrCreateConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -397,7 +413,10 @@ class EditorController extends Controller
 
         $config->propertyFromArray('themes', $themes);
 
-        return $this->configurationOperator->saveFileBased($config, 'themes');
+        $result = $this->configurationOperator->saveFileBased($config, 'themes');
+        $this->reconfigureJarves();
+        
+        return $result;
     }
 
     /**
@@ -446,7 +465,7 @@ class EditorController extends Controller
 
         $fs = $this->localFilesystem;
 
-        return $fs->read($path, $content);
+        return $fs->write($path, $content);
     }
 
     /**
@@ -466,7 +485,7 @@ class EditorController extends Controller
      */
     public function getObjectsAction($bundle)
     {
-        $config = $this->getConfig($bundle);
+        $config = $this->jarves->getConfig($bundle);
         if (!$config) {
             throw new BundleNotFoundException(sprintf('Bundle `%s` not found', $bundle));
         }
@@ -497,7 +516,7 @@ class EditorController extends Controller
      */
     public function setObjectsAction($bundle, $objects = null, $objectAttributes = null)
     {
-        $config = $this->getConfig($bundle);
+        $config = $this->jarves->getOrCreateConfig($bundle);
         if (!$config) {
             throw new BundleNotFoundException(sprintf('Bundle `%s` not found', $bundle));
         }
@@ -509,8 +528,11 @@ class EditorController extends Controller
         $config->propertyFromArray('objects', $objects);
         $config->propertyFromArray('objectAttributes', $objectAttributes);
 
-        return $this->configurationOperator->saveFileBased($config, 'objects') &&
+        $result = $this->configurationOperator->saveFileBased($config, 'objects') &&
         $this->configurationOperator->saveFileBased($config, 'objectAttributes');
+        $this->reconfigureJarves();
+
+        return $result;
     }
 
     /**
@@ -625,14 +647,17 @@ class EditorController extends Controller
         $bundle = $paramFetcher->get('bundle');
         $entryPoints = $paramFetcher->get('entryPoints') ?: null;
 
-        $config = $this->jarves->getConfig($bundle);
+        $config = $this->jarves->getOrCreateConfig($bundle);
         if (!$config) {
             return null;
         }
 
         $config->propertyFromArray('entryPoints', $entryPoints);
 
-        return $this->configurationOperator->saveFileBased($config, 'entryPoints');
+        $result = $this->configurationOperator->saveFileBased($config, 'entryPoints');
+        $this->reconfigureJarves();
+
+        return $result;
     }
 
     /**
@@ -871,7 +896,10 @@ class EditorController extends Controller
 
         $fs = $this->localFilesystem;
 
-        return $fs->write($path, $sourcecode);
+        $result = $fs->write($path, $sourcecode);
+        $this->reconfigureJarves();
+
+        return $result;
     }
 
     protected function normalizeField(&$field, $key, $res)
@@ -1011,7 +1039,10 @@ class EditorController extends Controller
 
         $fs = $this->localFilesystem;
 
-        return $fs->write($actualPath, $sourcecode);
+        $result = $fs->write($actualPath, $sourcecode);
+        $this->reconfigureJarves();
+
+        return $result;
     }
 
 }

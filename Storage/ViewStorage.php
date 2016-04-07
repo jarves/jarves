@@ -176,6 +176,10 @@ class ViewStorage extends AbstractStorage
         } else {
 
             $directory = $this->jarves->resolvePath($path, 'Resources/views', true) . '/';
+            if (!$this->localFilesystem->has($directory)) {
+                return [];
+            }
+
             $files = $this->localFilesystem->getFiles($directory);
 
             foreach ($files as $file) {

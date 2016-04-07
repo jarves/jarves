@@ -25,6 +25,11 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class JarvesBundle extends Bundle
 {
+    /**
+     * @var boolean
+     */
+    protected $booted = false;
+
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
@@ -48,6 +53,36 @@ class JarvesBundle extends Bundle
     {
         parent::boot();
 
+        $this->configure();
+
+        if (!$this->booted) {
+
+            /** @var $jarves Jarves */
+            $jarves = $this->container->get('jarves');
+
+            /** @var JarvesConfig $jarvesConfig */
+            $jarvesConfig = $this->container->get('jarves.config');
+
+            $twig = $this->container->get('twig');
+            $twig->addGlobal('jarves_content_render', $this->container->get('jarves.content.render'));
+
+
+            if ($jarvesConfig->getSystemConfig()->getLogs(true)->isActive()) {
+                /** @var $logger \Symfony\Bridge\Monolog\Logger */
+                $logger = $this->container->get('logger');
+
+                $logger->pushHandler($this->container->get('jarves.logger.handler'));
+            }
+        }
+
+        $this->booted = true;
+    }
+
+    /**
+     * Configures jarves, reads config files. Necessary when .xml configs changed.
+     */
+    public function configure()
+    {
         /** @var $jarves Jarves */
         $jarves = $this->container->get('jarves');
 
@@ -60,23 +95,11 @@ class JarvesBundle extends Bundle
         /** @var $jarvesEventDispatcher JarvesEventDispatcher */
         $jarvesEventDispatcher = $this->container->get('jarves.event_dispatcher');
 
+        $jarves->prepareWebSymlinks();
         $jarves->loadBundleConfigs($cacher);
-
         $this->loadPropelConfig($jarvesConfig->getSystemConfig()->getDatabase());
 
         $jarvesEventDispatcher->registerBundleEvents($jarves->getConfigs());
-
-        $twig = $this->container->get('twig');
-        $twig->addGlobal('jarves_content_render', $this->container->get('jarves.content.render'));
-
-        $jarves->prepareWebSymlinks();
-
-        if ($jarvesConfig->getSystemConfig()->getLogs(true)->isActive()) {
-            /** @var $logger \Symfony\Bridge\Monolog\Logger */
-            $logger = $this->container->get('logger');
-
-            $logger->pushHandler($this->container->get('jarves.logger.handler'));
-        }
     }
 
     /**

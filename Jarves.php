@@ -5,6 +5,7 @@ namespace Jarves;
 use Jarves\Admin\FieldTypes\FieldTypes;
 use Jarves\Cache\Cacher;
 use Jarves\Client\ClientAbstract;
+use Jarves\Configuration\Bundle;
 use Jarves\Configuration\Client;
 use Jarves\Configuration\Event;
 use Jarves\Configuration\Model;
@@ -235,6 +236,25 @@ class Jarves
         $bundle = $this->getBundle($bundleName);
         if ($bundle) {
             return $this->getConfigs()->getConfig($bundle->getName());
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $bundleName
+     * @return Configuration\Bundle|null
+     */
+    public function getOrCreateConfig($bundleName)
+    {
+        $bundle = $this->getBundle($bundleName);
+        if ($bundle) {
+            $config = $this->getConfigs()->getConfig($bundle->getName());
+            if (!$config) {
+                return new Bundle($bundle, null, $this);
+            }
+
+            return $config;
         }
 
         return null;
