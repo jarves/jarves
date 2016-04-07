@@ -1,3 +1,0 @@
-twig:
-    globals:
-        jarves: "@jarves"

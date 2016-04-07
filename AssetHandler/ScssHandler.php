@@ -2,10 +2,28 @@
 
 namespace Jarves\AssetHandler;
 
+use Jarves\Filesystem\Filesystem;
+use Jarves\Jarves;
 use Jarves\Tools;
 
 class ScssHandler extends AbstractHandler implements CompileHandlerInterface
 {
+    /**
+     * @var Filesystem
+     */
+    protected $webFilesystem;
+
+    /**
+     * CssHandler constructor.
+     * @param Jarves $jarves
+     * @param Filesystem $webFilesystem
+     */
+    public function __construct(Jarves $jarves, Filesystem $webFilesystem)
+    {
+        parent::__construct($jarves);
+        $this->webFilesystem = $webFilesystem;
+    }
+
     public function compileFile(AssetInfo $assetInfo)
     {
         $assetPath = $assetInfo->getPath();
@@ -46,7 +64,7 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
 
 //            $compiled = $this->replaceRelativePaths($publicPath, $targetPath, $compiled);
             $compiled = "/* compiled at $sourceMTime */\n".$compiled;
-            $this->getJarves()->getWebFileSystem()->write($targetPath, $compiled);
+            $this->webFilesystem->write($targetPath, $compiled);
         }
 
         $assetInfo = new AssetInfo();

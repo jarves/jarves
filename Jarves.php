@@ -2,6 +2,8 @@
 
 namespace Jarves;
 
+use Jarves\Admin\FieldTypes\FieldTypes;
+use Jarves\Cache\Cacher;
 use Jarves\Client\ClientAbstract;
 use Jarves\Configuration\Client;
 use Jarves\Configuration\Event;
@@ -11,6 +13,7 @@ use Jarves\Exceptions\BundleNotFoundException;
 use Jarves\Model\Domain;
 use Jarves\Model\Node;
 use Jarves\Propel\PropelHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -19,51 +22,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class Jarves
 {
-    use ContainerHelperTrait;
-
     /**
      * @var Configuration\Configs|Configuration\Bundle[]
      */
     protected $configs;
-
-    /**
-     * @var \Symfony\Component\DependencyInjection\Container
-     */
-    protected $container;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var Request
-     */
-    protected $lastRequest;
-
-    /**
-     * @var PropelHelper
-     */
-    protected $propelHelper;
-
-    /**
-     * @var SystemConfig
-     */
-    protected $systemConfig;
-
-    /**
-     * Client instance in administration area.
-     *
-     * @var ClientAbstract
-     */
-    protected $adminClient;
-
-    /**
-     * Frontend client instance.
-     *
-     * @var ClientAbstract
-     */
-    protected $client;
 
     /**
      * @var Utils
@@ -71,83 +33,105 @@ class Jarves
     protected $utils;
 
     /**
-     * @var Configuration\Cache
+     * @var string
      */
-    protected $cache;
+    private $adminPrefix;
 
     /**
-     * @var Model\Domain
+     * @var string
      */
-    protected $currentDomain;
+    private $cacheDir;
 
     /**
-     * @var Model\Node
+     * @var string
      */
-    protected $currentPage;
+    private $rootDir;
 
     /**
-     * @var array
+     * @var string
      */
-    protected $attachedEvents = [];
+    private $environment;
 
     /**
-     * @param $container
+     * @var string
      */
-    function __construct(Container $container)
+    private $debugMode;
+
+    /**
+     * @var KernelInterface
+     */
+    private $kernel;
+
+    /**
+     * @var FieldTypes
+     */
+    private $fieldTypes;
+
+    /**
+     * @var JarvesConfig
+     */
+    private $jarvesConfig;
+
+    /**
+     * @param JarvesConfig $jarvesConfig
+     * @param string $adminPrefix
+     * @param string $cacheDir
+     * @param string $rootDir
+     * @param string $environment
+     * @param string $debugMode
+     * @param KernelInterface $kernel
+     * @param RequestStack $requestStack
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param FieldTypes $fieldTypes
+     */
+    function __construct(JarvesConfig $jarvesConfig, $adminPrefix, $cacheDir, $rootDir, $environment,
+                         $debugMode, KernelInterface $kernel,
+                         RequestStack $requestStack, EventDispatcherInterface $eventDispatcher,
+                         FieldTypes $fieldTypes)
     {
-        $this->container = $container;
         Configuration\Model::$serialisationJarvesCore = $this;
-    }
-
-    public function prepareNewMasterRequest()
-    {
-        $this->container->set('jarves.page.response', null);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAdmin()
-    {
-        $adminPrefix = $this->container->getParameter('jarves_admin_prefix');
-        if ('/' === substr($adminPrefix, -1)) {
-            $adminPrefix = substr($adminPrefix, 0, -1);
-        }
-
-        if (!$this->container->has('request')) {
-            return false;
-        }
-
-        if (!$this->getRequest()) {
-            return false;
-        }
-
-        return (0 === strpos($this->getRequest()->getPathInfo(), $adminPrefix . '/'));
+        $this->adminPrefix = $adminPrefix;
+        $this->requestStack = $requestStack;
+        $this->cacheDir = $cacheDir;
+        $this->rootDir = $rootDir;
+        $this->environment = $environment;
+        $this->debugMode = $debugMode;
+        $this->kernel = $kernel;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->fieldTypes = $fieldTypes;
+        $this->jarvesConfig = $jarvesConfig;
     }
 
     /**
-     * @param int|null $nodeId
-     *
-     * @return bool
+     * @return string
      */
-    public function isEditMode($nodeId = null)
+    public function getCacheDir()
     {
-        $hasRequest = $this->container->has('request');
+        return $this->cacheDir;
+    }
 
-        if ($nodeId) {
-            return $hasRequest && 1 == $this->getRequest()->get('_jarves_editor')
-            && $this->getACL()->checkUpdate(
-                'JarvesBundle:Node',
-                $nodeId
-            );
-        }
+    /**
+     * @return string
+     */
+    public function getRootDir()
+    {
+        return $this->rootDir;
+    }
 
-        return $hasRequest && 1 == $this->getRequest()->get('_jarves_editor')
-        && $this->getJarves()->getCurrentPage()
-        && $this->getACL()->checkUpdate(
-            'JarvesBundle:Node',
-            $this->getJarves()->getCurrentPage()->getId()
-        );
+    /**
+     * Resets current PageResponse;
+     */
+    public function reset()
+    {
+//        $this->currentPageResponse = null;
+    }
+
+    /**
+     * @return Admin\FieldTypes\FieldTypes
+     */
+    public function getFieldTypes()
+    {
+        return $this->fieldTypes;
     }
 
     /**
@@ -156,7 +140,7 @@ class Jarves
      */
     public function prepareWebSymlinks()
     {
-        chdir($this->getKernel()->getRootDir() . '/..');
+        chdir($this->rootDir . '/..');
         $bundles = 'web/bundles/';
         if (!is_dir($bundles)) {
             if (!@mkdir($bundles)) {
@@ -180,193 +164,11 @@ class Jarves
     }
 
     /**
-     * Marks a code as invalidate beginning at $time.
-     * This is the distributed cache controller. Use it if you want
-     * to invalidate caches on a distributed backend (use by `setCache()`
-     * and `setDistributedCache()`.
-     *
-     * You don't have to define the full key, instead you can pass only the starting part of the key.
-     * This means, if you have following caches defined:
-     *
-     *   - news/list/2
-     *   - news/list/3
-     *   - news/list/4
-     *   - news/comments/134
-     *   - news/comments/51
-     *
-     * you can mark all listing caches as invalid by calling
-     *   - invalidateCache('news/list');
-     *
-     * or mark all caches as invalid which starts with `news/` you can call:
-     *   - invalidateCache('news');
-     *
-     *
-     * The invalidation mechanism explodes the key by / and checks all levels whether they're marked
-     * as invalid (through a microsecond timestamp) or not.
-     *
-     * Default is $time is `mark all caches as invalid which are older than CURRENT`.
-     *
-     * @param  string $key
-     * @param  integer $time Unix timestamp. Default is microtime(true). Uses float for ms.
-     *
-     * @return boolean
-     */
-    public function invalidateCache($key, $time = null)
-    {
-        if ($this->isDebugMode()) {
-            $time = $time ?: microtime(true);
-            $micro = sprintf("%06d", ($time - floor($time)) * 1000000);
-            $this->getLogger()->addDebug(
-                sprintf('Invalidate `%s` (from %s)', $key, date('F j, Y, H:i:s.' . $micro, $time))
-            );
-        }
-
-        return $this->getCache()->invalidate($key, $time ?: microtime(true));
-    }
-
-    /**
      * @return bool
      */
     public function isDebugMode()
     {
-        return $this->getKernel()->isDebug();
-    }
-
-    /**
-     * Returns a distributed cache value.
-     *
-     * @see setDistributedCache() for more information
-     *
-     * @param string $key
-     *
-     * @return mixed Null if not found
-     */
-    public function getDistributedCache($key)
-    {
-        $this->getStopwatch()->start(sprintf('Get Cache `%s`', $key));
-        $fastCache = $this->getFastCache();
-        $distributedCache = $this->getCache();
-
-        $invalidationKey = $key . '/!invalidationCheck';
-        $timestamp = $distributedCache->get($invalidationKey);
-        $cache = null;
-
-        $result = null;
-        if ($timestamp !== null) {
-            $cache = $fastCache->get($key);
-            if (is_array($cache) && isset($cache['timestamp']) && $cache['timestamp'] == $timestamp) {
-                $result = $cache['data'];
-            }
-        }
-        $this->getStopwatch()->stop(sprintf('Get Cache `%s`', $key));
-
-        return $result;
-    }
-
-    /**
-     * @param $key
-     */
-    public function deleteDistributedCache($key)
-    {
-        $fastCache = $this->getFastCache();
-        $distributedCache = $this->getCache();
-
-        $fastCache->delete($key);
-        $distributedCache->delete($key . '/!invalidationCheck');
-    }
-
-    /**
-     * Sets a distributed cache.
-     *
-     * This stores a ms timestamp on the distributed cache (Jarves::setCache())
-     * and the actual data on the high-speed cache driver (Jarves::setFastCache()).
-     * This mechanism makes sure, you gain the maximum performance by using the
-     * fast cache driver to store the actual data and using the distributed cache driver
-     * to store a ms timestamp where we can check (over several jarves.cms installations)
-     * whether the cache is still valid or not.
-     *
-     * Use Jarves::invalidateCache($key) to invalidate this cache.
-     * You don't have to define the full key, instead you can pass only a part of the key.
-     *
-     * @see invalidateCache for more information.
-     *
-     * Don't mix the usage of getDistributedCache() and getCache() since this method
-     * stores extra values at the value, which makes getCache() returning something invalid.
-     *
-     * @param string $key
-     * @param mixed $value Only simple data types. Serialize your value if you have objects/arrays.
-     * @param int $lifeTime
-     *
-     * @return boolean
-     * @static
-     */
-    public function setDistributedCache($key, $value, $lifeTime = null)
-    {
-        $fastCache = $this->getFastCache();
-        $distributedCache = $this->getCache();
-
-        $invalidationKey = $key . '/!invalidationCheck';
-        $timestamp = microtime();
-
-        $cache['data'] = $value;
-        $cache['timestamp'] = $timestamp;
-
-        return $fastCache->set($key, $cache, $lifeTime) && $distributedCache->set(
-            $invalidationKey,
-            $timestamp,
-            $lifeTime
-        );
-    }
-
-    /**
-     * Returns the current adminClient instance.
-     * If not exists, we create it and start the session process.
-     *
-     * Note that this method creates a new AbstractClient instance and starts
-     * the whole session process mechanism (with sending sessions ids etc)
-     * if the adminClient does not exists already.
-     *
-     * @return ClientAbstract
-     */
-    public function getAdminClient()
-    {
-        $systemClientConfig = $this->getSystemConfig()->getClient(true);
-        $defaultClientClass = $systemClientConfig->getClass();
-
-        if (null === $this->adminClient) {
-            $this->adminClient = new $defaultClientClass($this, $systemClientConfig);
-            $this->adminClient->start();
-            if (null === $this->client) {
-                $this->client = $this->adminClient;
-            }
-        }
-
-        return $this->adminClient;
-    }
-
-    /**
-     * @return ClientAbstract
-     *
-     */
-    public function getClient()
-    {
-        if ($this->client) {
-            return $this->client;
-        }
-
-        $systemClientConfig = $this->getSystemConfig()->getClient(true);
-        $defaultClientClass = $systemClientConfig->getClass();
-
-        $domainClientConfigXml = $this->getCurrentDomain() ? $this->getCurrentDomain()->getSessionProperties() : '';
-        $domainClientConfig = $systemClientConfig;
-
-        if ($domainClientConfigXml) {
-            $domainClientConfig = new Client($domainClientConfigXml);
-        }
-
-        $domainClientClass = $domainClientConfig->getClass() ?: $defaultClientClass;
-
-        return $this->client = new $domainClientClass($this, $domainClientConfig);
+        return $this->debugMode;
     }
 
     /**
@@ -374,121 +176,29 @@ class Jarves
      */
     public function terminate()
     {
-        $this->adminClient = null;
-        $this->client = null;
     }
 
+
     /**
-     * @param bool $withCache
-     *
+     * @deprecated  use jarvesConfig->getSystemConfig
      * @return SystemConfig
      */
-    public function getSystemConfig($withCache = true)
+    public function getSystemConfig()
     {
-        if (null === $this->systemConfig) {
-
-            $configFile = $this->getKernel()->getRootDir() . '/config/config.jarves.xml';
-            $configEnvFile = $this->getKernel()->getRootDir() . '/config/config.jarves_' . $this->getKernel()->getEnvironment() . '.xml';
-            if (file_exists($configEnvFile)) {
-                $configFile = $configEnvFile;
-            }
-
-            $cacheFile = $configFile . '.cache.php';
-            $systemConfigCached = @file_get_contents($cacheFile);
-
-            $cachedSum = 0;
-            if ($systemConfigCached) {
-                $cachedSum = substr($systemConfigCached, 0, 32);
-                $systemConfigCached = substr($systemConfigCached, 33);
-            }
-
-            $systemConfigHash = file_exists($configFile) ? md5(filemtime($configFile)) : -1;
-
-            if ($withCache && $systemConfigCached && $cachedSum === $systemConfigHash) {
-                $this->systemConfig = @unserialize($systemConfigCached);
-            }
-
-            if (!$this->systemConfig) {
-                $configXml = file_exists($configFile) ? file_get_contents($configFile) : [];
-                $this->systemConfig = new SystemConfig($configXml, $this);
-                file_put_contents($cacheFile, $systemConfigHash . "\n" . serialize($this->systemConfig));
-            }
-
-            if (!$this->systemConfig->getDatabase()) {
-                $database = $this->container->get('jarves.configuration.database');
-                $this->systemConfig->setDatabase($database);
-            }
-        }
-
-        return $this->systemConfig;
-        //return $this->container->get('jarves.configuration');
+        return $this->jarvesConfig->getSystemConfig();
     }
 
     /**
-     * @return Node|null
-     */
-    public function getCurrentPage()
-    {
-        return $this->currentPage;
-    }
-
-    /**
-     * @return Domain|null
-     */
-    public function getCurrentDomain()
-    {
-        return $this->currentDomain;
-    }
-
-    /**
-     * @param Node $currentPage
-     */
-    public function setCurrentPage(Node $currentPage)
-    {
-        $this->currentPage = $currentPage;
-    }
-
-    /**
-     * @param Domain $currentDomain
-     */
-    public function setCurrentDomain($currentDomain)
-    {
-        $this->getJarves()->getPageResponse()->setResourceCompression($currentDomain->getResourceCompression());
-        $this->currentDomain = $currentDomain;
-    }
-
-    /**
+     * @deprecated  use pageStack->getCurrentRequest
      * @return Request
      */
     public function getRequest()
     {
-        if (null === $this->requestStack) {
-            $this->requestStack = $this->container->get('request_stack');
-        }
-
-        $request = $this->requestStack->getCurrentRequest();
-
-        if (!$request) {
-            $request = $this->lastRequest;
-        } else {
-            $this->lastRequest = $request;
-        }
-
-        return $request;
     }
 
-    /**
-     * @return \Jarves\Cache\AbstractCache
-     */
     public function getCache()
     {
-        if (null === $this->cache) {
-            $cache = $this->getSystemConfig()->getCache(true);
-            $class = $cache->getClass();
-            $this->cache = new $class($cache);
-        }
-
-        return $this->cache;
+        throw new \Exception('Use jarves.cache.distributed service.');
     }
 
     /**
@@ -506,16 +216,6 @@ class Jarves
     }
 
     /**
-     * @return \Symfony\Bundle\FrameworkBundle\Templating\EngineInterface
-     */
-    public function getTemplating()
-    {
-        $this->container->get('twig')->addGlobal('baseUrl', $this->getRequest()->getBaseUrl() . '/');
-
-        return $this->container->get('templating');
-    }
-
-    /**
      * @return string
      */
     public function getWebCacheDir()
@@ -524,21 +224,11 @@ class Jarves
     }
 
     /**
-     * @return Utils
-     */
-    public function getUtils()
-    {
-        if (null === $this->utils) {
-            $this->utils = new Utils($this);
-        }
-
-        return $this->utils;
-    }
-
-    /**
+     * Returns a configuration for a bundle.
+     *
      * @param $bundleName
      *
-     * @return Configuration\Bundle
+     * @return Configuration\Bundle|null
      */
     public function getConfig($bundleName)
     {
@@ -546,17 +236,17 @@ class Jarves
         if ($bundle) {
             return $this->getConfigs()->getConfig($bundle->getName());
         }
+
+        return null;
     }
 
     /**
+     * Returns all configurations for all registered bundles.
+     *
      * @return Configuration\Configs|Configuration\Bundle[]
      */
     public function getConfigs()
     {
-        if (!$this->configs) {
-            $this->loadBundleConfigs();
-        }
-
         return $this->configs;
     }
 
@@ -576,7 +266,7 @@ class Jarves
     public function getBundles()
     {
         $bundles = [];
-        foreach ($this->getKernel()->getBundles() as $bundleName => $bundle) {
+        foreach ($this->kernel->getBundles() as $bundleName => $bundle) {
             $bundles[$bundleName] = $bundle;
         }
 
@@ -586,7 +276,7 @@ class Jarves
     /**
      * @param string $bundleName
      *
-     * @return \Symfony\Component\HttpKernel\Bundle\BundleInterface
+     * @return \Symfony\Component\HttpKernel\Bundle\BundleInterface|null
      */
     public function getBundle($bundleName)
     {
@@ -605,6 +295,8 @@ class Jarves
                 return $reflection->newInstance();
             }
         }
+
+        return null;
     }
 
     /**
@@ -626,7 +318,7 @@ class Jarves
     /**
      * @param string $bundleName full className or bundleName or short bundleName
      *
-     * @return string with leading / relative to root folder
+     * @return string|null with leading / relative to root folder
      */
     public function getBundleDir($bundleName)
     {
@@ -640,7 +332,7 @@ class Jarves
                 $path = dirname($reflection->getFileName());
             }
         }
-        $current = realpath($this->getKernel()->getRootDir() . '/..');
+        $current = realpath($this->rootDir . '/..');
         if ($path) {
             $path = Tools::getRelativePath($path, $current);
             if ('/' !== substr($path, -1)) {
@@ -649,6 +341,8 @@ class Jarves
 
             return $path;
         }
+
+        return null;
     }
 
     /**
@@ -656,7 +350,7 @@ class Jarves
      */
     public function getRoot()
     {
-        return realpath($this->getKernel()->getRootDir() . '/..');
+        return realpath($this->rootDir . '/..');
     }
 
     /**
@@ -678,7 +372,7 @@ class Jarves
      */
     public function isJarvesBundle($bundleName)
     {
-        $root = realpath($this->getKernel()->getRootDir() . '/..') . '/';
+        $root = realpath($this->rootDir . '/..') . '/';
         $path = $root . $this->getBundleDir($bundleName) . 'Resources/config/';
         if (file_exists($path . 'jarves.xml')) {
             return true;
@@ -690,86 +384,13 @@ class Jarves
     }
 
     /**
-     * @param      $nodeOrId
-     * @param bool $fullUrl
-     * @param bool $suppressStartNodeCheck
-     * @param Domain $domain
-     *
-     * @return string
-     */
-    public function getNodeUrl($nodeOrId, $fullUrl = false, $suppressStartNodeCheck = false, Domain $domain = null)
-    {
-        $id = $nodeOrId;
-
-        if (!$nodeOrId) {
-            $nodeOrId = $this->getCurrentPage();
-        }
-
-        if ($nodeOrId instanceof Node) {
-            $id = $nodeOrId->getId();
-        }
-
-        $domainId = $nodeOrId instanceof Node ? $nodeOrId->getDomainId() : $this->getUtils()->getDomainOfPage($id);
-        $currentDomain = $domain ?: $this->getCurrentDomain();
-
-        if (!$suppressStartNodeCheck && $currentDomain->getStartnodeId() === $id) {
-            $url = '/';
-        } else {
-            $urls = $this->getUtils()->getCachedPageToUrl($domainId);
-            $url = isset($urls[$id]) ? $urls[$id] : '';
-        }
-
-        //do we need to add app_dev.php/ or something?
-        $prefix = '';
-        if ($this->requestStack && $this->requestStack->getMasterRequest()) {
-            $prefix = substr(
-                $this->requestStack->getMasterRequest()->getBaseUrl(),
-                strlen($this->requestStack->getMasterRequest()->getBasePath())
-            );
-        }
-
-        if (false !== $prefix) {
-            $url = substr($prefix, 1) . $url;
-        }
-
-        if ($fullUrl || !$currentDomain || $domainId != $currentDomain->getId()) {
-            $domain = $currentDomain ?: $this->getUtils()->getDomain($domainId);
-
-            $domainName = $domain->getRealDomain();
-            if ($domain->getMaster() != 1) {
-                $url = $domainName . $domain->getPath() . $domain->getLang() . '/' . $url;
-            } else {
-                $url = $domainName . $domain->getPath() . $url;
-            }
-
-            $url = 'http' . ($this->getRequest()->isSecure() ? 's' : '') . '://' . $url;
-        }
-
-        //crop last /
-        if (substr($url, -1) == '/') {
-            $url = substr($url, 0, -1);
-        }
-
-        //crop first /
-        if (substr($url, 0, 1) == '/') {
-            $url = substr($url, 1);
-        }
-
-        if ($url == '/') {
-            $url = '.';
-        }
-
-        return $url;
-    }
-
-    /**
      * Returns the normalize jarves_admin_prefix parameter.
      *
      * @return string
      */
     public function getAdminPrefix()
     {
-        $prefix = $this->container->getParameter('jarves_admin_prefix');
+        $prefix = $this->adminPrefix;
 
         if (!$prefix) {
             return '/jarves';
@@ -808,10 +429,10 @@ class Jarves
         $path = preg_replace('/:+/', '/', $path);
         preg_match('/\@?([a-zA-Z0-9\-_\.\\\\]+)/', $path, $matches);
 
-        $root = realpath($this->getKernel()->getRootDir() . '/../');
+        $root = realpath($this->rootDir . '/../');
         if ($matches && isset($matches[1])) {
             try {
-                $bundle = $this->getKernel()->getBundle($matches[1]);
+                $bundle = $this->getBundle($matches[1]);
             } catch (\InvalidArgumentException $e) {
                 throw new BundleNotFoundException(
                     sprintf(
@@ -873,7 +494,7 @@ class Jarves
         preg_match('/(\@?[a-zA-Z0-9\-_\.\\\\]+)/', $path, $matches);
         if ($matches && isset($matches[1])) {
             try {
-                $bundle = $this->getKernel()->getBundle(str_replace('@', '', $matches[1]));
+                $bundle = $this->getBundle(str_replace('@', '', $matches[1]));
             } catch (\InvalidArgumentException $e) {
                 throw new BundleNotFoundException(
                     sprintf(
@@ -912,7 +533,7 @@ class Jarves
             return $path;
         }
 
-        $webDir = realpath($this->getKernel()->getRootDir() . '/../web') . '/';
+        $webDir = realpath($this->rootDir . '/../web') . '/';
 
         if ($path && '@' === $path[0]) {
             try {
@@ -926,11 +547,11 @@ class Jarves
             return $path;
         }
 
-        if ($this->getRequest()) {
+        if ($this->requestStack->getMasterRequest()) {
             //do we need to add app_dev.php/ or something?
             $prefix = substr(
-                $this->getRequest()->getBaseUrl(),
-                strlen($this->getRequest()->getBasePath())
+                $this->requestStack->getMasterRequest()->getBaseUrl(),
+                strlen($this->requestStack->getMasterRequest()->getBasePath())
             );
 
             if (false !== $prefix) {
@@ -944,13 +565,13 @@ class Jarves
     }
 
     /**
-     * @param bool $forceNoCache
+     * Loads all configurations from all registered bundles (BundleName/Resources/config/jarves*.xml)
+     * @param Cacher $cacher
      */
-    public function loadBundleConfigs($forceNoCache = false)
+    public function loadBundleConfigs(Cacher $cacher)
     {
-        $this->getStopwatch()->start('Load Bundle Configs');
-        $cached = $this->getFastCache()->get('core/configs');
-        $bundles = array_keys($this->container->getParameter('kernel.bundles'));
+        $cached = $cacher->getFastCache('core/configs');
+        $bundles = array_keys($this->kernel->getBundles());
 
         $configs = new Configuration\Configs($this);
 
@@ -978,57 +599,8 @@ class Jarves
                 ]
             );
 
-            $this->getFastCache()->set('core/configs', $cached);
+            $cacher->setFastCache('core/configs', $cached);
         }
-
-        foreach ($this->configs as $bundleConfig) {
-            if ($events = $bundleConfig->getListeners()) {
-                foreach ($events as $event) {
-
-                    $this->attachEvent($event);
-                    $fn = function (GenericEvent $genericEvent) use ($event) {
-                        if ($event->isCallable($genericEvent)) {
-                            $event->call($genericEvent);
-                        }
-                    };
-                    $this->getEventDispatcher()->addListener($event->getKey(), $fn);
-                }
-            }
-        }
-        $this->getStopwatch()->stop('Load Bundle Configs');
-    }
-
-    public function attachEvent(Event $event)
-    {
-        $fn = function (GenericEvent $genericEvent) use ($event) {
-            if ($event->isCallable($genericEvent)) {
-                $event->call($genericEvent);
-            }
-        };
-
-        $this->getEventDispatcher()->addListener($event->getKey(), $fn);
-        $this->attachedEvents[] = [
-            'key' => $event->getKey(),
-            'event' => $event,
-            'callback' => $fn
-        ];
-    }
-
-    public function detachEvents()
-    {
-        foreach ($this->attachedEvents as $eventInfo) {
-            $this->getEventDispatcher()->removeListener($eventInfo['key'], $eventInfo['callback']);
-        }
-
-        $this->attachedEvents = [];
-    }
-
-    /**
-     * @return array
-     */
-    public function getAttachedEvents()
-    {
-        return $this->attachedEvents;
     }
 
     /**

@@ -1,0 +1,21 @@
+services:
+  jarves.storage.propel:
+    class: Jarves\Storage\Propel
+    shared: false
+    arguments: ["@jarves", "@jarves.objects", "@jarves.acl", "@jarves.condition_operator"]
+
+  jarves.storage.entrypoint:
+    class: Jarves\Storage\EntryPointStorage
+    arguments: ["@jarves"]
+
+  jarves.storage.file:
+    class: Jarves\Storage\FileStorage
+    arguments: ["@jarves", "@jarves.filesystem.web", "@jarves.acl", "@jarves.condition_operator"]
+
+  jarves.storage.language:
+    class: Jarves\Storage\LanguageStorage
+    parent: jarves.storage.propel
+
+  jarves.storage.view:
+    class: Jarves\Storage\ViewStorage
+    arguments: ["@jarves", "@jarves.filesystem.local", "@jarves.condition_operator"]

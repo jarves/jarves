@@ -119,8 +119,8 @@ jarves.FieldProperty = new Class({
         asFrameworkColumn: false, //for column definition, with width field. renders all fields of jarves.LabelTypes.
         asFrameworkSearch: false, //Remove some option fields, like 'visibility condition', 'required', etc
         withoutChildren: false, //deactivate children?
-        tableItemLabelWidth: 330,
-        allTableItems: true,
+        // tableItemLabelWidth: 330,
+        // allTableItems: true,
         withActions: true,
 
         withWidth: false, //is enabled if asFrameworkColumn is active. otherwise you can enable it here manually.
@@ -198,8 +198,8 @@ jarves.FieldProperty = new Class({
                     type: 'fieldForm',
                     fields: options,
                     noWrapper: true,
-                    needValue: key.lcfirst(),
-                    allTableItems: this.options.allTableItems
+                    needValue: key.lcfirst()
+                    // allTableItems: this.options.allTableItems
                 }
             }
         }.bind(this));
@@ -329,7 +329,7 @@ jarves.FieldProperty = new Class({
             this.main.store('jarves.FieldProperty', this);
 
             this.fieldObject = new jarves.FieldForm(this.main, this.kaFields, {
-                allTableItems: this.options.allTableItems,
+                // allTableItems: this.options.allTableItems,
                 tableItemLabelWidth: this.options.tableItemLabelWidth,
                 withEmptyFields: false
             }, {win: this.win});
@@ -438,21 +438,21 @@ jarves.FieldProperty = new Class({
             text: tf('Field: %s', this.iKey.getValue())
         }).inject(main);
 
-        if (this.options.allTableItems) {
-            var table = new Element('table', {
-                width: '100%'
-            }).inject(main);
-
-            fieldContainer = new Element('tbody').inject(table);
-        } else {
-            fieldContainer = main;
-        }
+        // if (this.options.allTableItems) {
+        //     var table = new Element('table', {
+        //         width: '100%'
+        //     }).inject(main);
+        //
+        //     fieldContainer = new Element('tbody').inject(table);
+        // } else {
+        // }
+        fieldContainer = main;
 
         this.saveBtn = new jarves.Button(t('Apply'));
 
         this.fieldObject = new jarves.FieldForm(fieldContainer, this.kaFields, {
-            allTableItems: this.options.allTableItems,
-            tableItemLabelWidth: this.options.tableItemLabelWidth,
+            // allTableItems: this.options.allTableItems,
+            // tableItemLabelWidth: this.options.tableItemLabelWidth,
             saveButton: this.saveBtn,
             withEmptyFields: false
         });

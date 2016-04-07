@@ -11,7 +11,6 @@ class StoreDatabase extends AbstractStore
     {
         try {
             $session->save();
-//            Jarves::setPropelCacheObject('\Users\Models\Session', $session->getId(), $session);
             return true;
         } catch (\Exception $e) {
             return false;
@@ -27,7 +26,6 @@ class StoreDatabase extends AbstractStore
         }
 
         if ($session->getTime() + $this->getClient()->getConfig()['timeout'] < time()) {
-//            Jarves::removePropelCacheObject('\Users\Models\Session', $key);
             $session->delete();
 
             return false;

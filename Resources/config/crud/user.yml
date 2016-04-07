@@ -1,0 +1,94 @@
+fields:
+    __account__:
+        type: tab
+        label: '[[Account]]'
+        children:
+            username:
+                label: Username
+                desc: '(and the administration login)'
+                type: text
+                required: true
+            password:
+                label: Password
+                type: userPassword
+                desc: 'Leave empty to change nothing'
+                startEmpty: true
+                saveOnlyFilled: true
+            email:
+                label: Email
+                type: text
+                desc: '(and the administration login if enabled)'
+                required: true
+                requiredRegex: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-_]+'
+            activate:
+                label: 'Active account'
+                type: checkbox
+            groups:
+                fieldWidth: auto
+    __Person__:
+        type: tab
+        label: '[[Person]]'
+        children:
+            firstName:
+                label: 'First name'
+                type: text
+                target: names
+            lastName:
+                label: 'Last name'
+                type: text
+                target: names
+            imagePath:
+                label: Picture
+            company:
+                label: Company
+                type: text
+            street:
+                label: Street
+                type: text
+            city:
+                label: City
+                type: text
+            zip:
+                label: Zipcode
+                type: number
+                maxLength: 10
+                inputWidth: 100
+            country:
+                label: Country
+                type: text
+            phone:
+                label: Phone
+                type: text
+            fax:
+                label: Fax
+                type: text
+columns:
+    lastName:
+        label: 'Last name'
+        type: text
+    firstName:
+        label: 'First name'
+        type: text
+    username:
+        label: Username
+        width: '100'
+        type: text
+    email:
+        label: Email
+        type: text
+    activate:
+        label: Active
+        width: '35'
+        type: checkbox
+        align: center
+    groups.name:
+        label: Groups
+itemLayout: "\n    <div title=\"#{{id}}\">\n        <b>{{username}}</b>\n        {%if firstName or lastName%}\n            (<span>{{firstName}}</span>{% if lastName %} <span>{{lastName}}</span>{% endif %})\n        {%endif%}\n        {%if email%}<div class=\"sub\">{{email}}</div>{%endif%}\n        <div class=\"sub\">{%if groups%}{{groups.name}}{%endif%}</div>\n    </div>"
+itemsPerPage: 20
+add: true
+edit: true
+remove: true
+object: jarves/user
+order:
+    username: asc
+titleField: username

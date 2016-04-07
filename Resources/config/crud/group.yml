@@ -1,0 +1,19 @@
+fields:
+    __General__:
+        label: General
+        type: tab
+        children:
+            - name
+            - description
+columns:
+    - name
+    - description
+itemLayout: "{{name}}\n<div class=\"sub\">{{description|truncate(20)}}</div>"
+itemsPerPage: 10
+order:
+    name: asc
+add: true
+edit: true
+remove: true
+object: jarves/group
+titleField: name

@@ -2,9 +2,13 @@
 
 namespace Jarves\EventListener;
 
+use Jarves\EditMode;
 use Jarves\Exceptions\AccessDeniedException;
 use Jarves\Jarves;
 use Jarves\Model\Base\NodeQuery;
+use Jarves\PageResponse;
+use Jarves\PageResponseFactory;
+use Jarves\PageStack;
 use Jarves\Router\FrontendRouter;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -19,7 +23,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 class FrontendRouteListener extends RouterListener
 {
-
     /**
      * @var Jarves
      */
@@ -35,15 +38,46 @@ class FrontendRouteListener extends RouterListener
      */
     protected $loaded = [];
 
-    function __construct(Jarves $jarves)
+    /**
+     * @var FrontendRouter
+     */
+    private $frontendRouter;
+
+    /**
+     * @var PageStack
+     */
+    private $pageStack;
+    /**
+     * @var EditMode
+     */
+    private $editMode;
+    /**
+     * @var PageResponseFactory
+     */
+    private $pageResponseFactory;
+
+    /**
+     * @param Jarves $jarves
+     * @param PageStack $pageStack
+     * @param EditMode $editMode
+     * @param FrontendRouter $frontendRouter
+     * @param PageResponseFactory $pageResponseFactory
+     * @internal param PageResponse $pageResponse
+     */
+    function __construct(Jarves $jarves, PageStack $pageStack, EditMode $editMode,
+                         FrontendRouter $frontendRouter, PageResponseFactory $pageResponseFactory)
     {
         $this->jarves = $jarves;
         $this->routes = new RouteCollection();
+        $this->frontendRouter = $frontendRouter;
+        $this->pageStack = $pageStack;
 
         parent::__construct(
             new UrlMatcher($this->routes, new RequestContext()),
             new RequestStack()
         );
+        $this->editMode = $editMode;
+        $this->pageResponseFactory = $pageResponseFactory;
     }
 
     /**
@@ -84,15 +118,15 @@ class FrontendRouteListener extends RouterListener
 
         if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
             //prepare for new master request: clear the PageResponse object
-            $this->getJarves()->prepareNewMasterRequest();
+            $this->pageStack->setPageResponse($this->pageResponseFactory->create());
 
             if (!isset($this->loaded[$request->getPathInfo()])) {
-                $frontendRouter = new FrontendRouter($this->getJarves(), $request);
+                $this->frontendRouter->setRequest($request);
 
                 $this->loaded[$request->getPathInfo()] = true;
 
                 //check for redirects/access requirements and populates $this->routes with current page routes and its plugins
-                if ($response = $frontendRouter->loadRoutes($this->routes)) {
+                if ($response = $this->frontendRouter->loadRoutes($this->routes)) {
                     $event->setResponse($response);
 
                     return;
@@ -101,14 +135,14 @@ class FrontendRouteListener extends RouterListener
         }
 
         try {
-            if ($nodeId = (int)$this->getJarves()->getRequest()->get('_jarves_editor_node')) {
-                if ($this->getJarves()->isEditMode($nodeId)) {
+            if ($nodeId = (int)$this->pageStack->getRequest()->get('_jarves_editor_node')) {
+                if ($this->editMode->isEditMode($nodeId)) {
                     $node = NodeQuery::create()->joinWithDomain()->findPk($nodeId);
                     if ($node) {
-                        $this->jarves->setCurrentPage($node);
-                        $this->jarves->setCurrentDomain($node->getDomain());
+                        $this->pageStack->setCurrentPage($node);
+                        $this->pageStack->setCurrentDomain($node->getDomain());
 
-                        $request->attributes->set('_controller', 'Jarves\\Controller\\PageController::handleAction');
+                        $request->attributes->set('_controller', 'jarves.page_controller:handleAction');
                     }
                 } else {
                     throw new AccessDeniedException('Access denied.');
@@ -117,14 +151,14 @@ class FrontendRouteListener extends RouterListener
                 //check routes in $this->route
                 parent::onKernelRequest($event);
 
-                if ($request->attributes->has('_route')){
+                if ($request->attributes->has('_route')) {
                     $name = $request->attributes->get('_route');
                     $route = $this->routes->get($name);
                     $nodeId = $route->getDefault('nodeId');
 
                     $node = NodeQuery::create()->joinWithDomain()->findPk($nodeId);
-                    $this->jarves->setCurrentPage($node);
-                    $this->jarves->setCurrentDomain($node->getDomain());
+                    $this->pageStack->setCurrentPage($node);
+                    $this->pageStack->setCurrentDomain($node->getDomain());
                 }
             }
         } catch (MethodNotAllowedException $e) {

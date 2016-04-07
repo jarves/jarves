@@ -30,7 +30,7 @@ class ApiDocController extends Controller
             new \Nelmio\ApiDocBundle\Extractor\Handler\FosRestHandler,
             new \Nelmio\ApiDocBundle\Extractor\Handler\JmsSecurityExtraHandler,
             new \Nelmio\ApiDocBundle\Extractor\Handler\SensioFrameworkExtraHandler,
-            new \Jarves\Extractor\Handler\ObjectCrudHandler($this->get('jarves')),
+            new \Jarves\Extractor\Handler\ObjectCrudHandler($this->get('jarves'), $this->get('jarves.objects')),
 //            new \Nelmio\ApiDocBundle\Extractor\Handler\PhpDocHandler($commentExtractor),
         ];
 

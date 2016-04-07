@@ -20,9 +20,14 @@ use Jarves\Exceptions\FileNotWritableException;
 use Jarves\Exceptions\InvalidArgumentException;
 use Jarves\Exceptions\PackageNotFoundException;
 use Jarves\Admin\AppKernelModifier;
-use Jarves\Controller;
+use Jarves\Filesystem\Filesystem;
+use Jarves\Jarves;
+use Jarves\Utils;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Finder\Finder;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 class ManagerController extends Controller
@@ -38,6 +43,37 @@ class ManagerController extends Controller
     private $composer;
 
     protected $versionParser;
+
+    /**
+     * @var Jarves
+     */
+    private $jarves;
+
+    /**
+     * @var Filesystem
+     */
+    private $localFilesystem;
+
+    /**
+     * @var string
+     */
+    private $rootDir;
+
+    /**
+     * @var Utils
+     */
+    private $utils;
+
+    public function setContainer(ContainerInterface $container = null)
+    {
+        parent::setContainer($container);
+
+        $this->jarves = $this->container->get('jarves');
+        $this->localFilesystem = $this->container->get('jarves.filesystem.local');
+        $this->rootDir = $this->container->getParameter('kernel.root_dir');
+        $this->utils = $this->container->get('jarves.utils');
+    }
+
 
     /**
      * @ApiDoc(
@@ -57,7 +93,7 @@ class ManagerController extends Controller
     {
         Manager::prepareName($bundle);
 
-        $bundle = $this->getJarves()->getBundle($bundle);
+        $bundle = $this->jarves->getBundle($bundle);
 
         if ($bundle) {
             $appModifier = new AppKernelModifier();
@@ -103,12 +139,12 @@ class ManagerController extends Controller
         $classDir = './src/' . str_replace('\\', '/', $namespace);
         mkdir($classDir, 0777, true);
 
-        $bundleClassName = str_replace('\\Bundle\\', '\\', $namespace);
+//        $bundleClassName = str_replace('\\Bundle\\', '\\', $namespace);
         $bundleClassName = str_replace('\\', '', $namespace);
         $classFile = $classDir . '/' . $bundleClassName . '.php';
         $composerFile = $classDir . '/composer.json';
 
-        $fs = $this->getJarves()->getFileSystem();
+        $fs = $this->localFilesystem;
 
         $classPhp = sprintf(
             '<?php
@@ -222,7 +258,7 @@ This is the bundle $bundleClassName.
      */
     public function getInstalledInfoAction($name)
     {
-        $fs = $this->getJarves()->getFileSystem();
+        $fs = $this->localFilesystem;
         if ($fs->has('composer.lock')) {
             $composerLock = $fs->read('composer.lock');
             if ($composerLock) {
@@ -253,7 +289,7 @@ This is the bundle $bundleClassName.
     {
         $packages = [];
         $bundles = [];
-        $fs = $this->getJarves()->getFileSystem();
+        $fs = $this->localFilesystem;
 
         if ($fs->has('composer.json')) {
             $composer = $fs->read('composer.json');
@@ -317,7 +353,7 @@ This is the bundle $bundleClassName.
                 }
 
                 $reflection = new \ReflectionClass($bundle);
-                $current = realpath($this->getJarves()->getKernel()->getRootDir() . '/../');
+                $current = realpath($this->jarves->getRootDir() . '/../');
                 $path = substr(dirname($reflection->getFileName()), strlen($current) + 1);
 
                 if (false !== strpos($path, 'vendor/')) {
@@ -330,7 +366,7 @@ This is the bundle $bundleClassName.
                     'class' => $bundle,
                     'package' => $package,
                     'path' => $reflection->getFileName(),
-                    'active' => $this->getJarves()->isActiveBundle($bundle)
+                    'active' => $this->jarves->isActiveBundle($bundle)
                 ];
                 $bundles[] = $bundleInfo;
             }
@@ -349,9 +385,9 @@ This is the bundle $bundleClassName.
     protected function getBundlesFromPath($path)
     {
         $bundles = [];
-        if ($this->getJarves()->getFileSystem()->has($path)) {
+        if ($this->localFilesystem->has($path)) {
 
-            $finder = new \Symfony\Component\Finder\Finder();
+            $finder = new Finder();
             $finder
                 ->files()
                 ->name('*Bundle.php')
@@ -359,7 +395,7 @@ This is the bundle $bundleClassName.
                 ->notPath('/\/Test\//')
                 ->notPath('Tests/Integration/skeletion')
                 ->notPath('Jarves/vendor')
-                ->in($this->getKernel()->getRootDir() . '/../' . $path);
+                ->in($this->rootDir . '/../' . $path);
 
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             foreach ($finder as $file) {
@@ -428,8 +464,8 @@ This is the bundle $bundleClassName.
      */
     public function getLocalAction()
     {
-        $finder = new \Symfony\Component\Finder\Finder();
-        $root = $this->getJarves()->getKernel()->getRootDir();
+        $finder = new Finder();
+        $root = $this->jarves->getRootDir();
 
         $finder
             ->files()
@@ -450,10 +486,10 @@ This is the bundle $bundleClassName.
     }
 
     /**
-     * @param \Symfony\Component\Finder\Finder $finder
+     * @param Finder $finder
      * @return array
      */
-    protected function getBundles(\Symfony\Component\Finder\Finder $finder)
+    protected function getBundles(Finder $finder)
     {
         $bundles = array();
         /** @var \Symfony\Component\Finder\SplFileInfo $file */
@@ -489,16 +525,16 @@ This is the bundle $bundleClassName.
             $interfaces = $reflection->getInterfaceNames();
             if (in_array('Symfony\Component\HttpKernel\Bundle\BundleInterface', $interfaces)) {
 
-                $composer = $this->getJarves()->getUtils()->getComposerArray($bundleClass) ? : [];
-                $composer['_path'] = $this->getJarves()->getBundleDir($bundleClass);
+                $composer = $this->utils->getComposerArray($bundleClass) ? : [];
+                $composer['_path'] = $this->jarves->getBundleDir($bundleClass);
                 if (isset($composer['name'])) {
                     $composer['_installed'] = $this->getInstalledInfoAction($composer['name']);
                 } else {
                     $composer['_installed'] = [];
                 }
-                $composer['_bundleName'] = $this->getJarves()->getBundleName($bundleClass);
-                $composer['activated'] = $this->getJarves()->isActiveBundle($name);
-                $composer['jarvesBundle'] = $this->getJarves()->isJarvesBundle($name);
+                $composer['_bundleName'] = $this->jarves->getBundleName($bundleClass);
+                $composer['activated'] = $this->jarves->isActiveBundle($name);
+                $composer['jarvesBundle'] = $this->jarves->isJarvesBundle($name);
                 $res[$bundleClass] = $composer;
             }
         }
@@ -519,8 +555,8 @@ This is the bundle $bundleClassName.
     public function check4UpdatesAction()
     {
         $res = [];
-        foreach ($this->getKernel()->getBundles() as $bundleName => $bundle) {
-            $composer = $this->getJarves()->getUtils()->getComposerArray($bundleName) ? : [];
+        foreach ($this->jarves->getBundles() as $bundleName => $bundle) {
+            $composer = $this->utils->getComposerArray($bundleName) ? : [];
             $version = @$composer['version'];
             if ($version && $version != '' && self::versionCompareToServer(
                     $version,
@@ -565,15 +601,15 @@ This is the bundle $bundleClassName.
         $ormUpdate = filter_var($ormUpdate, FILTER_VALIDATE_BOOLEAN);
 
         Manager::prepareName($bundle);
-        $fs = $this->getJarves()->getFileSystem();
+        $fs = $this->localFilesystem;
 
-        $hasPropelModels = $fs->has($this->getJarves()->getBundleDir($bundle) . 'Resources/config/models.xml');
+        $hasPropelModels = $fs->has($this->jarves->getBundleDir($bundle) . 'Resources/config/models.xml');
         $this->firePackageManager($bundle, 'install');
 
         //fire update propel orm
         if ($ormUpdate && $hasPropelModels) {
             //update propel
-            $this->getJarves()->getEventDispatcher()->dispatch('core/bundle/schema-update', $bundle);
+            $this->jarves->getEventDispatcher()->dispatch('core/bundle/schema-update', $bundle);
         }
 
         $this->activateAction($bundle);
@@ -611,9 +647,9 @@ This is the bundle $bundleClassName.
         $removeFiles = filter_var($removeFiles, FILTER_VALIDATE_BOOLEAN);
 
         Manager::prepareName($bundle);
-        $fs = $this->getJarves()->getFileSystem();
+        $fs = $this->localFilesystem;
 
-        $path = $this->getJarves()->getBundleDir($bundle);
+        $path = $this->jarves->getBundleDir($bundle);
         if (!$path) {
             throw new \Jarves\Exceptions\BundleNotFoundException();
         }
@@ -628,7 +664,7 @@ This is the bundle $bundleClassName.
         if ($ormUpdate && $hasPropelModels) {
             //update propel
             if ($ormUpdate) {
-                $this->getJarves()->getEventDispatcher()->dispatch('core/bundle/schema-update', $bundle);
+                $this->jarves->getEventDispatcher()->dispatch('core/bundle/schema-update', $bundle);
             }
         }
 
@@ -673,7 +709,7 @@ This is the bundle $bundleClassName.
     {
         $name = $paramFetcher->get('name');
 
-        $fs = $this->getFileSystem();
+        $fs = $this->localFilesystem;
         if ($fs->has('composer.json') && is_string($name)) {
             $composer = $fs->read('composer.json');
             if ($composer) {
@@ -801,7 +837,7 @@ This is the bundle $bundleClassName.
             ));
         }
 
-        $fs = $this->getFileSystem();
+        $fs = $this->localFilesystem;
 
         if ($fs->has('composer.json') && is_string($name)) {
             $composerJson = $fs->read('composer.json');
@@ -817,7 +853,7 @@ This is the bundle $bundleClassName.
                     }
                     if (!$found) {
                         $composerJson['require'][$name] = $version;
-                        $fs->write('composer.json', json_format($composerJson));
+                        $fs->write('composer.json', json_encode($composerJson, JSON_PRETTY_PRINT));
                     } else {
                         $name = $found;
                     }
@@ -850,7 +886,7 @@ This is the bundle $bundleClassName.
     {
         $bundles = $this->getBundlesFromPath($path);
         foreach ($bundles as $bundle) {
-            if ($this->getJarves()->isActiveBundle($bundle)) {
+            if ($this->jarves->isActiveBundle($bundle)) {
                 $this->uninstallAction($bundle, $removeFiles, true);
             }
         }
@@ -873,7 +909,7 @@ This is the bundle $bundleClassName.
     private function getComposer()
     {
         putenv('COMPOSER_HOME=./');
-        putenv('COMPOSER_CACHE_DIR=' . $this->getJarves()->getKernel()->getCacheDir());
+        putenv('COMPOSER_CACHE_DIR=' . $this->jarves->getCacheDir());
 
         $this->composerIO = new BufferIO();
         $this->composer = Factory::create($this->composerIO);
@@ -920,7 +956,7 @@ This is the bundle $bundleClassName.
      */
     protected function firePackageManager($bundleName, $script)
     {
-        $bundle = $this->getJarves()->getBundle($bundleName);
+        $bundle = $this->jarves->getBundle($bundleName);
         if ($bundle) {
             $namespace = $bundle->getNamespace();
         } else {
@@ -936,20 +972,20 @@ This is the bundle $bundleClassName.
         $packageManagerClass = $namespace . '\\PackageManger';
 
         if (class_exists($packageManagerClass)) {
-            $packageManager = new $packageManagerClass($this->getJarves());
+            $packageManager = new $packageManagerClass($this->jarves);
             if ($packageManager instanceof ContainerAwareInterface) {
-                $packageManager->setContainer($this->getJarves()->getContainer());
+                $packageManager->setContainer($this->jarves->getContainer());
             }
 
             if (method_exists($packageManager, $script)) {
                 $packageManager->$script();
             } else {
-                $this->getJarves()->getLogger()->debug(
+                $this->jarves->getLogger()->debug(
                     sprintf('PackageManager of Bundle `%s` does not have the method `%s`', $bundle, $script)
                 );
             }
         } else {
-            $this->getJarves()->getLogger()->debug(
+            $this->jarves->getLogger()->debug(
                 sprintf('PackageManager class `%s` of Bundle `%s` does not exist', $packageManagerClass, $bundleName)
             );
         }

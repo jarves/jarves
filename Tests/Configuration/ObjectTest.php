@@ -15,8 +15,7 @@ class ObjectTest extends KernelAwareTestCase
 <objects>
   <object id="Test2">
     <label>Test</label>
-    <class>Core\Models\Test</class>
-    <dataModel>custom</dataModel>
+    <class>tests.store.core.test2</class>
     <fields>
       <field id="id" type="number" primaryKey="true">
         <label>ID</label>
@@ -60,8 +59,7 @@ EOF;
 <objects>
   <object id="User">
     <label>Test</label>
-    <class>Core\Models\Test</class>
-    <dataModel>custom</dataModel>
+    <class>tests.store.core.user</class>
     <fields>
       <field id="id" type="number" primaryKey="true">
         <label>ID</label>
@@ -79,8 +77,7 @@ EOF;
   </object>
   <object id="Group">
     <label>Test Group</label>
-    <class>Core\Models\TestGroup</class>
-    <dataModel>custom</dataModel>
+    <class>tests.store.core.group</class>
     <fields>
       <field id="id" type="number" primaryKey="true">
         <label>ID</label>

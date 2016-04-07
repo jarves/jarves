@@ -2,6 +2,9 @@
 
 namespace Jarves\Translation;
 
+use Jarves\Cache\Cacher;
+use Jarves\Filesystem\Adapter\Local;
+use Jarves\Filesystem\Filesystem;
 use Jarves\Jarves;
 
 class Translator implements TranslationInterface
@@ -13,12 +16,36 @@ class Translator implements TranslationInterface
      */
     protected $jarves;
 
-    function __construct(Jarves $jarves)
+    /**
+     * @var Cacher
+     */
+    private $cacher;
+
+    /**
+     * @var Filesystem
+     */
+    private $webFilesystem;
+
+    /**
+     * @var Filesystem
+     */
+    private $cacheFilesystem;
+
+    /**
+     * Translator constructor.
+     * @param Jarves $jarves
+     * @param Cacher $cacher
+     * @param Filesystem $webFilesystem
+     * @param Filesystem $cacheFilesystem
+     */
+    function __construct(Jarves $jarves, Cacher $cacher, Filesystem $webFilesystem, Filesystem $cacheFilesystem)
     {
         $this->jarves = $jarves;
+        $this->cacher = $cacher;
+        $this->webFilesystem = $webFilesystem;
+        $this->cacheFilesystem = $cacheFilesystem;
         $this->loadMessages();
     }
-
 
     /**
      * Check whether specified pLang is a valid language
@@ -26,7 +53,6 @@ class Translator implements TranslationInterface
      * @param string $lang
      *
      * @return bool
-     * @internal
      */
     public function isValidLanguage($lang)
     {
@@ -42,6 +68,13 @@ class Translator implements TranslationInterface
         }
     }
 
+    /**
+     * @param string $lang
+     * @param bool $force
+     * @return array|null|string
+     *
+     * @throws \Jarves\Exceptions\BundleNotFoundException
+     */
     public function loadMessages($lang = 'en', $force = false)
     {
         if (!$this->isValidLanguage($lang)) {
@@ -49,15 +82,15 @@ class Translator implements TranslationInterface
         }
 
         if ($this->messages && isset($this->messages['__lang']) && $this->messages['__lang'] == $lang && $force == false) {
-            return;
+            return null;
         }
 
         if (!$lang) {
-            return;
+            return null;
         }
 
         $code = 'core/lang/' . $lang;
-        $this->messages =& $this->jarves->getFastCache()->get($code);
+        $this->messages = $this->cacher->getFastCache($code);
 
         $md5 = '';
         $bundles = array();
@@ -83,7 +116,7 @@ class Translator implements TranslationInterface
                 $po = $this->getLanguage($file);
                 $this->messages = array_merge($this->messages, $po['translations']);
             }
-            $this->jarves->getFastCache()->set($code, $this->messages);
+            $this->cacher->setFastCache($code, $this->messages);
         }
 
         include_once($this->getPluralPhpFunctionFile($lang));
@@ -94,7 +127,7 @@ class Translator implements TranslationInterface
 
     public function getPluralPhpFunctionFile($lang)
     {
-        $fs = $this->jarves->getCacheFileSystem();
+        $fs = $this->cacheFilesystem;
 
         $file = 'core_gettext_plural_fn_' . $lang . '.php';
         if (!$fs->has($file)) {
@@ -111,7 +144,10 @@ if (!function_exists('gettext_plural_fn_$lang')) {
             $fs->write($file, $code);
         }
 
-        return $fs->getAdapter()->getRoot() . '/' . $file;
+        /** @var Local $adapter */
+        $adapter = $fs->getAdapter();
+
+        return $adapter->getRoot() . '/' . $file;
     }
 
 
@@ -122,7 +158,7 @@ if (!function_exists('gettext_plural_fn_$lang')) {
      */
     public function getPluralJsFunctionFile($lang)
     {
-        $fs = $this->jarves->getWebFileSystem();
+        $fs = $this->webFilesystem;
 
         $file = 'cache/core_gettext_plural_fn_' . $lang . '.js';
         if (!$fs->has($file)) {
@@ -152,8 +188,7 @@ if (!function_exists('gettext_plural_fn_$lang')) {
      */
     public function getUtils()
     {
-        $utils = new Utils($this->jarves);
-        return $utils;
+        return new Utils($this->jarves, $this->cacher);
     }
 
     public function t($id, $plural = null, $count = 0, $context = null)

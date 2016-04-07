@@ -8,9 +8,6 @@ parameters:
      jarves.content.types.html.class: Jarves\ContentTypes\TypeHtml
 
 services:
-     jarves.content.types:
-         class: %jarves.content.types.class%
-
      jarves.content.types.text:
          class: %jarves.content.types.text.class%
          tags:
@@ -30,7 +27,7 @@ services:
 
      jarves.content.types.plugin:
          class: %jarves.content.types.plugin.class%
-         arguments: ["@jarves"]
+         arguments: ["@jarves", "@jarves.page_stack", "@kernel", "@event_dispatcher", "@jarves.page_response.factory"]
          tags:
              - { name: jarves.content.type, alias: plugin }
 
@@ -42,6 +39,5 @@ services:
 
      jarves.content.types.tray:
          class: %jarves.content.types.tray.class%
-         arguments: ["@jarves.content.render"]
          tags:
              - { name: jarves.content.type, alias: tray }

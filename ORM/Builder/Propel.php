@@ -8,22 +8,27 @@ use \Jarves\Exceptions\ModelBuildException;
 use Jarves\Configuration\Object;
 use Jarves\Filesystem\Filesystem;
 use Jarves\Objects;
-use Jarves\ORM\ORMAbstract;
 use Jarves\Propel\StandardEnglishPluralizer;
+use Jarves\Storage\AbstractStorage;
 use Jarves\Tools;
 use Propel\Generator\Model\Column;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class Propel implements BuildInterface
 {
-
     /**
      * @var Filesystem
      */
     protected $filesystem;
+
+    /**
+     * @var KernelInterface
+     */
+    protected $kernel;
 
     /**
      * @var Objects
@@ -32,7 +37,7 @@ class Propel implements BuildInterface
 
     protected $databases = [];
 
-    public function __construct(Filesystem $filesystem, Objects $objects, Kernel $kernel)
+    public function __construct(Filesystem $filesystem, Objects $objects, KernelInterface $kernel)
     {
         $this->filesystem = $filesystem;
         $this->objects = $objects;
@@ -54,7 +59,8 @@ class Propel implements BuildInterface
         $output->writeln('Propel Build');
 
         foreach ($objects as $object) {
-            if ('propel' === strtolower($object->getDataModel())) {
+            if ($this->kernel->getContainer()->get($object->getStorageService()) instanceof \Jarves\Storage\Propel) {
+
                 $output->write('Build object ' . $object->getId() . ' => ' . $object->getTable() . ' ... ');
 
                 $bundlePath = $jarves->getBundleDir($object->getBundle()->getName());
@@ -307,8 +313,8 @@ class Propel implements BuildInterface
     protected function addRelation(Object $object, RelationDefinitionInterface $relation, &$xmlTable)
     {
         $possibleRelations = [
-            ORMAbstract::MANY_TO_ONE,
-            ORMAbstract::ONE_TO_ONE
+            AbstractStorage::MANY_TO_ONE,
+            AbstractStorage::ONE_TO_ONE
         ];
 
         if (in_array($relation->getType(), $possibleRelations)) {
@@ -331,11 +337,12 @@ class Propel implements BuildInterface
             );
         }
 
-        if ('propel' !== strtolower($foreignObject->getDataModel())) {
+        if ($object->getStorageService() !== $foreignObject->getStorageService()) {
             throw new ModelBuildException(
                 sprintf(
-                    'Can not create a relation between two different dataModels. Got `%s` but propel is needed.',
-                    $foreignObject->getDataModel()
+                    'Can not create a relation between two different dataModels. Got `%s` but `%s` is needed.',
+                    $foreignObject->getStorageService(),
+                    $object->getStorageService()
                 )
             );
         }

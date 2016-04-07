@@ -2,7 +2,7 @@
 
 namespace Jarves\Tests\Service\Translation;
 
-use Jarves\ContainerHelperTrait;
+use Jarves\Tests\ContainerHelperTrait;
 use Jarves\Tests\KernelAwareTestCase;
 
 class TranslationUtilsTest extends KernelAwareTestCase

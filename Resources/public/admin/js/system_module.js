@@ -589,11 +589,11 @@ var jarves_system_module = new Class({
             }
 
             new jarves.Button(_('Info')).addEvent('click', function () {
-                jarves.wm.open('jarvesbundle/system/module/view', {name: key, type: 0}, -1, true);
+                jarves.wm.open('jarvesbundle/system/module/view', {name: item._bundleName, type: 0}, -1, true);
             }.bind(this)).inject(actions);
 
             new jarves.Button(_('Edit')).addEvent('click', function () {
-                jarves.wm.open('jarvesbundle/system/module/edit', {name: key});
+                jarves.wm.open('jarvesbundle/system/module/edit', {name: item._bundleName});
             }.bind(this)).inject(actions);
 
             var activeIcon = new Element('span', {

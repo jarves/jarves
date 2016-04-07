@@ -73,21 +73,21 @@ class EventTest extends KernelAwareTestCase
 </event>';
 
         $event = new Event($xml, $this->getJarves());
-        $this->getJarves()->detachEvents();
-        $this->assertCount(0, $this->getJarves()->getAttachedEvents());
-        $this->getJarves()->attachEvent($event);
-        $this->assertCount(1, $this->getJarves()->getAttachedEvents());
+        $this->getJarvesEventDispatcher()->detachEvents();
+        $this->assertCount(0, $this->getJarvesEventDispatcher()->getAttachedEvents());
+        $this->getJarvesEventDispatcher()->attachEvent($event);
+        $this->assertCount(1, $this->getJarvesEventDispatcher()->getAttachedEvents());
 
         self::$fired = 0;
-        $this->getJarves()->getEventDispatcher()->dispatch('core/test', new GenericEvent('foo'));
+        $this->getEventDispatcher()->dispatch('core/test', new GenericEvent('foo'));
         $this->assertEquals(1, self::$fired);
 
-        $this->getJarves()->getEventDispatcher()->dispatch('core/test', new GenericEvent('foo'));
-        $this->getJarves()->getEventDispatcher()->dispatch('core/test', new GenericEvent('blaa')); //is not handled, since we have a subject defined
+        $this->getEventDispatcher()->dispatch('core/test', new GenericEvent('foo'));
+        $this->getEventDispatcher()->dispatch('core/test', new GenericEvent('blaa')); //is not handled, since we have a subject defined
         $this->assertEquals(2, self::$fired);
 
-        $this->getJarves()->detachEvents();
-        $this->assertCount(0, $this->getJarves()->getAttachedEvents());
+        $this->getJarvesEventDispatcher()->detachEvents();
+        $this->assertCount(0, $this->getJarvesEventDispatcher()->getAttachedEvents());
     }
 
     public function testStandardEvent()
@@ -97,19 +97,19 @@ class EventTest extends KernelAwareTestCase
 </event>';
 
         $event = new Event($xml, $this->getJarves());
-        $this->getJarves()->detachEvents();
-        $this->getJarves()->attachEvent($event);
-        $this->assertCount(1, $this->getJarves()->getAttachedEvents());
+        $this->getJarvesEventDispatcher()->detachEvents();
+        $this->getJarvesEventDispatcher()->attachEvent($event);
+        $this->assertCount(1, $this->getJarvesEventDispatcher()->getAttachedEvents());
 
         self::$fired = 0;
-        $this->getJarves()->getEventDispatcher()->dispatch('core/test', new GenericEvent('foo'));
+        $this->getEventDispatcher()->dispatch('core/test', new GenericEvent('foo'));
         $this->assertEquals(1, self::$fired);
 
-        $this->getJarves()->getEventDispatcher()->dispatch('core/test', new GenericEvent('2'));
-        $this->getJarves()->getEventDispatcher()->dispatch('core/test', new GenericEvent('3'));
+        $this->getEventDispatcher()->dispatch('core/test', new GenericEvent('2'));
+        $this->getEventDispatcher()->dispatch('core/test', new GenericEvent('3'));
         $this->assertEquals(3, self::$fired);
 
-        $this->getJarves()->detachEvents();
+        $this->getJarvesEventDispatcher()->detachEvents();
     }
 
     public function testConditionEventObject()
@@ -171,30 +171,30 @@ class EventTest extends KernelAwareTestCase
         $event = new Event($xml, $this->getJarves());
         $this->assertEquals($xml, $event->toXml());
 
-        $this->getJarves()->detachEvents();
-        $this->getJarves()->attachEvent($event);
+        $this->getJarvesEventDispatcher()->detachEvents();
+        $this->getJarvesEventDispatcher()->attachEvent($event);
 
         self::$fired = 0;
-        $this->getJarves()->getEventDispatcher()->dispatch('core/test', new GenericEvent('foo'));
+        $this->getEventDispatcher()->dispatch('core/test', new GenericEvent('foo'));
         $this->assertEquals(0, self::$fired, 'no args, therefore condition not satisfied');
 
-        $this->getJarves()->getEventDispatcher()->dispatch('core/test', new GenericEvent('foo', ['field1' => 50]));
+        $this->getEventDispatcher()->dispatch('core/test', new GenericEvent('foo', ['field1' => 50]));
         $this->assertEquals(1, self::$fired);
-        $this->getJarves()->getEventDispatcher()->dispatch('core/test', new GenericEvent('foo', ['field1' => 201]));
+        $this->getEventDispatcher()->dispatch('core/test', new GenericEvent('foo', ['field1' => 201]));
         $this->assertEquals(2, self::$fired);
 
-        $this->getJarves()->getEventDispatcher()->dispatch('core/test', new GenericEvent('notFoo', ['field1' => 201]));
+        $this->getEventDispatcher()->dispatch('core/test', new GenericEvent('notFoo', ['field1' => 201]));
         $this->assertEquals(2, self::$fired);
 
-        $this->getJarves()->getEventDispatcher()->dispatch('core/test', new GenericEvent('foo', ['field1' => 200]));
+        $this->getEventDispatcher()->dispatch('core/test', new GenericEvent('foo', ['field1' => 200]));
         $this->assertEquals(2, self::$fired);
 
-        $this->getJarves()->getEventDispatcher()->dispatch('core/test', new GenericEvent());
+        $this->getEventDispatcher()->dispatch('core/test', new GenericEvent());
         $this->assertEquals(2, self::$fired);
 
-        $this->getJarves()->getEventDispatcher()->dispatch('core/notTest', new GenericEvent());
+        $this->getEventDispatcher()->dispatch('core/notTest', new GenericEvent());
         $this->assertEquals(2, self::$fired);
-        $this->getJarves()->detachEvents();
+        $this->getJarvesEventDispatcher()->detachEvents();
     }
 
     public function testClearCache()
@@ -205,27 +205,27 @@ class EventTest extends KernelAwareTestCase
 </event>';
 
         $event = new Event($xml, $this->getJarves());
-        $this->getJarves()->detachEvents();
-        $this->getJarves()->attachEvent($event);
+        $this->getJarvesEventDispatcher()->detachEvents();
+        $this->getJarvesEventDispatcher()->attachEvent($event);
 
-        $this->getJarves()->getCache()->set('core/test1', 'test1');
-        $this->getJarves()->getCache()->set('core/test2', 'test2');
-        $this->getJarves()->getCache()->set('core/test2/sub', 'sub');
-        $this->assertEquals('test1', $this->getJarves()->getCache()->get('core/test1'));
-        $this->assertEquals('test2', $this->getJarves()->getCache()->get('core/test2'));
-        $this->assertEquals('sub', $this->getJarves()->getCache()->get('core/test2/sub'));
+        $this->getCacher()->setDistributedCache('core/test1', 'test1');
+        $this->getCacher()->setDistributedCache('core/test2', 'test2');
+        $this->getCacher()->setDistributedCache('core/test2/sub', 'sub');
+        $this->assertEquals('test1', $this->getCacher()->getDistributedCache('core/test1'));
+        $this->assertEquals('test2', $this->getCacher()->getDistributedCache('core/test2'));
+        $this->assertEquals('sub', $this->getCacher()->getDistributedCache('core/test2/sub'));
 
-        $this->getJarves()->getEventDispatcher()->dispatch('core/cache', new GenericEvent());
-        $this->assertEquals('test1', $this->getJarves()->getCache()->get('core/test1'));
-        $this->assertEquals('test2', $this->getJarves()->getCache()->get('core/test2'));
-        $this->assertEquals('sub', $this->getJarves()->getCache()->get('core/test2/sub'));
+        $this->getEventDispatcher()->dispatch('core/cache', new GenericEvent());
+        $this->assertEquals('test1', $this->getCacher()->getDistributedCache('core/test1'));
+        $this->assertEquals('test2', $this->getCacher()->getDistributedCache('core/test2'));
+        $this->assertEquals('sub', $this->getCacher()->getDistributedCache('core/test2/sub'));
 
-        $this->getJarves()->getEventDispatcher()->dispatch('core/cache', new GenericEvent('foo'));
-        $this->assertNull($this->getJarves()->getCache()->get('core/test1'));
-        $this->assertNull($this->getJarves()->getCache()->get('core/test2'));
-        $this->assertNull($this->getJarves()->getCache()->get('core/test2/sub'));
+        $this->getEventDispatcher()->dispatch('core/cache', new GenericEvent('foo'));
+        $this->assertNull($this->getCacher()->getDistributedCache('core/test1'));
+        $this->assertNull($this->getCacher()->getDistributedCache('core/test2'));
+        $this->assertNull($this->getCacher()->getDistributedCache('core/test2/sub'));
 
-        $this->getJarves()->detachEvents();
+        $this->getJarvesEventDispatcher()->detachEvents();
     }
 
     public static function fireEvent()

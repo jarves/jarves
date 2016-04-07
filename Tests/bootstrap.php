@@ -1,7 +1,7 @@
 <?php
 
+
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Composer\Autoload\ClassLoader;
 
 $file = __DIR__.'/../vendor/autoload.php';
 if (!file_exists($file)) {
@@ -9,9 +9,9 @@ if (!file_exists($file)) {
 }
 
 /** @var $autoload \Composer\Autoload\ClassLoader */
-$autoload = require_once $file;
+$autoload = include $file;
 
 AnnotationRegistry::registerLoader(array($autoload, 'loadClass'));
 
-$autoload->add('', realpath(__DIR__ . '/../../../'));
-$autoload->add('', realpath(__DIR__ . '/Integration/skeletion/src/'));
+$autoload->set('', realpath(__DIR__ . '/../../../'));
+$autoload->set('', realpath(__DIR__ . '/Integration/skeletion/src/'));

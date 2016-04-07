@@ -26,7 +26,7 @@ class RestExceptionListener
 
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        if ($this->container->get('jarves')->isAdmin()) {
+        if ($this->container->get('jarves.page_stack')->isAdmin()) {
             $exception = $event->getException();
             $statusCode = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
 

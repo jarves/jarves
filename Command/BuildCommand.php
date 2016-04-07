@@ -3,7 +3,6 @@
 namespace Jarves\Command;
 
 use Jarves\ORM\Builder\Propel;
-use Jarves\Propel\PropelHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -31,7 +30,7 @@ class BuildCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $modelBuilder = $this->getJarves()->getModelBuilder();
+        $modelBuilder = $this->getContainer()->get('jarves.model.builder');
 
         $bundleName = $input->getArgument('bundle');
         $overwrite = $input->getOption('overwrite');

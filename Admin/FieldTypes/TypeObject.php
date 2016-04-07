@@ -8,7 +8,7 @@ use Jarves\Configuration\Object;
 use Jarves\Exceptions\ModelBuildException;
 use Jarves\Exceptions\ObjectNotFoundException;
 use Jarves\Objects;
-use Jarves\ORM\ORMAbstract;
+use Jarves\Storage\AbstractStorage;
 use Jarves\Tools;
 
 class TypeObject extends AbstractType
@@ -27,8 +27,8 @@ class TypeObject extends AbstractType
 
     public function getColumns()
     {
-        if (ORMAbstract::MANY_TO_ONE == $this->getFieldDefinition()->getObjectRelation() ||
-            ORMAbstract::ONE_TO_ONE == $this->getFieldDefinition()->getObjectRelation()
+        if (AbstractStorage::MANY_TO_ONE == $this->getFieldDefinition()->getObjectRelation() ||
+            AbstractStorage::ONE_TO_ONE == $this->getFieldDefinition()->getObjectRelation()
         ) {
             $foreignObjectDefinition = $this->objects->getDefinition($this->getFieldDefinition()->getObject());
 
@@ -83,7 +83,7 @@ class TypeObject extends AbstractType
         $field = $this->getFieldDefinition();
 
         //check for n-to-n relation and create crossTable
-        if (ORMAbstract::MANY_TO_MANY == $field->getObjectRelation()) {
+        if (AbstractStorage::MANY_TO_MANY == $field->getObjectRelation()) {
             if ($this->defineCrossObject($object, $configs)) {
                 $configs->addReboot(sprintf('Added crossObject for field %s', $field->getId()));
             }
@@ -106,7 +106,7 @@ class TypeObject extends AbstractType
 //        }
 
         //create virtual reference-field for many-to-one relations
-        if ($this->getFieldDefinition()->getObjectRelation() == \Jarves\ORM\ORMAbstract::MANY_TO_ONE) {
+        if ($this->getFieldDefinition()->getObjectRelation() == AbstractStorage::MANY_TO_ONE) {
             if ($object = $configs->getObject($field->getObject())) {
 
                 if (!$refName = $field->getObjectRefRelationName()) {
@@ -123,7 +123,7 @@ class TypeObject extends AbstractType
                     $virtualField->setType('object');
                     $virtualField->setLabel('Auto Object Relation (' . $field->getObject() . ')');
                     $virtualField->setObject($field->getObjectDefinition()->getKey());
-                    $virtualField->setObjectRelation(\Jarves\ORM\ORMAbstract::ONE_TO_MANY);
+                    $virtualField->setObjectRelation(AbstractStorage::ONE_TO_MANY);
                     $object->addField($virtualField);
 
                     $configs->addReboot(sprintf('Added virtualField for field %s', $field->getId()));
@@ -178,7 +178,7 @@ class TypeObject extends AbstractType
             $leftObjectField->setId($leftFieldName);
             $leftObjectField->setType('object');
             $leftObjectField->setObject($objectDefinition->getKey());
-            $leftObjectField->setObjectRelation(ORMAbstract::ONE_TO_ONE);
+            $leftObjectField->setObjectRelation(AbstractStorage::ONE_TO_ONE);
             $leftObjectField->setPrimaryKey(true);
 
             $crossObject->addField($leftObjectField);
@@ -190,7 +190,7 @@ class TypeObject extends AbstractType
             $rightObjectField->setId($this->getFieldDefinition()->getId());
             $rightObjectField->setType('object');
             $rightObjectField->setObject($foreignObjectDefinition->getKey());
-            $rightObjectField->setObjectRelation(ORMAbstract::ONE_TO_ONE);
+            $rightObjectField->setObjectRelation(AbstractStorage::ONE_TO_ONE);
             $rightObjectField->setPrimaryKey(true);
 
             $crossObject->addField($rightObjectField);

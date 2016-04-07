@@ -98,8 +98,9 @@ class Form
                 } else {
                     $restException = new ValidationFailedException(
                         sprintf(
-                            'Field `%s` has a invalid value.',
-                            $key
+                            'Field `%s` has a invalid value. [%s]',
+                            $key,
+                            json_encode($errors)
                         ), 420
                     );
                     $restException->setData(['fields' => [$field->getId() => $errors]]);

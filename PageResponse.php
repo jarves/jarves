@@ -3,15 +3,16 @@
 namespace Jarves;
 
 use Jarves\AssetHandler\AssetInfo;
+use Jarves\AssetHandler\Container;
 use Jarves\AssetHandler\CssHandler;
 use Jarves\AssetHandler\JsHandler;
-use Jarves\Exceptions\BundleNotFoundException;
-use Jarves\File\FileInfo;
 use Jarves\Model\Content;
+use Jarves\Model\ContentInterface;
 use Jarves\Model\Node;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Jarves\Controller\PageController;
+use Symfony\Component\Templating\EngineInterface;
 
 /**
  * This is the response, we use to generate the basic html skeleton.
@@ -27,6 +28,11 @@ class PageResponse extends Response
      * @var Jarves
      */
     protected $jarves;
+
+    /**
+     * @var StopwatchHelper
+     */
+    protected $stopwatch;
 
     /**
      * Use in <script and <link tags.
@@ -102,49 +108,64 @@ class PageResponse extends Response
     protected $resourceCompression = false;
 
     /**
-     * @var StopwatchHelper
+     * @var Container
      */
-    protected $stopwatch;
+    private $assetCompilerContainer;
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
     /**
-     * Constructor
+     * @var EngineInterface
      */
-    public function __construct($content = '', $status = 200, $headers = array())
+    private $templating;
+
+    /**
+     * @var EditMode
+     */
+    private $editMode;
+    /**
+     * @var PageStack
+     */
+    private $pageStack;
+
+    /**
+     * @param string $content
+     * @param int $status
+     * @param array $headers
+     * @param PageStack $pageStack
+     * @param Jarves $jarves
+     * @param StopwatchHelper $stopwatch
+     * @param Container $assetCompilerContainer
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param EngineInterface $templating
+     * @param EditMode $editMode
+     */
+    public function __construct($content = '', $status = 200, $headers = array(),
+                                PageStack $pageStack, Jarves $jarves, StopwatchHelper $stopwatch, Container $assetCompilerContainer,
+                                EventDispatcherInterface $eventDispatcher, EngineInterface $templating,
+                                EditMode $editMode)
     {
         parent::__construct($content, $status, $headers);
-    }
-
-    /**
-     * @param StopwatchHelper $stopwatch
-     */
-    public function setStopwatch($stopwatch)
-    {
-        $this->stopwatch = $stopwatch;
-    }
-
-    /**
-     * @return StopwatchHelper
-     */
-    public function getStopwatch()
-    {
-        return $this->stopwatch;
-    }
-
-    /**
-     * @param Jarves $jarves
-     */
-    public function setJarves(Jarves $jarves)
-    {
         $this->jarves = $jarves;
-        $this->getJarves()->getRequest(); //trigger loading of the current request, otherwise we're out of scope
+        $this->stopwatch = $stopwatch;
+        $this->assetCompilerContainer = $assetCompilerContainer;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->templating = $templating;
+        $this->editMode = $editMode;
+        $this->pageStack = $pageStack;
     }
 
     /**
-     * @return Jarves
+     *
      */
-    public function getJarves()
+    public function reset()
     {
-        return $this->jarves;
+        $reflection = new \ReflectionClass($this);
+        foreach ($reflection->getDefaultProperties() as $key => $defaultValue) {
+            $this->$key = $defaultValue;
+        }
     }
 
     /**
@@ -161,7 +182,7 @@ class PageResponse extends Response
     public function getFavicon()
     {
         if ($this->getDomainHandling()) {
-            if ($domain = $this->getJarves()->getCurrentDomain()) {
+            if ($domain = $this->pageStack->getCurrentDomain()) {
                 if ($domain->getFavicon()) {
                     return $domain->getFavicon();
                 }
@@ -310,7 +331,8 @@ class PageResponse extends Response
      */
     public function handleAsset(&$assetInfo)
     {
-        $assetHandlerContainer = $this->getJarves()->getAssetCompilerContainer();
+        $assetHandlerContainer = $this->assetCompilerContainer;
+
         $compiler = $assetHandlerContainer->getCompileHandlerByContentType($assetInfo->getContentType());
         if (!$compiler) {
             $compiler = $assetHandlerContainer->getCompileHandlerByFileExtension($assetInfo->getPath());
@@ -473,10 +495,10 @@ class PageResponse extends Response
      */
     public function renderContent()
     {
-        $this->getStopwatch()->start("Render PageResponse");
+        $this->stopwatch->start("Render PageResponse");
         $html = $this->buildHtml();
         $this->setContent($html);
-        $this->getStopwatch()->stop("Render PageResponse");
+        $this->stopwatch->stop("Render PageResponse");
     }
 
     public function prepare(Request $request)
@@ -497,7 +519,7 @@ class PageResponse extends Response
     public function send()
     {
         $this->setCharset('utf-8');
-        $this->getJarves()->getEventDispatcher()->dispatch('core/page-response-send-pre');
+        $this->eventDispatcher->dispatch('core/page-response-send-pre');
 
         //search engine, todo
 //        if (false && Jarves::$disableSearchEngine == false) {
@@ -509,7 +531,7 @@ class PageResponse extends Response
 
     public function getFaviconPath()
     {
-        return $this->getJarves()->resolvePublicWebPath($this->getFavicon());
+        return $this->jarves->resolvePublicWebPath($this->getFavicon());
     }
 
     public function buildHtml()
@@ -520,8 +542,7 @@ class PageResponse extends Response
             $body = $this->buildBody();
         }
 
-        $this->getStopwatch()->start(sprintf('Render DocType [%s]', $this->getDocType()));
-        $templating = $this->getJarves()->getTemplating();
+        $this->stopwatch->start(sprintf('Render DocType [%s]', $this->getDocType()));
 
         $data = [
             'pageResponse' => $this,
@@ -530,18 +551,18 @@ class PageResponse extends Response
         ];
         $data = array_merge($data, $this->getAssetTags());
 
-        $html = $templating->render(
+        $html = $this->templating->render(
             $this->getDocType(),
             $data
         );
 
         $html = preg_replace(
             '/href="#([^"]*)"/',
-            'href="' . $this->getJarves()->getRequest()->getBaseUrl() . '/' . '#$1"',
+            'href="' . $this->pageStack->getRequest()->getBaseUrl() . '/' . '#$1"',
             $html
         );
 
-        $this->getStopwatch()->stop(sprintf('Render DocType [%s]', $this->getDocType()));
+        $this->stopwatch->stop(sprintf('Render DocType [%s]', $this->getDocType()));
 //        $html = Jarves::parseObjectUrls($html);
 //        $html = Jarves::translate($html);
 //        Jarves::removeSearchBlocks($html);
@@ -558,8 +579,8 @@ class PageResponse extends Response
     {
         if ($this->getFavicon()) {
             return sprintf(
-                '<link rel="shortcut icon" type="image/x-icon" href="%s">' . chr(10),
-                $this->getJarves()->resolveWebPath($this->getFavicon())
+                '<link rel="shortcut icon" type="image/x-icon" href="%s">' . PHP_EOL,
+                $this->jarves->resolveWebPath($this->getFavicon())
             );
         }
     }
@@ -569,9 +590,9 @@ class PageResponse extends Response
      */
     public function getLayout(Node $node)
     {
-        if ($nodeId = (int)$this->getJarves()->getRequest()->get('_jarves_editor_node')) {
-            if ($this->getJarves()->isEditMode($nodeId)) {
-                if ($layout = $this->getJarves()->getRequest()->get('_jarves_editor_layout')) {
+        if ($nodeId = (int)$this->pageStack->getRequest()->get('_jarves_editor_node')) {
+            if ($this->editMode->isEditMode($nodeId)) {
+                if ($layout = $this->pageStack->getRequest()->get('_jarves_editor_layout')) {
                     return $layout;
                 }
             }
@@ -588,32 +609,31 @@ class PageResponse extends Response
      */
     public function buildBody()
     {
-        $this->getJarves()->getStopwatch()->start('Build PageBody');
+        $this->stopwatch->start('Build PageBody');
 
-        if (!$page = $this->getJarves()->getCurrentPage()) {
-            $this->getJarves()->getStopwatch()->stop('Build PageBody');
+        if (!$page = $this->pageStack->getCurrentPage()) {
+            $this->stopwatch->stop('Build PageBody');
             return '';
         }
 
-        $themeId = $page->getTheme() ?: $this->getJarves()->getCurrentDomain()->getTheme();
-        if (!$theme = $this->getJarves()->getConfigs()->getTheme($themeId)) {
-            $this->getJarves()->getStopwatch()->stop('Build PageBody');
+        $themeId = $page->getTheme() ?: $this->pageStack->getCurrentDomain()->getTheme();
+        if (!$theme = $this->jarves->getConfigs()->getTheme($themeId)) {
+            $this->stopwatch->stop('Build PageBody');
             throw new \LogicException(sprintf('Theme `%s` not found.', $themeId));
         }
 
         $layoutKey = $this->getLayout($page);
 
         if (!$layout = $theme->getLayoutByKey($layoutKey)) {
-            $this->getJarves()->getStopwatch()->stop('Build PageBody');
+            $this->stopwatch->stop('Build PageBody');
             throw new \LogicException(
                 sprintf('Layout for `%s` in theme `%s` not found.', $layoutKey, $themeId)
             );
         }
         $layoutPath = $layout->getFile();
 
-        $template = $this->getJarves()->getTemplating();
         try {
-            $html = $template->render(
+            $html = $this->templating->render(
                 $layoutPath,
                 array(
                     'baseUrl' => $this->getBaseHref(),
@@ -624,7 +644,7 @@ class PageResponse extends Response
             throw new \Exception(sprintf('Cant render view `%s` of theme `%s`.', $layoutPath, $themeId), 0, $e);
         }
 
-        $this->getJarves()->getStopwatch()->stop('Build PageBody');
+        $this->stopwatch->stop('Build PageBody');
 
         return $html;
     }
@@ -637,7 +657,7 @@ class PageResponse extends Response
     public function getContentTypeTag()
     {
         return sprintf(
-            '<meta http-equiv="content-type" content="text/html; charset=%s">' . chr(10),
+            '<meta http-equiv="content-type" content="text/html; charset=%s">' . PHP_EOL,
             $this->getCharset()
         );
     }
@@ -691,7 +711,7 @@ class PageResponse extends Response
      */
     public function getBaseHref()
     {
-        return $this->getJarves()->getRequest()->getBasePath() . '/';
+        return $this->pageStack->getRequest()->getBasePath() . '/';
     }
 
 //    /**
@@ -770,10 +790,10 @@ class PageResponse extends Response
             return $this->title;
         }
 
-        if ($this->getDomainHandling() && $this->getJarves()->getCurrentDomain()) {
-            $title = $this->getJarves()->getCurrentDomain()->getTitleFormat();
+        if ($this->getDomainHandling() && $this->pageStack->getCurrentDomain()) {
+            $title = $this->pageStack->getCurrentDomain()->getTitleFormat();
 
-            if ($page = $this->getJarves()->getCurrentPage()) {
+            if ($page = $this->pageStack->getCurrentPage()) {
                 return str_replace(
                     array(
                          '%title%'
@@ -874,7 +894,7 @@ class PageResponse extends Response
 
     /**
      * @param  array $p1
-     * @param  arry  $p2
+     * @param  array  $p2
      *
      * @return array
      */
@@ -959,7 +979,7 @@ class PageResponse extends Response
      */
     public function getAssetTags()
     {
-        $assetHandlerContainer = $this->getJarves()->getAssetCompilerContainer();
+        $assetHandlerContainer = $this->assetCompilerContainer;
 
 //        /** @var $assets \Jarves\AssetHandler\AssetInfo[] */
 
@@ -1065,9 +1085,9 @@ class PageResponse extends Response
 
     /**
      *
-     * @param Content $content
+     * @param Content|ContentInterface $content
      *
-     * @return string
+     * @return PluginResponse
      */
     public function getPluginResponse($content)
     {

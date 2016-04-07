@@ -1,0 +1,179 @@
+fields:
+    __General__:
+        label: General
+        type: tab
+        children:
+            title:
+                label: Title
+                type: text
+                required: 'true'
+                options:
+                    redirectSameValue: 'urn:url'
+            alternativeTitle:
+                label: 'Alternative title'
+                type: text
+                desc: 'Overwrites the page title (not navigation).'
+            type:
+                label: Type
+                type: select
+                options:
+                    items:
+                        - [Page, '#icon-newspaper']
+                        - [Link, '#icon-link-5']
+                        - [Navigation, '#icon-folder-4']
+                        - [Tray, '#icon-clipboard-2']
+                    itemsLabelAsValue: false
+                required: 'true'
+            urn:
+                label: URN
+                type: text
+                required: true
+                needValue:
+                    - 0
+                    - 1
+                againstField: type
+                options:
+                    modifier: url
+            link:
+                label: Link
+                type: object
+                required: true
+                needValue: 1
+                againstField: type
+                options:
+                    combobox: true
+            __metas__:
+                needValue:
+                    - 0
+                    - 1
+                againstField: type
+                label: Metas
+                type: childrenSwitcher
+                children:
+                    metaDescription:
+                        label: 'Meta Description'
+                        type: text
+                    metas:
+                        label: 'Custom Meta-Tags'
+                        type: array
+                        options:
+                            columns:
+                                -
+                                    label: Name
+                                -
+                                    label: Content
+                            fields:
+                                name:
+                                    type: text
+                                    required: 'true'
+                                content:
+                                    type: text
+    __Access__:
+        label: Access
+        type: tab
+        children:
+            visible:
+                label: 'Visible in navigation'
+                type: checkbox
+            accessDenied:
+                label: 'Access denied'
+                type: checkbox
+                desc: 'For everyone. This removes the page from the navigation.'
+            forceHttps:
+                label: 'Force HTTPS'
+                type: checkbox
+            accessFrom:
+                label: 'Allow access from'
+                type: datetime
+            accessTo:
+                label: 'Allow access until'
+                type: datetime
+            accessNohidenavi:
+                label: 'Do not hide when no access'
+                type: checkbox
+    __Content__:
+        label: Content
+        type: tab
+        needValue: 0
+        againstField: type
+        children:
+            content:
+                noWrapper: true
+                type: pageContents
+                tableItem: false
+    __Search__:
+        label: Search
+        type: tab
+        needValue: 0
+        againstField: type
+        children:
+            unsearchable:
+                label: Unsearchable
+                type: checkbox
+                desc: 'Hides this page from the search results if active.'
+            search_words:
+                label: 'Search words'
+                type: textarea
+                desc: 'Additional keywords.'
+extraSelection: 'domain, domain.theme'
+columns:
+    type:
+        label: Type
+        type: select
+        options:
+            items:
+                - [Page, '#icon-newspaper']
+                - [Link, '#icon-link-5']
+                - [Navigation, '#icon-folder-4']
+                - [Tray, '#icon-clipboard-2']
+            itemsLabelAsValue: false
+        width: 30
+    title:
+        type: text
+        label: Title
+    urn:
+        type: text
+        label: Urn
+asNested: true
+addLabel: '[[Node]]'
+add: true
+edit: true
+remove: false
+nestedRootFieldTemplate: '{label}'
+nestedRootAddEntrypoint: root/
+nestedRootAddLabel: '[[New Domain]]'
+nestedRootEditEntrypoint: root/
+nestedRootRemoveEntrypoint: root/
+startCombine: true
+
+addMultipleFixedFields:
+    visible:
+        label: Visible
+        type: checkbox
+addMultipleFields:
+    title:
+        label: Title
+        type: text
+        required: true
+        options:
+            redirectSameValue: 'urn:url'
+    urn:
+        label: 'URL part'
+        type: text
+        required: true
+        options:
+            modifier: url
+    type:
+        label: Type
+        options:
+            items:
+                - Page
+                - Link
+                - Folder
+                - Tray
+        type: select
+        width: '50'
+addMultiple: true
+object: jarves/node
+titleField: Node
+multiLanguage: true

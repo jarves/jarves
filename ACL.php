@@ -11,9 +11,12 @@
 
 namespace Jarves;
 
+use Jarves\Cache\Cacher;
 use Jarves\Configuration\Condition;
 use Jarves\Model\Acl as AclObject;
 use Jarves\Model\AclQuery;
+use Jarves\Model\Base\UserQuery;
+use Jarves\Model\User;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 
@@ -70,26 +73,36 @@ class ACL
      */
     protected $objects;
 
-    function __construct(Jarves $jarves, Objects $objects)
+    /**
+     * @var PageStack
+     */
+    private $pageStack;
+
+    /**
+     * @var Cacher
+     */
+    private $cacher;
+
+    /**
+     * @var ConditionOperator
+     */
+    private $conditionOperator;
+
+    /**
+     * ACL constructor.
+     * @param Jarves $jarves
+     * @param Objects $objects
+     * @param PageStack $pageStack
+     * @param Cacher $cacher
+     * @param ConditionOperator $conditionOperator
+     */
+    function __construct(Jarves $jarves, Objects $objects, PageStack $pageStack, Cacher $cacher, ConditionOperator $conditionOperator)
     {
         $this->jarves = $jarves;
         $this->objects = $objects;
-    }
-
-    /**
-     * @param Jarves $jarves
-     */
-    public function setJarves($jarves)
-    {
-        $this->jarves = $jarves;
-    }
-
-    /**
-     * @return Jarves
-     */
-    public function getJarves()
-    {
-        return $this->jarves;
+        $this->pageStack = $pageStack;
+        $this->cacher = $cacher;
+        $this->conditionOperator = $conditionOperator;
     }
 
     /**
@@ -152,13 +165,13 @@ class ACL
         $objectKey = Objects::normalizeObjectKey($objectKey);
 
         $user = false;
-        if ($targetType === null && $this->getJarves()->getClient() && $this->getJarves()->getClient()->hasSession()) {
-            $user = $this->getJarves()->getClient()->getUser();
+        if ($targetType === null && $this->pageStack->getClient() && $this->pageStack->getClient()->hasSession()) {
+            $user = $this->pageStack->getClient()->getUser();
             $targetType = ACL::USER;
         }
 
         if ($targetType === ACL::USER && (($user && $targetId && $user->getId() != $targetId) || !$user)) {
-            $user = $this->getJarves()->getUtils()->getPropelCacheObject('Jarves\\Model\\User', $targetId);
+            $user = UserQuery::create()->findPk($targetId);
         }
 
         if ($targetType != ACL::USER) {
@@ -175,7 +188,7 @@ class ACL
         $cacheKey = '';
         if ($this->getCaching()) {
             $cacheKey = md5($targetType.'.'.$targetId.'.'.$inGroups.'.'.$objectKey . '.' . $mode);
-            $cached = $this->getJarves()->getDistributedCache('core/acl-rules/' . $cacheKey);
+            $cached = $this->cacher->getDistributedCache('core/acl-rules/' . $cacheKey);
             if (null !== $cached) {
                 return $cached;
             }
@@ -232,7 +245,7 @@ class ACL
         }
 
         if ($this->getCaching()) {
-            $this->getJarves()->setDistributedCache('core/acl-rules/' . $cacheKey, $rules);
+            $this->cacher->setDistributedCache('core/acl-rules/' . $cacheKey, $rules);
             return $rules;
         } else {
             return $rules;
@@ -268,7 +281,7 @@ class ACL
 
         if ($this->getCaching()) {
             $cacheKey = md5($objectKey);
-            $cached = $this->getJarves()->getDistributedCache('core/acl-listing/' . $cacheKey);
+            $cached = $this->cacher->getDistributedCache('core/acl-listing/' . $cacheKey);
             if (null !== $cached) {
                 return $cached;
             }
@@ -281,18 +294,18 @@ class ACL
 
         $denyList = array();
 
-        $conditionObject = new Condition(null, $this->getJarves());
+        $conditionObject = new Condition(null, $this->jarves);
 
         foreach ($rules as $rule) {
 
             if ($rule['constraint_type'] == '1') {
                 //todo $rule['constraint_code'] can be a (urlencoded) composite pk
                 //todo constraint_code is always urlencoded;
-                $condition = Condition::create(array($primaryKey, '=', Tools::urlDecode($rule['constraint_code'])), $this->getJarves());
+                $condition = Condition::create(array($primaryKey, '=', Tools::urlDecode($rule['constraint_code'])), $this->jarves);
             }
 
             if ($rule['constraint_type'] == '2') {
-                $condition = Condition::create($rule['constraint_code'], $this->getJarves());
+                $condition = Condition::create($rule['constraint_code'], $this->jarves);
             }
 
             if ($rule['constraint_type'] == '0') {
@@ -329,7 +342,7 @@ class ACL
         }
 
         if ($this->getCaching()) {
-            //$this->getJarves()->setDistributedCache('core/acl-listing/' . $cacheKey, $conditionObject);
+            $this->cacher->setDistributedCache('core/acl-listing/' . $cacheKey, $conditionObject);
         }
 
         return $conditionObject;
@@ -595,7 +608,7 @@ class ACL
         $query->filterByObject($objectKey);
         $query->filterByMode($mode);
         $query->orderByPrio(Criteria::DESC);
-        $highestPrio = $query->findOne();
+        $highestPrio = (int)$query->findOne();
 
         $acl->setPrio($highestPrio + 1);
 
@@ -627,12 +640,12 @@ class ACL
     ) {
 
         $objectKey = Objects::normalizeObjectKey($objectKey);
-        if (($targetId === null && $targetType === null) && $this->getJarves()->isAdmin() && $this->getJarves()->getAdminClient()->hasSession()) {
-            $targetId = $this->getJarves()->getAdminClient()->getUserId();
+        if (($targetId === null && $targetType === null) && $this->pageStack->isAdmin() && $this->pageStack->getAdminClient()->hasSession()) {
+            $targetId = $this->pageStack->getAdminClient()->getUserId();
             $targetType = ACL::USER;
 
-        } elseif (($targetId === null && $targetType === null) && $this->getJarves()->getClient() && $this->getJarves()->getClient()->hasSession()) {
-            $targetId = $this->getJarves()->getClient()->getUserId();
+        } elseif (($targetId === null && $targetType === null) && $this->pageStack->getClient() && $this->pageStack->getClient()->hasSession()) {
+            $targetId = $this->pageStack->getClient()->getUserId();
             $targetType = ACL::USER;
         }
 
@@ -640,7 +653,7 @@ class ACL
             $targetType = ACL::USER;
         }
 
-        $user = $this->getJarves()->getClient()->getUser();
+        $user = $this->pageStack->getClient()->getUser();
         if ($user) {
             $groupIds = $user->getGroupIds();
             if (false !== strpos(','.$groupIds.',', ',1,')) {
@@ -656,7 +669,7 @@ class ACL
         if ($pk && $this->getCaching()) {
             $pkString = $this->getObjects()->getObjectUrlId($objectKey, $pk);
             $cacheKey = md5($targetType.'.'.$targetId . '.'.$objectKey . '/' . $pkString . '/' . json_encode($field));
-            $cached = $this->getJarves()->getDistributedCache('core/acl/'.$cacheKey);
+            $cached = $this->cacher->getDistributedCache('core/acl/'.$cacheKey);
             if (null !== $cached) {
                 return $cached;
             }
@@ -720,7 +733,7 @@ class ACL
                 if ($acl['constraint_type'] == 2) {
                     $objectItem = $this->getObjects()->get($objectKey, $currentObjectPk);
 
-                    if ($objectItem && $this->getObjects()->satisfy($objectItem, $acl['constraint_code'])) {
+                    if ($objectItem && $this->conditionOperator->satisfy($acl['constraint_code'], $objectItem, $objectKey)) {
                         $match = true;
                     }
                 /*
@@ -741,10 +754,10 @@ class ACL
                     // we need to check if a parent matches this $acl as we have sub=true
                     $parentItem = $this->getObjects()->get($objectKey, $currentObjectPk);
                     $parentCondition = Condition::create($acl['constraint_code']);
-                    $parentOptions['fields'] = $parentCondition->extractFields();
+                    $parentOptions['fields'] = $this->conditionOperator->extractFields($parentCondition);
 
                     while ($parentItem = $this->getObjects()->getParent($objectKey, $this->getObjects()->getObjectPk($objectKey, $parentItem), $parentOptions)) {
-                        if ($acl['constraint_type'] == 2 && $parentCondition->satisfy($parentItem)) {
+                        if ($acl['constraint_type'] == 2 && $this->conditionOperator->satisfy($parentCondition, $parentItem)) {
                             $match = true;
                             break;
                         } else if ($acl['constraint_type'] == 1 && $acl['constraint_code'] == $this->getObjects()->getObjectUrlId($objectKey, $parentItem)) {
@@ -770,9 +783,11 @@ class ACL
                                             $satisfy = false;
                                             if (($f = $definition->getField($fKey)) && $f->getType() == 'object') {
                                                 $uri = $f->getObject() . '/' . $fValue;
-                                                $satisfy = $this->getObjects()->satisfyFromUrl($uri, $fRule['condition']);
+
+                                                $uriObject = $this->objects->getFromUrl($uri);
+                                                $satisfy = $this->conditionOperator->satisfy($fRule['condition'], $uriObject);
                                             } else if (null !== $fValue){
-                                                $satisfy = $this->getObjects()->satisfy($field, $fRule['condition']);
+                                                $satisfy = $this->conditionOperator->satisfy($fRule['condition'], $field);
                                             }
                                             if ($satisfy) {
                                                 return ($fRule['access'] == 1) ? true : false;
@@ -846,7 +861,7 @@ class ACL
         $access = !!$access;
 
         if ($pk && $this->getCaching()) {
-            $this->getJarves()->setDistributedCache('core/acl/'.$cacheKey, $access);
+            $this->cacher->setDistributedCache('core/acl/'.$cacheKey, $access);
         }
 
         return $access;

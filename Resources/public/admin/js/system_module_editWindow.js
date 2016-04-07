@@ -875,9 +875,6 @@ var jarves_system_module_editWindow = new Class({
 
         this.definition = pDefinition.data;
 
-        //compatibility
-//        this.definition.properties.dataModel = this.definition.properties.object ? 'object' : 'table';
-
         var generalValues = Object.clone(this.definition.properties);
         generalValues['class'] = this.definition['class'];
         generalValues['file'] = this.definition['file'];

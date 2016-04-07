@@ -37,7 +37,7 @@ class DemoDataCommand extends AbstractCommand
         $packageManager->setContainer($this->getContainer());
         $packageManager->installDemoData($jarves);
 
-        foreach ($jarves->getKernel()->getBundles() as $bundle) {
+        foreach ($jarves->getBundles() as $bundle) {
             $class = $bundle->getNamespace() . '\\PackageManager';
             if ($class !== $mainPackageManager && class_exists($class)) {
                 $packageManager = new $class;
@@ -50,6 +50,6 @@ class DemoDataCommand extends AbstractCommand
             }
         }
 
-        $this->getJarves()->invalidateCache('/');
+        $this->getContainer()->get('jarves.cache.cacher')->invalidateCache('/');
     }
 }

@@ -17,14 +17,11 @@ class Plugin extends Model
     protected $label;
 
     /**
+     * The controller php class name or service id.
+     *
      * @var string
      */
-    protected $class;
-
-    /**
-     * @var string
-     */
-    protected $method;
+    protected $controller;
 
     /**
      * @var Route[]
@@ -71,19 +68,19 @@ class Plugin extends Model
     }
 
     /**
-     * @param string $class
+     * @param string $controller
      */
-    public function setClass($class)
+    public function setController($controller)
     {
-        $this->class = $class;
+        $this->controller = $controller;
     }
 
     /**
      * @return string
      */
-    public function getClass()
+    public function getController()
     {
-        return $this->class;
+        return $this->controller;
     }
 
     /**
@@ -155,22 +152,6 @@ class Plugin extends Model
                 }
             }
         }
-    }
-
-    /**
-     * @param string $method
-     */
-    public function setMethod($method)
-    {
-        $this->method = $method;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMethod()
-    {
-        return $this->method;
     }
 
     /**

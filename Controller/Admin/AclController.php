@@ -2,7 +2,8 @@
 
 namespace Jarves\Controller\Admin;
 
-use Jarves\Controller;
+use Jarves\Cache\Cacher;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Jarves\Model\Acl;
 use Jarves\Model\AclQuery;
 use Jarves\Model\UserQuery;
@@ -11,9 +12,27 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Map\TableMap;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AclController extends Controller
 {
+
+    /**
+     * @var Objects
+     */
+    private $objects;
+    /**
+     * @var Cacher
+     */
+    private $cacher;
+
+    public function setContainer(ContainerInterface $container = null)
+    {
+        parent::setContainer($container);
+
+        $this->objects = $this->container->get('jarves.objects');
+        $this->cacher = $this->container->get('jarves.cache.cacher');
+    }
 
     /**
      *
@@ -37,8 +56,8 @@ class AclController extends Controller
         $type = ($type == 'user') ? 0 : 1;
 
         return AclQuery::create()
-            ->filterByTargetType($type+0)
-            ->filterByTargetId($id+0)
+            ->filterByTargetType($type + 0)
+            ->filterByTargetId($id + 0)
             ->orderByPrio(Criteria::ASC)
             ->find()
             ->toArray(null, null, TableMap::TYPE_CAMELNAME);
@@ -93,8 +112,8 @@ class AclController extends Controller
             }
         }
 
-        $this->getJarves()->invalidateCache('core/acl');
-        $this->getJarves()->invalidateCache('core/acl-rules');
+        $this->cacher->invalidateCache('core/acl');
+        $this->cacher->invalidateCache('core/acl-rules');
 
         return true;
     }
@@ -164,7 +183,7 @@ class AclController extends Controller
             );
         }
 
-        $users = $this->getJarves()->getObjects()->getList(
+        $users = $this->objects->getList(
             'jarves/user',
             $userFilter,
             array(
@@ -175,7 +194,7 @@ class AclController extends Controller
 
         $this->setAclCount($users, 0);
 
-        $groups = $this->getJarves()->getObjects()->getList(
+        $groups = $this->objects->getList(
             'jarves/group',
             $groupFilter,
             array(

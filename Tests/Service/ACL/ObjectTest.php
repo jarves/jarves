@@ -21,7 +21,6 @@ class ObjectTest extends AuthTestCase
 {
     public function testConditionToSql()
     {
-
         $condition = new Condition();
 
         $condition2 = new Condition();
@@ -35,7 +34,7 @@ class ObjectTest extends AuthTestCase
         ]);
 
         $params = [];
-        $sql = $condition->toSql($params, 'jarves/node');
+        $sql = $this->getConditionOperator()->standardConditionToSql($condition, $params, 'jarves/node');
 
         $expectedArray = [
             [
@@ -51,13 +50,16 @@ class ObjectTest extends AuthTestCase
         $this->assertEquals(' system_node.title = :p1  OR 1= 1', $sql);
     }
 
+    /**
+     * @group test
+     */
     public function testNestedSubPermission()
     {
         $this->getACL()->setCaching(false);
         $this->getACL()->removeObjectRules('jarves/node');
 
-        $this->getJarves()->getClient()->login('test', 'test');
-        $user = $this->getJarves()->getClient()->getUser();
+        $this->getPageStack()->getClient()->login('test', 'test');
+        $user = $this->getPageStack()->getClient()->getUser();
 
         $domain = DomainQuery::create()->findOne();
         $root = NodeQuery::create()->findRoot($domain->getId());
@@ -70,7 +72,7 @@ class ObjectTest extends AuthTestCase
         $subNode2 = new Node();
         $subNode2->setTitle('TestNode sub');
         $subNode2->insertAsFirstChildOf($subNode);
-        $subNode2->Save();
+        $subNode2->save();
 
         //make access for all
         $rule = new Acl();
@@ -104,6 +106,7 @@ class ObjectTest extends AuthTestCase
         $items = $this->getObjects()->getBranch('jarves/node', $subNode->getId(), null, 1, null, [
             'permissionCheck' => true
         ]);
+
         $this->assertNull($items, 'rule2 revokes the access to all elements');
         $item = $this->getObjects()->get('jarves/node', $subNode2->getId(), [
             'permissionCheck' => true

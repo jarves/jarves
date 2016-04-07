@@ -20,13 +20,11 @@
   <table name="test_item" phpName="Item">
     <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
     <column name="title" type="VARCHAR"/>
-    <behavior name="Jarves\Propel\Behavior\WorkspaceBehavior"/>
 
     <column name="category_id" type="INTEGER"/>
 
     <foreign-key foreignTable="test_item_category" phpName="OneCategory" onDelete="cascade">
       <reference local="category_id" foreign="id"/>
-      <reference local="workspace_id" foreign="workspace_id"/>
     </foreign-key>
 
     <vendor type="mysql">
@@ -38,13 +36,10 @@
     <column name="item_category_id" type="INTEGER" primaryKey="true" required="true"/>
     <foreign-key foreignTable="test_item" phpName="CategoryItem" onDelete="CASCADE">
       <reference local="item_id" foreign="id"/>
-      <reference local="workspace_id" foreign="workspace_id"/>
     </foreign-key>
     <foreign-key foreignTable="test_item_category" refPhpName="CategoryCrossItem" onDelete="CASCADE">
       <reference local="item_category_id" foreign="id"/>
-      <reference local="workspace_id" foreign="workspace_id"/>
     </foreign-key>
-    <behavior name="Jarves\Propel\Behavior\WorkspaceBehavior"/>
     <vendor type="mysql">
       <parameter name="Charset" value="utf8"/>
     </vendor>
@@ -52,7 +47,6 @@
   <table name="test_item_category" phpName="ItemCategory">
     <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
     <column name="name" type="VARCHAR"/>
-    <behavior name="Jarves\Propel\Behavior\WorkspaceBehavior"/>
     <vendor type="mysql">
       <parameter name="Charset" value="utf8"/>
     </vendor>

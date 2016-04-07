@@ -103,18 +103,17 @@ class BundleConfigTest extends KernelAwareTestCase
         $this->assertStringEqualsFile($this->getJarvesObjectsXmlFile(), $export, 'no changes');
 
         $objects = $testBundleConfig->getObjects();
-        current($objects)->setId('Test2');
+        current($objects)->setId('TestChanged');
         $testBundleConfig->setObjects($objects);
 
-        $testBundleConfig->saveFileBased('objects');
+        $this->getConfigurationOperator()->saveFileBased($testBundleConfig, 'objects');
 
         $xml = '<config>
   <bundle>
     <objects>
-      <object id="Test2">
+      <object id="TestChanged">
         <label>Test</label>
-        <storageClass>Core\Models\Test</storageClass>
-        <dataModel>custom</dataModel>
+        <storageService>tests.store.core.test</storageService>
         <fields>
           <field id="id" type="number" primaryKey="true">
             <label>ID</label>
@@ -154,7 +153,7 @@ class BundleConfigTest extends KernelAwareTestCase
         $this->assertStringEqualsFile($this->getJarvesXmlFile(), $exportCaches, 'no changes');
 
         $objects = $testBundleConfig->getObjects();
-        current($objects)->setId('Test2');
+        current($objects)->setId('TestChanged');
         $testBundleConfig->setObjects($objects);
 
         $caches = $testBundleConfig->getCaches();
@@ -165,15 +164,14 @@ class BundleConfigTest extends KernelAwareTestCase
         $events[1]->setKey('core/object/updateModified');
         $testBundleConfig->setEvents($events);
 
-        $testBundleConfig->saveFileBased('objects');
+        $this->getConfigurationOperator()->saveFileBased($testBundleConfig, 'objects');
 
         $xml = '<config>
   <bundle>
     <objects>
-      <object id="Test2">
+      <object id="TestChanged">
         <label>Test</label>
-        <storageClass>Core\Models\Test</storageClass>
-        <dataModel>custom</dataModel>
+        <storageService>tests.store.core.test</storageService>
         <fields>
           <field id="id" type="number" primaryKey="true">
             <label>ID</label>
@@ -193,7 +191,7 @@ class BundleConfigTest extends KernelAwareTestCase
         $this->assertEquals(static::$jarvesXml, $testBundleConfig->getPropertyFilePath('caches'));
         $this->assertEquals(static::$jarvesXml, $testBundleConfig->getPropertyFilePath('events'));
 
-        $testBundleConfig->saveFileBased('caches');
+        $this->getConfigurationOperator()->saveFileBased($testBundleConfig, 'caches');
 
         $xmlCaches = '<config>
   <bundle>
@@ -225,7 +223,7 @@ class BundleConfigTest extends KernelAwareTestCase
 </config>';
         $this->assertStringEqualsFile($this->getRoot() . $testBundleConfig->getPropertyFilePath('caches'), $xmlCaches);
 
-        $testBundleConfig->saveFileBased('events');
+        $this->getConfigurationOperator()->saveFileBased($testBundleConfig, 'events');
 
         $xmlEvents = '<config>
   <bundle>
@@ -269,7 +267,7 @@ class BundleConfigTest extends KernelAwareTestCase
         $this->assertCount(2, $testBundleConfig->getCaches());
         $this->assertCount(2, $testBundleConfig->getEvents());
 
-        $this->assertEquals('Test2', current($testBundleConfig->getObjects())->getId());
+        $this->assertEquals('TestChanged', current($testBundleConfig->getObjects())->getId());
         $this->assertEquals('testMethod2', $testBundleConfig->getCaches()[1]->getMethod());
         $this->assertEquals('core/object/updateModified', $testBundleConfig->getEvents()[1]->getKey());
 
@@ -425,9 +423,8 @@ class BundleConfigTest extends KernelAwareTestCase
         $xml = '<object id="View">
   <label>Template View</label>
   <desc>Template views</desc>
-  <storageClass>\Admin\ObjectView</storageClass>
+  <storageService>\Admin\ObjectView</storageService>
   <labelField>name</labelField>
-  <dataModel>custom</dataModel>
   <nested>true</nested>
   <treeIconMapping>
     <icon id="dir">#icon-folder-4</icon>
@@ -446,9 +443,8 @@ class BundleConfigTest extends KernelAwareTestCase
             'id' => 'View',
             'label' => 'Template View',
             'desc' => 'Template views',
-            'storageClass' => '\\Admin\\ObjectView',
+            'storageService' => '\\Admin\\ObjectView',
             'labelField' => 'name',
-            'dataModel' => 'custom',
             'nested' => true,
             'treeIconMapping' => array(
                 'dir' => '#icon-folder-4',
@@ -475,9 +471,8 @@ class BundleConfigTest extends KernelAwareTestCase
         $object->setLabel('Template View');
         $object->setDesc('Template views');
         $object->setLabelField('name');
-        $object->setDataModel('custom');
         $object->setNested(true);
-        $object->setStorageClass('\Admin\ObjectView');
+        $object->setStorageService('\Admin\ObjectView');
 
         $treeIconMapping = new TreeIconMapping(null, $this->getJarves());
         $treeIconMapping->setOption('dir', '#icon-folder-4');
@@ -511,9 +506,8 @@ class BundleConfigTest extends KernelAwareTestCase
         $xml = '<object id="View">
   <label>Template View</label>
   <desc>Template views</desc>
-  <storageClass>\Admin\ObjectView</storageClass>
+  <storageService>\Admin\ObjectView</storageService>
   <labelField>name</labelField>
-  <dataModel>custom</dataModel>
   <nested>true</nested>
   <fields>
     <field id="path" type="text" primaryKey="true">
@@ -538,9 +532,8 @@ class BundleConfigTest extends KernelAwareTestCase
         $object->setLabel('Template View');
         $object->setDesc('Template views');
         $object->setLabelField('name');
-        $object->setDataModel('custom');
         $object->setNested(true);
-        $object->setStorageClass('\Admin\ObjectView');
+        $object->setStorageService('\Admin\ObjectView');
 
         $field1 = new Field(null, $this->getJarves());
         $field1->setId('path');
@@ -581,7 +574,6 @@ class BundleConfigTest extends KernelAwareTestCase
   <table>test_item</table>
   <labelField>title</labelField>
   <nested>false</nested>
-  <dataModel>propel</dataModel>
   <multiLanguage>false</multiLanguage>
   <workspace>true</workspace>
   <domainDepended>false</domainDepended>
@@ -804,7 +796,6 @@ class BundleConfigTest extends KernelAwareTestCase
         $xml = '<object id="File">
   <label>File</label>
   <class>Admin\Models\ObjectFile</class>
-  <dataModel>custom</dataModel>
   <table>system_file</table>
   <labelField>path</labelField>
   <nested>true</nested>

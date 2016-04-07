@@ -7,7 +7,10 @@ use Jarves\Model\Content;
 use Jarves\Exceptions\PluginException;
 use Jarves\Model\ContentInterface;
 use Jarves\PageResponse;
+use Jarves\PageResponseFactory;
+use Jarves\PageStack;
 use Jarves\PluginResponse;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -16,6 +19,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Jarves\Jarves;
 use Jarves\Configuration\Plugin;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class TypePlugin extends AbstractType
 {
@@ -40,37 +44,42 @@ class TypePlugin extends AbstractType
      */
     protected $jarves;
 
-    function __construct($jarves)
-    {
-        $this->jarves = $jarves;
-    }
+    /**
+     * @var KernelInterface
+     */
+
+    private $kernel;
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
     /**
+     * @var PageStack
+     */
+    private $pageStack;
+
+    /**
+     * @var PageResponseFactory
+     */
+    private $pageResponseFactory;
+
+    /**
+     * TypePlugin constructor.
      * @param Jarves $jarves
+     * @param PageStack $pageStack
+     * @param KernelInterface $kernel
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param PageResponseFactory $pageResponseFactory
      */
-    public function setJarves($jarves)
+    function __construct(Jarves $jarves, PageStack $pageStack, KernelInterface $kernel,
+                         EventDispatcherInterface $eventDispatcher, PageResponseFactory $pageResponseFactory)
     {
         $this->jarves = $jarves;
-    }
-
-    /**
-     * @return Jarves
-     */
-    public function getJarves()
-    {
-        return $this->jarves;
-    }
-
-    public function exceptionHandler(GetResponseForExceptionEvent $event)
-    {
-        throw new PluginException(
-            sprintf(
-                'The plugin `%s` from bundle `%s` [%s] returned a wrong result.',
-                $this->plugin['plugin'],
-                $this->bundleName,
-                $this->pluginDef->getClass() . '::' . $this->pluginDef->getMethod()
-            ), null, $event->getException()
-        );
+        $this->pageStack = $pageStack;
+        $this->kernel = $kernel;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->pageResponseFactory = $pageResponseFactory;
     }
 
     public function setContent(ContentInterface $content)
@@ -80,6 +89,24 @@ class TypePlugin extends AbstractType
         $this->bundleName = $this->plugin['bundle'] ?: $this->plugin['module']; //module for BC
     }
 
+    public function exceptionHandler(GetResponseForExceptionEvent $event)
+    {
+        if ($event->getException() instanceof PluginException) {
+            return;
+        }
+
+        $event->setException(
+            new PluginException(
+                sprintf(
+                    'The plugin `%s` from bundle `%s` [%s] errored.',
+                    $this->plugin['plugin'],
+                    $this->bundleName,
+                    $this->pluginDef->getController()
+                ), null, $event->getException()
+            )
+        );
+    }
+
     public function fixResponse(GetResponseForControllerResultEvent $event)
     {
         $data = $event->getControllerResult();
@@ -87,8 +114,9 @@ class TypePlugin extends AbstractType
         if ($data instanceof PluginResponse) {
             $response = $data;
         } else {
-            $response = new PluginResponse($data);
+            $response = $this->pageResponseFactory->createPluginResponse($data);
         }
+
         $response->setControllerRequest($event->getRequest());
         $event->setResponse($response);
     }
@@ -103,10 +131,10 @@ class TypePlugin extends AbstractType
 
     public function render()
     {
-        if ($response = $this->getJarves()->getPageResponse()->getPluginResponse($this->getContent())) {
+        if ($response = $this->pageStack->getPageResponse()->getPluginResponse($this->getContent())) {
             return $response->getContent();
         } elseif ($this->plugin) {
-            $config = $this->getJarves()->getConfig($this->bundleName);
+            $config = $this->jarves->getConfig($this->bundleName);
 
             if (!$config) {
                 return sprintf(
@@ -116,74 +144,60 @@ class TypePlugin extends AbstractType
             }
 
             if ($this->pluginDef = $config->getPlugin($this->plugin['plugin'])) {
-                $clazz = $this->pluginDef->getClass();
-                $method = $this->pluginDef->getMethod();
+                $controller = $this->pluginDef->getController();
 
-                if (class_exists($clazz)) {
-                    if (method_exists($clazz, $method)) {
-                        if ($this->isPreview()) {
-                            if (!$this->pluginDef->isPreview()) {
-                                //plugin does not allow to have a preview on the actual action method,
-                                //so try <method>Preview
-                                if (method_exists($clazz, $method . 'Preview')) {
-                                    $method = $method . 'Preview';
-                                } else {
-                                    return $config->getLabel() . ': ' . $this->pluginDef->getLabel();
-                                }
-                            }
-                        }
-
-                        //create a sub request
-                        $request = new Request();
-                        $request->attributes->add(
-                            array(
-                                '_controller' => $clazz . '::' . $method,
-                                '_content' => $this->getContent(),
-                                'options' => isset($this->plugin['options']) ? $this->plugin['options'] : array()
-                            )
-                        );
-
-                        $dispatcher = $this->getJarves()->getEventDispatcher();
-
-                        $callable = array($this, 'exceptionHandler');
-                        $fixResponse = array($this, 'fixResponse');
-
-                        $dispatcher->addListener(
-                            KernelEvents::EXCEPTION,
-                            $callable,
-                            100
-                        );
-
-                        $dispatcher->addListener(
-                            KernelEvents::VIEW,
-                            $fixResponse,
-                            100
-                        );
-
-                        ob_start();
-                        $response = $this->getJarves()->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST);
-                        //EventListener\PluginRequestListener converts all PluginResponse objects to PageResponses
-                        if ($response instanceof PageResponse) {
-                            $response = $response->getPluginResponse($this->getContent()->getId());
-                        }
-                        $ob = ob_get_clean();
-
-                        $dispatcher->removeListener(
-                            KernelEvents::EXCEPTION,
-                            $callable
-                        );
-                        $dispatcher->removeListener(
-                            KernelEvents::VIEW,
-                            $fixResponse
-                        );
-
-                        return $ob . $response->getContent();
-                    } else {
-                        return '';
+                if ($this->isPreview()) {
+                    if (!$this->pluginDef->isPreview()) {
+                        //plugin does not allow to have a preview on the actual action method
+                        return $config->getLabel() . ': ' . $this->pluginDef->getLabel();
                     }
-                } else {
-                    return sprintf('Class `%s` does not exist. You should create this class.', $clazz);
                 }
+
+                //create a sub request
+                $request = new Request();
+                $request->attributes->add(
+                    array(
+                        '_controller' => $controller,
+                        '_content' => $this->getContent(),
+                        'options' => isset($this->plugin['options']) ? $this->plugin['options'] : array()
+                    )
+                );
+
+                $dispatcher = $this->eventDispatcher;
+
+                $callable = array($this, 'exceptionHandler');
+                $fixResponse = array($this, 'fixResponse');
+
+                $dispatcher->addListener(
+                    KernelEvents::EXCEPTION,
+                    $callable,
+                    100
+                );
+
+                $dispatcher->addListener(
+                    KernelEvents::VIEW,
+                    $fixResponse,
+                    100
+                );
+
+                ob_start();
+                $response = $this->kernel->handle($request, HttpKernelInterface::SUB_REQUEST);
+                //EventListener\PluginRequestListener converts all PluginResponse objects to PageResponses
+                if ($response instanceof PageResponse) {
+                    $response = $response->getPluginResponse($this->getContent()->getId());
+                }
+                $ob = ob_get_clean();
+
+                $dispatcher->removeListener(
+                    KernelEvents::EXCEPTION,
+                    $callable
+                );
+                $dispatcher->removeListener(
+                    KernelEvents::VIEW,
+                    $fixResponse
+                );
+
+                return $ob . $response->getContent();
             } else {
                 return sprintf(
                     'Plugin `%s` in bundle `%s` does not exist. You probably have to install the bundle first.',

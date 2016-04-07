@@ -71,9 +71,6 @@ class BasicTest extends KernelAwareTestCase
         $this->assertEquals($id2, $response['data']['id']);
     }
 
-    /**
-     * @group test
-     */
     public function testUpdating()
     {
         ItemQuery::create()->deleteAll();
@@ -86,7 +83,7 @@ class BasicTest extends KernelAwareTestCase
         $response = $this->restCall('/jarves/object/test/item/' . $id . '?fields=title');
         $this->assertEquals('Item 1', $response['data']['title']);
 
-        $item = $this->getJarves()->getObjects()->get('test/item', $id);
+        $item = $this->getObjects()->get('test/item', $id);
 
         $response = $this->restCall(
             '/jarves/object/test/item/' . $id,

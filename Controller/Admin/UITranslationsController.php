@@ -3,16 +3,57 @@
 namespace Jarves\Controller\Admin;
 
 use FOS\RestBundle\Request\ParamFetcher;
+use Jarves\Filesystem\Filesystem;
 use Jarves\Jarves;
 use Jarves\Model\LanguageQuery;
+use Jarves\PageStack;
+use Jarves\Translation\Translator;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Templating\EngineInterface;
 
 class UITranslationsController extends Controller
 {
+    /**
+     * @var Jarves
+     */
+    protected $jarves;
+    
+    /**
+     * @var PageStack
+     */
+    protected $pageStack;
+
+    /**
+     * @var Translator
+     */
+    protected $translator;
+
+    /**
+     * @var Filesystem
+     */
+    protected $webFilesystem;
+
+    /**
+     * @var EngineInterface
+     */
+    protected $templating;
+
+    public function setContainer(ContainerInterface $container = null)
+    {
+        parent::setContainer($container);
+
+        $this->jarves = $this->get('jarves');
+        $this->pageStack = $this->get('jarves.page_stack');
+        $this->translator = $this->get('jarves.translator');
+        $this->webFilesystem = $this->get('jarves.filesystem.web');
+        $this->templating = $this->get('templating');
+    }
+
     /**
      * @ApiDoc(
      *  section="Interface i18n",
@@ -69,12 +110,11 @@ class UITranslationsController extends Controller
         $lang = $paramFetcher->get('lang');
 
         $lang = preg_replace('/[^a-z]/', '', $lang);
-        $file = $this->getJarves()->getTranslator()->getPluralJsFunctionFile($lang); //just make sure the file has been created
-        $fs = $this->getJarves()->getWebFileSystem();
+        $file = $this->translator->getPluralJsFunctionFile($lang); //just make sure the file has been created
 
         $response = new Response();
         $response->headers->set('Content-Type', 'text/javascript');
-        $response->setContent($fs->read($file));
+        $response->setContent($this->webFilesystem->read($file));
         return $response;
     }
 
@@ -89,34 +129,34 @@ class UITranslationsController extends Controller
      *
      * @Rest\Get("/admin/ui/language")
      *
-     * @param string $lang
-     * @param string $javascript
+     * @param ParamFetcher $paramFetcher
      *
      * @return array|string depends on javascript param
      */
-    public function getLanguageAction($lang, $javascript)
+    public function getLanguageAction(ParamFetcher $paramFetcher)
     {
-        if (!$this->getJarves()->getTranslator()->isValidLanguage($lang)) {
+        $lang = $paramFetcher->get('lang');
+        $javascript = $paramFetcher->get('javascript');
+        if (!$this->translator->isValidLanguage($lang)) {
             $lang = 'en';
         }
 
-        $this->getJarves()->getAdminClient()->getSession()->setLanguage($lang);
-        $this->getJarves()->getAdminClient()->syncStore();
+        $this->pageStack->getAdminClient()->getSession()->setLanguage($lang);
+        $this->pageStack->getAdminClient()->syncStore();
 
-        $messages = $this->getJarves()->getTranslator()->loadMessages($lang);
-        $template = $this->getJarves()->getTemplating();
+        $messages = $this->translator->loadMessages($lang);
 
         if ($javascript) {
             $response = new Response();
             $response->headers->set('Content-Type', 'text/javascript');
             $content = "if( typeof(jarves)=='undefined') window.jarves = {}; jarves.lang = " . json_encode($messages, JSON_PRETTY_PRINT);
-            $content .= "\nLocale.define('en-US', 'Date', " . $template->render(
+            $content .= "\nLocale.define('en-US', 'Date', " . $this->templating->render(
                 'JarvesBundle:Default:javascript-locales.js.twig'
             ) . ");";
             $response->setContent($content);
             return $response;
         } else {
-            $messages['mootools'] = $template->render('JarvesBundle:Default:javascript-locales.js.twig');
+            $messages['mootools'] = $this->templating->render('JarvesBundle:Default:javascript-locales.js.twig');
 
             return $messages;
         }

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "fd823efa0a43cb63b5d83bd7763ae63d",
-    "content-hash": "893319ae8a1529100928f1b0b4f72a2a",
+    "hash": "2ccc9bcd155e1dbf4e92b224085ba0e9",
+    "content-hash": "4115c686a86b12c1845d37f33b92ad9a",
     "packages": [
         {
             "name": "composer/composer",
@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/composer.git",
-                "reference": "f542b0f32d044a9cc958510303b299685f7e7cc1"
+                "reference": "40c14709f79f9d7ea35ac969cfbd7f41beb525bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/composer/zipball/f542b0f32d044a9cc958510303b299685f7e7cc1",
-                "reference": "f542b0f32d044a9cc958510303b299685f7e7cc1",
+                "url": "https://api.github.com/repos/composer/composer/zipball/40c14709f79f9d7ea35ac969cfbd7f41beb525bb",
+                "reference": "40c14709f79f9d7ea35ac969cfbd7f41beb525bb",
                 "shasum": ""
             },
             "require": {
@@ -80,20 +80,20 @@
                 "dependency",
                 "package"
             ],
-            "time": "2016-03-26 09:49:28"
+            "time": "2016-04-05 12:27:16"
         },
         {
             "name": "composer/semver",
-            "version": "1.3.0",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/semver.git",
-                "reference": "df4463baa9f44fe6cf0a6da4fde2934d4c0a2747"
+                "reference": "84c47f3d8901440403217afc120683c7385aecb8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/semver/zipball/df4463baa9f44fe6cf0a6da4fde2934d4c0a2747",
-                "reference": "df4463baa9f44fe6cf0a6da4fde2934d4c0a2747",
+                "url": "https://api.github.com/repos/composer/semver/zipball/84c47f3d8901440403217afc120683c7385aecb8",
+                "reference": "84c47f3d8901440403217afc120683c7385aecb8",
                 "shasum": ""
             },
             "require": {
@@ -142,7 +142,7 @@
                 "validation",
                 "versioning"
             ],
-            "time": "2016-02-25 22:23:39"
+            "time": "2016-03-30 13:16:03"
         },
         {
             "name": "composer/spdx-licenses",
@@ -1215,16 +1215,16 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "1.18.1",
+            "version": "1.18.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "a5f2734e8c16f3aa21b3da09715d10e15b4d2d45"
+                "reference": "064b38c16790249488e7a8b987acf1c9d7383c09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/a5f2734e8c16f3aa21b3da09715d10e15b4d2d45",
-                "reference": "a5f2734e8c16f3aa21b3da09715d10e15b4d2d45",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/064b38c16790249488e7a8b987acf1c9d7383c09",
+                "reference": "064b38c16790249488e7a8b987acf1c9d7383c09",
                 "shasum": ""
             },
             "require": {
@@ -1239,13 +1239,13 @@
                 "doctrine/couchdb": "~1.0@dev",
                 "graylog2/gelf-php": "~1.0",
                 "jakub-onderka/php-parallel-lint": "0.9",
+                "php-amqplib/php-amqplib": "~2.4",
                 "php-console/php-console": "^3.1.3",
                 "phpunit/phpunit": "~4.5",
                 "phpunit/phpunit-mock-objects": "2.3.0",
                 "raven/raven": "^0.13",
                 "ruflin/elastica": ">=0.90 <3.0",
-                "swiftmailer/swiftmailer": "~5.3",
-                "videlalvaro/php-amqplib": "~2.4"
+                "swiftmailer/swiftmailer": "~5.3"
             },
             "suggest": {
                 "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",
@@ -1254,11 +1254,11 @@
                 "ext-mongo": "Allow sending log messages to a MongoDB server",
                 "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
                 "mongodb/mongodb": "Allow sending log messages to a MongoDB server via PHP Driver",
+                "php-amqplib/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib",
                 "php-console/php-console": "Allow sending log messages to Google Chrome",
                 "raven/raven": "Allow sending log messages to a Sentry server",
                 "rollbar/rollbar": "Allow sending log messages to Rollbar",
-                "ruflin/elastica": "Allow sending log messages to an Elastic Search server",
-                "videlalvaro/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib"
+                "ruflin/elastica": "Allow sending log messages to an Elastic Search server"
             },
             "type": "library",
             "extra": {
@@ -1289,7 +1289,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2016-03-13 16:08:35"
+            "time": "2016-04-02 13:12:58"
         },
         {
             "name": "nelmio/api-doc-bundle",
@@ -1530,12 +1530,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/propelorm/Propel2.git",
-                "reference": "790ce556b22b57101d517011a41c4812fe28f655"
+                "reference": "14377a8c468dd8a5ca01064f140ab36f6cb117df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/790ce556b22b57101d517011a41c4812fe28f655",
-                "reference": "790ce556b22b57101d517011a41c4812fe28f655",
+                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/14377a8c468dd8a5ca01064f140ab36f6cb117df",
+                "reference": "14377a8c468dd8a5ca01064f140ab36f6cb117df",
                 "shasum": ""
             },
             "require": {
@@ -1587,20 +1587,20 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2016-03-22 11:18:46"
+            "time": "2016-04-04 10:03:45"
         },
         {
             "name": "propel/propel-bundle",
             "version": "2.0.x-dev",
             "source": {
                 "type": "git",
-                "url": "https://github.com/propelorm/PropelBundle.git",
-                "reference": "fab7981630f4d546564edd7a48a468adb4dab5f3"
+                "url": "https://github.com/marcj/PropelBundle.git",
+                "reference": "07dd412e0684632a24938c57da7995ab0f369594"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/propelorm/PropelBundle/zipball/fab7981630f4d546564edd7a48a468adb4dab5f3",
-                "reference": "fab7981630f4d546564edd7a48a468adb4dab5f3",
+                "url": "https://api.github.com/repos/marcj/PropelBundle/zipball/07dd412e0684632a24938c57da7995ab0f369594",
+                "reference": "07dd412e0684632a24938c57da7995ab0f369594",
                 "shasum": ""
             },
             "require": {
@@ -1621,13 +1621,12 @@
                     "Tests/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
             "authors": [
                 {
-                    "name": "William DURAND",
+                    "name": "William Durand",
                     "email": "william.durand1@gmail.com"
                 }
             ],
@@ -1637,7 +1636,10 @@
                 "persistence",
                 "propel"
             ],
-            "time": "2016-02-15 06:34:40"
+            "support": {
+                "source": "https://github.com/marcj/PropelBundle/tree/2.0"
+            },
+            "time": "2016-03-27 01:16:43"
         },
         {
             "name": "psr/log",
@@ -2605,16 +2607,16 @@
         },
         {
             "name": "symfony/symfony",
-            "version": "v2.8.3",
+            "version": "v2.8.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/symfony.git",
-                "reference": "7a9a5fce7ce6e448e527f635463dda00761e12c2"
+                "reference": "9e14f9f4869c19188a376eab61d9a1c1f1fee347"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/symfony/zipball/7a9a5fce7ce6e448e527f635463dda00761e12c2",
-                "reference": "7a9a5fce7ce6e448e527f635463dda00761e12c2",
+                "url": "https://api.github.com/repos/symfony/symfony/zipball/9e14f9f4869c19188a376eab61d9a1c1f1fee347",
+                "reference": "9e14f9f4869c19188a376eab61d9a1c1f1fee347",
                 "shasum": ""
             },
             "require": {
@@ -2701,11 +2703,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony\\Bridge\\Doctrine\\": "src/Symfony/Bridge/Doctrine/",
-                    "Symfony\\Bridge\\Monolog\\": "src/Symfony/Bridge/Monolog/",
-                    "Symfony\\Bridge\\ProxyManager\\": "src/Symfony/Bridge/ProxyManager/",
-                    "Symfony\\Bridge\\Swiftmailer\\": "src/Symfony/Bridge/Swiftmailer/",
-                    "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
+                    "Symfony\\Bridge\\": "src/Symfony/Bridge/",
                     "Symfony\\Bundle\\": "src/Symfony/Bundle/",
                     "Symfony\\Component\\": "src/Symfony/Component/"
                 },
@@ -2735,7 +2733,7 @@
             "keywords": [
                 "framework"
             ],
-            "time": "2016-02-28 21:06:29"
+            "time": "2016-03-27 12:57:53"
         },
         {
             "name": "twig/extensions",
@@ -2903,6 +2901,51 @@
     ],
     "packages-dev": [
         {
+            "name": "hamcrest/hamcrest-php",
+            "version": "v1.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hamcrest/hamcrest-php.git",
+                "reference": "b37020aa976fa52d3de9aa904aa2522dc518f79c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hamcrest/hamcrest-php/zipball/b37020aa976fa52d3de9aa904aa2522dc518f79c",
+                "reference": "b37020aa976fa52d3de9aa904aa2522dc518f79c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "replace": {
+                "cordoval/hamcrest-php": "*",
+                "davedevelopment/hamcrest-php": "*",
+                "kodova/hamcrest-php": "*"
+            },
+            "require-dev": {
+                "phpunit/php-file-iterator": "1.3.3",
+                "satooshi/php-coveralls": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "hamcrest"
+                ],
+                "files": [
+                    "hamcrest/Hamcrest.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD"
+            ],
+            "description": "This is the PHP port of Hamcrest Matchers",
+            "keywords": [
+                "test"
+            ],
+            "time": "2015-05-11 14:41:42"
+        },
+        {
             "name": "jarves/demotheme-bundle",
             "version": "dev-master",
             "target-dir": "Jarves/DemoTheme",
@@ -2950,12 +2993,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jarves/jarves-publication.git",
-                "reference": "696b6a34b148b6d3dd80f18d38b7947de31563f2"
+                "reference": "2af692f00c959422ba8c365474f9e7a1cb021c48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jarves/jarves-publication/zipball/696b6a34b148b6d3dd80f18d38b7947de31563f2",
-                "reference": "696b6a34b148b6d3dd80f18d38b7947de31563f2",
+                "url": "https://api.github.com/repos/jarves/jarves-publication/zipball/2af692f00c959422ba8c365474f9e7a1cb021c48",
+                "reference": "2af692f00c959422ba8c365474f9e7a1cb021c48",
                 "shasum": ""
             },
             "type": "library",
@@ -2982,7 +3025,72 @@
                 "blog",
                 "news"
             ],
-            "time": "2016-03-26 23:09:21"
+            "time": "2016-04-07 11:40:50"
+        },
+        {
+            "name": "mockery/mockery",
+            "version": "0.9.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/padraic/mockery.git",
+                "reference": "70bba85e4aabc9449626651f48b9018ede04f86b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/padraic/mockery/zipball/70bba85e4aabc9449626651f48b9018ede04f86b",
+                "reference": "70bba85e4aabc9449626651f48b9018ede04f86b",
+                "shasum": ""
+            },
+            "require": {
+                "hamcrest/hamcrest-php": "~1.1",
+                "lib-pcre": ">=7.0",
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.9.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Mockery": "library/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Pádraic Brady",
+                    "email": "padraic.brady@gmail.com",
+                    "homepage": "http://blog.astrumfutura.com"
+                },
+                {
+                    "name": "Dave Marshall",
+                    "email": "dave.marshall@atstsolutions.co.uk",
+                    "homepage": "http://davedevelopment.co.uk"
+                }
+            ],
+            "description": "Mockery is a simple yet flexible PHP mock object framework for use in unit testing with PHPUnit, PHPSpec or any other testing framework. Its core goal is to offer a test double framework with a succinct API capable of clearly defining all possible object operations and interactions using a human readable Domain Specific Language (DSL). Designed as a drop in alternative to PHPUnit's phpunit-mock-objects library, Mockery is easy to integrate with PHPUnit and can operate alongside phpunit-mock-objects without the World ending.",
+            "homepage": "http://github.com/padraic/mockery",
+            "keywords": [
+                "BDD",
+                "TDD",
+                "library",
+                "mock",
+                "mock objects",
+                "mockery",
+                "stub",
+                "test",
+                "test double",
+                "testing"
+            ],
+            "time": "2015-04-02 19:54:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -3353,6 +3461,7 @@
         "propel/propel-bundle": 20,
         "propel/propel": 20,
         "composer/composer": 20,
+        "mockery/mockery": 0,
         "jarves/demotheme-bundle": 20,
         "jarves/publication-bundle": 20
     },

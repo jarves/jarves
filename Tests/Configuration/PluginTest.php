@@ -27,8 +27,7 @@ class PluginTest extends KernelAwareTestCase
 {
     private $xml = '<plugin id="listing">
   <label>News Listing</label>
-  <class>Publication\Controller\Plugin\News</class>
-  <method>listing</method>
+  <controller>Publication\Controller\Plugin\News:listing</controller>
   <routes>
     <route pattern="{page}">
       <default key="page">1</default>
@@ -65,8 +64,7 @@ class PluginTest extends KernelAwareTestCase
     {
         $this->assertEquals('listing', $plugin->getId());
         $this->assertEquals('News Listing', $plugin->getLabel());
-        $this->assertEquals('Publication\Controller\Plugin\News', $plugin->getClass());
-        $this->assertEquals('listing', $plugin->getMethod());
+        $this->assertEquals('Publication\Controller\Plugin\News:listing', $plugin->getController());
 
         $this->assertInstanceOf('\Jarves\Configuration\Route', $plugin->getRoutes()[0]);
         $this->assertInstanceOf('\Jarves\Configuration\Route', $plugin->getRoutes()[1]);
@@ -80,8 +78,7 @@ class PluginTest extends KernelAwareTestCase
 
         $this->assertEquals('listing', $array['id']);
         $this->assertEquals('News Listing', $array['label']);
-        $this->assertEquals('Publication\Controller\Plugin\News', $array['class']);
-        $this->assertEquals('listing', $array['method']);
+        $this->assertEquals('Publication\Controller\Plugin\News:listing', $array['controller']);
 
         $this->assertCount(2, $array['routes']);
         $this->assertCount(3, $array['options']);
@@ -106,8 +103,7 @@ class PluginTest extends KernelAwareTestCase
         $plugin = new Plugin();
         $plugin->setId('listing');
         $plugin->setLabel('News Listing');
-        $plugin->setClass('Publication\Controller\Plugin\News');
-        $plugin->setMethod('listing');
+        $plugin->setController('Publication\Controller\Plugin\News:listing');
 
         $route1 = new Route();
         $route1->setPattern('{page}');
@@ -154,8 +150,7 @@ class PluginTest extends KernelAwareTestCase
         $pluginArray = array (
             'id' => 'listing',
             'label' => 'News Listing',
-            'class' => 'Publication\\Controller\\Plugin\\News',
-            'method' => 'listing',
+            'controller' => 'Publication\\Controller\\Plugin\\News:listing',
             'routes' => array (
                 array (
                     'pattern' => '{page}',

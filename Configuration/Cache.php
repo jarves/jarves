@@ -7,17 +7,16 @@ class Cache extends Model
     protected $docBlock = '
   The cache layer we use for the distributed caching.
   (The `fast caching` is auto determined (Order: APC, XCache, Files))
+
+  service: MUST have `Core\Cache\CacheInterface` as interface
   ';
 
-    protected $docBlocks = [
-        'class' => 'The full classname of the storage. MUST have `Core\Cache\CacheInterface` as interface.'
-    ];
-
+    protected $attributes = ['service'];
 
     /**
      * @var string
      */
-    protected $class = '\Jarves\Cache\Files';
+    protected $service = 'jarves.cache.backend.files';
 
     /**
      * @var Options
@@ -54,19 +53,19 @@ class Cache extends Model
     }
 
     /**
-     * @param string $class
+     * @param string $service
      */
-    public function setClass($class)
+    public function setService($service)
     {
-        $this->class = $class;
+        $this->service = $service;
     }
 
     /**
      * @return string
      */
-    public function getClass()
+    public function getService()
     {
-        return $this->class;
+        return $this->service;
     }
 
 }

@@ -8,14 +8,17 @@
 
 namespace Jarves\Client;
 
+use Jarves\Cache\Backend\CacheInterface;
 use Jarves\Configuration\Client;
 use Jarves\Configuration\SessionStorage;
 use Jarves\Jarves;
 use Jarves\JarvesBundle;
+use Jarves\JarvesConfig;
 use Jarves\Model\Session;
 use Jarves\Model\User;
 use Jarves\Model\UserGroup;
 use Jarves\Model\UserQuery;
+use Jarves\PageStack;
 use Symfony\Component\HttpFoundation\Cookie;
 
 /**
@@ -84,31 +87,41 @@ abstract class ClientAbstract
     protected $user;
 
     /**
-     * @var Jarves
+     * @var PageStack
      */
-    protected $jarves;
+    protected $pageStack;
+
+    /**
+     * @var JarvesConfig
+     */
+    protected $jarvesConfig;
 
     /**
      * Constructor
      *
-     * @param Core   $jarves
-     * @param Client $clientConfig
+     * @param JarvesConfig $jarvesConfig
+     * @param PageStack $pageStack
      */
-    public function __construct(Jarves $jarves, Client $clientConfig)
+    public function __construct(JarvesConfig $jarvesConfig, PageStack $pageStack)
     {
-        $this->setJarves($jarves);
-        $this->clientConfig = $clientConfig;
-        $this->config = array_merge($this->config, $clientConfig->getOptions()->toArray());
+        $this->pageStack = $pageStack;
+        $this->jarvesConfig = $jarvesConfig;
 
         if ($this->config['tokenId']) {
             $this->tokenId = $this->config['tokenId'];
         }
 
-        $clazz = $clientConfig->getSessionStorage()->getClass();
-        $store = new $clazz($clientConfig->getSessionStorage(), $this);
-        if (!($store instanceof \Jarves\Client\SessionStorageInterface)) {
-            throw new \LogicException(sprintf('Class `%s` has the wrong interface. \Jarves\Client\SessionStorageInterface needed.', $clazz));
-        }
+    }
+
+    /**
+     * @param Client $clientConfig
+     * @param SessionStorageInterface $store
+     */
+    public function configure(Client $clientConfig, SessionStorageInterface $store)
+    {
+        $this->clientConfig = $clientConfig;
+        $this->config = array_merge($this->config, $clientConfig->getOptions()->toArray());
+
         $this->store = $store;
     }
 
@@ -117,22 +130,6 @@ abstract class ClientAbstract
         if (isset($this->config[$key])) {
             return $this->config[$key];
         }
-    }
-
-    /**
-     * @param Jarves $jarves
-     */
-    public function setJarves($jarves)
-    {
-        $this->jarves = $jarves;
-    }
-
-    /**
-     * @return Jarves
-     */
-    public function getJarves()
-    {
-        return $this->jarves;
     }
 
     /**
@@ -148,11 +145,11 @@ abstract class ClientAbstract
         } else {
             //maybe we wanna check the ip ?
             if ($this->config['ipCheck']) {
-                //$ip = $this->get('ip');
-
-                //if ($ip != $_SERVER['REMOTE_ADDR']) {
-                //    $this->logout(); //force down to guest
-                //}
+//                $ip = $this->get('ip');
+//
+//                if ($ip != $_SERVER['REMOTE_ADDR']) {
+//                    $this->logout(); //force down to guest
+//                }
             }
 
             if ($this->getSession()->getTime() + 5 < time()) //do only all 5 seconds an session update
@@ -161,9 +158,9 @@ abstract class ClientAbstract
             }
         }
 
-        if ($this->config['autoLoginLogout']) {
-            $this->handleClientLoginLogout();
-        }
+//        if ($this->config['autoLoginLogout']) {
+//            $this->handleClientLoginLogout();
+//        }
 
         if ($this->config['garbageCollector']) {
             $this->removeExpiredSessions();
@@ -197,7 +194,7 @@ abstract class ClientAbstract
     {
         $this->getSession()->setTime(time());
         $this->getSession()->setRefreshed($this->session->getRefreshed() + 1);
-        $this->getSession()->setPage(substr($this->getJarves()->getRequest()->getRequestUri(), 0, 255));
+        $this->getSession()->setPage(substr($this->pageStack->getRequest()->getRequestUri(), 0, 255));
 
         $cookie = new Cookie(
             $this->getTokenId(),
@@ -208,39 +205,7 @@ abstract class ClientAbstract
             false,
             false
         );
-        $this->getJarves()->getPageResponse()->headers->setCookie($cookie);
-    }
-
-    /**
-     * Handles the input (login/logout) of the client.
-     */
-    public function handleClientLoginLogout()
-    {
-        //todo
-        if (getArgv($this->config['loginTrigger'])) {
-
-            $login = getArgv('username');
-
-            if (getArgv('login')) {
-                $login = getArgv('login');
-            }
-
-            $passwd = getArgv('passwd') ? getArgv('passwd') : getArgv('password');
-
-            $userId = $this->login($login, $passwd);
-
-            if (!$userId) {
-                klog('authentication', str_replace("%s", getArgv('username'), "SECURITY Login failed for '%s'"));
-            }
-        }
-
-        if (getArgv($this->config['logoutTrigger'])) {
-            $this->logout();
-            $this->syncStore();
-            if (getArgv(1) == 'admin') {
-                json(true);
-            }
-        }
+        $this->pageStack->getPageResponse()->headers->setCookie($cookie);
     }
 
     /**
@@ -258,7 +223,7 @@ abstract class ClientAbstract
         }
 
         if (null === $this->user) {
-            $this->user = $this->getJarves()->getUtils()->getPropelCacheObject('Jarves\Model\User', $this->getSession()->getUserId());
+            $this->user = UserQuery::create()->findPk($this->getSession()->getUserId());
         }
 
         return $this->user;
@@ -278,28 +243,6 @@ abstract class ClientAbstract
     }
 
     /**
-     * Auth against the internal user table.
-     *
-     * @param $login
-     * @param $password
-     *
-     * @return bool
-     */
-    protected function internalLogin($login, $password)
-    {
-        $clientConfig = new Client(null, $this->getJarves());
-        $storage = new SessionStorage(null, $this->getJarves());
-        $storage->setClass('Jarves\Client\StoreDatabase');
-        $clientConfig->setSessionStorage($storage);
-
-        $jarvesUsers = new JarvesUsers($this->getJarves(), $clientConfig);
-
-        $state = $jarvesUsers->checkCredentials($login, $password);
-
-        return $state;
-    }
-
-    /**
      * Check credentials and set user_id to the session.
      *
      * @param  string $login
@@ -313,11 +256,7 @@ abstract class ClientAbstract
             $this->start();
         }
 
-        if ($login == 'admin') {
-            $state = $this->internalLogin($login, $password);
-        } else {
-            $state = $this->checkCredentials($login, $password);
-        }
+        $state = $this->checkCredentials($login, $password);
 
         if ($state == false) {
             return false;
@@ -330,7 +269,7 @@ abstract class ClientAbstract
     }
 
     /**
-     * If the user has not been found in the system_user table, we've created it and
+     * If the user has not been found in the system_user_group table, we create it and
      * maybe this class want to map some groups to this new user.
      *
      * Don't forget to clear the cache after updating.
@@ -374,7 +313,7 @@ abstract class ClientAbstract
 
                 if (preg_match('/' . $item['login'] . '/', $user['username']) == 1) {
                     $userGroup = new UserGroup();
-                    $userGroup->setGroupId($item['group']);
+                    $userGroup->setGroupsId($item['group']);
                     $userGroup->setUserId($item['id']);
                     $userGroup->save();
                 }
@@ -442,7 +381,7 @@ abstract class ClientAbstract
             return;
         }
 
-        $time = microtime(true);
+//        $time = microtime(true);
         if ($this->hasSession()) {
             $this->store->save(
                 $this->token,
@@ -457,6 +396,8 @@ abstract class ClientAbstract
      * into $this->token. Also set cookie.
      *
      * @return bool|Session The session object
+     *
+     * @throws \Exception when no free session id can be generated.
      */
     public function createSession()
     {
@@ -476,7 +417,10 @@ abstract class ClientAbstract
                     false,
                     false
                 );
-                $this->getJarves()->getPageResponse()->headers->setCookie($cookie);
+
+                if ($this->pageStack->getPageResponse()) {
+                    $this->pageStack->getPageResponse()->headers->setCookie($cookie);
+                }
 
 //                \Jarves\Utils::$latency['session'][] = microtime(true) - $time;
                 return $session;
@@ -485,7 +429,7 @@ abstract class ClientAbstract
         }
 
         //after 25 tries, we stop and log it.
-        $this->getJarves()->getLogger()->critical(
+        throw new \Exception(
             "The system just tried to create a session 25 times, but can't generate a new free session id.'.
                         'Maybe the caching server is full and you forgot to setup a cronjob for the garbage collector."
         );
@@ -518,12 +462,12 @@ abstract class ClientAbstract
         $session = new Session();
         $session->setId($id)
             ->setTime(time())
-            ->setPage($this->getJarves()->getRequest() ? $this->getJarves()->getRequest()->getRequestUri() : '')
+            ->setPage($this->pageStack->getRequest() ? $this->pageStack->getRequest()->getRequestUri() : '')
             ->setRefreshed(0);
 
         //in some countries it's not allowed to store the IP per default
-        if (!isset($this->config['noIPStorage']) && $this->getJarves()->getRequest()) {
-            $session->setIp($this->getJarves()->getRequest()->getClientIp());
+        if (!isset($this->config['noIPStorage']) && $this->pageStack->getRequest()) {
+            $session->setIp($this->pageStack->getRequest()->getClientIp());
         }
 
         try {
@@ -619,9 +563,11 @@ abstract class ClientAbstract
     /**
      * Tries to load a session based on current token or pToken from the SessionStorage.
      *
-     * "ets $this->session.
+     * Sets $this->session.
      *
      * @param  string $token
+     *
+     * @return bool
      */
     protected function fetchSession($token = null)
     {
@@ -639,16 +585,17 @@ abstract class ClientAbstract
     /**
      * Tries to load a session based on current pToken from the cache backend.
      *
-     * @param $token
+     * @param string $token
      *
-     * @return \Jarves\Model\Session false if the session does not exist, and Session object, if found.
+     * @return \Jarves\Model\Session|false false if the session does not exist, and Session object, if found.
      */
     public function loadSessionStore($token)
     {
+        /** @var Session $session */
         $session = $this->store->get($token);
 
         if (!$session) {
-            return;
+            return false;
         }
 
         if (!($session instanceof Session)) {
@@ -656,14 +603,14 @@ abstract class ClientAbstract
         }
 
         if (!$session->getId()) {
-            return;
+            return false;
         }
 
         $this->setSession($session);
         if ($session && $session->getTime() + $this->config['timeout'] < time()) {
             $this->store->delete($token);
 
-            return;
+            return false;
         }
 
         return $session;
@@ -677,7 +624,7 @@ abstract class ClientAbstract
      */
     public function getClientToken()
     {
-        $request = $this->getJarves()->getRequest();
+        $request = $this->pageStack->getRequest();
         if (!$request) return null;
 
         if ($value = $request->cookies->get($this->tokenId)) {
@@ -723,16 +670,16 @@ abstract class ClientAbstract
     /**
      * Injects the passwd hash from config.php into $string
      *
-     * @param  string $string
+     * @param string $string
+     * @param string $passwordHashKey from the system configuration
      *
      * @return string
      */
-    public static function injectConfigPasswdHash($string)
+    public static function injectConfigPasswdHash($string, $passwordHashKey)
     {
         $result = '';
         $len = mb_strlen($string);
-        $hashKey = JarvesBundle::$systemConfig->getPasswordHashKey();
-        $clen = mb_strlen($hashKey);
+        $clen = mb_strlen($passwordHashKey);
 
         for ($i = 0; $i < $len; $i++) {
             $s = hexdec(bin2hex(mb_substr($string, $i, 1)));
@@ -740,7 +687,7 @@ abstract class ClientAbstract
             while ($j > $clen) {
                 $j -= $clen + 1;
             } //CR
-            $c = hexdec(bin2hex(mb_substr($hashKey, $j, 1)));
+            $c = hexdec(bin2hex(mb_substr($passwordHashKey, $j, 1)));
             $result .= pack("H*", $s + $c);
         }
 
@@ -749,8 +696,13 @@ abstract class ClientAbstract
 
     /**
      * Returns a hashed password with salt.
+     * @param string $password
+     * @param string $salt
+     * @param string $passwordHashKey from the system configuration
+     *
+     * @return string
      */
-    public static function getHashedPassword($password, $salt)
+    public static function getHashedPassword($password, $salt, $passwordHashKey)
     {
         $hash = hash('sha512', ($password . $salt) . $salt) . hash(
                 'sha512',
@@ -758,7 +710,7 @@ abstract class ClientAbstract
             );
 
         for ($i = 0; $i < 201; $i++) {
-            $hash = self::injectConfigPasswdHash($hash);
+            $hash = self::injectConfigPasswdHash($hash, $passwordHashKey);
             $hash = hash(
                     'sha512',
                     $i % 2 ?
@@ -813,7 +765,7 @@ abstract class ClientAbstract
     /**
      * @param Session $session
      */
-    public function setSession($session)
+    public function setSession(Session $session)
     {
         $this->session = $session;
     }

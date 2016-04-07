@@ -7,16 +7,15 @@ class SessionStorage extends Model
     protected $docBlock = '
         A class that handles the actual data storage.
 
-        class: The full classname of the storage. MUST have `Core\Cache\CacheInterface` as interface.
-        Define `database` for the database storage.
+        service: MUST have `Core\Cache\CacheInterface` as interface
     ';
 
-    protected $attributes = ['class'];
+    protected $attributes = ['service'];
 
     /**
      * @var string
      */
-    protected $class = 'Jarves\Client\StoreDatabase';
+    protected $service = 'jarves.client.store.database';
 
     /**
      * @var Options
@@ -58,19 +57,19 @@ class SessionStorage extends Model
     }
 
     /**
-     * @param string $class
+     * @param string $service
      */
-    public function setClass($class)
+    public function setService($service)
     {
-        $this->class = $class;
+        $this->service = $service;
     }
 
     /**
      * @return string
      */
-    public function getClass()
+    public function getService()
     {
-        return $this->class;
+        return $this->service;
     }
 
 }

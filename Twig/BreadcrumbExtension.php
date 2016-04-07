@@ -2,8 +2,11 @@
 
 namespace Jarves\Twig;
 
+use Jarves\Cache\Cacher;
 use Jarves\Jarves;
+use Jarves\PageStack;
 use Propel\Runtime\Map\TableMap;
+use Symfony\Component\Templating\EngineInterface;
 
 class BreadcrumbExtension extends \Twig_Extension
 {
@@ -12,17 +15,26 @@ class BreadcrumbExtension extends \Twig_Extension
      */
     protected $jarves;
 
-    function __construct(Jarves $jarves)
-    {
-        $this->jarves = $jarves;
-    }
+    /**
+     * @var PageStack
+     */
+    private $pageStack;
 
     /**
-     * @return \Jarves\Jarves
+     * @var Cacher
      */
-    public function getJarves()
+    private $cacher;
+
+    /**
+     * @param Jarves $jarves
+     * @param PageStack $pageStack
+     * @param Cacher $cacher
+     */
+    function __construct(Jarves $jarves, PageStack $pageStack, Cacher $cacher)
     {
-        return $this->jarves;
+        $this->jarves = $jarves;
+        $this->pageStack = $pageStack;
+        $this->cacher = $cacher;
     }
 
     public function getName()
@@ -34,18 +46,19 @@ class BreadcrumbExtension extends \Twig_Extension
     {
         return array(
             'breadcrumb' => new \Twig_Function_Method($this, 'breadcrumb', [
-                    'is_safe' => ['html']
-                ])
+                'is_safe' => ['html'],
+                'needs_environment' => true
+            ])
         );
     }
 
-    public function breadcrumb($view = 'JarvesBundle:Default/breadcrumb.html.twig')
+    public function breadcrumb(\Twig_Environment $twig, $view = 'JarvesBundle:Default/breadcrumb.html.twig')
     {
         $breadcrumbs = [];
-        $page = $this->getJarves()->getCurrentPage();
+        $page = $this->pageStack->getCurrentPage();
 
         $cacheKey = 'core/breadcrumbs/' . $page->getId();
-        if ($cache = $this->getJarves()->getDistributedCache($cacheKey)) {
+        if ($cache = $this->cacher->getDistributedCache($cacheKey)) {
             if (is_string($cache)) {
                 return $cache;
             }
@@ -59,14 +72,14 @@ class BreadcrumbExtension extends \Twig_Extension
         }
 
         $data = [
-            'domain' => $this->getJarves()->getCurrentDomain(),
-            'baseUrl' => $this->getJarves()->getPageResponse()->getBaseHref(),
+            'domain' => $this->pageStack->getCurrentDomain(),
+            'baseUrl' => $this->pageStack->getPageResponse()->getBaseHref(),
             'breadcrumbs' => $breadcrumbs,
-            'currentPage' => $this->getJarves()->getCurrentPage()
+            'currentPage' => $this->pageStack->getCurrentPage()
         ];
 
-        $html = $this->getJarves()->getTemplating()->render($view, $data);
-        $this->getJarves()->setDistributedCache($cacheKey, $html);
+        $html = $twig->render($view, $data);
+        $this->cacher->setDistributedCache($cacheKey, $html);
         return $html;
     }
 

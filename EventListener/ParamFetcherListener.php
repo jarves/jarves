@@ -22,7 +22,7 @@ class ParamFetcherListener extends FosParamFetcherListener
 
     public function onKernelController(FilterControllerEvent $event)
     {
-        if ($this->container->get('jarves')->isAdmin()) {
+        if ($this->container->get('jarves.page_stack')->isAdmin()) {
             parent::onKernelController($event);
         }
     }

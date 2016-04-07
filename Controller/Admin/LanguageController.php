@@ -3,13 +3,33 @@
 namespace Jarves\Controller\Admin;
 
 use FOS\RestBundle\Request\ParamFetcher;
-use Jarves\Controller;
+use Jarves\Jarves;
+use Jarves\Translation\Translator;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Jarves\Controller\Admin\BundleManager\Manager;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LanguageController extends Controller
 {
+    /**
+     * @var Translator
+     */
+    protected $translator;
+
+    /**
+     * @var Jarves
+     */
+    protected $jarves;
+
+    public function setContainer(ContainerInterface $container = null)
+    {
+        parent::setContainer($container);
+
+        $this->jarves = $this->container->get('jarves');
+        $this->translator = $this->container->get('jarves.translator');
+    }
 
     /**
      * @ApiDoc(
@@ -40,9 +60,9 @@ class LanguageController extends Controller
     protected function getLanguage($bundle, $lang)
     {
         Manager::prepareName($bundle);
-        $utils = $this->getTranslator()->getUtils();
+        $utils = $this->translator->getUtils();
 
-        $file = $this->getJarves()->getBundleDir($bundle) . "Resources/translations/$lang.po";
+        $file = $this->jarves->getBundleDir($bundle) . "Resources/translations/$lang.po";
         $res = $utils->parsePo($file);
 
         $pluralForm = $utils->getPluralForm($lang);
@@ -77,7 +97,7 @@ class LanguageController extends Controller
         $langs = $paramFetcher->get('langs');
 
         Manager::prepareName($bundle);
-        $utils = $this->getTranslator()->getUtils();
+        $utils = $this->translator->getUtils();
         return $utils->saveLanguage($bundle, $lang, $langs);
     }
 
@@ -100,7 +120,7 @@ class LanguageController extends Controller
         $bundle = $paramFetcher->get('bundle');
         Manager::prepareName($bundle);
 
-        $utils = $this->getTranslator()->getUtils();
+        $utils = $this->translator->getUtils();
         return $utils->extractLanguage($bundle);
     }
 
@@ -124,7 +144,7 @@ class LanguageController extends Controller
         $bundle = $paramFetcher->get('bundle');
         $lang = $paramFetcher->get('lang');
 
-        $utils = $this->getTranslator()->getUtils();
+        $utils = $this->translator->getUtils();
         $extract = $utils->extractLanguage($bundle);
         $translated = $this->getLanguage($bundle, $lang);
 

@@ -86,9 +86,9 @@ $containerPadding: 1205-880; //actual window width - container width of our cont
 }
 
 .jarves-Dashboard-newsFeed-item {
-    color: gray;
+    color: #414141;
     padding: 9px 15px;
-    border-bottom: 1px solid darken($mainColor, 5%);
+    border-bottom: 1px solid darken($mainColor, 10%);
     clear: both;
     @include animation(kaDashboardNewsItemFadeIn 0.4s);
 }
@@ -121,11 +121,12 @@ $containerPadding: 1205-880; //actual window width - container width of our cont
 
 .jarves-Dashboard-newsFeed-item-date {
     float: right;
-    color: #b4b4b4;
+    color: #4E4E4E;
 }
 
 .jarves-Dashboard-newsFeed-item-verb {
-    margin: 0 4px;
+    color: #2B2B2B;
+    font-weight: 400;
 }
 
 .jarves-Dashboard-newsFeed-item-object-label {

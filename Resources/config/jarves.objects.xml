@@ -4,7 +4,7 @@
       <object id="File" crossRef="false">
         <label>File</label>
         <table>system_file</table>
-        <storageClass>Jarves\ORM\ObjectFile</storageClass>
+        <storageService>jarves.storage.file</storageService>
         <labelField>name</labelField>
         <dataModel>custom</dataModel>
         <fieldLabel>path</fieldLabel>
@@ -71,7 +71,7 @@
       </object>
       <object id="Node">
         <label>Node</label>
-        <apiController>@JarvesBundle/Controller/ObjectAPI/NodeCrudController.php</apiController>
+        <apiControllerDefinition>@JarvesBundle/Resources/config/crud/node.yml</apiControllerDefinition>
         <desc>Pages, Links, Trays and Navigation folder</desc>
         <table>system_node</table>
         <labelField>title</labelField>
@@ -146,7 +146,7 @@
       </object>
       <object id="Domain">
         <label>Domain</label>
-        <apiController>@JarvesBundle/Controller/ObjectAPI/DomainCrudController.php</apiController>
+        <apiControllerDefinition>@JarvesBundle/Resources/config/crud/domain.yml</apiControllerDefinition>
         <table>system_domain</table>
         <labelField>domain</labelField>
         <labelTemplate>[{{lang}}] {{domain}}</labelTemplate>
@@ -214,7 +214,7 @@
       <object id="Language">
         <label>Language</label>
         <table>system_langs</table>
-        <storageClass>Jarves\ORM\ObjectLanguage</storageClass>
+        <storageService>jarves.storage.language</storageService>
         <labelField>title</labelField>
         <labelTemplate>{{title}} ({{langtitle}}, {{code}})</labelTemplate>
         <defaultSelection>title, langtitle, code</defaultSelection>
@@ -245,7 +245,7 @@
       </object>
       <object id="EntryPoint" crossRef="false">
         <label>EntryPoint</label>
-        <storageClass>Jarves\ORM\ObjectEntryPoint</storageClass>
+        <storageService>jarves.storage.entrypoint</storageService>
         <labelField>title</labelField>
         <dataModel>custom</dataModel>
         <nested>true</nested>
@@ -287,7 +287,7 @@
       <object id="View">
         <label>Template View</label>
         <desc>Template views</desc>
-        <storageClass>Jarves\ORM\ObjectView</storageClass>
+        <storageService>jarves.storage.view</storageService>
         <labelField>name</labelField>
         <dataModel>custom</dataModel>
         <nested>true</nested>
@@ -304,7 +304,7 @@
         <label>Users</label>
         <table>system_user</table>
         <labelField>username</labelField>
-        <apiController>@JarvesBundle/Controller/ObjectAPI/UserCrudController.php</apiController>
+        <apiControllerDefinition>@JarvesBundle/Resources/config/crud/user.yml</apiControllerDefinition>
         <blacklistSelection>passwd, passwdSalt</blacklistSelection>
         <fields>
           <field id="id" type="number" primaryKey="true" autoIncrement="true">
@@ -352,7 +352,7 @@
         <label>Groups</label>
         <table>system_group</table>
         <labelField>name</labelField>
-        <apiController>@JarvesBundle/Controller/ObjectAPI/GroupCrudController.php</apiController>
+        <apiControllerDefinition>@JarvesBundle/Resources/config/crud/group.yml</apiControllerDefinition>
         <defaultSelection>name, description</defaultSelection>
         <fields>
           <field id="id" type="number" primaryKey="true" autoIncrement="true">

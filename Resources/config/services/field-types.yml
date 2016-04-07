@@ -149,6 +149,7 @@ services:
 
      jarves.field.types.userPassword:
          class: %jarves.field.types.userPassword.class%
+         arguments: ["@jarves.config"]
          tags:
              - { name: jarves.field.type, alias: userPassword }
 

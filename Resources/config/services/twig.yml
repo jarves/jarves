@@ -1,25 +1,25 @@
 services:
      jarves.twig.extension.navigation:
          class: Jarves\Twig\NavigationExtension
-         arguments: ["@jarves"]
+         arguments: ["@jarves.navigation"]
          tags:
             - { name: twig.extension }
 
      jarves.twig.extension.nodeIsActive:
          class: Jarves\Twig\NodeIsActiveExtension
-         arguments: ["@jarves"]
+         arguments: ["@jarves.page_stack", "@jarves.utils"]
          tags:
             - { name: twig.extension }
 
      jarves.twig.extension.nodeUrl:
          class: Jarves\Twig\NodeUrlExtension
-         arguments: ["@jarves"]
+         arguments: ["@jarves.utils"]
          tags:
             - { name: twig.extension }
 
      jarves.twig.extension.loadAsset:
          class: Jarves\Twig\LoadAssetExtension
-         arguments: ["@jarves"]
+         arguments: ["@jarves.page_stack"]
          tags:
             - { name: twig.extension }
 
@@ -31,13 +31,12 @@ services:
 
      jarves.twig.extension.breadcrumb:
          class: Jarves\Twig\BreadcrumbExtension
-         arguments: ["@jarves"]
+         arguments: ["@jarves", "@jarves.page_stack", "@jarves.cache.cacher"]
          tags:
             - { name: twig.extension }
 
      jarves.twig.extension.content:
          class: Jarves\Twig\ContentExtension
-         arguments: ["@jarves"]
          tags:
             - { name: twig.extension }
 
@@ -60,6 +59,6 @@ services:
 
      jarves.twig.extension.renderContents:
          class: Jarves\Twig\RenderContentsExtension
-         arguments: ["@jarves"]
+         arguments: ["@service_container"]
          tags:
             - { name: twig.extension }

@@ -3,8 +3,10 @@
 namespace Jarves\Admin;
 
 
+use Jarves\ACL;
 use Jarves\Jarves;
 use Jarves\Model\DomainQuery;
+use Jarves\PageStack;
 
 class AdminAssets
 {
@@ -14,36 +16,37 @@ class AdminAssets
      */
     protected $jarves;
 
-    function __construct(Jarves $jarves)
-    {
-        $this->jarves = $jarves;
-    }
+    /**
+     * @var PageStack
+     */
+    private $pageStack;
 
     /**
-     * @param \Jarves\Jarves $jarves
+     * @var ACL
      */
-    public function setJarves($jarves)
-    {
-        $this->jarves = $jarves;
-    }
+    private $acl;
 
     /**
-     * @return \Jarves\Jarves
+     * @param Jarves $jarves
+     * @param PageStack $pageStack
+     * @param ACL $acl
      */
-    public function getJarves()
+    function __construct(Jarves $jarves, PageStack $pageStack, ACL $acl)
     {
-        return $this->jarves;
+        $this->jarves = $jarves;
+        $this->pageStack = $pageStack;
+        $this->acl = $acl;
     }
 
     public function appendAngularTemplates()
     {
-        $response = $this->getJarves()->getPageResponse();
+        $response = $this->pageStack->getPageResponse();
 
-        foreach ($this->getJarves()->getConfigs() as $bundle) {
+        foreach ($this->jarves->getConfigs() as $bundle) {
             $templates = $bundle->getAdminAngularTemplatesInfo();
             foreach ($templates as $template) {
-                $publicPath = $this->getJarves()->resolvePublicWebPath($template->getPath());
-                $localPath = $this->getJarves()->resolveInternalPublicPath($template->getPath());
+                $publicPath = $this->jarves->resolvePublicWebPath($template->getPath());
+                $localPath = $this->jarves->resolveInternalPublicPath($template->getPath());
 
                 $content = file_get_contents($localPath);
                 $content = str_replace('</script>', '', $content);
@@ -54,11 +57,11 @@ class AdminAssets
 
     public function addSessionScripts()
     {
-        $response = $this->getJarves()->getPageResponse();
+        $response = $this->pageStack->getPageResponse();
 
-        $client = $this->getJarves()->getAdminClient();
+        $client = $this->pageStack->getAdminClient();
         if (!$client) {
-            $client = $this->getJarves()->getClient();
+            $client = $this->pageStack->getClient();
         }
 
         $session = array();
@@ -66,10 +69,10 @@ class AdminAssets
         $session['sessionid'] = $client->getToken();
         $session['tokenid'] = $client->getTokenId();
         $session['lang'] = $client->getSession()->getLanguage();
-        $session['access'] = $this->getJarves()->getACL()->check('JarvesBundle:EntryPoint', '/admin');
+        $session['access'] = $this->acl->check('JarvesBundle:EntryPoint', '/admin');
         if ($client->getUserId()) {
             $session['username'] = $client->getUser()->getUsername();
-            $session['lastLogin'] = $client->getUser()->getLastlogin();
+            $session['lastLogin'] = $client->getUser()->getLastLogin();
             $session['firstName'] = $client->getUser()->getFirstName();
             $session['lastName'] = $client->getUser()->getLastName();
 
@@ -84,8 +87,8 @@ class AdminAssets
 
     public function addLanguageResources()
     {
-        $response = $this->getJarves()->getPageResponse();
-        $prefix = substr($this->getJarves()->getAdminPrefix(), 1);
+        $response = $this->pageStack->getPageResponse();
+        $prefix = substr($this->jarves->getAdminPrefix(), 1);
 
         $response->addJsFile($prefix . '/admin/ui/languages');
         $response->addJsFile($prefix . '/admin/ui/language?lang=en&javascript=1');
@@ -94,11 +97,11 @@ class AdminAssets
 
     public function addMainResources($options = array())
     {
-        $response = $this->getJarves()->getPageResponse();
-        $request = $this->getJarves()->getRequest();
+        $response = $this->pageStack->getPageResponse();
+        $request = $this->pageStack->getRequest();
         $options['noJs'] = isset($options['noJs']) ? $options['noJs'] : false;
 
-        $prefix = substr($this->getJarves()->getAdminPrefix(), 1);
+        $prefix = substr($this->jarves->getAdminPrefix(), 1);
 
         $response->addJs(
             '
@@ -106,8 +109,8 @@ class AdminAssets
         window._pathAdmin = ' . json_encode($request->getBaseUrl() . '/' . $prefix . '/')
         );
 
-        if ($this->getJarves()->getKernel()->isDebug()) {
-            foreach ($this->getJarves()->getConfigs() as $bundleConfig) {
+        if ($this->jarves->isDebugMode()) {
+            foreach ($this->jarves->getConfigs() as $bundleConfig) {
                 foreach ($bundleConfig->getAdminAssetsInfo() as $assetInfo) {
                     if ($options['noJs'] && $assetInfo->isJavaScript()) {
                         continue;
@@ -122,7 +125,7 @@ class AdminAssets
                 $response->addJsFile($prefix . '/admin/backend/script', 3000);
             }
 
-            foreach ($this->getJarves()->getConfigs() as $bundleConfig) {
+            foreach ($this->jarves->getConfigs() as $bundleConfig) {
                 foreach ($bundleConfig->getAdminAssetsInfo() as $assetInfo) {
                     if ($options['noJs'] && $assetInfo->isJavaScript()) {
                         continue;
@@ -131,7 +134,7 @@ class AdminAssets
                     if ($assetInfo->getPath()) {
                         // load javascript files, that are not accessible (means those point to a controller)
                         // because those can't be compressed
-                        $path = $this->getJarves()->resolveWebPath($assetInfo->getPath());
+                        $path = $this->jarves->resolveWebPath($assetInfo->getPath());
                         if (!file_exists($path)) {
                             $response->addAsset($assetInfo);
                             continue;
@@ -162,9 +165,9 @@ class AdminAssets
     {
         $this->addMainResources(['noJs' => true]);
         $this->addSessionScripts();
-        $page = $this->getJarves()->getCurrentPage();
+        $page = $this->pageStack->getCurrentPage();
 
-        $response = $this->getJarves()->getPageResponse();
+        $response = $this->pageStack->getPageResponse();
 
         // TODO, remove mootools dependency. WE NEED MOOTOOLS PRIME FOR THAT!
         $response->addJsFile('@JarvesBundle/admin/mootools-core-1.4.5-fixed-memory-leak.js');
@@ -175,7 +178,7 @@ class AdminAssets
         $response->setResourceCompression(false);
         $response->setDomainHandling(false);
 
-        $request = $this->getJarves()->getRequest();
+        $request = $this->pageStack->getRequest();
 
         $nodeArray['id'] = $page->getId();
         $nodeArray['title'] = $page->getTitle();

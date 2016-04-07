@@ -6,7 +6,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use FOS\RestBundle\Request\ParamFetcher;
 use Symfony\Component\HttpFoundation\Request;
 
-abstract class NestedObjectCrudController extends ObjectCrudController
+class NestedObjectCrudController extends ObjectCrudController
 {
     /**
      * @ApiDoc(
@@ -27,9 +27,7 @@ abstract class NestedObjectCrudController extends ObjectCrudController
      */
     public function addItemAction(Request $request, ParamFetcher $paramFetcher)
     {
-        $obj = $this->getObj();
-
-        return $obj->add($request, $paramFetcher->get('_pk'), $paramFetcher->get('_position'), $paramFetcher->get('_targetObjectKey'));
+        return $this->add($request, $paramFetcher->get('_pk'), $paramFetcher->get('_position'), $paramFetcher->get('_targetObjectKey'));
     }
 
     /**
@@ -50,9 +48,7 @@ abstract class NestedObjectCrudController extends ObjectCrudController
      */
     public function addMultipleItemAction(Request $request)
     {
-        $obj = $this->getObj();
-
-        return $obj->addMultiple($request);
+        return $this->addMultiple($request);
     }
 
 
@@ -68,8 +64,6 @@ abstract class NestedObjectCrudController extends ObjectCrudController
      */
     public function removeRootAction()
     {
-        $obj = $this->getObj();
-
         return '#todo';
 //        return $obj->removeRoot();
 //
@@ -115,10 +109,9 @@ abstract class NestedObjectCrudController extends ObjectCrudController
         $limit = null,
         $offset = null,
         $filter = null
-    ) {
-        $obj = $this->getObj();
-
-        return $obj->getBranchItems(null, $filter, $fields, $scope, $depth, $limit, $offset);
+    )
+    {
+        return $this->getBranchItems(null, $filter, $fields, $scope, $depth, $limit, $offset);
     }
 
     /**
@@ -150,7 +143,6 @@ abstract class NestedObjectCrudController extends ObjectCrudController
      */
     public function getBranchItemsAction(
         Request $request,
-        $pk = null,
         $fields = null,
         $scope = null,
         $depth = null,
@@ -158,11 +150,10 @@ abstract class NestedObjectCrudController extends ObjectCrudController
         $offset = null,
         $filter = null,
         $withAcl = null
-    ) {
-        $obj = $this->getObj();
-
+    )
+    {
         $primaryKey = $this->extractPrimaryKey($request);
-        return $obj->getBranchItems($primaryKey, $filter, $fields, $scope, $depth, $limit, $offset, $withAcl);
+        return $this->getBranchItems($primaryKey, $filter, $fields, $scope, $depth, $limit, $offset, $withAcl);
     }
 
     /**
@@ -185,14 +176,12 @@ abstract class NestedObjectCrudController extends ObjectCrudController
      */
     public function getBranchChildrenCountAction(Request $request, $scope = null, $filter = null)
     {
-        $obj = $this->getObj();
-
         $primaryKey = $this->extractPrimaryKey($request);
 
         if ($primaryKey) {
-            return $obj->getBranchChildrenCount($primaryKey, $scope, $filter);
+            return $this->getBranchChildrenCount($primaryKey, $scope, $filter);
         } else {
-            return $obj->getBranchChildrenCount(null, $scope, $filter);
+            return $this->getBranchChildrenCount(null, $scope, $filter);
         }
 
     }
@@ -205,35 +194,29 @@ abstract class NestedObjectCrudController extends ObjectCrudController
      * @Rest\RequestParam(name="target", requirements=".+", description="The target PK")
      * @Rest\RequestParam(name="position", strict=false, requirements="prev|next|insert", default="first", description="The position")
      * @Rest\RequestParam(name="targetObjectKey", strict=false, description="Target object key. Usually blank.")
-     * @Rest\RequestParam(name="overwrite", strict=false, requirements="true|false", default="false", description="If the target should be replaced when exist")
+     * @ //Rest\RequestParam(name="overwrite", strict=false, requirements="true|false", default="false", description="If the target should be replaced when exist")
      *
      * @Rest\View()
      * @Rest\Post("/{pk}/:move")
      *
      * @param Request $request
-     * @param string $target
-     * @param string $position
-     * @param string $targetObjectKey
-     * @param bool $overwrite
      *
      * @return boolean
      */
     public function moveItemAction(Request $request, ParamFetcher $paramFetcher)
     {
-        $obj = $this->getObj();
-
         $primaryKey = $this->extractPrimaryKey($request);
         $target = $paramFetcher->get('target');
         $position = $paramFetcher->get('position') ?: 'first';
         $targetObjectKey = $paramFetcher->get('targetObjectKey');
-        $overwrite = $paramFetcher->get('overwrite');
+//        $overwrite = $paramFetcher->get('overwrite');
 
-        return $obj->moveItem(
+        return $this->moveItem(
             $primaryKey,
             $target,
             $position,
-            $targetObjectKey,
-            filter_var($overwrite, FILTER_VALIDATE_BOOLEAN)
+            $targetObjectKey//,
+//            filter_var($overwrite, FILTER_VALIDATE_BOOLEAN)
         );
 
     }
@@ -253,9 +236,7 @@ abstract class NestedObjectCrudController extends ObjectCrudController
      */
     public function getRootsAction(ParamFetcher $paramFetcher)
     {
-        $obj = $this->getObj();
-
-        return $obj->getRoots(null, $paramFetcher->get('lang'), $paramFetcher->get('domain'));
+        return $this->getRoots(null, $paramFetcher->get('lang'), $paramFetcher->get('domain'));
     }
 
     /**
@@ -274,9 +255,7 @@ abstract class NestedObjectCrudController extends ObjectCrudController
      */
     public function getRootAction($scope = null)
     {
-        $obj = $this->getObj();
-
-        return $obj->getRoot($scope);
+        return $this->getRoot($scope);
     }
 
     /**
@@ -293,11 +272,9 @@ abstract class NestedObjectCrudController extends ObjectCrudController
      */
     public function getParentAction(Request $request)
     {
-        $obj = $this->getObj();
-
         $primaryKey = $this->extractPrimaryKey($request);
 
-        return $obj->getParent($primaryKey);
+        return $this->getParent($primaryKey);
     }
 
     /**
@@ -314,11 +291,9 @@ abstract class NestedObjectCrudController extends ObjectCrudController
      */
     public function getParentsAction(Request $request)
     {
-        $obj = $this->getObj();
-
         $primaryKey = $this->extractPrimaryKey($request);
 
-        return $obj->getParents($primaryKey);
+        return $this->getParents($primaryKey);
     }
 
 } 

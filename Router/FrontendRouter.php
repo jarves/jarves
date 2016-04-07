@@ -2,12 +2,16 @@
 
 namespace Jarves\Router;
 
+use Jarves\Cache\Cacher;
 use Jarves\Jarves;
 use Jarves\Model\Node;
-use Jarves\Model\NodeQuery;
+use Jarves\PageStack;
+use Jarves\StopwatchHelper;
+use Jarves\Utils;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-
 use Jarves\Model\DomainQuery;
 use Jarves\Model\Content;
 use Jarves\Model\ContentQuery;
@@ -18,7 +22,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 class FrontendRouter
 {
-
     /**
      * @var Request|null
      */
@@ -44,10 +47,55 @@ class FrontendRouter
      */
     protected $editorMode = false;
 
-    function __construct(Jarves $jarves, Request $request)
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
+     * @var Cacher
+     */
+    private $cacher;
+
+    /**
+     * @var StopwatchHelper
+     */
+    private $stopwatch;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var Utils
+     */
+    private $utils;
+    /**
+     * @var PageStack
+     */
+    private $pageStack;
+
+    /**
+     * FrontendRouter constructor.
+     * @param Jarves $jarves
+     * @param PageStack $pageStack
+     * @param StopwatchHelper $stopwatch
+     * @param Utils $utils
+     * @param LoggerInterface $logger
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param Cacher $cacher
+     */
+    function __construct(Jarves $jarves, PageStack $pageStack, StopwatchHelper $stopwatch, Utils $utils,
+                         LoggerInterface $logger, EventDispatcherInterface $eventDispatcher, Cacher $cacher)
     {
-        $this->request = $request;
         $this->jarves = $jarves;
+        $this->stopwatch = $stopwatch;
+        $this->logger = $logger;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->cacher = $cacher;
+        $this->utils = $utils;
+        $this->pageStack = $pageStack;
     }
 
     /**
@@ -64,22 +112,6 @@ class FrontendRouter
     public function getRoutes()
     {
         return $this->routes;
-    }
-
-    /**
-     * @param Jarves $jarves
-     */
-    public function setJarves($jarves)
-    {
-        $this->jarves = $jarves;
-    }
-
-    /**
-     * @return Jarves
-     */
-    public function getJarves()
-    {
-        return $this->jarves;
     }
 
     /**
@@ -110,11 +142,11 @@ class FrontendRouter
         $this->routes = $routes;
 
         if ($this->request) {
-            if ($this->getJarves()->isAdmin()) {
+            if ($this->pageStack->isAdmin()) {
                 return null;
             }
 
-            if ($this->searchDomain() && $page = $this->searchPage($this->request->getPathInfo())) {
+            if ($this->searchDomain() && $page = $this->searchPage()) {
                 $this->registerMainPage($page);
                 $this->registerPluginRoutes($page);
                 if ($response = $this->checkPageAccess($page)) {
@@ -122,10 +154,13 @@ class FrontendRouter
                 }
             }
         }
+
+        return null;
     }
 
     public function checkPageAccess(Node $page)
     {
+        /** @var Node $oriPage */
         $oriPage = $page;
 
         if ($page->getAccessFrom() > 0 && ($page->getAccessFrom() > time())) {
@@ -162,7 +197,7 @@ class FrontendRouter
 
             if (!$access) {
                 //maybe we have access through the backend auth?
-                if ($this->getJarves()->getAdminClient()->hasSession()) {
+                if ($this->pageStack->getAdminClient()->hasSession()) {
 //                    foreach ($this->getJarves()->getAdminClient()->getUser()->getGroups() as $group) {
 //                        if (strpos($groups, "," . $group . ",") !== false) {
 //                            $access = true;
@@ -177,9 +212,9 @@ class FrontendRouter
             }
         }
 
-        if (!$page && $to = $oriPage->getAccessRedirectto()) {
+        if (!$page && $to = $oriPage->getAccessRedirectTo()) {
             if (intval($to) > 0) {
-                $to = $this->getJarves()->getNodeUrl($to);
+                $to = $this->utils->getNodeUrl($to);
             }
 
             return new RedirectResponse($to);
@@ -197,19 +232,18 @@ class FrontendRouter
 //            container('HTTP/1.0 401 Unauthorized');
 
         }
-//        return $page;
     }
 
     public function registerMainPage(Node $page)
     {
         $domain = $page->getDomain();
 
-        $clazz = 'Jarves\\Controller\\PageController';
+        $clazz = 'jarves.page_controller';
         $domainUrl = $domain->getMaster() ? '' : '/' . $domain->getLang();
 
-        $url = $this->jarves->getNodeUrl($page->getId(), null, null, $domain);
+        $url = $this->utils->getNodeUrl($page->getId(), null, null, $domain);
 
-        $controller = $clazz . '::handleAction';
+        $controller = $clazz . ':handleAction';
 
         if ('' !== $url && '/' !== $url && $domain && $domain->getStartnodeId() == $page->getId()) {
             //This is the start page, so add a redirect controller
@@ -218,7 +252,7 @@ class FrontendRouter
                 new SyRoute(
                     $url,
                     array(
-                        '_controller' => $clazz . '::redirectToStartPageAction',
+                        '_controller' => $clazz . ':redirectToStartPageAction',
                         'jarvesFrontend' => true,
                         'nodeId' => $page->getId()
                     )
@@ -240,10 +274,11 @@ class FrontendRouter
     public function registerPluginRoutes(Node $page)
     {
         $domain = $page->getDomain();
-        $this->getJarves()->getStopwatch()->start('Register Plugin Routes');
+
+        $this->stopwatch->start('Register Plugin Routes');
         //add all router to current router and fire sub-request
         $cacheKey = 'core/node/plugins-' . $page->getId();
-        $plugins = $this->getJarves()->getDistributedCache($cacheKey);
+        $plugins = $this->cacher->getDistributedCache($cacheKey);
 
         if (null === $plugins) {
             $plugins = ContentQuery::create()
@@ -251,7 +286,7 @@ class FrontendRouter
                 ->filterByType('plugin')
                 ->find();
 
-            $this->getJarves()->setDistributedCache($cacheKey, serialize($plugins));
+            $this->cacher->setDistributedCache($cacheKey, serialize($plugins));
         } else {
             $plugins = unserialize($plugins);
         }
@@ -264,7 +299,7 @@ class FrontendRouter
             $data = json_decode($plugin->getContent(), true);
 
             if (!$data) {
-                $this->getJarves()->getLogger()->addAlert(
+                $this->logger->alert(
                     sprintf(
                         'On page `%s` [%d] is a invalid plugin `%d`.',
                         $page->getTitle(),
@@ -277,9 +312,9 @@ class FrontendRouter
 
             $bundleName = isset($data['module']) ? $data['module'] : @$data['bundle'];
 
-            $config = $this->getJarves()->getConfig($bundleName);
+            $config = $this->jarves->getConfig($bundleName);
             if (!$config) {
-                $this->getJarves()->getLogger()->alert(
+                $this->logger->alert(
                     sprintf(
                         'Bundle `%s` for plugin `%s` on page `%s` [%d] does not not exist.',
                         $bundleName,
@@ -294,7 +329,7 @@ class FrontendRouter
             $pluginDefinition = $config->getPlugin(@$data['plugin']);
 
             if (!$pluginDefinition) {
-                $this->getJarves()->getLogger()->addAlert(
+                $this->logger->alert(
                     sprintf(
                         'In bundle `%s` the plugin `%s` on page `%s` [%d] does not not exist.',
                         $bundleName,
@@ -309,13 +344,7 @@ class FrontendRouter
             if ($pluginRoutes = $pluginDefinition->getRoutes()) {
                 foreach ($pluginRoutes as $idx => $route) {
 
-                    $clazz = $pluginDefinition->getClass();
-                    if (false !== strpos($clazz, '\\')) {
-                        $controller = $clazz . '::' . $pluginDefinition->getMethod();
-                    } else {
-                        $controller = $clazz . '\\' . $pluginDefinition->getClass(
-                            ) . '::' . $pluginDefinition->getMethod();
-                    }
+                    $controller = $pluginDefinition->getController();
 
                     $defaults = array(
                         '_controller' => $controller,
@@ -330,7 +359,7 @@ class FrontendRouter
                         $defaults = array_merge($defaults, $route->getArrayDefaults());
                     }
 
-                    $url = $this->jarves->getNodeUrl($page->getId(), null, null, $domain);
+                    $url = $this->utils->getNodeUrl($page->getId(), null, null, $domain);
 
                     $this->routes->add(
                         'jarves_plugin_' . ($route->getId() ?: $plugin->getId()) . '_' . $idx,
@@ -343,7 +372,7 @@ class FrontendRouter
                 }
             }
         }
-        $this->getJarves()->getStopwatch()->stop('Register Plugin Routes');
+        $this->stopwatch->stop('Register Plugin Routes');
     }
 
     /**
@@ -372,10 +401,9 @@ class FrontendRouter
     /**
      * Check whether specified pLang is a valid language
      *
-     * @param string $lang
+     * @param $lang
      *
      * @return bool
-     * @internal
      */
     public function isValidLanguage($lang)
     {
@@ -395,33 +423,30 @@ class FrontendRouter
     /**
      * Returns the domain if found
      *
-     * @param bool $noRefreshCache
-     *
      * @return \Jarves\Model\Domain|null
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function searchDomain($noRefreshCache = false)
+    public function searchDomain()
     {
         $request = $this->getRequest();
-        $dispatcher = $this->getJarves()->getEventDispatcher();
+        $dispatcher = $this->eventDispatcher;
 
         if ($domainId = $request->get('_jarves_editor_domain')) {
             $hostname = DomainQuery::create()->select('domain')->findOneById($domainId);
         } else {
             $hostname = $request->getHost();
         }
-        $stopwatch = $this->getJarves()->getStopwatch();
 
         $title = sprintf('Searching Domain [%s]', $hostname);
-        $stopwatch->start($title);
+        $this->stopwatch->start($title);
 
         /** @var \Jarves\Model\Domain $foundDomain */
         $foundDomain = null;
         $possibleLanguage = $this->getPossibleLanguage();
         $hostnameWithLanguage = $hostname . '/' . $possibleLanguage;
 
-        $cachedDomains = $this->getJarves()->getDistributedCache('core/domains');
+        $cachedDomains = $this->cacher->getDistributedCache('core/domains');
 
         if ($cachedDomains) {
             $cachedDomains = @unserialize($cachedDomains);
@@ -458,7 +483,7 @@ class FrontendRouter
                 }
             }
 
-            $this->getJarves()->setDistributedCache('core/domains', serialize($cachedDomains));
+            $this->cacher->setDistributedCache('core/domains', serialize($cachedDomains));
         }
 
         //search redirect
@@ -491,10 +516,10 @@ class FrontendRouter
             return null;
         }
 
-        $this->getJarves()->setCurrentDomain($foundDomain);
+        $this->pageStack->setCurrentDomain($foundDomain);
         $foundDomain->setRealDomain($hostname);
 
-        $stopwatch->stop($title);
+        $this->stopwatch->stop($title);
 
         return $foundDomain;
     }
@@ -502,22 +527,19 @@ class FrontendRouter
     /**
      * Returns the id of given path-info. Null if not existent.
      *
-     * @param string $pathInfo
-     *
      * @return Node|null
      */
-    protected function searchPage($pathInfo)
+    protected function searchPage()
     {
         $url = $this->getRequest()->getPathInfo();
-        $stopwatch = $this->getJarves()->getStopwatch();
 
         $page = null;
         $title = sprintf('Searching Page [%s]', $url);
 
-        $stopwatch->start($title);
+        $this->stopwatch->start($title);
         if (!$page) {
-            $domain = $this->getJarves()->getCurrentDomain();
-            $urls = $this->getJarves()->getUtils()->getCachedUrlToPage($domain->getId());
+            $domain = $this->pageStack->getCurrentDomain();
+            $urls = $this->utils->getCachedUrlToPage($domain->getId());
 
             $possibleUrl = $url;
             $id = false;
@@ -544,20 +566,20 @@ class FrontendRouter
             $url = $possibleUrl;
 
             if ($url == '/') {
-                $pageId = $this->getJarves()->getCurrentDomain()->getStartnodeId();
+                $pageId = $this->pageStack->getCurrentDomain()->getStartnodeId();
 
                 if (!$pageId > 0) {
-                    $this->getJarves()->getEventDispatcher()->dispatch('core/domain-no-start-page');
+                    $this->eventDispatcher->dispatch('core/domain-no-start-page');
                 }
             } else {
                 $pageId = $id;
             }
             /** @var \Jarves\Model\Node $page */
-            $page = $this->getJarves()->getUtils()->getPage($pageId);
-            $this->getJarves()->setCurrentPage($page);
+            $page = $this->utils->getPage($pageId);
         }
 
-        $stopwatch->stop($title);
+        $this->pageStack->setCurrentPage($page);
+        $this->stopwatch->stop($title);
 
         return $page;
     }

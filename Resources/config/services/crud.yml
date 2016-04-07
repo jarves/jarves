@@ -1,0 +1,16 @@
+services:
+
+  jarves.crud.object_crud:
+    class: Jarves\Admin\ObjectCrud
+    shared: false
+    arguments: ["@jarves.translator", "@jarves.objects", "@jarves", "@request_stack", "@jarves.condition_operator", "@jarves.acl", "@event_dispatcher", "@jarves.utils"]
+
+  jarves.crud.controller.object:
+    class: Jarves\Controller\ObjectCrudController
+    shared: false
+    parent: jarves.crud.object_crud
+
+  jarves.crud.controller.nested_object:
+    class: Jarves\Controller\NestedObjectCrudController
+    shared: false
+    parent: jarves.crud.object_crud

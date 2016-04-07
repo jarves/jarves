@@ -3,7 +3,13 @@
 namespace Jarves\Controller\Admin;
 
 use FOS\RestBundle\Request\ParamFetcher;
-use Jarves\Controller;
+use Jarves\ACL;
+use Jarves\Filesystem\Filesystem;
+use Jarves\Jarves;
+use Jarves\Objects;
+use Jarves\PageStack;
+use Jarves\Utils;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Jarves\Exceptions\AccessDeniedException;
 use Jarves\Exceptions\FileNotFoundException;
 use Jarves\Exceptions\FileUploadException;
@@ -13,6 +19,7 @@ use Jarves\File\FileSize;
 use Jarves\Model\Base\FileQuery;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Jarves\Model\File;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -20,6 +27,49 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FileController extends Controller
 {
+    /**
+     * @var Jarves
+     */
+    protected $jarves;
+
+    /**
+     * @var PageStack
+     */
+    protected $pageStack;
+
+    /**
+     * @var Filesystem
+     */
+    protected $webFilesystem;
+
+    /**
+     * @var Objects
+     */
+    protected $objects;
+
+    /**
+     * @var Utils
+     */
+    protected $utils;
+
+    /**
+     * @var ACL
+     */
+    protected $acl;
+
+    public function setContainer(ContainerInterface $container = null)
+    {
+        parent::setContainer($container);
+
+        $this->jarves = $this->container->get('jarves');
+        $this->pageStack = $this->container->get('jarves.page_stack');
+        $this->objects = $this->container->get('jarves.objects');
+        $this->webFilesystem = $this->container->get('jarves.filesystem.web');
+        $this->utils = $this->container->get('jarves.utils');
+        $this->acl = $this->container->get('jarves.acl');
+    }
+
+
     /**
      * @ApiDoc(
      *  section="File Manager",
@@ -37,13 +87,13 @@ class FileController extends Controller
     public function deleteFileAction($path)
     {
         $this->checkAccess($path);
-        if (!$file = $this->getJarves()->getWebFileSystem()->getFile($path)) {
+        if (!$file = $this->webFilesystem->getFile($path)) {
             return false;
         }
 
         FileQuery::create()->filterByPath($path)->delete();
 
-        if ($result = $this->getJarves()->getWebFileSystem()->remove($path)) {
+        if ($result = $this->webFilesystem->remove($path)) {
             $this->newFeed($file, 'deleted', $path);
         }
 
@@ -71,11 +121,11 @@ class FileController extends Controller
         $content = $paramFetcher->get('content');
         $this->checkAccess($path);
 
-        if ($this->getJarves()->getWebFileSystem()->has($path)) {
+        if ($this->webFilesystem->has($path)) {
             return ['targetExists' => true];
         }
 
-        $result = $this->getJarves()->getWebFileSystem()->write($path, $content);
+        $result = $this->webFilesystem->write($path, $content);
         if ($result) {
             $this->newFeed($path, 'created');
         }
@@ -105,7 +155,7 @@ class FileController extends Controller
         $target = $paramFetcher->get('target');
         $overwrite = filter_var($paramFetcher->get('overwrite'), FILTER_VALIDATE_BOOLEAN);
 
-        if (!$overwrite && $this->getJarves()->getWebFileSystem()->has($target)) {
+        if (!$overwrite && $this->webFilesystem->has($target)) {
             return ['targetExists' => true];
         }
 
@@ -113,7 +163,7 @@ class FileController extends Controller
         $this->checkAccess($target);
 
         $this->newFeed($path, 'moved', sprintf('from %s to %s', $path, $target));
-        $result = $this->getJarves()->getWebFileSystem()->move($path, $target);
+        $result = $this->webFilesystem->move($path, $target);
 
         return $result;
     }
@@ -147,14 +197,14 @@ class FileController extends Controller
             $this->checkAccess($file);
 
             $newPath = $target . '/' . basename($file);
-            if (!$overwrite && $this->getJarves()->getWebFileSystem()->has($newPath)) {
+            if (!$overwrite && $this->webFilesystem->has($newPath)) {
                 return ['targetExists' => true];
             }
 
             $this->newFeed($file, $move ? 'moved': 'copied', sprintf('from %s to %s', $file, $newPath));
         }
 
-        return $this->getJarves()->getWebFileSystem()->paste($files, $target, $move ? 'move' : 'copy');
+        return $this->webFilesystem->paste($files, $target, $move ? 'move' : 'copy');
     }
 
     /**
@@ -176,7 +226,7 @@ class FileController extends Controller
         $path = $paramFetcher->get('path');
         $this->checkAccess(dirname($path));
 
-        if ($result = $this->getJarves()->getWebFileSystem()->mkdir($path)) {
+        if ($result = $this->webFilesystem->mkdir($path)) {
             $this->newFeed($path, 'created', $path);
         }
 
@@ -205,12 +255,12 @@ class FileController extends Controller
         }
 
         try {
-            $file = $this->getJarves()->getWebFileSystem()->getFile($path);
+            $file = $this->webFilesystem->getFile($path);
         } catch (FileNotFoundException $e) {
             while ('/' !== $path) {
                 try {
                     $path = dirname($path);
-                    $file = $this->getJarves()->getWebFileSystem()->getFile($path);
+                    $file = $this->webFilesystem->getFile($path);
                 } catch (FileNotFoundException $e) {
                 }
             }
@@ -218,7 +268,7 @@ class FileController extends Controller
 
         $method = $method ? 'check' . ucfirst($method) . 'Exact' : 'checkUpdateExact';
 
-        if ($file && !$this->getJarves()->getACL()->$method(
+        if ($file && !$this->acl->$method(
                 'jarves/file',
                 array('id' => $file->getId()),
                 $fields
@@ -267,7 +317,7 @@ class FileController extends Controller
             $res['name'] = $name;
         }
 
-        $exist = $this->getJarves()->getWebFileSystem()->has($newPath);
+        $exist = $this->webFilesystem->has($newPath);
         if ($exist && !$overwrite) {
             if ($autoRename) {
                 //find new name
@@ -284,7 +334,7 @@ class FileController extends Controller
                     $i++;
                     $name = $firstName . '-' . $i . ($extension ? '.' . $extension : '');
                     $newPath = ($path == '/') ? '/' . $name : $path . '/' . $name;
-                    if (!$this->getJarves()->getWebFileSystem()->has($newPath)) {
+                    if (!$this->webFilesystem->has($newPath)) {
                         break;
                     }
                 } while (true);
@@ -298,9 +348,9 @@ class FileController extends Controller
             }
         }
 
-        $this->getJarves()->getWebFileSystem()->write(
+        $this->webFilesystem->write(
             $newPath,
-            "file-is-being-uploaded-by-" . hash('sha512', $this->getJarves()->getAdminClient()->getTokenId())
+            "file-is-being-uploaded-by-" . hash('sha512', $this->pageStack->getAdminClient()->getTokenId())
         );
         $res['ready'] = true;
 
@@ -356,12 +406,12 @@ class FileController extends Controller
         }
 
         $newPath = ($path == '/') ? '/' . $name : $path . '/' . $name;
-        if ($this->getJarves()->getWebFileSystem()->has($newPath)) {
+        if ($this->webFilesystem->has($newPath)) {
 //            if (!$overwrite) {
-                if ($this->getJarves()->getWebFileSystem()->has($newPath)) {
-                    $content = $this->getJarves()->getWebFileSystem()->read($newPath);
+                if ($this->webFilesystem->has($newPath)) {
+                    $content = $this->webFilesystem->read($newPath);
 
-                    $check = "file-is-being-uploaded-by-" . hash('sha512', $this->getJarves()->getAdminClient()->getTokenId());
+                    $check = "file-is-being-uploaded-by-" . hash('sha512', $this->pageStack->getAdminClient()->getTokenId());
                     if ($content != $check) {
                         //not our file, so cancel
                         throw new FileUploadException(sprintf(
@@ -374,8 +424,8 @@ class FileController extends Controller
 //            }
         }
 
-        $jarvesFile = $this->getJarves()->getWebFileSystem()->getFile(dirname($path));
-        if ($jarvesFile && !$this->getJarves()->getACL()->checkUpdate(
+        $jarvesFile = $this->webFilesystem->getFile(dirname($path));
+        if ($jarvesFile && !$this->acl->checkUpdate(
                 'jarves/file',
                 array('id' => $jarvesFile->getId())
             )
@@ -384,7 +434,7 @@ class FileController extends Controller
         }
 
         $content = file_get_contents($file->getPathname());
-        $result = $this->getJarves()->getWebFileSystem()->write($newPath, $content);
+        $result = $this->webFilesystem->write($newPath, $content);
         @unlink($file->getPathname());
 
         if ($result) {
@@ -403,11 +453,12 @@ class FileController extends Controller
     {
         $file = $path;
         if (!($path instanceof File)) {
-            $file = $this->getJarves()->getWebFileSystem()->getFile($path);
+            $file = $this->webFilesystem->getFile($path);
         }
 
         if ($file instanceof File) {
-            $this->getJarves()->getUtils()->newNewsFeed(
+            $this->utils->newNewsFeed(
+                $this->objects,
                 'jarves/file',
                 $file->toArray(),
                 $verb,
@@ -441,7 +492,7 @@ class FileController extends Controller
         if ($file['type'] == 'dir') {
             return $this->getFiles($path);
         } else {
-            return $this->getJarves()->getWebFileSystem()->read($path);
+            return $this->webFilesystem->read($path);
         }
     }
 
@@ -460,7 +511,7 @@ class FileController extends Controller
 
         //todo, create new option 'show hidden files' in user settings and depend on that
 
-        $files = $this->getJarves()->getWebFileSystem()->getFiles($path);
+        $files = $this->webFilesystem->getFiles($path);
 
         return $this->prepareFiles($files);
     }
@@ -480,7 +531,7 @@ class FileController extends Controller
 
         foreach ($files as $key => $file) {
             $file = $file->toArray();
-            if (!$this->getJarves()->getACL()->checkListExact(
+            if (!$this->acl->checkListExact(
                 'jarves/file',
                 array('id' => $file['id']))
             ) {
@@ -490,7 +541,7 @@ class FileController extends Controller
             if (isset($blacklistedFiles[$file['path']]) | (!$showHiddenFiles && substr($file['name'], 0, 1) == '.')) {
                 continue;
             } else {
-                $file['writeAccess'] = $this->getJarves()->getACL()->checkUpdateExact(
+                $file['writeAccess'] = $this->acl->checkUpdateExact(
                     'jarves/file',
                     array('id' => $file['id'])
                 );
@@ -512,7 +563,7 @@ class FileController extends Controller
         $imageTypes = array('jpg', 'jpeg', 'png', 'bmp', 'gif');
 
         if (array_search($file['extension'], $imageTypes) !== false) {
-            $content = $this->getJarves()->getWebFileSystem()->read($file['path']);
+            $content = $this->webFilesystem->read($file['path']);
 
             $size = new FileSize();
             $size->setHandleFromBinary($content);
@@ -547,7 +598,7 @@ class FileController extends Controller
         $q = $paramFetcher->get('q');
         $depth = $paramFetcher->get('depth');
 
-        $files = $this->getJarves()->getWebFileSystem()->search($path, $q, $depth);
+        $files = $this->webFilesystem->search($path, $q, $depth);
 
         return $this->prepareFiles($files);
     }
@@ -581,13 +632,13 @@ class FileController extends Controller
      */
     protected function getFile($path)
     {
-        $file = $this->getJarves()->getWebFileSystem()->getFile($path);
-        if (!$file || !$this->getJarves()->getACL()->checkListExact('jarves/file', array('id' => $file->getId()))) {
+        $file = $this->webFilesystem->getFile($path);
+        if (!$file || !$this->acl->checkListExact('jarves/file', array('id' => $file->getId()))) {
             return null;
         }
 
         $file = $file->toArray();
-        $file['writeAccess'] = $this->getJarves()->getACL()->checkUpdateExact('jarves/file', $file['id']);
+        $file['writeAccess'] = $this->acl->checkUpdateExact('jarves/file', $file['id']);
 
         $this->appendImageInformation($file);
 
@@ -609,6 +660,7 @@ class FileController extends Controller
      * @Rest\Get("/admin/file/preview")
      *
      * @param ParamFetcher $paramFetcher
+     * @return Response
      */
     public function showPreviewAction(ParamFetcher $paramFetcher)
     {
@@ -622,16 +674,16 @@ class FileController extends Controller
         }
 
         if (is_numeric($path)) {
-            $path = $this->getJarves()->getWebFileSystem()->getPath($path);
+            $path = $this->webFilesystem->getPath($path);
         }
 
         $this->checkAccess($path, null, 'view');
-        $file = $this->getJarves()->getWebFileSystem()->getFile($path);
+        $file = $this->webFilesystem->getFile($path);
         if ($file->isDir()) {
             return;
         }
 
-        $ifModifiedSince = $this->getJarves()->getRequest()->headers->get('If-Modified-Since');
+        $ifModifiedSince = $this->pageStack->getRequest()->headers->get('If-Modified-Since');
         if (isset($ifModifiedSince) && (strtotime($ifModifiedSince) == $file->getModifiedTime())) {
             // Client's cache IS current, so we just respond '304 Not Modified'.
 
@@ -643,9 +695,9 @@ class FileController extends Controller
 
         $image = null;
         try {
-            $image = $this->getJarves()->getWebFileSystem()->getResizeMax($path, $width, $height);
+            $image = $this->webFilesystem->getResizeMax($path, $width, $height);
         } catch (\Exception $e) {
-            $image = $this->getJarves()->getWebFileSystem()->getResizeMax('bundles/jarves/images/broken-image.png', $width, $height);
+            $image = $this->webFilesystem->getResizeMax('bundles/jarves/images/broken-image.png', $width, $height);
         }
 
         $expires = 3600; //1 h
@@ -684,16 +736,16 @@ class FileController extends Controller
         $path = $paramFetcher->get('path');
 
         if (is_numeric($path)) {
-            $path = $this->getJarves()->getWebFileSystem()->getPath($path);
+            $path = $this->webFilesystem->getPath($path);
         }
         $this->checkAccess($path, null, 'view');
 
-        $file = $this->getJarves()->getWebFileSystem()->getFile($path);
+        $file = $this->webFilesystem->getFile($path);
         if ($file->isDir()) {
             return;
         }
 
-        $ifModifiedSince = $this->getJarves()->getRequest()->headers->get('If-Modified-Since');
+        $ifModifiedSince = $this->pageStack->getRequest()->headers->get('If-Modified-Since');
         if (isset($ifModifiedSince) && (strtotime($ifModifiedSince) == $file->getModifiedTime())) {
             // Client's cache IS current, so we just respond '304 Not Modified'.
             $response = new Response();
@@ -702,7 +754,7 @@ class FileController extends Controller
             return $response;
         }
 
-        $content = $this->getJarves()->getWebFileSystem()->read($path);
+        $content = $this->webFilesystem->read($path);
         $mime = $file->getMimeType();
 
         $expires = 3600; //1 h
@@ -744,7 +796,7 @@ class FileController extends Controller
             $content = base64_decode($content);
         }
 
-        if ($result = $this->getJarves()->getWebFileSystem()->write($path, $content)) {
+        if ($result = $this->webFilesystem->write($path, $content)) {
             $this->newFeed($path, 'changed content of');
         }
 
@@ -762,22 +814,23 @@ class FileController extends Controller
      * @Rest\Get("/admin/file/image")
      *
      * @param ParamFetcher $paramFetcher
+     * @return Response
      */
     public function showImageAction(ParamFetcher $paramFetcher)
     {
         $path = $paramFetcher->get('path');
 
         if (is_numeric($path)) {
-            $path = $this->getJarves()->getWebFileSystem()->getPath($path);
+            $path = $this->webFilesystem->getPath($path);
         }
 
         $this->checkAccess($path, null, 'view');
-        $file = $this->getJarves()->getWebFileSystem()->getFile($path);
+        $file = $this->webFilesystem->getFile($path);
         if ($file->isDir()) {
             return;
         }
 
-        $ifModifiedSince = $this->getJarves()->getRequest()->headers->get('If-Modified-Since');
+        $ifModifiedSince = $this->pageStack->getRequest()->headers->get('If-Modified-Since');
         if (isset($ifModifiedSince) && (strtotime($ifModifiedSince) == $file->getModifiedTime())) {
             // Client's cache IS current, so we just respond '304 Not Modified'.
             $response = new Response();
@@ -786,7 +839,7 @@ class FileController extends Controller
             return $response;
         }
 
-        $content = $this->getJarves()->getWebFileSystem()->read($path);
+        $content = $this->webFilesystem->read($path);
         $image = \PHPImageWorkshop\ImageWorkshop::initFromString($content);
 
         $result = $image->getResult();

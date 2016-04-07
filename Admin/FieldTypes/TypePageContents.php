@@ -5,7 +5,7 @@ namespace Jarves\Admin\FieldTypes;
 use Jarves\Configuration\Field;
 use Jarves\Configuration\Object;
 use Jarves\Configuration\Configs;
-use Jarves\ORM\ORMAbstract;
+use Jarves\Storage\AbstractStorage;
 
 class TypePageContents extends AbstractSingleColumnType
 {
@@ -41,7 +41,7 @@ class TypePageContents extends AbstractSingleColumnType
 
             $relation = new RelationDefinition();
             $relation->setName($this->getFieldDefinition()->getId());
-            $relation->setType(ORMAbstract::ONE_TO_MANY);
+            $relation->setType(AbstractStorage::ONE_TO_MANY);
             $relation->setForeignObjectKey('jarves/content');
             $relation->setRefName($object->getId());
 

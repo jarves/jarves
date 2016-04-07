@@ -2,11 +2,9 @@
 
 namespace Jarves\Translation;
 
-use Jarves\Controller;
+use Jarves\Cache\Cacher;
 use Jarves\Exceptions\FileNotWritableException;
 use Jarves\Jarves;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\Finder\Finder;
 
 class Utils
 {
@@ -18,13 +16,20 @@ class Utils
     protected $jarves;
 
     /**
+     * @var Cacher
+     */
+    private $cacher;
+
+    /**
      * Utils constructor.
      *
      * @param Jarves $jarves
+     * @param Cacher $cacher
      */
-    public function __construct(Jarves $jarves)
+    public function __construct(Jarves $jarves, Cacher $cacher)
     {
         $this->jarves = $jarves;
+        $this->cacher = $cacher;
     }
 
     /**
@@ -227,7 +232,7 @@ class Utils
         }
         fclose($fh);
 
-        $this->getJarves()->invalidateCache('core/lang');
+        $this->cacher->invalidateCache('core/lang');
 
         return true;
     }
@@ -243,54 +248,54 @@ class Utils
 
     public function extractLanguage($bundleName)
     {
-        $root = realpath($this->getJarves()->getKernel()->getRootDir() . '/../');
+//        $root = realpath($this->getJarves()->getRootDir() . '/../');
         $bundleDir = $this->getJarves()->getBundleDir($bundleName);
 
         $translations = [];
         $translations = array_merge($translations, $this->readDirectory($bundleDir . 'Resources/views'));
 
-        $files = Finder::create()
-            ->files()
-            ->in($root . '/' . $bundleDir)
-            ->name('*.php');
-
-        foreach ($files as $file) {
-            $classPlain = file_get_contents($file);
-            if (preg_match('/ extends ObjectCrud/', $classPlain)) {
-                preg_match('/^\s*\t*class ([a-z0-9_]+)/mi', $classPlain, $className);
-                if (isset($className[1]) && $className[1]) {
-                    preg_match('/\s*\t*namespace ([a-zA-Z0-9_\\\\]+)/', $classPlain, $namespace);
-                    $className = (count($namespace) > 1 ? $namespace[1] . '\\' : '') . $className[1];
-                    $classReflection = new \ReflectionClass($className);
-
-                    if ($classReflection->isSubclassOf('Jarves\Admin\ObjectCrud')) {
-                        $tempObj = new $className();
-
-                        if ($tempObj instanceof ContainerAwareInterface) {
-                            $tempObj->setContainer($this->getJarves()->getContainer());
-                        }
-
-                        try {
-                            $tempObj->initialize();
-                            if ($tempObj->getColumns()) {
-                                self::extractFrameworkFields($tempObj->getColumns());
-                            }
-                            if ($tempObj->getInitializedFields()) {
-                                self::extractFrameworkFields($tempObj->getFields());
-                            }
-                        } catch (\Exception $e) {
-                            throw new \Exception(sprintf('Could not extract field from ' . $className), 0, $e);
-                        }
-                    }
-//                    if ($tempObj->tabFields) {
-//                        foreach ($tempObj->tabFields as $key => $fields) {
-//                            $GLOBALS['moduleTempLangs'][$key] = $key;
-//                            self::extractFrameworkFields($fields);
+//        $files = Finder::create()
+//            ->files()
+//            ->in($root . '/' . $bundleDir)
+//            ->name('*.php');
+//
+//        foreach ($files as $file) {
+//            $classPlain = file_get_contents($file);
+//            if (preg_match('/ extends ObjectCrud/', $classPlain)) {
+//                preg_match('/^\s*\t*class ([a-z0-9_]+)/mi', $classPlain, $className);
+//                if (isset($className[1]) && $className[1]) {
+//                    preg_match('/\s*\t*namespace ([a-zA-Z0-9_\\\\]+)/', $classPlain, $namespace);
+//                    $className = (count($namespace) > 1 ? $namespace[1] . '\\' : '') . $className[1];
+//                    $classReflection = new \ReflectionClass($className);
+//
+//                    if ($classReflection->isSubclassOf('Jarves\Admin\ObjectCrud')) {
+//                        $tempObj = new $className();
+//
+//                        if ($tempObj instanceof ContainerAwareInterface) {
+//                            $tempObj->setContainer($this->getJarves()->getContainer());
+//                        }
+//
+//                        try {
+//                            $tempObj->initialize();
+//                            if ($tempObj->getColumns()) {
+//                                self::extractFrameworkFields($tempObj->getColumns());
+//                            }
+//                            if ($tempObj->getInitializedFields()) {
+//                                self::extractFrameworkFields($tempObj->getFields());
+//                            }
+//                        } catch (\Exception $e) {
+//                            throw new \Exception(sprintf('Could not extract field from ' . $className), 0, $e);
 //                        }
 //                    }
-                }
-            }
-        }
+////                    if ($tempObj->tabFields) {
+////                        foreach ($tempObj->tabFields as $key => $fields) {
+////                            $GLOBALS['moduleTempLangs'][$key] = $key;
+////                            self::extractFrameworkFields($fields);
+////                        }
+////                    }
+//                }
+//            }
+//        }
 
         unset($translations['']);
 
@@ -408,11 +413,16 @@ class Utils
         return \Jarves\Translation\Utils::$extractTranslations;
     }
 
+    /**
+     * @param string $path
+     *
+     * @return array|null
+     */
     public function readDirectory($path)
     {
-        $root = realpath($this->getJarves()->getKernel()->getRootDir() . '/../');
+        $root = realpath($this->getJarves()->getRootDir() . '/../');
         if (!file_exists($root . '/' . $path)) {
-            return;
+            return null;
         }
         $h = opendir($root . '/' . $path);
 

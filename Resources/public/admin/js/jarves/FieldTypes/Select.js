@@ -50,12 +50,12 @@ jarves.FieldTypes.Select = new Class({
             withoutManageLink: {
                 label: t('Without manage link'),
                 type: 'checkbox',
-                desc: t('Disables the link that points to the manage-window')
+                desc: t('Disables the link that points to the crud edit window')
             },
             withoutAddLink: {
                 label: t('Without add link'),
                 type: 'checkbox',
-                desc: t('Disables the link that points to the add-window')
+                desc: t('Disables the link that points to the crud add window')
             }
         }
     },
@@ -67,7 +67,9 @@ jarves.FieldTypes.Select = new Class({
         items: false, //array or object
         store: false, //string
         object: false, //for object chooser
-        objectIdAsUrlId: false
+        objectIdAsUrlId: false,
+        withoutManageLink: false,
+        withoutAddLink: false
     },
 
     createLayout: function () {

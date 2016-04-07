@@ -2,14 +2,29 @@
 
 namespace Jarves\Controller\Admin;
 
-use Jarves\Controller;
+use Jarves\JarvesConfig;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Jarves\Model\LanguageQuery;
 use Propel\Runtime\Map\TableMap;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ConfigController extends Controller
 {
+    /**
+     * @var JarvesConfig
+     */
+    protected $jarvesConfig;
+
+    public function setContainer(ContainerInterface $container = null)
+    {
+        parent::setContainer($container);
+
+        $this->jarvesConfig = $this->container->get('jarves.config');
+    }
+
+
     /**
      * @ApiDoc(
      *  section="System configuration",
@@ -45,7 +60,7 @@ class ConfigController extends Controller
      */
     public function getConfigAction()
     {
-        return $this->getJarves()->getSystemConfig()->toArray(true);
+        return $this->jarvesConfig->getSystemConfig()->toArray(true);
     }
 
     /**

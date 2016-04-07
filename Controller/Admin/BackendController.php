@@ -3,21 +3,54 @@
 namespace Jarves\Controller\Admin;
 
 use FOS\RestBundle\Request\ParamFetcher;
+use Jarves\ACL;
 use Jarves\Admin\Utils;
 use Jarves\Jarves;
 use Jarves\Model\Base\GroupQuery;
 use Jarves\Model\LanguageQuery;
+use Jarves\PageStack;
 use Jarves\Properties;
 use Jarves\Tools;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 
 class BackendController extends Controller
 {
+    /**
+     * @var Jarves
+     */
+    protected $jarves;
+
+    /**
+     * @var PageStack
+     */
+    protected $pageStack;
+
+    /**
+     * @var Utils
+     */
+    protected $utils;
+
+    /**
+     * @var ACL
+     */
+    protected $acl;
+
+    public function setContainer(ContainerInterface $container = null)
+    {
+        parent::setContainer($container);
+
+        $this->pageStack = $this->get('jarves.page_stack');
+        $this->jarves = $this->get('jarves');
+        $this->acl = $this->get('jarves.acl');
+        $this->utils = $this->get('jarves.utils');
+    }
+
     /**
      * @ApiDoc(
      *  section="Backend",
@@ -30,19 +63,11 @@ class BackendController extends Controller
      */
     public function clearCacheAction()
     {
-        $utils = new Utils($this->getJarves());
+        $utils = new Utils($this->jarves);
 
         $utils->clearCache();
 
         return true;
-    }
-
-    /**
-     * @return Jarves
-     */
-    protected function getJarves()
-    {
-        return $this->get('jarves');
     }
 
     /**
@@ -65,10 +90,10 @@ class BackendController extends Controller
 
         $properties = new Properties($settings);
 
-        if ($this->getJarves()->getAdminClient()->getUser()->getId() > 0) {
-            $this->getJarves()->getAdminClient()->getUser()->setSettings($properties);
+        if ($this->pageStack->getAdminClient()->getUser()->getId() > 0) {
+            $this->pageStack->getAdminClient()->getUser()->setSettings($properties);
 
-            return $this->getJarves()->getAdminClient()->getUser()->save();
+            return $this->pageStack->getAdminClient()->getUser()->save();
         }
 
         return false;
@@ -99,7 +124,7 @@ class BackendController extends Controller
         $code = preg_replace('[^a-zA-Z0-9_-]', '', $code);
         $onLoad = preg_replace('[^a-zA-Z0-9_-]', '', $onLoad);
 
-        $bundle = $this->getJarves()->getBundle($module);
+        $bundle = $this->jarves->getBundle($module);
 
         $file = $bundle->getPath() . '/Resources/public/admin/js/' . $code . '.js';
 
@@ -157,19 +182,19 @@ class BackendController extends Controller
         $res = array();
 
         if ($loadKeys == false || in_array('modules', $loadKeys)) {
-            foreach ($this->getJarves()->getConfigs() as $config) {
+            foreach ($this->jarves->getConfigs() as $config) {
                 $res['bundles'][] = $config->getBundleName();
             }
         }
 
         if ($loadKeys == false || in_array('configs', $loadKeys)) {
-            $res['configs'] = $this->getJarves()->getConfigs()->toArray();
+            $res['configs'] = $this->jarves->getConfigs()->toArray();
         }
 
         if (
             $loadKeys == false || in_array('themes', $loadKeys)
         ) {
-            foreach ($this->getJarves()->getConfigs() as $key => $config) {
+            foreach ($this->jarves->getConfigs() as $key => $config) {
                 if ($config->getThemes()) {
                     foreach ($config->getThemes() as $themeTitle => $theme) {
                         /** @var $theme \Jarves\Configuration\Theme */
@@ -191,7 +216,7 @@ class BackendController extends Controller
         }
 
         if ($loadKeys == false || in_array('user', $loadKeys)) {
-            if ($settings = $this->getJarves()->getAdminClient()->getUser()->getSettings()) {
+            if ($settings = $this->pageStack->getAdminClient()->getUser()->getSettings()) {
                 if ($settings instanceof Properties) {
                     $res['user'] = $settings->toArray();
                 }
@@ -203,14 +228,14 @@ class BackendController extends Controller
         }
 
         if ($loadKeys == false || in_array('system', $loadKeys)) {
-            $system = clone $this->getJarves()->getSystemConfig();
+            $system = clone $this->jarves->getSystemConfig();
             $system->setDatabase(null);
             $system->setPasswordHashKey('');
             $res['system'] = $system->toArray();
         }
 
         if ($loadKeys == false || in_array('domains', $loadKeys)) {
-            $res['domains'] = $this->getJarves()->getObjects()->getList(
+            $res['domains'] = $this->container->get('jarves.objects')->getList(
                 'JarvesBundle:Domain',
                 null,
                 array('permissionCheck' => true)
@@ -218,7 +243,7 @@ class BackendController extends Controller
         }
 
         if ($loadKeys == false || in_array('langs', $loadKeys)) {
-            $codes = Tools::listToArray($this->getJarves()->getSystemConfig()->getLanguages());
+            $codes = Tools::listToArray($this->jarves->getSystemConfig()->getLanguages());
             $query = LanguageQuery::create()->filterByCode($codes);
 
             $tlangs = $query->find()->toArray(
@@ -238,6 +263,10 @@ class BackendController extends Controller
         return $res;
     }
 
+    /**
+     * @param string $val
+     * @return int
+     */
     protected function toBytes($val)
     {
         $val = trim($val);
@@ -265,7 +294,7 @@ class BackendController extends Controller
      */
     public function loadJsMapAction()
     {
-        $this->loadJsAction(true);
+        $this->loadJsAction();
     }
 
     /**
@@ -285,13 +314,13 @@ class BackendController extends Controller
         $newestMTime = 0;
         $jsContent = '';
 
-        foreach ($this->getJarves()->getConfigs() as $bundleConfig) {
+        foreach ($this->jarves->getConfigs() as $bundleConfig) {
             $path = $bundleConfig->getBundleClass()->getPath();
 
             $assetInfos = $bundleConfig->getAdminPreloadTypescriptModulesInfo();
 
             foreach ($assetInfos as $assetInfo) {
-                $localPath = $this->getJarves()->resolveInternalPublicPath($assetInfo->getPath());
+                $localPath = $this->jarves->resolveInternalPublicPath($assetInfo->getPath());
                 $mtime = filemtime($localPath);
                 $newestMTime = max($newestMTime, $mtime);
 
@@ -305,7 +334,7 @@ class BackendController extends Controller
             }
         }
 
-        $ifModifiedSince = $this->getJarves()->getRequest()->headers->get('If-Modified-Since');
+        $ifModifiedSince = $this->pageStack->getRequest()->headers->get('If-Modified-Since');
         if (isset($ifModifiedSince) && (strtotime($ifModifiedSince) == $newestMTime)) {
             // Client's cache IS current, so we just respond '304 Not Modified'.
 
@@ -342,21 +371,21 @@ class BackendController extends Controller
      */
     public function loadCssAction()
     {
-        $oFile = $this->getJarves()->getKernel()->getRootDir() . '/../web/cache/admin.style-compiled.css';
+        $oFile = $this->jarves->getRootDir() . '/../web/cache/admin.style-compiled.css';
         $md5String = '';
 
-        $assetHandlerContainer = $this->getJarves()->getAssetCompilerContainer();
-
+        /** @var \Jarves\AssetHandler\Container $assetHandlerContainer */
+        $assetHandlerContainer = $this->container->get('jarves.asset_handler.container');
 
         $files = [];
-        foreach ($this->getJarves()->getConfigs() as $bundleConfig) {
+        foreach ($this->jarves->getConfigs() as $bundleConfig) {
             foreach ($bundleConfig->getAdminAssetsInfo() as $assetInfo) {
                 if (!$assetInfo->isCompressionAllowed()) {
                     continue;
                 }
 
                 if ($assetInfo->isStylesheet()) {
-                    $path = $this->getJarves()->resolveWebPath($assetInfo->getPath());
+                    $path = $this->jarves->resolveWebPath($assetInfo->getPath());
                     if (file_exists($path)) {
                         $files[] = $assetInfo->getPath();
                         $md5String .= filemtime($path);
@@ -364,7 +393,7 @@ class BackendController extends Controller
                 }
 
                 if ($assetInfo->isScss()) {
-                    $path = $this->getJarves()->resolveWebPath($assetInfo->getPath());
+                    $path = $this->jarves->resolveWebPath($assetInfo->getPath());
                     if (file_exists($path)) {
                         foreach ($assetHandlerContainer->compileAsset($assetInfo) as $subAssetInfo) {
                             $files[] = $subAssetInfo->getPath();
@@ -388,9 +417,9 @@ class BackendController extends Controller
         }
 
         if (!$fileUpToDate) {
-            $content = $this->getJarves()->getUtils()->compressCss(
+            $content = $this->utils->compressCss(
                 $files,
-                $this->getJarves()->getAdminPrefix() . 'admin/backend/'
+                $this->jarves->getAdminPrefix() . 'admin/backend/'
             );
             $content = $md5Line . $content;
             file_put_contents($oFile, $content);
@@ -418,8 +447,6 @@ class BackendController extends Controller
      *
      * @Rest\Get("/admin/backend/script")
      *
-     * @param boolean $printSourceMap
-     *
      * @return string javascript
      */
     public function loadJsAction()
@@ -430,7 +457,7 @@ class BackendController extends Controller
 
         $jsContent = '';
 
-        foreach ($this->getJarves()->getConfigs() as $bundleConfig) {
+        foreach ($this->jarves->getConfigs() as $bundleConfig) {
             foreach ($bundleConfig->getAdminAssetsInfo() as $assetInfo) {
                 if (!$assetInfo->isJavaScript()) {
                     continue;
@@ -439,7 +466,7 @@ class BackendController extends Controller
                     continue;
                 }
 
-                $path = $this->getJarves()->resolveWebPath($assetInfo->getPath());
+                $path = $this->jarves->resolveWebPath($assetInfo->getPath());
                 if (file_exists($path)) {
                     $assets[] = $assetInfo->getPath();
                     $mtime = filemtime($path);
@@ -451,7 +478,7 @@ class BackendController extends Controller
             }
         }
 
-        $ifModifiedSince = $this->getJarves()->getRequest()->headers->get('If-Modified-Since');
+        $ifModifiedSince = $this->pageStack->getRequest()->headers->get('If-Modified-Since');
         if (isset($ifModifiedSince) && (strtotime($ifModifiedSince) == $newestMTime)) {
             // Client's cache IS current, so we just respond '304 Not Modified'.
 
@@ -491,13 +518,13 @@ class BackendController extends Controller
     {
         $entryPoints = array();
 
-        foreach ($this->getJarves()->getConfigs() as $bundleName => $bundleConfig) {
+        foreach ($this->jarves->getConfigs() as $bundleName => $bundleConfig) {
             foreach ($bundleConfig->getAllEntryPoints() as $subEntryPoint) {
                 $path = $subEntryPoint->getFullPath();
 
                 if (substr_count($path, '/') <= 3) {
                     if ($subEntryPoint->isLink()) {
-                        if ($this->getJarves()->getACL()->check('jarvesbundle:entryPoint', '/' . $path)) {
+                        if ($this->acl->check('jarvesbundle:entryPoint', '/' . $path)) {
                             $entryPoints[$path] = array(
                                 'label' => $subEntryPoint->getLabel(),
                                 'icon' => $subEntryPoint->getIcon(),
@@ -531,7 +558,7 @@ class BackendController extends Controller
 
                 $childs = $this->getChildMenus($code . "/$key", $value2);
                 if (count($childs) == 0) {
-                    //if ($this->getJarves()->checkUrlAccess($code . "/$key")) {
+                    //if ($this->jarves->checkUrlAccess($code . "/$key")) {
                     unset($value2['children']);
                     $links[$key] = $value2;
                     //}
@@ -541,7 +568,7 @@ class BackendController extends Controller
                 }
 
             } else {
-                //if ($this->getJarves()->checkUrlAccess($code . "/$key")) {
+                //if ($this->jarves->checkUrlAccess($code . "/$key")) {
                 $links[$key] = $value2;
                 //}
             }

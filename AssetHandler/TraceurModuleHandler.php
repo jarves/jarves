@@ -2,6 +2,8 @@
 
 namespace Jarves\AssetHandler;
 
+use Jarves\Filesystem\Filesystem;
+use Jarves\Jarves;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -24,7 +26,7 @@ class TraceurModuleHandler extends JsHandler implements CompileHandlerInterface
 
     protected function compileFiles($files, $output)
     {
-        $root = $webDir = realpath($this->jarves->getKernel()->getRootDir().'/../') . '/';
+        $root = $webDir = realpath($this->jarves->getRootDir().'/../') . '/';
         $web = $root . 'web';
 
         chdir($web);
@@ -78,15 +80,15 @@ class TraceurModuleHandler extends JsHandler implements CompileHandlerInterface
             }
 
             if ($isSuccessful) {
-                $this->jarves->getWebFileSystem()->mkdir(dirname($output));
-                $this->jarves->getWebFileSystem()->move('traceur_compiled.js', $output);
+                $this->webFilesystem->mkdir(dirname($output));
+                $this->webFilesystem->move('traceur_compiled.js', $output);
                 $mapName = explode('.', $output);
                 array_pop($mapName);
                 $mapName[] = 'map';
                 $mapName = implode('.', $mapName);
                 $contents = file_get_contents($output);
                 if (file_exists('traceur_compiled.map')) {
-                    $this->jarves->getWebFileSystem()->move('traceur_compiled.map', $mapName);
+                    $this->webFilesystem->move('traceur_compiled.map', $mapName);
                     $contents = str_replace(
                         '//# sourceMappingURL=traceur_compiled.map',
                         '//# sourceMappingURL=' . basename($mapName),

@@ -26,14 +26,14 @@ class ViewResponseListener extends FOSViewResponseListener
 
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
-        if ($this->container->get('jarves')->isAdmin()) {
+        if ($this->container->get('jarves.page_stack')->isAdmin()) {
             $view = $event->getControllerResult();
             $view = [
                 'status' => 200,
                 'data' => $view
             ];
             try {
-                $response = $this->container->get('jarves')->getPageResponse();
+                $response = $this->container->get('jarves.page_stack')->getPageResponse();
                 $response->setContent(json_encode($view, JSON_PRETTY_PRINT));
                 $response->headers->set('Content-Type', 'application/json');
                 $event->setResponse($response);
@@ -45,9 +45,9 @@ class ViewResponseListener extends FOSViewResponseListener
 
     public function onKernelController(FilterControllerEvent $event)
     {
-        if ($this->container->get('jarves')->isAdmin()) {
-            //parent::onKernelController($event);
-        }
+//        if ($this->container->get('jarves.page_stack')->isAdmin()) {
+//            //parent::onKernelController($event);
+//        }
     }
 
 }

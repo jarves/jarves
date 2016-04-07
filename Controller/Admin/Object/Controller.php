@@ -3,22 +3,30 @@
 namespace Jarves\Controller\Admin\Object;
 
 use FOS\RestBundle\Request\ParamFetcher;
-use Jarves\Controller as JarvesController;
-use Jarves\Controller\ObjectCrudController;
+use Jarves\Objects;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller as SymfonyController;
 use Jarves\Exceptions\ClassNotFoundException;
-use Jarves\Exceptions\ObjectMisconfiguration;
 use Jarves\Exceptions\ObjectNotFoundException;
 use Jarves\Tools;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
 
 /**
  * Controller
  *
  * Proxy class for \Jarves\Object
  */
-class Controller extends JarvesController
+class Controller extends SymfonyController
 {
+    /**
+     * @return Objects
+     */
+    protected function getObjects()
+    {
+        return $this->container->get('jarves.objects');
+    }
+
     /**
      * @ApiDoc(
      *  section="Object Browser",
@@ -74,10 +82,10 @@ class Controller extends JarvesController
 
         $url = $paramFetcher->get('url');
         $fields = $paramFetcher->get('fields');
-        $returnKey =filter_var($paramFetcher->get('returnKey'), FILTER_VALIDATE_BOOLEAN);
+        $returnKey = filter_var($paramFetcher->get('returnKey'), FILTER_VALIDATE_BOOLEAN);
         $returnKeyAsRequested = filter_var($paramFetcher->get('returnKeyAsRequested'), FILTER_VALIDATE_BOOLEAN);
 
-        list($objectKey, $objectIds, ) = $this->getObjects()->parseUrl($url);
+        list($objectKey, $objectIds,) = $this->getObjects()->parseUrl($url);
         //check if we got a id
         if ($objectIds[0] === '') {
             throw new \Exception(sprintf('No id given in uri %s.', $url));
@@ -120,14 +128,14 @@ class Controller extends JarvesController
                 foreach ($requestedIds as $id) {
                     $pk = $this->getObjects()->parsePk($objectKey, $id);
                     if ($pk) {
-                        $map[$this->getObjects()->getObjectUrlId($objectKey, $pk[0]) + ''] = $id;
+                        $map[$this->getObjects()->getObjectUrlId($objectKey, $pk[0]) . ''] = $id;
                     }
                 }
 
                 if (is_array($items)) {
                     foreach ($items as &$item) {
                         $pk = $this->getObjects()->getObjectUrlId($objectKey, $item);
-                        $res[$map[$pk + '']] = $item;
+                        $res[$map[$pk . '']] = $item;
                     }
                 }
 
@@ -142,7 +150,7 @@ class Controller extends JarvesController
 
                         if ($c > 1) {
                             $keys = array();
-                            foreach ($primaryKeys as $key => &$field) {
+                            foreach ($primaryKeys as $key => $field) {
                                 $keys[] = Tools::urlEncode($item[$key]);
                             }
                             $res[implode(',', $keys)] = $item;

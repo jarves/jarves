@@ -4,25 +4,28 @@ namespace Jarves\Twig;
 
 use Jarves\Jarves;
 use Jarves\Model\Node;
+use Jarves\PageStack;
+use Jarves\Utils;
 
 class NodeIsActiveExtension extends \Twig_Extension
 {
     /**
-     * @var Jarves
+     * @var Utils
      */
-    protected $jarves;
-
-    function __construct(Jarves $jarves)
-    {
-        $this->jarves = $jarves;
-    }
+    private $utils;
+    /**
+     * @var PageStack
+     */
+    private $pageStack;
 
     /**
-     * @return \Jarves\Jarves
+     * @param PageStack $pageStack
+     * @param Utils $utils
      */
-    public function getJarves()
+    function __construct(PageStack $pageStack, Utils $utils)
     {
-        return $this->jarves;
+        $this->utils = $utils;
+        $this->pageStack = $pageStack;
     }
 
     public function getName()
@@ -39,15 +42,15 @@ class NodeIsActiveExtension extends \Twig_Extension
 
     public function isActive(Node $node, $exact = false)
     {
-        $current = $this->getJarves()->getCurrentPage();
+        $current = $this->pageStack->getCurrentPage();
 
         if ($node->getId() == $current->getId()) {
             return true;
         }
 
         if (!$exact) {
-            $url = $this->getJarves()->getNodeUrl($current, true, true);
-            $purl = $this->getJarves()->getNodeUrl($node, true, true);
+            $url = $this->utils->getNodeUrl($current, true, true);
+            $purl = $this->utils->getNodeUrl($node, true, true);
 
             if ($url && $purl) {
                 $pos = strpos($url, $purl);

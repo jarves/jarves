@@ -10,12 +10,8 @@ class ContentTypesCompilerPass implements CompilerPassInterface {
 
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('jarves.content.types')) {
-            return;
-        }
-
         $definition = $container->getDefinition(
-            'jarves.content.types'
+            'jarves.content.render'
         );
 
         $taggedServices = $container->findTaggedServiceIds(

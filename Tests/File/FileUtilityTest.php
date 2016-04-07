@@ -10,17 +10,17 @@ class FileUtilityTest extends KernelAwareTestCase
 
     public function testTempFile()
     {
-        $this->fileTester($this->getJarves()->getCacheFileSystem(), $this->getKernel()->getCacheDir().'/');
+        $this->fileTester($this->getCacheFileSystem(), $this->getKernel()->getCacheDir().'/');
     }
 
     public function testSystemFile()
     {
-        $this->fileTester($this->getJarves()->getFileSystem(), realpath($this->getKernel()->getRootDir().'/..').'/');
+        $this->fileTester($this->getFileSystem(), realpath($this->getKernel()->getRootDir().'/..').'/');
     }
 
     public function testWebFile()
     {
-        $this->fileTester($this->getJarves()->getWebFileSystem(), realpath($this->getKernel()->getRootDir().'/../web').'/');
+        $this->fileTester($this->getWebFileSystem(), realpath($this->getKernel()->getRootDir().'/../web').'/');
     }
 
     /**

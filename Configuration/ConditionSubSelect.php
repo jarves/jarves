@@ -4,7 +4,6 @@ namespace Jarves\Configuration;
 
 class ConditionSubSelect extends Condition
 {
-
     CONST DESC = 'DESC';
     CONST ASC = 'ASC';
 
@@ -15,8 +14,6 @@ class ConditionSubSelect extends Condition
     protected $joins = [];
 
     protected $selfJoins = [];
-
-    protected $tableName = '';
 
     protected $tableNameSelect = '';
 
@@ -35,16 +32,43 @@ class ConditionSubSelect extends Condition
         $this->selfJoins[$alias] = $on;
     }
 
-    public function setTableName($tableName)
-    {
-        $this->tableName = $tableName;
-    }
 
     public function setTableNameSelect($tableName)
     {
         $this->tableNameSelect = $tableName;
     }
 
+    /**
+     * @return array
+     */
+    public function getJoins()
+    {
+        return $this->joins;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSelfJoins()
+    {
+        return $this->selfJoins;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOrder()
+    {
+        return $this->order;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableNameSelect()
+    {
+        return $this->tableNameSelect;
+    }
 
     public function select($select)
     {
@@ -66,73 +90,18 @@ class ConditionSubSelect extends Condition
         return $this->order;
     }
 
-    /**
-     * Returns the actual result of the sub-select
-     *
-     * @return mixed
-     */
-    public function getValue($objectKey, &$usedFieldNames = array())
-    {
-        $params = [];
-        $sql = $this->toSql($params, $objectKey, $usedFieldNames);
-        $row = dbExFetch($sql, $params);
-
-        return 1 === count($row) ? current($row) : $row;
-    }
-
-    public function toSql(&$params, $objectKey, array &$usedFieldNames = null)
-    {
-        $tableName = $this->tableNameSelect;
-        if ($objectKey) {
-            $def = $this->getJarves()->getObjects()->getDefinition($objectKey);
-            if ($def) {
-                $tableName = $def->getTable();
-            }
-        }
-
-        if (is_array($this->select)) {
-            if (null !== $usedFieldNames) {
-                $usedFieldNames = array_merge($usedFieldNames, array_keys($this->select));
-            }
-            $selected = implode(', ', $this->select);
-        } else {
-            if (null !== $usedFieldNames) {
-                $usedFieldNames[] = $this->select;
-            }
-            $selected = $tableName.'.'.$this->select;
-        }
-
-        $joins = '';
-
-        if ($this->joins) {
-            $joins .= implode("\n", $this->joins);
-        }
-
-        if ($this->selfJoins) {
-            foreach ($this->selfJoins as $alias => $on) {
-                $joins .= sprintf('JOIN %s as %s ON (%s)',
-                    $tableName,
-                    $alias,
-                    str_replace('%table%', $tableName, $on)
-                );
-            }
-        }
-
-        $sql = sprintf('SELECT %s FROM %s %s',
-            $selected,
-            $tableName ? : $objectKey,
-            $joins
-        );
-
-        if ($w = parent::toSql($params, $objectKey, $usedFieldNames)) {
-            $sql .= sprintf(' WHERE %s', $w);
-        }
-
-        if ($this->order) {
-            $sql .= sprintf(' ORDER BY %s %s', $this->order[0], $this->order[1]);
-        }
-
-        return $sql;
-    }
+//    /**
+//     * Returns the actual result of the sub-select
+//     *
+//     * @return mixed
+//     */
+//    public function getValue($objectKey, &$usedFieldNames = array())
+//    {
+//        $params = [];
+//        $sql = $this->toSql($params, $objectKey, $usedFieldNames);
+//        $row = dbExFetch($sql, $params);
+//
+//        return 1 === count($row) ? current($row) : $row;
+//    }
 
 }

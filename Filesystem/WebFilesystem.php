@@ -2,11 +2,15 @@
 
 namespace Jarves\Filesystem;
 
+use Jarves\Filesystem\Adapter\Local;
 use Jarves\Jarves;
 use Jarves\File\FileInfo;
 use Jarves\Filesystem\Adapter\AdapterInterface;
+use Jarves\JarvesConfig;
 use Jarves\Model\FileQuery;
+use Jarves\Utils;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 
 class WebFilesystem extends Filesystem
@@ -23,38 +27,75 @@ class WebFilesystem extends Filesystem
     protected $jarves;
 
     /**
-     * @param Jarves $jarves
+     * @var JarvesConfig
      */
-    function __construct(Jarves $jarves)
-    {
-        $this->jarves = $jarves;
-    }
+    private $jarvesConfig;
+
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
+     * @var Filesystem
+     */
+    private $cacheFilesystem;
+    /**
+     * @var Utils
+     */
+    private $utils;
 
     /**
      * @param Jarves $jarves
+     * @param JarvesConfig $jarvesConfig
+     * @param ContainerInterface $container
+     * @param Filesystem $cacheFilesystem
      */
-    public function setJarves($jarves)
+    function __construct(Jarves $jarves, JarvesConfig $jarvesConfig, ContainerInterface $container,
+                         Filesystem $cacheFilesystem)
     {
         $this->jarves = $jarves;
+        $this->jarvesConfig = $jarvesConfig;
+        $this->container = $container;
+        $this->cacheFilesystem = $cacheFilesystem;
     }
 
     /**
-     * @return Jarves
+     * Creates a temp folder and returns its path.
+     * Please use TempFile::createFolder() class instead.
+     *
+     * @param  string $prefix
+     * @param  bool $fullPath Returns the full path on true and the relative to the current TempFolder on false.
+     *
+     * @return string Path with trailing slash
      */
-    public function getJarves()
+    public function createTempFolder($prefix = '', $fullPath = true)
     {
-        return $this->jarves;
+        $tmp = $this->jarves->getCacheDir();
+
+        do {
+            $path = $tmp . $prefix . dechex(time() / mt_rand(100, 500));
+        } while (is_dir($path));
+
+        mkdir($path);
+
+        if ('/' !== substr($path, -1)) {
+            $path .= '/';
+        }
+
+        return $fullPath ? $path : substr($path, strlen($tmp));
     }
 
     /**
      * @param string $path
+     *
      * @return AdapterInterface
      */
     public function getAdapter($path = null)
     {
         $adapterServiceId = 'jarves.filesystem.adapter.local';
 
-        $params['root'] = realpath($this->getJarves()->getKernel()->getRootDir() . '/../web/');
+        $params['root'] = realpath($this->jarves->getRootDir() . '/../web/');
 
         if ($path && '/' !== $path[0]) {
             $path = '/' . $path;
@@ -73,7 +114,7 @@ class WebFilesystem extends Filesystem
 
         if ('/' !== $firstFolder) {
             //todo
-            $mounts = $this->getJarves()->getSystemConfig()->getMountPoints(true);
+            $mounts = $this->jarvesConfig->getSystemConfig()->getMountPoints(true);
 
             //if firstFolder a mounted folder?
             if ($mounts && $mounts->hasMount($firstFolder)) {
@@ -94,7 +135,7 @@ class WebFilesystem extends Filesystem
         $adapter->setMountPath($firstFolder);
 
         if ($adapter instanceof ContainerAwareInterface) {
-            $adapter->setContainer($this->getJarves()->getContainer());
+            $adapter->setContainer($this->container);
         }
 
         $adapter->loadConfig();
@@ -110,7 +151,7 @@ class WebFilesystem extends Filesystem
      */
     public function newAdapter($serviceId, $mountPath, $params)
     {
-        $service = $this->getJarves()->getContainer()->get($serviceId);
+        $service = $this->container->get($serviceId);
         $service->setMountPath($mountPath);
         $service->setParams($params);
         return $service;
@@ -132,7 +173,7 @@ class WebFilesystem extends Filesystem
         }
 
         if ('/' === $path) {
-            foreach ($this->getJarves()->getSystemConfig()->getMountPoints() as $mountPoint) {
+            foreach ($this->jarvesConfig->getSystemConfig()->getMountPoints() as $mountPoint) {
                 $fileInfo = new FileInfo();
                 $fileInfo->setPath('/' . $mountPoint->getPath());
 //                $fileInfo->setIcon($mountPoint->getIcon());
@@ -162,7 +203,7 @@ class WebFilesystem extends Filesystem
             return $id;
         }
 
-        return FileQuery::create()->select('path')->findOneBy($id);
+        return FileQuery::create()->select('path')->findOneById($id);
     }
 
     public function move($source, $target)
@@ -216,14 +257,15 @@ class WebFilesystem extends Filesystem
                     $newFs->write($this->normalizePath($newPath), $content);
                 } else {
                     if ('/' === $oldFs->getMountPath()) {
+                        /** @var Local $oldFs */
                         //just directly upload the stuff
-                        $this->copyFolder($oldFs->getAdapter()->getRoot() . $oldFile, $newPath);
+                        $this->copyFolder($oldFs->getRoot() . $oldFile, $newPath);
                     } else {
                         //we need to copy all files down to our local hdd temporarily
                         //and upload then
                         $folder = $this->downloadFolder($oldFile);
                         $this->copyFolder($folder, $newPath);
-                        $this->getJarves()->getCacheFileSystem()->delete($folder);
+                        $this->cacheFilesystem->delete($folder);
                     }
                 }
                 if ('move' === $action) {
@@ -251,14 +293,13 @@ class WebFilesystem extends Filesystem
         $fs = $this->getAdapter($path);
         $files = $fs->getFiles($this->normalizePath($path));
 
-        $to = $to ? : $this->getJarves()->getUtils()->createTempFolder('', false);
-        $tempFs = $this->getJarves()->getCacheFileSystem();
+        $to = $to ? : $this->createTempFolder('', false);
 
         if (is_array($files)) {
             foreach ($files as $file) {
                 if ('file' === $file['type']) {
                     $content = $fs->read($this->normalizePath($path . '/' . $file['name']));
-                    $tempFs->write($to . '/' . $file['name'], $content);
+                    $this->cacheFilesystem->write($to . '/' . $file['name'], $content);
                 } else {
                    $this->downloadFolder($path . '/' . $file['name'], $to . '/' . $file['name']);
                 }

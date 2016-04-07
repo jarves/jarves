@@ -2,6 +2,8 @@
 
 namespace Jarves\Twig\Node;
 
+use Jarves\ContentRender;
+
 class Content extends \Twig_Node
 {
     protected $name;
@@ -9,6 +11,7 @@ class Content extends \Twig_Node
     public function __construct($name, $id, $type, $optional, $options, $line, $tag = 'content')
     {
         $this->name = $name;
+
         parent::__construct(
             array('id' => $id, 'type' => $type, 'options' => $options),
             array('optional' => filter_var($optional, FILTER_VALIDATE_BOOLEAN)),
@@ -45,10 +48,9 @@ class Content extends \Twig_Node
         }
 
         $compiler
-            ->write("echo \$context['jarves']->getContentRender()->$methodName(null")
+            ->write("echo \$context['jarves_content_render']->$methodName(null")
             ->write(', ')->subcompile($this->getNode('id'))
-            ->write(', $renderParams');
-        $compiler
+            ->write(', $renderParams')
             ->write(");\n");
         ;
     }
