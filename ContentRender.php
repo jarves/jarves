@@ -273,7 +273,7 @@ class ContentRender
         $html = '';
 
         if ($count > 0) {
-            foreach ($filteredContents as &$content) {
+            foreach ($filteredContents as $content) {
                 if ($i == $count) {
                     $data['layoutContentsIsLast'] = true;
                 }
@@ -292,11 +292,6 @@ class ContentRender
 
         $argument = array($data, &$html);
         $this->eventDispatcher->dispatch('core/render/slot', new GenericEvent($argument));
-
-//        if ($slotProperties['assign'] != "") {
-//            //Jarves::getInstance()->assign($slotProperties['assign'], $html);
-//            return '';
-//        }
 
         $this->stopwatch->stop($title);
 
@@ -352,6 +347,8 @@ class ContentRender
         if ($content->getTemplate() == '' || $content->getTemplate() == '-') {
             if ($unsearchable) {
                 $result = '<!--unsearchable-begin-->' . $data['html'] . '<!--unsearchable-end-->';
+            } else {
+                $result = $data['html'];
             }
         } else {
             $result = $this->templating->render($content->getTemplate(), $data);

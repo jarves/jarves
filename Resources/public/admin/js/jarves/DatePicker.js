@@ -382,14 +382,21 @@ jarves.DatePicker = new Class({
             new Element('span').inject(a);
         }
 
-        var a = new Element('a', {
+        var now = new Element('a', {
             href: 'javascript: ;',
             html: _('Now'),
             'class': 'jarves-Button jarves-button'
         }).addEvent('click', function() {
                 this.choose(new Date(), true);
             }.bind(this)).inject(this.body);
-        new Element('span').inject(a);
+
+        var close = new Element('a', {
+            href: 'javascript: ;',
+            html: _('Close'),
+            'class': 'jarves-Button jarves-button'
+        }).addEvent('click', function() {
+                this.close();
+            }.bind(this)).inject(this.body);
 
     }
 });

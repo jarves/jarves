@@ -166,7 +166,7 @@ services:
         arguments: ["@jarves", "@jarves.page_stack", "@jarves.frontendRoutes.listener", "@kernel", "@jarves.page_response.factory"]
         tags:
             - { name: kernel.event_listener, event: kernel.response }
-            - { name: kernel.event_listener, event: kernel.view }
+            - { name: kernel.event_listener, event: kernel.view, priority: 24 }
 
      jarves.paramFetcher.listener:
         class: "%jarves.paramFetcher.listener.class%"
@@ -179,14 +179,13 @@ services:
         class: "%jarves.viewResponse.listener.class%"
         arguments: ["@service_container"]
         tags:
-            - { name: kernel.event_listener, event: kernel.view, priority: 101 }
-            - { name: kernel.event_listener, event: kernel.controller, priority: -9 }
+            - { name: kernel.event_listener, event: kernel.view, priority: 16 }
 
      jarves.frontendRoutes.listener:
         class: "%jarves.frontendRoutes.listener.class%"
         arguments: ["@jarves", "@jarves.page_stack", "@jarves.editmode", "@jarves.frontend_router", "@jarves.page_response.factory"]
         tags:
-            - { name: kernel.event_listener, event: kernel.request, priority: 33 }
+            - { name: kernel.event_listener, event: kernel.request, priority: 64 }
 
      jarves.securityFirewall.listener:
         class: "%jarves.securityFirewall.listener.class%"

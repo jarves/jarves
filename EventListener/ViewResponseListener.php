@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
-class ViewResponseListener extends FOSViewResponseListener
+class ViewResponseListener
 {
     /**
      * @var \Symfony\Component\DependencyInjection\ContainerInterface
@@ -42,12 +42,4 @@ class ViewResponseListener extends FOSViewResponseListener
             }
         }
     }
-
-    public function onKernelController(FilterControllerEvent $event)
-    {
-//        if ($this->container->get('jarves.page_stack')->isAdmin()) {
-//            //parent::onKernelController($event);
-//        }
-    }
-
 }
