@@ -85,6 +85,6 @@ jarves.DashboardWidgets.NewsFeed = new Class({
                 html: item.message
             }).inject(div);
         }
-        div.inject(this.container, 'top');
+        div.inject(this.container);
     }
 });

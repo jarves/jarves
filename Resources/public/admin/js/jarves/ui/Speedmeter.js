@@ -26,8 +26,10 @@ jarves.ui.Speedmeter = new Class({
             value: 0,
             min: 0,
             max: 100,
-            titleFontColor: '#bbb',
-            valueFontColor: '#bbb',
+            titleFontColor: '#888',
+            valueFontColor: '#444',
+            labelFontColor: '#888',
+            gaugeColor: '#fff',
             showInnerShadow: false,
             title: "Title",
             levelColors: ["#114754"]
