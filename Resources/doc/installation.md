@@ -11,7 +11,7 @@ A end-user zip package can be downloaded at http://jarves.io when we've released
 symfony new website-with-jarves 2.8
 ```
 
-### 2. Install the JarvesBundle for Developer and testing
+### 2.1 Install the Jarves bundles for development/testing
 
 ```bash
 cd src
@@ -19,6 +19,14 @@ git clone git@github.com:jarves/jarves.git Jarves
 cd Jarves
 git clone git@github.com:jarves/jarves-publication.git Publication
 git clone  git@github.com:jarves/jarves-demotheme.git DemoTheme
+```
+
+### 2.2 or install all Jarves bundles using composer
+
+```bash
+composer require jarves/jarves
+composer require jarves/jarves-publication
+composer require jarves/jarves-demotheme
 ```
 
 Activate the bundle in your AppKernel:
@@ -31,15 +39,17 @@ public function registerBundles()
 {
     $bundles = array(
         // ...
+
+
+        // our dependencies - it's important that these come before Jarves
+        new Propel\Bundle\PropelBundle\PropelBundle(),
+        new FOS\RestBundle\FOSRestBundle(),
+        new Nelmio\ApiDocBundle\NelmioApiDocBundle(),
+
+        // Jarves
         new Jarves\JarvesBundle(),
         new Jarves\DemoTheme\JarvesDemoThemeBundle(),
         new Jarves\Publication\JarvesPublicationBundle(),
-
-        // our dependencies
-        new Propel\Bundle\PropelBundle\PropelBundle(),
-        new FOS\RestBundle\FOSRestBundle(),
-        new JMS\SerializerBundle\JMSSerializerBundle(),
-        new Nelmio\ApiDocBundle\NelmioApiDocBundle(),
     );
 }
 ```
@@ -55,9 +65,8 @@ Add following composer dependencies to the root `composer.json`:
         "propel/propel": "dev-master",
         "sybio/image-workshop": ">=2",
         "michelf/php-markdown": ">=1.3",
-        "composer\/composer": "1.0.*@dev",
-        "friendsofsymfony/rest-bundle": "1.1.*",
-        "jms/serializer-bundle": "0.12.*",
+        "composer\/composer": "1.0.0",
+        "friendsofsymfony/rest-bundle": "^2.0.0",
         "nelmio/api-doc-bundle": "~2.5",
         "icap/html-diff": ">=1.0.1",
         "leafo/scssphp": ">=0.6.1"
@@ -101,9 +110,8 @@ Composer.json should look like:
         "propel/propel": "dev-master",
         "sybio/image-workshop": ">=2",
         "michelf/php-markdown": ">=1.3",
-        "composer\/composer": "1.0.*@dev",
-        "friendsofsymfony/rest-bundle": "1.1.*",
-        "jms/serializer-bundle": "0.12.*",
+        "composer\/composer": "1.0.0",
+        "friendsofsymfony/rest-bundle": "^2.0.0",
         "nelmio/api-doc-bundle": "~2.5",
         "icap/html-diff": ">=1.0.1",
         "leafo/scssphp": ">=0.6.1"
@@ -148,14 +156,17 @@ Composer.json should look like:
 
 ### 3. Define the jarves configuration
 
-
 ```bash
    cp src/Jarves/Resources/meta/config.xml.dist app/config/config.jarves.xml
    #or if from composer
    cp vendor/jarves/jarves-bundle/Jarves/Resources/meta/config.xml.dist app/config/config.jarves.xml
 ```
 
-   Adjust the `<database>` configuration in `app/config/config.jarves.xml`.
+Adjust the `<database>` configuration in `app/config/config.jarves.xml`.
+
+Pro tip: You can completely remove `<database>` section, then Symfony is using the database settings from your `app/config/parameters.yml`.
+If you use this ``<database>` configuration way, then all database related stuff regarding Propel from your `app/config` is overwritten.
+This database section modifies only Propel connection settings (not Doctrine or other services that use `app/config/parameters.yml` `database_*` parameters)
 
 ```xml
   <database>
@@ -201,15 +212,6 @@ app/console jarves:install:demo localhost /
 ```yaml
 jarves:
     resource: "@JarvesBundle/Resources/config/routing.yml"
-```
-
-Change the `jarves_admin_prefix` parameter if n:
-
-```yaml
-# app/config/parameters.yml
-parameters:
-    # ...
-    jarves_admin_prefix: /jarves
 ```
 
 ### 6. Verify

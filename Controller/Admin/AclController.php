@@ -35,7 +35,6 @@ class AclController extends Controller
     }
 
     /**
-     *
      * @ApiDoc(
      *  section="ACL Management",
      *  description="Gets all rules from given type and id"
@@ -62,7 +61,6 @@ class AclController extends Controller
             ->find()
             ->toArray(null, null, TableMap::TYPE_CAMELNAME);
     }
-
 
     /**
      * @ApiDoc(

@@ -138,10 +138,10 @@ class ObjectCrudController extends ObjectCrud
      * )
      *
      * @Rest\QueryParam(name="fields", requirements=".+", description="Comma separated list of field names")
-     * @Rest\QueryParam(name="filter", array=true, requirements=".*", description="Simple filtering per field")
+     * @Rest\QueryParam(name="filter", requirements=".*", description="Simple filtering per field")
      * @Rest\QueryParam(name="limit", requirements="[0-9]+", description="Limits the result")
      * @Rest\QueryParam(name="offset", requirements="[0-9]+", description="Offsets the result")
-     * @Rest\QueryParam(name="order", array=true, requirements=".+", description="Ordering. ?order[title]=asc")
+     * @Rest\QueryParam(name="order", requirements=".+", description="Ordering. ?order[title]=asc")
      * @Rest\QueryParam(name="primaryKeys", description="PrimaryKey to filter as array")
      * @Rest\QueryParam(name="q", requirements=".+", description="Search query")
      * @Rest\QueryParam(name="withAcl", default=false, requirements=".+", description="With ACL information")
@@ -161,13 +161,13 @@ class ObjectCrudController extends ObjectCrud
         $this->setDomain($paramFetcher->get('domain'));
 
         return $this->getItems(
-            $paramFetcher->get('filter'),
-            $paramFetcher->get('limit'),
-            $paramFetcher->get('offset'),
-            $paramFetcher->get('q'),
-            $paramFetcher->get('fields'),
-            $paramFetcher->get('order'),
-            $paramFetcher->get('withAcl'),
+            $paramFetcher->get('filter') ?: null,
+            $paramFetcher->get('limit') ?: null,
+            $paramFetcher->get('offset') ?: null,
+            $paramFetcher->get('q') ?: '',
+            $paramFetcher->get('fields') ?: null,
+            $paramFetcher->get('order') ?: null,
+            $paramFetcher->get('withAcl') ?: null,
             $paramFetcher->get('primaryKeys') ?: []
         );
     }
@@ -213,7 +213,7 @@ class ObjectCrudController extends ObjectCrud
      *    description="Returns %object% items count"
      * )
      *
-     * @Rest\QueryParam(name="filter", array=true, requirements=".*", description="Simple filtering per field")
+     * @Rest\QueryParam(name="filter", requirements=".*", description="Simple filtering per field")
      * @Rest\QueryParam(name="q", requirements=".+", description="Search query")
      *
      * @Rest\View()
@@ -253,7 +253,7 @@ class ObjectCrudController extends ObjectCrud
      *    description="Deletes multiple items at once"
      * )
      *
-     * @Rest\RequestParam(name="pks", requirements=".+", array=true, description="All primary keys as list")
+     * @Rest\RequestParam(name="pks", requirements=".+", description="All primary keys as list")
      *
      * @Rest\View()
      * @Rest\Delete("/")

@@ -76,7 +76,7 @@ class BackendController extends Controller
      *  description="Saves user settings"
      * )
      *
-     * @Rest\RequestParam(name="settings", array=true)
+     * @Rest\RequestParam(name="settings")
      *
      * @Rest\Post("/admin/backend/user-settings")
      *
@@ -162,7 +162,7 @@ class BackendController extends Controller
      *
      *  Example: settings?keys[]=modules&keys[]=layouts
      *
-     * @Rest\QueryParam(name="keys", array=true, requirements=".+", description="List of config keys to filter"))
+     * @Rest\QueryParam(name="keys", requirements=".+", description="List of config keys to filter"))
      *
      * @Rest\Get("/admin/backend/settings")
      *

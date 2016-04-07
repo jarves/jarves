@@ -37,7 +37,6 @@ parameters:
      jarves.model.builder.class: Jarves\ORM\Builder\Builder
      jarves.model.builder.propel.class: Jarves\ORM\Builder\Propel
 
-#     jarves.configuration.class: Jarves\Configuration\SystemConfig
      jarves.configuration.database.class: Jarves\Configuration\Database
 
      jarves.configuration.database.connection.main.class: Jarves\Configuration\Connection
@@ -52,15 +51,15 @@ parameters:
 
 services:
      jarves:
-         class: %jarves.core.class%
+         class: "%jarves.core.class%"
          arguments: ["@jarves.config", "%jarves_admin_prefix%", "%kernel.cache_dir%", "%kernel.root_dir%", "%kernel.environment%", "%kernel.debug%", "@kernel", "@request_stack", "@event_dispatcher", "@jarves.field.types"]
 
      jarves.config:
-         class: %jarves.config.class%
-         arguments: ["%kernel.root_dir%", "%kernel.environment%"]
+         class: "%jarves.config.class%"
+         arguments: ["%kernel.root_dir%", "%kernel.environment%", "@service_container"]
 
      jarves.objects:
-         class: %jarves.objects.class%
+         class: "%jarves.objects.class%"
          arguments: ["@jarves", "@service_container"]
 
      jarves.event_dispatcher:
@@ -92,51 +91,45 @@ services:
          arguments: ["@jarves", "@jarves.page_stack", "@jarves.stopwatch", "@jarves.asset_handler.container", "@event_dispatcher", "@templating", "@jarves.editmode"]
 
      jarves.cache.fast:
-         class: %jarves.cache.fast.class%
+         class: "%jarves.cache.fast.class%"
          factory: [%jarves.cache.factory.class%, createFast]
          arguments: ["@service_container", "@jarves.config"]
 
      jarves.cache.distributed:
-         class: %jarves.cache.fast.class%
+         class: "%jarves.cache.fast.class%"
          factory: [%jarves.cache.factory.class%, createDistributed]
          arguments: ["@service_container", "@jarves.config"]
 
      jarves.content.render:
-         class: %jarves.content.render.class%
+         class: "%jarves.content.render.class%"
          arguments: ["@jarves", "@jarves.stopwatch", "@jarves.editmode", "@jarves.cache.cacher", "@event_dispatcher", "@jarves.page_stack", "@templating"]
 
      jarves.cache.cacher:
-          class: %jarves.cache.cacher.class%
+          class: "%jarves.cache.cacher.class%"
           arguments: ["@jarves.stopwatch", "@jarves.cache.distributed", "@jarves.cache.fast"]
 
      jarves.cache.response_cacher:
-          class: %jarves.cache.response_cacher.class%
+          class: "%jarves.cache.response_cacher.class%"
           arguments: ["@jarves", "@jarves.page_stack", "@jarves.cache.cacher", "@templating", "@jarves.page_response.factory"]
 
-#     jarves.configuration:
-#         class: %jarves.configuration.class%
-#         calls:
-#            - [setDatabase, ["@jarves.configuration.database"]]
-#            - [setJarves, ["@jarves"]]
-
-#     jarves.configuration.database:
-#         class: %jarves.configuration.database.class%
-#         calls:
-#            - [addConnection, ["@jarves.configuration.database.connection.main"]]
+     jarves.configuration.database:
+         class: "%jarves.configuration.database.class%"
+         calls:
+            - [addConnection, ["@jarves.configuration.database.connection.main"]]
 #            - [setPrefix, ["%database_table_prefix%"]]
-#
-#     jarves.configuration.database.connection.main:
-#         class: %jarves.configuration.database.connection.main.class%
-#         calls:
-#            - [setType, ["%database_driver%"]]
-#            - [setServer, ["%database_host%"]]
-#            - [setPort, ["%database_port%"]]
-#            - [setName, ["%database_name%"]]
-#            - [setUsername, ["%database_user%"]]
-#            - [setPassword, ["%database_password%"]]
+
+     jarves.configuration.database.connection.main:
+         class: "%jarves.configuration.database.connection.main.class%"
+         calls:
+            - [setType, ["%database_driver%"]]
+            - [setServer, ["%database_host%"]]
+            - [setPort, ["%database_port%"]]
+            - [setName, ["%database_name%"]]
+            - [setUsername, ["%database_user%"]]
+            - [setPassword, ["%database_password%"]]
 
      jarves.filesystem.adapter.local:
-         class: %jarves.filesystem.adapter.local.class%
+         class: "%jarves.filesystem.adapter.local.class%"
          shared: false
          arguments: ["/"]
          calls:
@@ -144,88 +137,88 @@ services:
              - [setRoot, ["%kernel.root_dir%/.."]]
 
      jarves.filesystem.adapter.cache:
-         class: %jarves.filesystem.adapter.local.class%
+         class: "%jarves.filesystem.adapter.local.class%"
          arguments: ["/"]
          calls:
              - [setJarves, ["@jarves"]]
              - [setRoot, ["%kernel.cache_dir%"]]
 
      jarves.filesystem.local:
-         class: %jarves.filesystem.local.class%
+         class: "%jarves.filesystem.local.class%"
          calls:
-            - [setAdapter, ["@jarves.filesystem.adapter.local="]]
+            - [setAdapter, ["@jarves.filesystem.adapter.local"]]
 
      jarves.filesystem.cache:
-         class: %jarves.filesystem.cache.class%
+         class: "%jarves.filesystem.cache.class%"
          calls:
-            - [setAdapter, ["@jarves.filesystem.adapter.cache="]]
+            - [setAdapter, ["@jarves.filesystem.adapter.cache"]]
 
      jarves.filesystem.web:
-         class: %jarves.filesystem.web.class%
+         class: "%jarves.filesystem.web.class%"
          arguments: ["@jarves", "@jarves.config", "@service_container", "@jarves.filesystem.cache"]
 
      jarves.navigation:
-         class: %jarves.navigation.class%
+         class: "%jarves.navigation.class%"
          arguments: ["@jarves", "@jarves.utils", "@jarves.cache.cacher", "@jarves.page_stack"]
 
      jarves.pluginResponse.listener:
-        class: %jarves.pluginResponse.listener.class%
+        class: "%jarves.pluginResponse.listener.class%"
         arguments: ["@jarves", "@jarves.page_stack", "@jarves.frontendRoutes.listener", "@kernel", "@jarves.page_response.factory"]
         tags:
             - { name: kernel.event_listener, event: kernel.response }
             - { name: kernel.event_listener, event: kernel.view }
 
      jarves.paramFetcher.listener:
-        class: %jarves.paramFetcher.listener.class%
-        arguments: ["@service_container"]
+        class: "%jarves.paramFetcher.listener.class%"
+        arguments: ["@jarves.page_stack", "@fos_rest.request.param_fetcher"]
         tags:
             - { name: kernel.event_listener, event: kernel.controller, prioarity: 6 }
 
      jarves.viewResponse.listener:
-        class: %jarves.viewResponse.listener.class%
+        class: "%jarves.viewResponse.listener.class%"
         arguments: ["@service_container"]
         tags:
             - { name: kernel.event_listener, event: kernel.view, priority: 101 }
             - { name: kernel.event_listener, event: kernel.controller, priority: -9 }
 
      jarves.frontendRoutes.listener:
-        class: %jarves.frontendRoutes.listener.class%
+        class: "%jarves.frontendRoutes.listener.class%"
         arguments: ["@jarves", "@jarves.page_stack", "@jarves.editmode", "@jarves.frontend_router", "@jarves.page_response.factory"]
         tags:
             - { name: kernel.event_listener, event: kernel.request, priority: 33 }
 
      jarves.securityFirewall.listener:
-        class: %jarves.securityFirewall.listener.class%
+        class: "%jarves.securityFirewall.listener.class%"
         arguments: ["@service_container"]
         tags:
             - { name: kernel.event_listener, event: kernel.request, priority: 21 }
 
      jarves.termination.listener:
-        class: %jarves.termination.listener.class%
+        class: "%jarves.termination.listener.class%"
         arguments: ["@jarves", "@jarves.page_stack"]
         tags:
             - { name: kernel.event_listener, event: kernel.terminate, priority: -1024 }
 
      jarves.restException.listener:
-        class: %jarves.restException.listener.class%
+        class: "%jarves.restException.listener.class%"
         arguments: ["@service_container"]
         tags:
             - { name: kernel.event_listener, event: kernel.exception}
 
      jarves.latencyMonitor.subscriber:
-        class: %jarves.latencyMonitor.subscriber.class%
+        class: "%jarves.latencyMonitor.subscriber.class%"
         arguments: ["@jarves.page_stack", "@jarves.cache.distributed"]
         tags:
             - { name: kernel.event_subscriber }
 
      jarves.debugger.subscriber:
-        class: %jarves.debugger.subscriber.class%
+        class: "%jarves.debugger.subscriber.class%"
         arguments: ["@service_container", "@jarves.logger.handler"]
         tags:
             - { name: kernel.event_subscriber }
 
      jarves.translator:
-        class: %jarves.translator.class%
+        class: "%jarves.translator.class%"
         arguments: ["@jarves", "@jarves.cache.cacher", "@jarves.filesystem.web", "@jarves.filesystem.cache"]
 
      jarves.frontend_router:
@@ -233,7 +226,7 @@ services:
         arguments: ["@jarves", "@jarves.page_stack", "@jarves.stopwatch", "@jarves.utils", "@logger", "@event_dispatcher", "@jarves.cache.cacher"]
 
      jarves.stopwatch:
-        class: %jarves.stopwatch.class%
+        class: "%jarves.stopwatch.class%"
         arguments: ["@?debug.stopwatch"]
 
      jarves.condition_operator:
@@ -241,41 +234,41 @@ services:
         arguments: ["@jarves", "@jarves.config", "@jarves.objects", "@jarves.page_stack"]
 
      jarves.acl:
-        class: %jarves.acl.class%
+        class: "%jarves.acl.class%"
         arguments: ["@jarves", "@jarves.objects", "@jarves.page_stack", "@jarves.cache.cacher", "@jarves.condition_operator"]
 
      jarves.logger.handler:
-        class: %jarves.logger.handler.class%
+        class: "%jarves.logger.handler.class%"
         arguments: ["@jarves.page_stack"]
         
      jarves.rest.routing_loader:
-        class: %jarves.rest.routing_loader.class%
+        class: "%jarves.rest.routing_loader.class%"
         arguments: ["@jarves"]
         tags:
             - { name: routing.loader }
 
      jarves.model.builder:
-        class: %jarves.model.builder.class%
+        class: "%jarves.model.builder.class%"
         arguments: ["@jarves"]
 
      jarves.model.builder.propel:
-        class: %jarves.model.builder.propel.class%
+        class: "%jarves.model.builder.propel.class%"
         arguments: ["@jarves.filesystem.local", "@jarves.objects", "@kernel"]
         tags:
             - { name: jarves.model.builder, alias: propel }
 
      jarves.asset_handler.container:
         arguments: ["@service_container"]
-        class: %jarves.asset_handler.container.class%
+        class: "%jarves.asset_handler.container.class%"
 
      jarves.asset_handler.scss:
-        class: %jarves.asset_handler.scss.class%
+        class: "%jarves.asset_handler.scss.class%"
         arguments: ["@jarves", "@jarves.filesystem.web"]
         tags:
             - { name: jarves.asset_handler.compiler, extension: scss }
 
      jarves.asset_handler.css:
-        class: %jarves.asset_handler.css.class%
+        class: "%jarves.asset_handler.css.class%"
         arguments: ["@jarves", "@jarves.filesystem.web", "@jarves.utils"]
         tags:
             - { name: jarves.asset_handler.loader, contentType: 'text/css', extension: css }
@@ -285,7 +278,7 @@ services:
         arguments: ['@jarves.cache.distributed']
 
      jarves.asset_handler.js:
-        class: %jarves.asset_handler.js.class%
+        class: "%jarves.asset_handler.js.class%"
         arguments: ["@jarves", "@jarves.filesystem.web"]
         tags:
             - { name: jarves.asset_handler.loader, contentType: 'text/javascript', extension: js }

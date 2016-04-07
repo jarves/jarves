@@ -2,6 +2,7 @@
 
 namespace Jarves\Command;
 
+use Jarves\PackageManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -27,15 +28,16 @@ class DemoDataCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        define('KRYN_MANAGER', true);
         $jarves = $this->getJarves();
 
         $mainPackageManager = 'Jarves\PackageManager';
+
+        /** @var PackageManager $packageManager */
         $packageManager = new $mainPackageManager();
         $packageManager->setDomain($input->getArgument('hostname'));
         $packageManager->setPath($input->getArgument('path'));
         $packageManager->setContainer($this->getContainer());
-        $packageManager->installDemoData($jarves);
+        $packageManager->installDemoData();
 
         foreach ($jarves->getBundles() as $bundle) {
             $class = $bundle->getNamespace() . '\\PackageManager';
@@ -44,6 +46,7 @@ class DemoDataCommand extends AbstractCommand
                 if ($packageManager instanceof ContainerAwareInterface) {
                     $packageManager->setContainer($this->getContainer());
                 }
+
                 if (method_exists($packageManager, 'installDemoData')) {
                     $packageManager->installDemoData($jarves);
                 }

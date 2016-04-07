@@ -17,7 +17,7 @@ class ApiDocController extends Controller
      *  description="REST API documentation"
      * )
      *
-     * @Rest\Get("/doc", name="jarves_api_doc_index")
+     * @Rest\Get("/api", name="jarves_api_doc_index")
      *
      * @return Response
      */

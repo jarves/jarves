@@ -25,7 +25,7 @@ class FieldTypesCompilerPass implements CompilerPassInterface
 
         foreach ($taggedServices as $id => $tagAttributes) {
             $tagDef = $container->getDefinition($id);
-            $tagDef->setScope('prototype');
+            $tagDef->setShared(false);
 
             foreach ($tagAttributes as $attributes) {
                 $definition->addMethodCall(

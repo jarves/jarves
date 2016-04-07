@@ -174,7 +174,7 @@ class FileController extends Controller
      *  description="Moves or copies files in /web to $target in /web"
      * )
      *
-     * @Rest\RequestParam(name="files", requirements=".*", array=true, strict=true, description="The file paths")
+     * @Rest\RequestParam(name="files", requirements=".*", strict=true, description="The file paths")
      * @Rest\RequestParam(name="target", requirements=".*", strict=true, description="The target file path")
      * @Rest\RequestParam(name="overwrite", requirements=".*", strict=true, default="false", description="If the target should be overwritten")
      * @Rest\RequestParam(name="move", requirements=".*", strict=true, default="false", description="If files should be moved (cut&paste) or copied (copy&paste)")

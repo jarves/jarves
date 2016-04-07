@@ -18,9 +18,11 @@ use Jarves\Model\SessionQuery;
 use Jarves\Model\User;
 use Jarves\Model\UserGroupQuery;
 use Jarves\Model\UserQuery;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class PackageManager extends ContainerAware {
+class PackageManager implements ContainerAwareInterface
+{
 
     /**
      * @var string
@@ -31,6 +33,16 @@ class PackageManager extends ContainerAware {
      * @var string
      */
     protected $path = '/';
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
 
     /**
      * @param string $domain
@@ -356,7 +368,7 @@ class PackageManager extends ContainerAware {
         }
 
         $startNode = NodeQuery::create()->filterByDomainId($domain->getId())->findOneByLft(2);
-        $domain->setStartNodeId($startNode->getId());
+        $domain->setStartnodeId($startNode->getId());
         $domain->save();
 
         LanguageQuery::create()
@@ -381,8 +393,7 @@ class PackageManager extends ContainerAware {
         $footerNavi = NodeQuery::create()->findOneByTitle('Footer Navigation');
         $footerText = NodeQuery::create()->findOneByTitle('Footer text');
 
-        $domainThemeProperties = new \Jarves\Properties('{"@JarvesDemoThemeBundle":{"jarvesDemoTheme":{"logo":"@JarvesDemoThemeBundle/images/logo.png","title":"BUSINESSNAME","slogan":"Business Slogan comes here!","footer_deposit":"' . $footerText->getId(
-            ) . '","search_Node":"12","footer_navi":"' . $footerNavi->getId() . '"}}}');
+        $domainThemeProperties = new \Jarves\Properties('{"@JarvesDemoThemeBundle":{"jarvesDemoTheme":{"logo":"@JarvesDemoThemeBundle/images/logo.png","title":"BUSINESSNAME","slogan":"Business Slogan comes here!","footer_deposit":"' . $footerText->getId() . '","search_Node":"12","footer_navi":"' . $footerNavi->getId() . '"}}}');
         $domain->setThemeProperties($domainThemeProperties);
         $domain->save();
 
@@ -398,7 +409,7 @@ class PackageManager extends ContainerAware {
         $groupGuest->setDescription('All anonymous user');
         $groupGuest->save();
 
-        $id = $groupGuest->getId(0);
+        $id = $groupGuest->getId();
         GroupQuery::create()
             ->filterById($id)
             ->update(array('Id' => 0));
@@ -453,7 +464,7 @@ class PackageManager extends ContainerAware {
     /**
      * @static
      *
-     * @param Node  $pNode
+     * @param Node $pNode
      * @param array $pChildren
      */
     function installNodes(Node $pNode, $pChildren)
@@ -502,7 +513,7 @@ class PackageManager extends ContainerAware {
     /**
      * @static
      *
-     * @param Node  $pNode
+     * @param Node $pNode
      * @param array $pBoxedContents
      */
     function installContents(Node $pNode, $pBoxedContents)

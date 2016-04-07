@@ -260,7 +260,7 @@ abstract class AbstractStorage
      * @param Condition $condition complex filter condition
      * @param array $options
      */
-    abstract public function getItems(array $filter = [], Condition $condition = null, $options = null);
+    abstract public function getItems(array $filter = null, Condition $condition = null, $options = null);
 
     /**
      *
