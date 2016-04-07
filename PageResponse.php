@@ -100,7 +100,7 @@ class PageResponse extends Response
     /**
      * @var string
      */
-    protected $favicon = '@JarvesBundle/images/favicon.ico';
+    protected $favicon = '@JarvesBundle/admin/images/favicon.ico';
 
     /**
      * @var bool
