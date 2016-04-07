@@ -325,7 +325,7 @@ class AdminController extends Controller
         $__streams = array_map('strtolower', $streams);
 
         $response = array();
-        $params = $paramFetcher->get('params');
+        $params = $paramFetcher->get('params') ?: [];
         foreach ($this->getJarves()->getConfigs() as $bundleConfig) {
             if ($streams = $bundleConfig->getStreams()) {
                 foreach ($streams as $stream) {
