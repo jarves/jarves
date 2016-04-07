@@ -32,7 +32,7 @@ jarves.Dashboard = new Class({
         this.main.empty();
 
         [
-            'jarves.DashboardWidgets.LiveVisitor',
+            // 'jarves.DashboardWidgets.LiveVisitor',
             'jarves.DashboardWidgets.Latency',
             'jarves.DashboardWidgets.LatencyChart',
             'jarves.DashboardWidgets.Uptime',

@@ -27,24 +27,24 @@ class ObjectCrud implements ObjectCrudInterface
 {
     /**
      * Defines the table which should be accessed.
-     * This variable has to be set by any subclass.
      *
      * Use this only if you know, what you're doing,
-     * normally this comes from the object settings.
+     * normally this comes from the object definition from the object property.
      *
+     * @internal
      * @var string table name
      */
     protected $table = '';
 
     /**
-     * Defines the object which should be listed.
+     * Defines the object which should be used.
      *
      * @var string object key
      */
     protected $object = '';
 
     /**
-     * Copy of the object definition
+     * Copy of the object definition, by is being set in the initialisation. Only set when object property is defined.
      *
      * @var \Jarves\Configuration\Object
      */
@@ -52,19 +52,21 @@ class ObjectCrud implements ObjectCrudInterface
 
     /**
      * Defines your primary fields as a array.
+     *
      * Example: $primary = array('id');
      * Example: $primary = array('id', 'name');
      *
      * Use this only if you know, what you're doing,
      * normally this comes from the object settings.
      *
-     * @abstract
+     * @internal
      * @var array
      */
     protected $primary = array();
 
     /**
      * The primary key of the current object.
+     *
      * If the class created a item through addItem(),
      * it contains the primary key of the newly created
      * item.
@@ -80,22 +82,26 @@ class ObjectCrud implements ObjectCrudInterface
      *
      * @var array
      * @see getPrimaryKey()
+     * @internal
      */
     protected $primaryKey = array();
 
     /**
-     * Defines the fields of your edit/add window which should be displayed.
+     * Defines the fields of your edit/add crud window which should be displayed  (and POST/PUT of the REST api).
+     *
      * Can contains several fields nested, via 'children', also type 'tab' are allowed.
+     *
      * Every jarves.field is allowed.
      *
-     * @abstract
      * @var array
      */
     protected $fields = array();
 
     /**
      * Defines additional to $fields more selected field keys, so you can
-     * provide through the API more values without defining those in the editor ($fields) itself.
+     * provide through the API more values without defining those in the fields property itself.
+     *
+     * Only field names allowed that are available by the underlying object.
      *
      * Comma separated or as array.
      *
@@ -105,16 +111,18 @@ class ObjectCrud implements ObjectCrudInterface
 
     /**
      * Defines the fields of your table which should be displayed.
-     * Only one level, no children, no tabs. Use the window editor,
+     *
+     * This is used by the listing crud window (and GET of the REST api)
+     *
+     * Only one level, no children, no tabs. Use the crud editor,
      * to get the list of possible types.
      *
-     * @abstract
      * @var array
      */
     protected $columns = null;
 
     /**
-     * Defines how many rows should be displayed per page.
+     * Defines how many items should be displayed per page.
      *
      * @var integer number of rows per page
      */
@@ -130,7 +138,6 @@ class ObjectCrud implements ObjectCrudInterface
     /**
      * Order field
      *
-     * @private
      * @var string
      */
     protected $customOrderBy = '';
@@ -333,12 +340,15 @@ class ObjectCrud implements ObjectCrudInterface
     /**
      * Flatten list of fields.
      *
+     * @internal
      * @var Field[]
      */
     protected $_fields = array();
 
     /**
      * Defines whether the class checks, if the user has account to requested object item.
+     *
+     * Deactivate this means this object does not listen to any ACL.
      *
      * @var boolean
      */
@@ -347,10 +357,11 @@ class ObjectCrud implements ObjectCrudInterface
     /**
      * If the object is a nested set, then you should switch this property to true.
      *
+     * Is automatically set when object property is defined.
+     *
      * @var bool
      */
     protected $asNested = false;
-
 
     /**
      * @var int
@@ -506,6 +517,8 @@ class ObjectCrud implements ObjectCrudInterface
                     }
                 }
             }
+
+            $this->asNested = $this->objectDefinition->getNested();
 
             if (!$this->table) {
                 $this->table = $this->objectDefinition->getTable();
@@ -1073,7 +1086,8 @@ class ObjectCrud implements ObjectCrudInterface
         $orderBy = [],
         $withAcl = false,
         array $primaryKeys = []
-    ) {
+    )
+    {
         $options = array();
 
         $storageController = $this->objects->getStorageController($this->getObject());
@@ -1087,7 +1101,7 @@ class ObjectCrud implements ObjectCrudInterface
             $condition->mergeAnd($extraCondition);
         }
 
-        $options['order'] = $orderBy ? : $this->getOrder();
+        $options['order'] = $orderBy ?: $this->getOrder();
         $options['fields'] = $this->getItemsSelection($fields);
         $options['permissionCheck'] = $this->getPermissionCheck();
 
@@ -1152,7 +1166,7 @@ class ObjectCrud implements ObjectCrudInterface
             }
         }
 
-        return $items ? : null;
+        return $items ?: null;
     }
 
     /**
@@ -1395,7 +1409,8 @@ class ObjectCrud implements ObjectCrudInterface
         $limit = null,
         $offset = null,
         $withAcl = false
-    ) {
+    )
+    {
         $storageController = $this->objects->getStorageController($this->getObject());
 
         if (null !== $pk) {
@@ -2227,7 +2242,7 @@ class ObjectCrud implements ObjectCrudInterface
     }
 
     /**
-     * @param string $editIconObjectCrud.php:792
+     * @param string $editIconObjectCrud .php:792
      */
     public function setEditIcon($editIcon)
     {

@@ -27,12 +27,12 @@ class DashboardWidgets
     public function newsFeed(&$response, $params)
     {
         $items = NewsFeedQuery::create()
-            ->orderByCreated(Criteria::ASC);
+            ->orderByCreated(Criteria::DESC);
 
         if ($lastTime = @$params['newsFeed/lastTime']) {
             $items->filterByCreated($lastTime, Criteria::GREATER_THAN);
         } else {
-            $items->limit(6);
+            $items->limit(20);
         }
 
         $result = [
