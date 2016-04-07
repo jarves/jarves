@@ -24,7 +24,7 @@ class BasicTest extends KernelAwareTestCase
 
         $this->assertNotEmpty($response);
 
-        $this->assertContains('Jarves cms Administration', $response, "we got the login view.");
+        $this->assertContains('Jarves Administration', $response, "we got the login view.");
 
         $this->assertContains('window._session = {"userId":1', $response, "we're logged in.");
     }

@@ -919,7 +919,7 @@ jarves.AdminInterface = new Class({
             }
 
             if (!this.options.frontPage && jarves.settings.system && jarves.settings.system.systemTitle) {
-                document.title = jarves.settings.system.systemTitle + t(' | Jarves cms Administration');
+                document.title = jarves.settings.system.systemTitle + t(' | Jarves Administration');
             }
 
             jarves.settings.configsAlias = {};
