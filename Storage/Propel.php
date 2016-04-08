@@ -14,8 +14,10 @@ use Jarves\Model\AclQuery;
 use Jarves\Objects;
 use Jarves\Propel\StandardEnglishPluralizer;
 use Jarves\Propel\WorkspaceManager;
+use Jarves\Publication\Model\Map\NewsTableMap;
 use Jarves\Tools;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\InstancePoolTrait;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Map\RelationMap;
@@ -84,6 +86,24 @@ class Propel extends AbstractStorage
         $this->query = $this->getQueryClass();
         $this->tableMap = $this->query->getTableMap();
         $this->propelPrimaryKeys = $this->tableMap->getPrimaryKeys();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clearCache()
+    {
+        if (!$this->getObjectKey()) {
+            return;
+        }
+
+        $this->query = $this->getQueryClass();
+        $this->tableMap = $this->query->getTableMap();
+
+        /** @var InstancePoolTrait $class */
+        $class = get_class($this->tableMap);
+        $class::clearInstancePool();
+        $class::clearRelatedInstancePool();
     }
 
     /**
@@ -1068,7 +1088,7 @@ class Propel extends AbstractStorage
                 $setItems = 'set' . $name;
                 $clearItems = 'clear' . $name;
 
-                if ($fieldValue) {
+                if (is_array($fieldValue)) {
                     $foreignQuery = $self->getQueryClass($relation->getForeignObjectKey());
                     $foreignClass = $self->getPhpName($relation->getForeignObjectKey());
                     $foreignObjClass = $self->objects->getStorageController(

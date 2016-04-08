@@ -13,7 +13,7 @@ use Jarves\AssetHandler\AssetInfo;
  */
 class Asset extends Model
 {
-    protected $attributes = ['compression', 'priority', 'type'];
+    protected $attributes = ['compression', 'priority', 'type', 'src'];
     protected $nodeValueVar = 'content';
 
     /**

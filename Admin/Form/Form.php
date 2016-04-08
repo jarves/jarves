@@ -64,9 +64,10 @@ class Form
 
         foreach ($this->getFields() as $field) {
             $key = lcfirst($field->getId());
+
             $value = isset($data[$key]) ? $data[$key] : null;
 
-            if (null == $value && $defaultData) {
+            if (null === $value && $defaultData) {
                 $value = isset($defaultData[$key]) ? $defaultData[$key] : null;
             }
 
@@ -148,7 +149,7 @@ class Form
     public static function searchField(&$fields, $key)
     {
         foreach ($fields as $field) {
-            if ($field->getId() == $key) {
+            if ($field->getId() === $key) {
                 return $field;
             } else {
                 if ($field->getChildren()) {

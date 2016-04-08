@@ -10,21 +10,15 @@ use Jarves\Utils;
 class NodeIsActiveExtension extends \Twig_Extension
 {
     /**
-     * @var Utils
-     */
-    private $utils;
-    /**
      * @var PageStack
      */
     private $pageStack;
 
     /**
      * @param PageStack $pageStack
-     * @param Utils $utils
      */
-    function __construct(PageStack $pageStack, Utils $utils)
+    function __construct(PageStack $pageStack)
     {
-        $this->utils = $utils;
         $this->pageStack = $pageStack;
     }
 
@@ -49,8 +43,8 @@ class NodeIsActiveExtension extends \Twig_Extension
         }
 
         if (!$exact) {
-            $url = $this->utils->getNodeUrl($current, true, true);
-            $purl = $this->utils->getNodeUrl($node, true, true);
+            $url = $this->pageStack->getNodeUrl($current, true, true);
+            $purl = $this->pageStack->getNodeUrl($node, true, true);
 
             if ($url && $purl) {
                 $pos = strpos($url, $purl);

@@ -74,6 +74,14 @@ abstract class AbstractStorage
         }
     }
 
+    /**
+     * Clears the internal cache. This is called when the defined object has been changed.
+     */
+    public function clearCache()
+    {
+
+    }
+
     public function getDefinition()
     {
         return $this->definition;

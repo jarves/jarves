@@ -38,7 +38,7 @@
         "propel/propel-bundle": "2.0.x-dev@dev",
         "propel/propel": "dev-master",
         "sybio/image-workshop": ">=2",
-        "michelf/php-markdown": ">=1.3",
+        "michelf/php-markdown": "^1.6",
         "composer\/composer": "1.0.0",
         "friendsofsymfony/rest-bundle": "^2.0.0-BETA2",
         "nelmio/api-doc-bundle": "~2.5",

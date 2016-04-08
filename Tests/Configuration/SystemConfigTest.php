@@ -18,7 +18,6 @@ class SystemConfigTest extends KernelAwareTestCase
     {
 
         $xml = "<config>
-  <!--The system title of this installation.-->
   <systemTitle>Peter's Jarves</systemTitle>
 </config>";
 
@@ -30,7 +29,6 @@ class SystemConfigTest extends KernelAwareTestCase
         $this->assertEquals($xml, $reverse->toXml());
 
         $xmlAdditional = '<config asd="fgh">
-  <!--The system title of this installation.-->
   <systemTitle>Peter\'s Jarves</systemTitle>
   <custom>fooobarr</custom>
   <otherValues>
@@ -52,14 +50,7 @@ class SystemConfigTest extends KernelAwareTestCase
         $xml = '<config>
   <database>
     <connections>
-      <!--
-        type: mysql|pgsql|sqlite (the pdo driver name)
-        persistent: true|false (if the connection should be persistent)
-        slave: true|false (if the connection is a slave or not (readonly or not))
-        charset: \'utf8\'
-      -->
       <connection>
-        <!--The schema/database name-->
         <name>testdb</name>
         <username>peter</username>
       </connection>
@@ -92,15 +83,7 @@ class SystemConfigTest extends KernelAwareTestCase
     public function testSystemConfigFile()
     {
         $xml = '<config>
-  <!--
-    Whenever Jarves creates files we try to set the correct permission and file owner.
-    Attributes (default):
-    groupPermission:    rw|r|empty (rw)
-    everyonePermission: rw|r|empty (r)
-    disableModeChange:  true|false (false)
-    -->
   <file groupPermission="r" everyonePermission="">
-    <!--The group owner name-->
     <groupOwner>ftp</groupOwner>
   </file>
 </config>';
@@ -122,13 +105,6 @@ class SystemConfigTest extends KernelAwareTestCase
         $this->assertEquals($xml, $reverse->toXml());
 
         $xml = '<config>
-  <!--
-    Whenever Jarves creates files we try to set the correct permission and file owner.
-    Attributes (default):
-    groupPermission:    rw|r|empty (rw)
-    everyonePermission: rw|r|empty (r)
-    disableModeChange:  true|false (false)
-    -->
   <file disableModeChange="true"/>
 </config>';
         $config4 = new SystemConfig();
@@ -147,12 +123,6 @@ class SystemConfigTest extends KernelAwareTestCase
     public function testSystemConfigCache()
     {
         $xml = '<config>
-  <!--
-  The cache layer we use for the distributed caching.
-  (The `fast caching` is auto determined (Order: APC, XCache, Files))
-
-  service: MUST have `Core\Cache\CacheInterface` as interface
-  -->
   <cache service="vendor.other.cache">
     <options>
       <option key="servers">
@@ -186,21 +156,11 @@ class SystemConfigTest extends KernelAwareTestCase
     {
 
         $xml = '<config>
-  <!--The client session/authorisation/authentication handling.
-  Attributes: (default)
-    autoStart: true|false (false) If the systems starts always a session for each request and therefore sends for each
-                                visitor/request a cookie (if none is delivered).
-  -->
   <client service="vendor.custom.client_handling">
     <options>
       <option key="server">127.0.0.1</option>
       <option key="cert">false</option>
     </options>
-    <!--
-        A class that handles the actual data storage.
-
-        service: MUST have `Core\Cache\CacheInterface` as interface
-    -->
     <sessionStorage service="vendor.own.storage"/>
   </client>
 </config>';
@@ -265,7 +225,7 @@ class SystemConfigTest extends KernelAwareTestCase
 
         $distConfig = file_get_contents($this->getRoot() . 'app/config/config.jarves.dist.xml');
 
-        $this->assertEquals($distConfig, $config->toXml(true));
+        $this->assertEquals($distConfig, $config->toXml(true, false));
 
         $reverse = new SystemConfig($distConfig);
 

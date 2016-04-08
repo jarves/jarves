@@ -12,15 +12,6 @@ class Navigation
      * @var Jarves
      */
     protected $jarves;
-    /**
-     * @var Utils
-     */
-    private $utils;
-
-    /**
-     * @var EngineInterface
-     */
-    private $templating;
 
     /**
      * @var Cacher
@@ -34,14 +25,12 @@ class Navigation
     /**
      * Navigation constructor.
      * @param Jarves $jarves
-     * @param Utils $utils
      * @param Cacher $cacher
      * @param PageStack $pageStack
      */
-    function __construct(Jarves $jarves, Utils $utils, Cacher $cacher, PageStack $pageStack)
+    function __construct(Jarves $jarves, Cacher $cacher, PageStack $pageStack)
     {
         $this->jarves = $jarves;
-        $this->utils = $utils;
         $this->cacher = $cacher;
         $this->pageStack = $pageStack;
     }
@@ -52,7 +41,7 @@ class Navigation
         return $array[$level - 2];
     }
 
-    public function getRendered($options, $twig)
+    public function getRendered($options, \Twig_Environment $twig)
     {
         $options['noCache'] = isset($options['noCache']) ? $options['noCache'] : false;
         $view = $options['template'] ?: $options['view'];
@@ -111,7 +100,7 @@ class Navigation
 
     /**
      * @param array $options
-
+     *
      * @return null|Model\Node
      *
      * @throws Exceptions\BundleNotFoundException
@@ -129,7 +118,7 @@ class Navigation
         if (!$navigation && $options['id'] != 'breadcrumb' && ($options['id'] || $options['level'])) {
 
             if ($options['id'] + 0 > 0) {
-                $navigation = $this->utils->getPage($options['id'] + 0);
+                $navigation = $this->pageStack->getPage($options['id'] + 0);
 
                 if (!$navigation) {
                     return null;
@@ -146,14 +135,15 @@ class Navigation
                 $page = $this->arrayLevel($parents, $options['level']);
 
                 if ($page && $page->getId() > 0) {
-                    $navigation = $this->utils->getPage($page->getId());
+                    $navigation = $this->pageStack->getPage($page->getId());
                 } elseif ($options['level'] == $currentLevel + 1) {
                     $navigation = $this->pageStack->getCurrentPage();
                 }
             }
 
             if ($options['level'] == 1) {
-                $navigation = NodeQuery::create()->findRoot($this->pageStack->getCurrentDomain()->getId());
+                $navigation = NodeQuery::create()
+                    ->findRoot($this->pageStack->getCurrentDomain()->getId());
             }
         }
 

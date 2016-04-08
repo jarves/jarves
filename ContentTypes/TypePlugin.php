@@ -10,6 +10,7 @@ use Jarves\PageResponse;
 use Jarves\PageResponseFactory;
 use Jarves\PageStack;
 use Jarves\PluginResponse;
+use Jarves\PluginResponseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -111,13 +112,12 @@ class TypePlugin extends AbstractType
     {
         $data = $event->getControllerResult();
 
-        if ($data instanceof PluginResponse) {
+        if ($data instanceof PluginResponseInterface) {
             $response = $data;
         } else {
             $response = $this->pageResponseFactory->createPluginResponse($data);
         }
 
-        $response->setControllerRequest($event->getRequest());
         $event->setResponse($response);
     }
 
@@ -149,7 +149,7 @@ class TypePlugin extends AbstractType
                 if ($this->isPreview()) {
                     if (!$this->pluginDef->isPreview()) {
                         //plugin does not allow to have a preview on the actual action method
-                        return $config->getLabel() . ': ' . $this->pluginDef->getLabel();
+                        return ($config->getLabel() ?: $config->getBundleName()) . ': ' . $this->pluginDef->getLabel();
                     }
                 }
 
@@ -183,9 +183,19 @@ class TypePlugin extends AbstractType
                 ob_start();
                 $response = $this->kernel->handle($request, HttpKernelInterface::SUB_REQUEST);
                 //EventListener\PluginRequestListener converts all PluginResponse objects to PageResponses
+
                 if ($response instanceof PageResponse) {
-                    $response = $response->getPluginResponse($this->getContent()->getId());
+                    if ($pluginResponse = $response->getPluginResponse($this->getContent()->getId())) {
+                        $response = $pluginResponse;
+                    }
                 }
+
+//                if ($response instanceof PageResponse) {
+//                    if ($response->getPluginResponse($this->getContent()->getId())) {
+//                        $response = $response->getPluginResponse($this->getContent()->getId());
+//                    }
+//                }
+
                 $ob = ob_get_clean();
 
                 $dispatcher->removeListener(

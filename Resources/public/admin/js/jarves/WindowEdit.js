@@ -138,10 +138,10 @@ jarves.WindowEdit = new Class({
             if (!pResponse.error && pResponse.data && pResponse.data._isClassDefinition) {
                 this.render(pResponse.data);
             } else {
-                this.container.set('html', '<div style="text-align: center; padding: 50px; color: red">' + t('Failed. No correct class definition returned. %s').replace('%s', 'admin/' + this.getEntryPoint() + '?_method=options') + '</div>');
+                this.container.set('html', '<div style="text-align: center; padding: 50px; color: red">' + t('Failed. No correct class definition returned. %s').replace('%s', 'admin/' + this.getEntryPoint()) + '</div>');
             }
 
-        }.bind(this)}).post({_method: 'options'});
+        }.bind(this)}).requestOptions();
     },
 
     generateItemParams: function(version) {
@@ -619,7 +619,7 @@ jarves.WindowEdit = new Class({
                     this.fireEvent('remove', this.getPrimaryKey());
                     jarves.getAdminInterface().objectChanged(this.classProperties['object']);
                     this.destroy();
-                }.bind(this)}).post({_method: 'delete'});
+                }.bind(this)}).requestDelete();
 
         }.bind(this));
     },
@@ -807,6 +807,7 @@ jarves.WindowEdit = new Class({
         }
 
         var req = this.fieldForm.getValue(null, patch);
+        console.log('retrieveData', req);
 
         if (this.languageSelect) {
             if (!withoutEmptyCheck && this.languageSelect.getValue() == '') {
@@ -920,6 +921,7 @@ jarves.WindowEdit = new Class({
             this.lastSaveRq.cancel();
         }
 
+        console.log('----save----');
         var request = this.buildRequest(this.classProperties.usePatch);
 
         if (typeOf(request) != 'null') {
@@ -947,9 +949,8 @@ jarves.WindowEdit = new Class({
     doSave: function(andClose) {
         var objectId = jarves.getObjectUrlId(this.classProperties['object'], this.getPrimaryKey());
         var request = this.buildRequest(this.classProperties.usePatch);
-        var method = this.classProperties.usePatch ? 'patch' : 'put';
 
-        this.lastSaveRq = new Request.JSON({url: _pathAdmin + this.getEntryPoint() + '/' + objectId + '?_method=' + method,
+        this.lastSaveRq = new Request.JSON({url: _pathAdmin + this.getEntryPoint() + '/' + objectId,
             noErrorReporting: [
                 'Jarves\\Exceptions\\Rest\\ValidationFailedException',
                 'DuplicateKeysException',
@@ -987,7 +988,13 @@ jarves.WindowEdit = new Class({
                 if (this.classProperties.multiLanguage) {
                     this.itemLanguage = request.lang;
                 }
-            }.bind(this)}
-        ).post(request);
+            }.bind(this)
+        });
+
+        if (this.classProperties.usePatch) {
+            this.lastSaveRq.patch(request);
+        } else {
+            this.lastSaveRq.post(request);
+        }
     }
 });

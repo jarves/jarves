@@ -20,6 +20,11 @@ class Tools {
         return $return;
     }
 
+    public static function indentString($string, $size = 2, $char = ' ')
+    {
+        return preg_replace('/^/mu', str_repeat($char, $size), $string);
+    }
+
     public static function getArrayTrace($exception)
     {
         $trace = [];

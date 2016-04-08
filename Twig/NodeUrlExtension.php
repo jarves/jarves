@@ -4,21 +4,22 @@ namespace Jarves\Twig;
 
 use Jarves\Jarves;
 use Jarves\Model\Node;
+use Jarves\PageStack;
 use Jarves\Utils;
 
 class NodeUrlExtension extends \Twig_Extension
 {
     /**
-     * @var Utils
+     * @var PageStack
      */
-    private $utils;
+    private $pageStack;
 
     /**
-     * @param Utils $utils
+     * @param PageStack $pageStack
      */
-    function __construct(Utils $utils)
+    function __construct(PageStack $pageStack)
     {
-        $this->utils = $utils;
+        $this->pageStack = $pageStack;
     }
 
 
@@ -43,6 +44,6 @@ class NodeUrlExtension extends \Twig_Extension
 
     public function getUrl($nodeOrId = false)
     {
-        return $this->utils->getNodeUrl($nodeOrId);
+        return $this->pageStack->getNodeUrl($nodeOrId);
     }
 }

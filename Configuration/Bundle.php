@@ -116,12 +116,14 @@ class Bundle extends Model
      * @param \DOMElement $bundleDoc
      * @param null $jarves
      */
-    public function __construct($bundleClass, \DOMElement $bundleDoc = null, $jarves = null)
+    public function __construct($bundleClass, $jarves = null, \DOMElement $bundleDoc = null)
     {
-        $this->element = $bundleDoc;
         if (!$bundleClass) {
             throw new \InvalidArgumentException('$bundleClass needs to be set.');
         }
+
+        parent::__construct(null, $jarves);
+        $this->element = $bundleDoc;
 
         if ($bundleClass instanceof BundleInterface) {
             $bundleClass = get_class($bundleClass);

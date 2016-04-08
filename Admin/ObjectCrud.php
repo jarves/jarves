@@ -1729,18 +1729,42 @@ class ObjectCrud implements ObjectCrudInterface
             $items = array_reverse($items);
         }
 
+        $pk = $this->requestStack->getCurrentRequest()->request->get('_pk');
+        $targetObjectKey = $this->requestStack->getCurrentRequest()->request->get('_targetObjectKey');
+
+
         foreach ($items as $item) {
 
             $data = $fixedData;
             $data += $this->mapData($this->collectData($request), $fields, $item);
 
+            $args = [
+                'pk' => $pk,
+                'values' => &$data,
+                'position' => $position,
+                'targetObjectKey' => $targetObjectKey,
+                'controller' => $this,
+                'mode' => 'update'
+            ];
+            $eventPre = new GenericEvent($this->getObject(), $args);
+            $this->eventDispatcher->dispatch('core/object/modify-pre', $eventPre);
+            $this->eventDispatcher->dispatch('core/object/update-pre', $eventPre);
+
             try {
-                $inserted[] = $this->add(
+                $result = $this->add(
                     $data,
-                    $this->requestStack->getCurrentRequest()->request->get('_pk'),
+                    $pk,
                     $position,
-                    $this->requestStack->getCurrentRequest()->request->get('_targetObjectKey')
+                    $targetObjectKey
                 );
+
+                $inserted[] = $result;
+                $args['result'] = $result;
+                $event = new GenericEvent($this->getObject(), $args);
+
+                $this->eventDispatcher->dispatch('core/object/modify', $event);
+                $this->eventDispatcher->dispatch('core/object/add', $event);
+
             } catch (\Exception $e) {
                 $inserted[] = array('error' => [
                     'exception' => get_class($e),

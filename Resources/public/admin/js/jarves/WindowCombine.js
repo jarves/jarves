@@ -199,10 +199,7 @@ jarves.WindowCombine = new Class({
                         jarves.getAdminInterface().objectChanged(this.classProperties['object']);
                         this._deleteSuccess();
 
-                    }.bind(this)}).get({
-                        _method: 'delete',
-                        pk: items
-                    });
+                    }.bind(this)}).requestDelete({pk: items});
             }.bind(this));
         }
     },

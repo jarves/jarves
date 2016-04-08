@@ -68,7 +68,7 @@ services:
 
      jarves.page_stack:
          class: Jarves\PageStack
-         arguments: ["%jarves_admin_prefix%", "@request_stack", "@jarves.client.factory"]
+         arguments: ["%jarves_admin_prefix%", "@request_stack", "@jarves.client.factory", "@jarves.cache.cacher"]
 
      jarves.utils:
          class: Jarves\Utils
@@ -76,7 +76,7 @@ services:
 
      jarves.page_controller:
          class: Jarves\Controller\PageController
-         arguments: ["@jarves", "@jarves.utils", "@jarves.editmode", "@jarves.page_stack", "@jarves.acl"]
+         arguments: ["@jarves", "@jarves.editmode", "@jarves.page_stack", "@jarves.acl"]
 
      jarves.configuration_operator:
          class: Jarves\Configuration\ConfigurationOperator
@@ -159,7 +159,7 @@ services:
 
      jarves.navigation:
          class: "%jarves.navigation.class%"
-         arguments: ["@jarves", "@jarves.utils", "@jarves.cache.cacher", "@jarves.page_stack"]
+         arguments: ["@jarves", "@jarves.cache.cacher", "@jarves.page_stack"]
 
      jarves.pluginResponse.listener:
         class: "%jarves.pluginResponse.listener.class%"
@@ -223,7 +223,7 @@ services:
 
      jarves.frontend_router:
         class: Jarves\Router\FrontendRouter
-        arguments: ["@jarves", "@jarves.page_stack", "@jarves.stopwatch", "@jarves.utils", "@logger", "@event_dispatcher", "@jarves.cache.cacher"]
+        arguments: ["@jarves", "@jarves.page_stack", "@jarves.stopwatch", "@logger", "@event_dispatcher", "@jarves.cache.cacher"]
 
      jarves.stopwatch:
         class: "%jarves.stopwatch.class%"
@@ -305,3 +305,7 @@ services:
      jarves.client.store.database:
         class: Jarves\Client\StoreDatabase
         shared: false
+
+     jarves.markdowner:
+        class: Jarves\ContentTypes\Markdowner
+        arguments: ["@jarves.page_stack"]

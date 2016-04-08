@@ -475,7 +475,7 @@ jarves.FieldTypes.PageContents = new Class({
                             this.saveBtn.doneLoading(t('Saved!'));
                             this.saveBtn.setProgress(false);
                         }.bind(this)
-                    }).post({_method: 'patch', content: value, layout: this.layoutSelection.getValue()});
+                    }).patch({content: value, layout: this.layoutSelection.getValue()});
                 }.bind(this),
                 onError: function(progressWatch) {
                     this.saveBtn.startLoading(t('Failed'));

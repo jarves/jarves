@@ -864,6 +864,7 @@ jarves.FieldForm = new Class({
             var patchValue = {};
 
             Object.each(res, function(v, k) {
+                console.log('getValue:', !this.value, k, this.isDifferent(v, this.value[k]), v, this.value[k]);
                 if (!this.value || this.isDifferent(v, this.value[k])) {
                     patchValue[k] = v;
                 }

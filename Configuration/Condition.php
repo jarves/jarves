@@ -230,17 +230,16 @@ class Condition extends Model
      * @param \DOMNode $node
      * @param boolean $printDefaults
      *
+     * @param bool $printComments
      * @return \DOMElement|void
-     *
-     * @throws \Exception
      */
-    public function appendXml(\DOMNode $node, $printDefaults = false)
+    public function appendXml(\DOMNode $node, $printDefaults = false, $printComments = false)
     {
         $doc = $node->ownerDocument;
         if ($this->rules) {
             $condition = $doc->createElement('condition');
             foreach ($this->rules as $rule) {
-                $this->appendXmlValue(null, $rule, $condition, $doc);
+                $this->appendXmlValue(null, $rule, $condition, $doc, $printComments);
             }
             $node->appendChild($condition);
         }
@@ -255,6 +254,7 @@ class Condition extends Model
      * @param boolean $arrayType
      * @param boolean $printDefaults
      *
+     * @param bool $printComments
      * @return \DOMNode|void
      */
     public function appendXmlValue(
@@ -262,7 +262,8 @@ class Condition extends Model
         $value,
         \DOMNode $node,
         $arrayType = false,
-        $printDefaults = false
+        $printDefaults = false,
+        $printComments = false
     )
     {
         $doc = $node->ownerDocument;
@@ -272,7 +273,7 @@ class Condition extends Model
                 $group = $doc->createElement('group');
                 $node->appendChild($group);
                 foreach ($value as $rule) {
-                    $this->appendXmlValue(null, $rule, $group, $doc);
+                    $this->appendXmlValue(null, $rule, $group, $doc, $printComments);
                 }
             } else {
                 //we have a rule

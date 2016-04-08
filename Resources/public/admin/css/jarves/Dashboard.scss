@@ -52,7 +52,7 @@ $containerPadding: 1205-880; //actual window width - container width of our cont
 @for $i from $width through 3500 {
     @if $i % strip-unit($width) == 0 {
         $mediaWidth: $i + $containerPadding;
-        @media all and (min-width: #{$mediaWidth}px) {
+        @media all and (min-width: #{$mediaWidth}) {
             @for $j from 1 through $i / $width {
                 .jarves-Dashboard-widget-grid-#{$j} {
                     width: percentage($width*$j / $i);

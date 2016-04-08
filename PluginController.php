@@ -5,6 +5,7 @@ namespace Jarves;
 use Jarves\Cache\Cacher;
 use Jarves\Cache\ResponseCacher;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Templating\EngineInterface;
 
 class PluginController extends Controller
 {
@@ -33,8 +34,28 @@ class PluginController extends Controller
     protected function isValidCache($cacheKey)
     {
         /** @var Cacher $cacher */
-        $cacher = $this->container->get('jarves.cache.cacher');
+        $cacher = $this->get('jarves.cache.cacher');
         return $cacher->getDistributedCache($cacheKey) !== null;
+    }
+
+    /**
+     * Renders a view and wrap it with a PluginResponse, so the result will
+     * be rendered at the plugin's position.
+     *
+     * If you use the regular `render` method, its Symfony response will
+     * be passed through the HttpKernel and will be displayed without the PageResponse.
+     *
+     * @param string $view The view name
+     * @param array $parameters An array of parameters to pass to the view
+     *
+     * @return string will be transformed into a PluginResponse automatically by Jarves
+     */
+    protected function renderPluginView($view, array $parameters = array())
+    {
+        /** @var EngineInterface $templating */
+        $templating = $this->get('templating');
+
+        return $templating->render($view, $parameters);
     }
 
     /**
@@ -65,7 +86,7 @@ class PluginController extends Controller
     protected function renderCached($cacheKey, $view, $data = null)
     {
         /** @var ResponseCacher $responseCacher */
-        $responseCacher = $this->container->get('jarves.cache.response_cacher');
+        $responseCacher = $this->get('jarves.cache.response_cacher');
         
         return $responseCacher->renderCached($cacheKey, $view, $data);
     }
@@ -99,8 +120,8 @@ class PluginController extends Controller
     protected function renderFullCached($cacheKey, $view, $data = null, $lifeTime = null, $force = false)
     {
         /** @var ResponseCacher $responseCacher */
-        $responseCacher = $this->container->get('jarves.cache.response_cacher');
-        
+        $responseCacher = $this->get('jarves.cache.response_cacher');
+
         return $responseCacher->renderFullCached($cacheKey, $view, $data, $lifeTime, $force);
     }
 }

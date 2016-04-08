@@ -3,10 +3,13 @@
 namespace Jarves\EventListener;
 
 use Jarves\Jarves;
+use Jarves\Model\Content;
 use Jarves\PageResponseFactory;
 use Jarves\PageStack;
 use Jarves\PluginResponse;
+use Jarves\PluginResponseInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -66,22 +69,27 @@ class PluginResponseListener
     public function onKernelResponse(FilterResponseEvent $event)
     {
         $response = $event->getResponse();
-        if (null !== $response && $response instanceof PluginResponse) {
-            $response->setControllerRequest($event->getRequest());
-            $response = $this->pageStack->getPageResponse()->setPluginResponse($response);
+        if (null !== $response && $response instanceof PluginResponseInterface) {
+//            $response->setControllerRequest($event->getRequest());
+            $pageResponse = $this->pageStack->getPageResponse();
 
+            /** @var $content Content */
+            $content = $event->getRequest()->attributes->get('_content');
+            $pageResponse->setPluginResponse($content->getId(), $response);
+
+            //when a route from a plugin is hit
             if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
-                $response->setRenderFrontPage(true);
-                $response->renderContent();
+                $pageResponse->setRenderFrontPage(true);
+                $pageResponse->renderContent();
             }
 
-            $event->setResponse($response);
+            //maintain the actual PageResponse
+            $event->setResponse($pageResponse);
         }
     }
 
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
-
         $data = $event->getControllerResult();
         $request = $event->getRequest();
         if (!$request->attributes->has('_content')) {
@@ -91,12 +99,11 @@ class PluginResponseListener
         $content = $request->attributes->get('_content');
 
         if (null !== $data) {
-            if ($data instanceof PluginResponse) {
+            if ($data instanceof PluginResponseInterface) {
                 $response = $data;
             } else {
                 $response = $this->pageResponseFactory->createPluginResponse($data);
             }
-            $response->setControllerRequest($event->getRequest());
             $event->setResponse($response);
         } else {
             $foundRoute = false;
@@ -105,7 +112,7 @@ class PluginResponseListener
 
             foreach ($routes as $idx => $route) {
                 /** @var \Symfony\Component\Routing\Route $route */
-                if ($content == $route->getDefault('_content')) {
+                if ($content === $route->getDefault('_content')) {
                     $routes->remove($idx);
                     $foundRoute = true;
                     break;

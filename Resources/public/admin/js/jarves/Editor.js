@@ -543,7 +543,7 @@ jarves.Editor = new Class({
     },
 
     getUrl: function() {
-        return _pathAdmin + 'object/jarves/node/' + this.options.node.id + '?_method=patch';
+        return _pathAdmin + 'object/jarves/node/' + this.options.node.id;
     },
 
     highlightSave: function(pHighlight) {

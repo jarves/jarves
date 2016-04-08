@@ -7,6 +7,11 @@ Request.JSON = new Class({
     saveButton: null,
 
     initialize: function (options) {
+        options = options || {};
+
+        options.urlEncoded = false;
+        options.emulation = false;
+
         if (!'secure' in options) {
             options.secure = true;
         }
@@ -34,17 +39,55 @@ Request.JSON = new Class({
         }
 
         this.parent(options);
+        Object.append(this.headers, {
+            'Content-Type': 'application/json'
+        });
 
         if (options.noErrorReporting === true) {
             return;
         }
     },
 
-    send: function(data) {
+    send: function(options) {
         if (this.saveButton) {
             this.saveButton.startLoading(this.options.saveStatusButtonStartText || t('Saving ...'));
         }
-        this.parent(data);
+
+        if (!options.method || options.method.toLowerCase() !== 'get') {
+            options.data = JSON.encode(options.data);
+        }
+
+        return this.parent(options);
+    },
+
+    requestOptions: function(data) {
+        var object = {
+            method: 'OPTIONS'
+        };
+        if (data != null) {
+            object.data = data;
+        }
+        return this.send(object);
+    },
+
+    requestDelete: function(data) {
+        var object = {
+            method: 'DELETE'
+        };
+        if (data != null) {
+            object.data = data;
+        }
+        return this.send(object);
+    },
+
+    patch: function(data) {
+        var object = {
+            method: 'PATCH'
+        };
+        if (data != null) {
+            object.data = data;
+        }
+        return this.send(object);
     },
 
     onFailure: function () {

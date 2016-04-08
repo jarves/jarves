@@ -142,7 +142,9 @@ class FrontendRouteListener extends RouterListener
                         $this->pageStack->setCurrentPage($node);
                         $this->pageStack->setCurrentDomain($node->getDomain());
 
-                        $request->attributes->set('_controller', 'jarves.page_controller:handleAction');
+                        if (!$request->attributes->has('_controller')) {
+                            $request->attributes->set('_controller', 'jarves.page_controller:handleAction');
+                        }
                     }
                 } else {
                     throw new AccessDeniedException('Access denied.');

@@ -7,6 +7,7 @@ use Jarves\Jarves;
 use Jarves\PageResponseFactory;
 use Jarves\PageStack;
 use Jarves\PluginResponse;
+use Jarves\PluginResponseInterface;
 use Symfony\Component\Templating\EngineInterface;
 
 class ResponseCacher
@@ -145,7 +146,7 @@ class ResponseCacher
      *
      * @see method `render` to get more information.
      *
-     * @return string
+     * @return PluginResponseInterface|null
      */
     public function renderFullCached($cacheKey, $view, $data = null, $lifeTime = null, $force = false)
     {

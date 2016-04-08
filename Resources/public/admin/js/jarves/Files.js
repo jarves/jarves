@@ -787,7 +787,7 @@ jarves.Files = new Class({
             }
             new Request.JSON({url: _pathAdmin + 'admin/file', onComplete: function(res) {
                 this.reload();
-            }.bind(this)}).post({_method: 'put', path: this.current + '/' + name});
+            }.bind(this)}).put({path: this.current + '/' + name});
         }.bind(this));
     },
 
@@ -807,7 +807,7 @@ jarves.Files = new Class({
             }
             new Request.JSON({url: _pathAdmin + 'admin/file/dir', onComplete: function(res) {
                 this.reload();
-            }.bind(this)}).post({_method: 'put', path: this.currentFile.path + '/' + name});
+            }.bind(this)}).put({path: this.currentFile.path + '/' + name});
         }.bind(this));
     },
 
@@ -885,7 +885,7 @@ jarves.Files = new Class({
                         this.showLoader(false);
                         this.reload();
                     }.bind(this)
-                }).post({_method: 'delete', path: item.path});
+                }).requestDelete({path: item.path});
 
             }.bind(this));
 

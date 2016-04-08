@@ -154,10 +154,10 @@ var jarves_system_logs = new Class({
     clearLogs: function() {
         this.btnClearLogs.startTip(_('Clearing logs ...'));
 
-        new Request.JSON({url: _pathAdmin + 'admin/system/tools/logs?_method=delete', noCache: 1, onComplete: function() {
+        new Request.JSON({url: _pathAdmin + 'admin/system/tools/logs', noCache: 1, onComplete: function() {
             this.btnClearLogs.stopTip(_('Cleared'));
             this.loadLogRequestItems(1);
-        }.bind(this)}).post();
+        }.bind(this)}).requestDelete();
 
     },
 

@@ -22,11 +22,6 @@ class PageController
     private $jarves;
 
     /**
-     * @var Utils
-     */
-    private $utils;
-
-    /**
      * @var EditMode
      */
     private $editMode;
@@ -43,15 +38,13 @@ class PageController
 
     /**
      * @param Jarves $jarves
-     * @param Utils $utils
      * @param EditMode $editMode
      * @param PageStack $pageStack
      * @param ACL $acl
      */
-    public function __construct(Jarves $jarves, Utils $utils, EditMode $editMode, PageStack $pageStack, ACL $acl)
+    public function __construct(Jarves $jarves, EditMode $editMode, PageStack $pageStack, ACL $acl)
     {
         $this->jarves = $jarves;
-        $this->utils = $utils;
         $this->editMode = $editMode;
         $this->pageStack = $pageStack;
         $this->acl = $acl;
@@ -78,7 +71,7 @@ class PageController
             }
 
             if (intval($to) > 0) {
-                return new RedirectResponse($this->utils->getNodeUrl($to), 301);
+                return new RedirectResponse($this->pageStack->getNodeUrl($to), 301);
             } else {
                 return new RedirectResponse($to, 301);
             }

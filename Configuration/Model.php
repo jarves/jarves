@@ -2,8 +2,10 @@
 
 namespace Jarves\Configuration;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Jarves\Jarves;
 use \Jarves\Exceptions\FileNotWritableException;
+use Jarves\Tools;
 
 class Model implements \ArrayAccess
 {
@@ -56,6 +58,13 @@ class Model implements \ArrayAccess
      * @var array
      */
     protected $additionalAttributes = [];
+
+    /**
+     * A list of property names that are required and can no be ommited or be null.
+     *
+     * @var string[]
+     */
+    protected $requiredProperties = [];
 
     /**
      * Defines the element name in the xml structure of array items in array properties.
@@ -161,7 +170,7 @@ class Model implements \ArrayAccess
 
     /**
      * @param \DOMElement|array|string $values
-     * @param Jarves                   $jarves
+     * @param Jarves $jarves
      */
     public function __construct($values = null, Jarves $jarves = null)
     {
@@ -189,13 +198,48 @@ class Model implements \ArrayAccess
                 $dom->loadXml($values);
                 $this->element = $dom->firstChild;
                 $this->setupObject($jarves);
+                $this->checkRequirements();
             } else if ($values instanceof \DOMElement) {
                 $this->element = $values;
                 $this->setupObject($jarves);
+                $this->checkRequirements();
             } else if (is_array($values)) {
                 $this->fromArray($values);
+                $this->checkRequirements();
             }
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getClass()
+    {
+        return (new \ReflectionClass(get_called_class()))->getShortName();
+    }
+
+    /**
+     * @return string
+     */
+    public function getDocBlock()
+    {
+        return $this->docBlock;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDocBlocks()
+    {
+        return $this->docBlocks;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRootName()
+    {
+        return $this->rootName;
     }
 
     /**
@@ -270,12 +314,12 @@ class Model implements \ArrayAccess
         /** @var \DOMNode $child */
         foreach ($element->childNodes as $child) {
             $nodeName = $child->nodeName;
-            $value    = $child->nodeValue;
+            $value = $child->nodeValue;
 
-            if ('#comment' === $nodeName){
+            if ('#comment' === $nodeName) {
                 continue;
             }
-            if ('#text' === $nodeName){
+            if ('#text' === $nodeName) {
                 if (null == $this->nodeValueVar) {
                     continue;
                 } else {
@@ -317,7 +361,7 @@ class Model implements \ArrayAccess
                     }
 
                     $noClazz = !$clazz;
-                    if ($firstParameter->isArray()){
+                    if ($firstParameter->isArray()) {
                         if ($elementToArrayProperty) {
                             //for elements without plural parent: <route><req><req></route>
                             $setterValue = $this->$getter() ?: [];
@@ -375,7 +419,7 @@ class Model implements \ArrayAccess
 
         foreach ($element->attributes as $attribute) {
             $nodeName = $attribute->nodeName;
-            $value    = $attribute->nodeValue;
+            $value = $attribute->nodeValue;
 
             $setter = 'set' . ucfirst($nodeName);
             if (is_callable(array($this, $setter))) {
@@ -407,7 +451,7 @@ class Model implements \ArrayAccess
 
     /**
      * @param \DOMNode $child
-     * @param array    $options
+     * @param array $options
      */
     public function extractExtraNodes(\DOMNode $child, array &$options)
     {
@@ -574,14 +618,17 @@ class Model implements \ArrayAccess
      *
      * @param boolean $printDefaults
      *
+     * @param bool $printComments
      * @return string
+     * @throws \Exception
      */
-    public function toXml($printDefaults = false)
+    public function toXml($printDefaults = false, $printComments = false)
     {
+        $this->lastRootElementComment = null;
         $doc = new \DOMDocument();
         $doc->formatOutput = true;
 
-        $this->appendXml($doc, $printDefaults);
+        $this->appendXml($doc, $printDefaults, $printComments);
 
         return trim(str_replace("<?xml version=\"1.0\"?>\n", '', $doc->saveXML()));
     }
@@ -589,7 +636,7 @@ class Model implements \ArrayAccess
     /**
      * Saves the xml into a file.
      *
-     * @param string  $path
+     * @param string $path
      * @param boolean $withDefaults
      *
      * @return boolean
@@ -607,30 +654,30 @@ class Model implements \ArrayAccess
     /**
      * Appends the xml structure with our values.
      *
-     * @param \DOMNode     $node
-     * @param boolean      $printDefaults
-     * @throws \Exception
-     *
+     * @param \DOMNode $node
+     * @param boolean $printDefaults
+     * @param bool $printComments
      * @return \DOMElement
+     * @throws \Exception
      */
-    public function appendXml(\DOMNode $node, $printDefaults = false)
+    public function appendXml(\DOMNode $node, $printDefaults = false, $printComments = false)
     {
         $doc = $node instanceof \DOMDocument ? $node : $node->ownerDocument;
 
-        if ($this->docBlock) {
-            $comment = $doc->createComment($this->docBlock);
-            $node->appendChild($comment);
+        if ($printComments) {
+            $this->lastRootElementComment = $doc->createComment($this->docBlock);
+            $node->appendChild($this->lastRootElementComment);
         }
 
         try {
             $rootNode = $doc->createElement($this->rootName);
             $node->appendChild($rootNode);
-        } catch (\DOMException $e ){
+        } catch (\DOMException $e) {
             throw new \Exception(sprintf('Can not create xml element `%s`', $this->rootName), 0, $e);
         }
 
         foreach ($this as $key => $val) {
-            $this->appendXmlProperty($key, $rootNode, $printDefaults);
+            $this->appendXmlProperty($key, $rootNode, $printDefaults, $printComments);
         }
 
         foreach ($this->additionalNodes as $k => $v) {
@@ -641,15 +688,22 @@ class Model implements \ArrayAccess
             $rootNode->setAttribute($k, (string)$v);
         }
 
+        if ($this->lastRootElementComment && !$this->lastRootElementComment->substringData(0, 1)) {
+            $node->removeChild($this->lastRootElementComment);
+        }
+
         return $rootNode;
     }
 
     /**
-     * @param string   $key
+     * @param string $key
      * @param \DOMNode $parentNode
-     * @param bool     $printDefaults
+     * @param bool $printDefaults
+     *
+     * @param bool $printComments
+     * @return \DOMNode|void
      */
-    public function appendXmlProperty($key, \DOMNode $parentNode, $printDefaults)
+    public function appendXmlProperty($key, \DOMNode $parentNode, $printDefaults = false, $printComments = false)
     {
         if (!$this->canPropertyBeExported($key)) return;
 
@@ -689,47 +743,92 @@ class Model implements \ArrayAccess
         if (is_callable(array($this, $setter))) {
             return $this->$setter($parentNode, $printDefaults);
         } else {
-            return $this->appendXmlValue($key, $val, $parentNode, null, $printDefaults);
+            return $this->appendXmlValue($key, $val, $parentNode, null, $printDefaults, $printComments);
         }
     }
 
     /**
+     * @param string $property
+     * @return null|string
+     */
+    public function getPropertyDescription($property)
+    {
+        $propertyReflection = new \ReflectionProperty($this, $property);
+        if ($comment = $propertyReflection->getDocComment()) {
+
+            //start
+            $comment = preg_replace('/^\s*\/\*\*$/mu', '', $comment);
+//            $comment = preg_replace('/^\s*\/\*\s*/m', '', $comment);
+
+            $comment = trim($comment);
+
+            //detect how much spaces need to be removed
+            preg_match('/^\s*\*([ \t]*)/', $comment, $matches);
+            $cut = 0;
+            if (isset($matches[1])) {
+                $cut = strlen($matches[1]);
+            }
+
+            //middle
+            // {' . $cut . '}
+            $comment = preg_replace('/^[ \t]*\*[ \t]{' . $cut . '}/m', '', $comment);
+            $comment = preg_replace('/^[ \t]*\*$/m', '', $comment);
+
+            //end
+            $comment = preg_replace('/^\s*\*\//mu', '', $comment);
+            return rtrim($comment);
+        }
+
+        return null;
+    }
+
+    protected $lastRootElementComment;
+
+    /**
      * Appends the xm structure with the given values.
      *
-     * @param string       $key
-     * @param mixed        $value
-     * @param \DOMNode     $node
-     * @param boolean      $arrayType
-     * @param boolean      $printDefaults
+     * @param string $key
+     * @param mixed $value
+     * @param \DOMNode $node
+     * @param boolean $arrayType
+     * @param boolean $printDefaults
      *
+     * @param bool $printComments
      * @return \DOMNode
+     * @throws \Exception
      */
     public function appendXmlValue(
         $key,
         $value,
         \DOMNode $node,
         $arrayType = false,
-        $printDefaults = false
+        $printDefaults = false,
+        $printComments = false
     )
     {
         $doc = $node instanceof \DOMDocument ? $node : $node->ownerDocument;
 
-        $append = function($el) use ($node){
+        $append = function ($el) use ($node) {
             return $node->appendChild($el);
         };
 
-        if (null === $value || (is_scalar($value) && !in_array($key, $this->attributes)) || is_array($value) || $value instanceof Model) {
-            if (isset($this->docBlocks[$key]) && $comment = $this->docBlocks[$key]) {
+        if ($printComments && isset($this->$key) && $comment = $this->getPropertyDescription($key)) {
+            if (in_array($key, $this->attributes)) {
+                $comment = Tools::indentString($comment, 4);
+                $comment = sprintf("\n\n  Attribute %s:\n\n%s", $key, $comment);
+                $this->lastRootElementComment->appendData($comment);
+            } else {
+                $comment = "\n" . Tools::indentString($comment, 2);
                 $comment = $doc->createComment($comment);
                 $append($comment);
             }
         }
 
-        if (null !== $this->nodeValueVar && $key == $this->nodeValueVar){
+        if (null !== $this->nodeValueVar && $key == $this->nodeValueVar) {
             $textNode = $doc->createTextNode($value);
             $result = $append($textNode);
         } else if (is_scalar($value) || null === $value) {
-            $value = is_bool($value) ? $value?'true':'false' : (string)$value;
+            $value = is_bool($value) ? $value ? 'true' : 'false' : (string)$value;
             if ($arrayType) {
                 $element = $doc->createElement(@$this->arrayIndexNames[$arrayType] ?: 'item');
                 if (!is_integer($key)) {
@@ -767,7 +866,8 @@ class Model implements \ArrayAccess
         return $result;
     }
 
-    public function getElementArrayName($property) {
+    public function getElementArrayName($property)
+    {
         foreach ($this->elementToArray as $elementName => $propertyName) {
             if ($propertyName == $property) {
                 return $elementName;
@@ -785,7 +885,7 @@ class Model implements \ArrayAccess
         $result = array();
 
         $reflection = new \ReflectionClass($this);
-        $blacklist = array('config', 'element', 'jarves');
+        $blacklist = array('config', 'element', 'jarves', 'rootName', 'docBlock', 'docBlocks');
 
         foreach ($reflection->getProperties() as $property) {
             $k = $property->getName();
@@ -795,7 +895,7 @@ class Model implements \ArrayAccess
             }
 
             $value = $this->propertyToArray($k, $printDefaults);
-            if (null === $value){
+            if (null === $value) {
                 continue;
             }
 
@@ -845,7 +945,7 @@ class Model implements \ArrayAccess
                 }
             }
             return $result;
-        } else if (is_object($value) && $value instanceof Model){
+        } else if (is_object($value) && $value instanceof Model) {
             $value = $value->toArray($printDefaults);
         }
 
@@ -876,9 +976,21 @@ class Model implements \ArrayAccess
         $this->$setter($value);
     }
 
+    /**
+     * Checks $this->requiredProperties and throws a exception when not met
+     */
+    protected function checkRequirements()
+    {
+        //make sure requirements are met
+        foreach ($this->requiredProperties as $property) {
+            if (null === $this->$property) {
+                throw new \RuntimeException(sprintf('Property `%s` at %s can not be null.', $property, $this->getClass()));
+            }
+        }
+    }
 
     /**
-     * @param mixed  $values
+     * @param mixed $values
      * @param string $arrayKeyValue
      */
     public function fromArray($values, $arrayKeyValue = null)
@@ -925,7 +1037,7 @@ class Model implements \ArrayAccess
                     $setterValue = new $className(null, $this->getJarves());
                     $setterValue->fromArray($value, $key);
                 }
-                if ($firstParameter->isArray() && is_array($value)){
+                if ($firstParameter->isArray() && is_array($value)) {
                     $setterValue = array();
 
                     $result = str_replace(array('[', ']'), '', $phpDocs['return']['type']);
@@ -959,10 +1071,14 @@ class Model implements \ArrayAccess
         }
     }
 
-    public function getMethodMetaData(\ReflectionMethod $method)
+    /**
+     * @param \ReflectionMethod|\ReflectionClass $reflection
+     * @return array|bool
+     */
+    public function getMethodMetaData($reflection)
     {
-        $file = $method->getFileName();
-        $startLine = $method->getStartLine();
+        $file = $reflection->getFileName();
+        $startLine = $reflection->getStartLine();
 
         $fh = fopen($file, 'r');
         if (!$fh) return false;
@@ -981,7 +1097,7 @@ class Model implements \ArrayAccess
         while ($line = array_pop($lines)) {
 
             if ($blockStarted) {
-                $phpDoc = $line.$phpDoc;
+                $phpDoc = $line . $phpDoc;
 
                 //if start comment block: /*
                 if (preg_match('/\s*\t*\/\*/', $line)) {
@@ -1002,7 +1118,7 @@ class Model implements \ArrayAccess
 
             //if end comment block: */
             if (preg_match('/\*\//', $line)) {
-                $phpDoc = $line.$phpDoc;
+                $phpDoc = $line . $phpDoc;
                 $blockStarted = true;
                 //one line php doc?
                 if (preg_match('/\s*\t*\/\*/', $line)) {
@@ -1048,7 +1164,7 @@ class Model implements \ArrayAccess
                 $currentTag = $match[1];
             }
 
-            $currentData = trim($currentData.' '.$line);
+            $currentData = trim($currentData . ' ' . $line);
 
         }
         if ($currentTag)
@@ -1068,9 +1184,9 @@ class Model implements \ArrayAccess
                     preg_match($regex[$tag][0], $item, $match);
                     $item = array();
                     $c = count($match);
-                    for ($i =1; $i < $c; $i++) {
-                        if ($regex[$tag][1][$i-1]) {
-                            $item[$regex[$tag][1][$i-1]] = $match[$i];
+                    for ($i = 1; $i < $c; $i++) {
+                        if ($regex[$tag][1][$i - 1]) {
+                            $item[$regex[$tag][1][$i - 1]] = $match[$i];
 
                         }
                     }
@@ -1150,7 +1266,7 @@ class Model implements \ArrayAccess
         foreach ($properties as $property => $val) {
             if ($reflection->getProperty($property) && $reflection->getProperty($property)->isPrivate()) continue;
             if (in_array($property, $static)) continue;
-            if (!in_array($property, $blacklist)){
+            if (!in_array($property, $blacklist)) {
                 $vars[] = $property;
             }
         }

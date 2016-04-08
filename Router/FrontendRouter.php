@@ -68,10 +68,6 @@ class FrontendRouter
     private $logger;
 
     /**
-     * @var Utils
-     */
-    private $utils;
-    /**
      * @var PageStack
      */
     private $pageStack;
@@ -81,12 +77,11 @@ class FrontendRouter
      * @param Jarves $jarves
      * @param PageStack $pageStack
      * @param StopwatchHelper $stopwatch
-     * @param Utils $utils
      * @param LoggerInterface $logger
      * @param EventDispatcherInterface $eventDispatcher
      * @param Cacher $cacher
      */
-    function __construct(Jarves $jarves, PageStack $pageStack, StopwatchHelper $stopwatch, Utils $utils,
+    function __construct(Jarves $jarves, PageStack $pageStack, StopwatchHelper $stopwatch,
                          LoggerInterface $logger, EventDispatcherInterface $eventDispatcher, Cacher $cacher)
     {
         $this->jarves = $jarves;
@@ -94,7 +89,6 @@ class FrontendRouter
         $this->logger = $logger;
         $this->eventDispatcher = $eventDispatcher;
         $this->cacher = $cacher;
-        $this->utils = $utils;
         $this->pageStack = $pageStack;
     }
 
@@ -214,7 +208,7 @@ class FrontendRouter
 
         if (!$page && $to = $oriPage->getAccessRedirectTo()) {
             if (intval($to) > 0) {
-                $to = $this->utils->getNodeUrl($to);
+                $to = $this->pageStack->getNodeUrl($to);
             }
 
             return new RedirectResponse($to);
@@ -241,7 +235,7 @@ class FrontendRouter
         $clazz = 'jarves.page_controller';
         $domainUrl = $domain->getMaster() ? '' : '/' . $domain->getLang();
 
-        $url = $this->utils->getNodeUrl($page->getId(), null, null, $domain);
+        $url = $this->pageStack->getNodeUrl($page->getId(), null, null, $domain);
 
         $controller = $clazz . ':handleAction';
 
@@ -359,7 +353,7 @@ class FrontendRouter
                         $defaults = array_merge($defaults, $route->getArrayDefaults());
                     }
 
-                    $url = $this->utils->getNodeUrl($page->getId(), null, null, $domain);
+                    $url = $this->pageStack->getNodeUrl($page->getId(), null, null, $domain);
 
                     $this->routes->add(
                         'jarves_plugin_' . ($route->getId() ?: $plugin->getId()) . '_' . $idx,
@@ -539,7 +533,7 @@ class FrontendRouter
         $this->stopwatch->start($title);
         if (!$page) {
             $domain = $this->pageStack->getCurrentDomain();
-            $urls = $this->utils->getCachedUrlToPage($domain->getId());
+            $urls = $this->pageStack->getCachedUrlToPage($domain->getId());
 
             $possibleUrl = $url;
             $id = false;
@@ -575,7 +569,7 @@ class FrontendRouter
                 $pageId = $id;
             }
             /** @var \Jarves\Model\Node $page */
-            $page = $this->utils->getPage($pageId);
+            $page = $this->pageStack->getPage($pageId);
         }
 
         $this->pageStack->setCurrentPage($page);

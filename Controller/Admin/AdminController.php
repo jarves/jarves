@@ -19,7 +19,6 @@ use Jarves\ContentRender;
 use Jarves\Jarves;
 use Jarves\Model\Content;
 use Jarves\PageStack;
-use Jarves\Utils;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -43,11 +42,6 @@ class AdminController extends Controller
     protected $contentRender;
 
     /**
-     * @var Utils
-     */
-    protected $utils;
-
-    /**
      * @var ACL
      */
     protected $acl;
@@ -60,7 +54,6 @@ class AdminController extends Controller
         $this->acl = $this->get('jarves.acl');
         $this->pageStack = $this->get('jarves.page_stack');
         $this->contentRender = $this->get('jarves.content.render');
-        $this->utils = $this->get('jarves.utils');
     }
 
     /**
@@ -69,18 +62,6 @@ class AdminController extends Controller
     protected function getJarves()
     {
         return $this->get('jarves');
-    }
-
-    /**
-     * @return \Jarves\Admin\Utils
-     */
-    protected function getUtils()
-    {
-        if (null === $this->utils) {
-            $this->utils = new \Jarves\Admin\Utils($this->getJarves());
-        }
-
-        return $this->utils;
     }
 
     /**
@@ -193,12 +174,12 @@ class AdminController extends Controller
         $contentObject->setContent($content);
 
         if ($domainId) {
-            $domain = $this->utils->getDomain($domainId);
+            $domain = $this->pageStack->getDomain($domainId);
             $this->pageStack->setCurrentDomain($domain);
         }
 
         if ($nodeId) {
-            $page = $this->utils->getPage($nodeId);
+            $page = $this->pageStack->getPage($nodeId);
             $this->pageStack->setCurrentPage($page);
         }
 

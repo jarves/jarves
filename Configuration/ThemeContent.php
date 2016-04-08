@@ -5,6 +5,7 @@ namespace Jarves\Configuration;
 class ThemeContent extends Model
 {
     protected $rootName = 'content';
+    protected $requiredProperties = ['file'];
 
     /**
      * @var string
@@ -12,6 +13,10 @@ class ThemeContent extends Model
     protected $label;
 
     /**
+     * File path to a view.
+     *
+     * Symfony paths recommended like "AppBundle:ControllerName:view.html.twig"
+     *
      * @var string
      */
     protected $file;

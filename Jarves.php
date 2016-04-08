@@ -251,7 +251,7 @@ class Jarves
         if ($bundle) {
             $config = $this->getConfigs()->getConfig($bundle->getName());
             if (!$config) {
-                return new Bundle($bundle, null, $this);
+                return new Bundle($bundle, $this, null);
             }
 
             return $config;

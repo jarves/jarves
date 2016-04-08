@@ -3006,7 +3006,7 @@ var jarves_system_module_edit = new Class({
                     jarves.loadSettings();
 
                 }.bind(this)
-            }).post({_method: 'put', object: key, values: values});
+            }).put({object: key, values: values});
 
         }.bind(this)).setButtonStyle('blue').inject(this.dialog.bottom);
 

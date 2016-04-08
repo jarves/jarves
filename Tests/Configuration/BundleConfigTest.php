@@ -277,7 +277,7 @@ class BundleConfigTest extends KernelAwareTestCase
 
     public function testBundle()
     {
-        $config = new Bundle('DummyBundle', null, $this->getJarves());
+        $config = new Bundle('DummyBundle', $this->getJarves());
 
         $events = [
             ['key' => 'core/object/modify', 'desc' => 'foo'],
@@ -361,7 +361,7 @@ class BundleConfigTest extends KernelAwareTestCase
     </content>
   </contents>
   <layouts>
-    <layout>
+    <layout key="default">
       <label>Default</label>
       <file>@JarvesDemoThemeBundle/layout_default.tpl</file>
     </layout>
@@ -383,6 +383,7 @@ class BundleConfigTest extends KernelAwareTestCase
         $layout = new ThemeLayout(null, $this->getJarves());
         $layout->setFile('@JarvesDemoThemeBundle/layout_default.tpl');
         $layout->setLabel('Default');
+        $layout->setKey('default');
         $theme->setLayouts(array($layout));
 
         $this->assertEquals($xml, $theme->toXml());

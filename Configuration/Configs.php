@@ -38,7 +38,7 @@ class Configs implements \IteratorAggregate
     public function loadBundles(array $bundles)
     {
         foreach ($bundles as $bundleName) {
-            $bundle = $this->getCore()->getBundle($bundleName);
+            $bundle = $this->getJarves()->getBundle($bundleName);
             $configs = $this->getXmlConfigsForBundle($bundle);
             $this->configElements = array_merge($this->configElements, $configs);
         }
@@ -78,7 +78,7 @@ class Configs implements \IteratorAggregate
     /**
      * @return \Jarves\Jarves
      */
-    public function getCore()
+    public function getJarves()
     {
         return $this->core;
     }
@@ -92,7 +92,7 @@ class Configs implements \IteratorAggregate
     public function getConfigHash($bundleName)
     {
         $hash = [];
-        $bundle = $this->getCore()->getBundle($bundleName);
+        $bundle = $this->getJarves()->getBundle($bundleName);
         foreach ($this->getConfigFiles($bundle) as $file) {
             $hash[] = filemtime($file);
         }
@@ -146,7 +146,7 @@ class Configs implements \IteratorAggregate
                 foreach ($bundles as $bundleXml) {
                     if ($bundleXml->attributes->getNamedItem('name')) {
                         $bundleName = $bundleXml->attributes->getNamedItem('name')->nodeValue;
-                        if (!$bundleToImport = $this->getCore()->getBundle($bundleName)) {
+                        if (!$bundleToImport = $this->getJarves()->getBundle($bundleName)) {
                             continue;
                         }
                     }
@@ -214,13 +214,17 @@ class Configs implements \IteratorAggregate
             foreach ($priorities as $configs) {
                 foreach ($configs as $file => $bundleElement) {
 
-                    $bundle = $this->getCore()->getBundle($bundleName);
+                    $bundle = $this->getJarves()->getBundle($bundleName);
                     $indexName = $this->normalizeBundleName($bundle->getName());
                     if (!isset($bundleConfigs[$indexName])) {
-                        $bundleConfigs[$indexName] = new Bundle($bundle, null, $this->getCore());
+                        $bundleConfigs[$indexName] = new Bundle($bundle, $this->getJarves());
                     }
 
-                    $bundleConfigs[$indexName]->import($bundleElement, $file);
+                    try {
+                        $bundleConfigs[$indexName]->import($bundleElement, $file);
+                    } catch (\Exception $e) {
+                        throw new \RuntimeException(sprintf('Can not import configuration %s of bundle %s', $file, $bundleName), 0, $e);
+                    }
                 }
             }
 

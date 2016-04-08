@@ -980,20 +980,6 @@ class PageResponse extends Response
     }
 
     /**
-     * @param  PluginResponse $response
-     *
-     * @return PageResponse
-     */
-    public function setPluginResponse(PluginResponse $response)
-    {
-        /** @var $content Content */
-        $content = $response->getControllerRequest()->attributes->get('_content');
-        $this->pluginResponse[$content->getId()] = $response;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getAssetTags()
@@ -1102,6 +1088,18 @@ class PageResponse extends Response
         ];
     }
 
+    /**
+     * @param string|integer $id usually the Jarves\Model\Content->id
+     * @param  PluginResponseInterface $response
+     * @return PageResponse
+     */
+    public function setPluginResponse($id, PluginResponseInterface $response)
+    {
+        $this->pluginResponse[$id] = $response;
+
+        return $this;
+    }
+    
     /**
      *
      * @param Content|ContentInterface $content

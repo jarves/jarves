@@ -8,13 +8,23 @@ class ThemeLayout extends ThemeContent
 
 	protected $attributes = ['key', 'doctype'];
 
+	protected $requiredProperties = ['key', 'file'];
+
 	/**
+	 * A key which is saved in the database for further access of this layout.
+	 *
+	 * Note: The file path is not directly stored anywhere, instead only this key is.
+	 *
 	 * @var string
 	 */
 	protected $key;
 
 	/**
 	 * Allows to overwrite the default docType of PageResponse::$docType.
+	 *
+	 * Default is Jarves:Doctypes:html5.html.twig (Jarves/Resources/views/Doctypes/html5.html.twig)
+	 *
+	 * You should copy and paste the default and adjust it accordingly.
 	 *
 	 * @var string
 	 */

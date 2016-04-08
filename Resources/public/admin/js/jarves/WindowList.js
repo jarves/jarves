@@ -84,7 +84,7 @@ jarves.WindowList = new Class({
             this.classLoaded = true;
             this.fireEvent('render');
 
-        }.bind(this)}).post({_method: 'options'});
+        }.bind(this)}).requestOptions();
     },
 
     _deleteSuccess: function () {
@@ -584,10 +584,7 @@ jarves.WindowList = new Class({
                     jarves.getAdminInterface().objectChanged(this.classProperties['object']);
                     this._deleteSuccess();
 
-                }.bind(this)}).post({
-                    _method: 'delete',
-                    pks: pItems
-                });
+                }.bind(this)}).requestDelete({pks: pItems});
             }.bind(this));
         }
     },

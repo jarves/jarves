@@ -66,8 +66,28 @@ class JarvesEventDispatcher
         $this->detachEvents();
 
         foreach ($configs->getConfigs() as $bundleConfig) {
+
+            //register custom listener through config, like cache clearing, service calls etc
             if ($events = $bundleConfig->getListeners()) {
                 foreach ($events as $event) {
+                    $this->attachEvent($event);
+                }
+            }
+
+            //clear storage caches when object changes
+            if ($objects = $bundleConfig->getObjects()) {
+                foreach ($objects as $object) {
+
+                    $fn = function () use ($object) {
+                        $storage = $this->container->get($object->getStorageService());
+                        $storage->configure($object->getKey(), $object);
+                        $storage->clearCache();
+                    };
+
+                    $event = new Event();
+                    $event->setSubject($object->getKey());
+                    $event->setKey('core/object/modify');
+                    $event->setCalls([$fn]);
                     $this->attachEvent($event);
                 }
             }

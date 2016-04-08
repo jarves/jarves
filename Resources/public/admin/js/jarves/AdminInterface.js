@@ -329,7 +329,7 @@ jarves.AdminInterface = new Class({
 
         new Request.JSON({url: _pathAdmin + 'admin/backend/cache', noCache: 1, onComplete: function(res) {
             this.cacheToolTip.stop(t('Cache cleared'));
-        }.bind(this)}).post({_method: 'delete'});
+        }.bind(this)}).requestDelete();
     },
 
     /*

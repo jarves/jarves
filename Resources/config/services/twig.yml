@@ -7,13 +7,13 @@ services:
 
      jarves.twig.extension.nodeIsActive:
          class: Jarves\Twig\NodeIsActiveExtension
-         arguments: ["@jarves.page_stack", "@jarves.utils"]
+         arguments: ["@jarves.page_stack"]
          tags:
             - { name: twig.extension }
 
      jarves.twig.extension.nodeUrl:
          class: Jarves\Twig\NodeUrlExtension
-         arguments: ["@jarves.utils"]
+         arguments: ["@jarves.page_stack"]
          tags:
             - { name: twig.extension }
 
@@ -60,5 +60,11 @@ services:
      jarves.twig.extension.renderContents:
          class: Jarves\Twig\RenderContentsExtension
          arguments: ["@service_container"]
+         tags:
+            - { name: twig.extension }
+
+     jarves.twig.extension.markdowner:
+         class: Jarves\Twig\MarkdownerExtension
+         arguments: ["@jarves.markdowner"]
          tags:
             - { name: twig.extension }
