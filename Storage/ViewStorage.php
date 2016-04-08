@@ -46,8 +46,15 @@ class ViewStorage extends AbstractStorage
 
         $file = $this->jarves->resolvePath($path, 'Resources/views/', true);
         $fileObj = $this->localFilesystem->getFile($file);
+        $this->jarves->getBundleFromPath($path, $bundleName);
 
-        return $fileObj->toArray();
+        $directory = $this->jarves->resolvePath('@' . $bundleName, 'Resources/views', true);
+        $path = $this->buildPath($bundleName . ':' . Tools::getRelativePath($fileObj->getPath(), $directory));
+
+        return [
+            'name' => $path,
+            'path' => $path
+        ];
     }
 
     /**
@@ -199,18 +206,18 @@ class ViewStorage extends AbstractStorage
                 }
 
                 $item = array(
-                    'name' => $item['name'],
+//                    'name' => $item['name'],
+                    'name' => $this->buildPath($path . '/' . Tools::getRelativePath($item['path'], $directory)),
                     'path' => $this->buildPath($path . '/' . Tools::getRelativePath($item['path'], $directory))
                 );
 
                 if ($file->isDir()) {
                     $children = self::getBranch(array('path' => $item['path']), $condition, $depth - 1);
                     foreach ($children as $child) {
-                        $child['name'] = $item['name'] . '/' . $child['name'];
+//                        $child['name'] = $item['name'] . '/' . $child['name'];
                         $result[] = $child;
                     }
                 }
-
 
                 if ($file->isFile()) {
                     $result[] = $item;

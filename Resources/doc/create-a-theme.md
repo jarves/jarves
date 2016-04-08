@@ -184,10 +184,10 @@ So, enough talked. Here is the file.
                 <label>App Themes</label>
                 <layouts>
                     <layout key="startpage">
-                        <file>AppBundle:Layout/startpage.html.twig</file>
+                        <file>AppBundle:Layout:startpage.html.twig</file>
                     </layout>
                     <layout key="default">
-                        <file>AppBundle:Layout/default.html.twig</file>
+                        <file>AppBundle:Layout:default.html.twig</file>
                     </layout>
                 </layouts>
             </theme>

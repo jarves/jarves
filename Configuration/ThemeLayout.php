@@ -6,9 +6,19 @@ class ThemeLayout extends ThemeContent
 {
     protected $rootName = 'layout';
 
-	protected $attributes = ['key'];
+	protected $attributes = ['key', 'doctype'];
 
+	/**
+	 * @var string
+	 */
 	protected $key;
+
+	/**
+	 * Allows to overwrite the default docType of PageResponse::$docType.
+	 *
+	 * @var string
+	 */
+	protected $doctype;
 
 	/**
 	 * @param mixed $key
@@ -22,5 +32,21 @@ class ThemeLayout extends ThemeContent
 	 */
 	public function getKey() {
 		return $this->key;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDoctype()
+	{
+		return $this->doctype;
+	}
+
+	/**
+	 * @param string $doctype
+	 */
+	public function setDoctype($doctype)
+	{
+		$this->doctype = $doctype;
 	}
 }

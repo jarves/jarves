@@ -675,6 +675,25 @@ class PageResponse extends Response
      */
     public function getDocType()
     {
+        if ($page = $this->pageStack->getCurrentPage()) {
+
+            $themeId = $page->getTheme() ?: $this->pageStack->getCurrentDomain()->getTheme();
+            if ($theme = $this->jarves->getConfigs()->getTheme($themeId)) {
+    
+                $layoutKey = $this->getLayout($page);
+                if ($layout = $theme->getLayoutByKey($layoutKey)) {
+                    if ($layout->getDoctype()) {
+                        return $layout->getDoctype();
+                    }
+                }
+                
+                if ($theme->getDoctype()) {
+                    return $theme->getDoctype();
+                }
+            }
+            
+        }
+        
         return $this->docType;
     }
 

@@ -4,7 +4,7 @@ namespace Jarves\Configuration;
 
 class Theme extends Model
 {
-    protected $attributes = ['id'];
+    protected $attributes = ['id', 'doctype'];
     protected $elementMap = ['content' => 'ThemeContent', 'layout' => 'ThemeLayout'];
 
     /**
@@ -36,6 +36,31 @@ class Theme extends Model
      * @var Field[]
      */
     protected $options;
+
+    /**
+     * Allows to overwrite the default docType of PageResponse::$docType.
+     *
+     * Can be overwritten by ThemeLayout::$docType.
+     *
+     * @var string
+     */
+    protected $doctype;
+
+    /**
+     * @return string
+     */
+    public function getDoctype()
+    {
+        return $this->doctype;
+    }
+
+    /**
+     * @param string $doctype
+     */
+    public function setDoctype($doctype)
+    {
+        $this->doctype = $doctype;
+    }
 
     /**
      * @param ThemeContent[] $contents

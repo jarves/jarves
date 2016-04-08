@@ -5,6 +5,8 @@ namespace Jarves\AssetHandler;
 use Jarves\Filesystem\Filesystem;
 use Jarves\Jarves;
 use Jarves\Tools;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ProcessBuilder;
 
 class ScssHandler extends AbstractHandler implements CompileHandlerInterface
 {
@@ -53,16 +55,28 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
         }
 
         if ($needsCompilation) {
-            $options = [
-            ];
+            $processBuilder = new ProcessBuilder();
+            $processBuilder
+                ->setInput(file_get_contents($localPath))
+                ->add('sass')
+                ->add('--scss')
+                ->add('--unix-newlines')
+                ->add('--load-path')
+                ->add(dirname($localPath))
+                ->add($localPath)
+                ->enableOutput()
+            ;
 
-//            $localPath = realpath($localPath);
-            $compiler = new \Leafo\ScssPhp\Compiler();
-            $compiler->setImportPaths(dirname($localPath));
+            $process = $processBuilder->getProcess();
+            $process->start();
+            while ($process->isRunning());
 
-            $compiled = $compiler->compile(file_get_contents($localPath), $localPath);
+            if (($error = $process->getErrorOutput()) && false !== strpos($error, 'Error:')) {
+                throw new \RuntimeException(sprintf("Error during scss compilation of %s:\n%s", $assetPath, $error));
+            }
 
-//            $compiled = $this->replaceRelativePaths($publicPath, $targetPath, $compiled);
+            $compiled = $process->getOutput();
+            $compiled = $this->replaceRelativePaths($publicPath, $targetPath, $compiled);
             $compiled = "/* compiled at $sourceMTime */\n".$compiled;
             $this->webFilesystem->write($targetPath, $compiled);
         }

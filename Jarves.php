@@ -447,23 +447,12 @@ class Jarves
     public function resolvePath($path, $suffix = '', $relativePath = false)
     {
         $path = preg_replace('/:+/', '/', $path);
-        preg_match('/\@?([a-zA-Z0-9\-_\.\\\\]+)/', $path, $matches);
 
         $root = realpath($this->rootDir . '/../');
-        if ($matches && isset($matches[1])) {
-            try {
-                $bundle = $this->getBundle($matches[1]);
-            } catch (\InvalidArgumentException $e) {
-                throw new BundleNotFoundException(
-                    sprintf(
-                        'Bundle for `%s` (%s) not found.',
-                        $matches[1],
-                        $path
-                    ), 0, $e
-                );
-            }
 
-            $path = substr($path, strlen($matches[1]) + 1);
+        if ($bundle = $this->getBundleFromPath($path, $bundleName)) {
+
+            $path = substr($path, strlen($bundleName) + 1);
 
             $bundlePath = $bundle->getPath();
             $suffix = trim($suffix, '/');
@@ -480,6 +469,38 @@ class Jarves
         }
 
         return $path;
+    }
+
+    /**
+     * @param string $path
+     * @param string $bundleName will be modified when found
+     *
+     * @return null|\Symfony\Component\HttpKernel\Bundle\BundleInterface
+     *
+     * @throws BundleNotFoundException
+     */
+    public function getBundleFromPath($path, &$bundleName)
+    {
+        $path = preg_replace('/:+/', '/', $path);
+        preg_match('/\@?([a-zA-Z0-9\-_\.\\\\]+)/', $path, $matches);
+
+        if ($matches && isset($matches[1])) {
+            try {
+                $bundle = $this->getBundle($matches[1]);
+                $bundleName = $matches[1];
+                return $bundle;
+            } catch (\InvalidArgumentException $e) {
+                throw new BundleNotFoundException(
+                    sprintf(
+                        'Bundle for `%s` (%s) not found.',
+                        $matches[1],
+                        $path
+                    )
+                );
+            }
+        }
+
+        return null;
     }
 
     /**

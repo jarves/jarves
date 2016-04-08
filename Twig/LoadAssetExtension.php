@@ -34,14 +34,14 @@ class LoadAssetExtension extends \Twig_Extension
         );
     }
 
-    public function loadAsset($asset)
+    public function loadAsset($asset, $contentType = null)
     {
-        $this->pageStack->getPageResponse()->loadAssetFile($asset);
+        $this->pageStack->getPageResponse()->loadAssetFile($asset, $contentType);
     }
 
-    public function loadAssetAtBottom($asset)
+    public function loadAssetAtBottom($asset, $contentType = null)
     {
-        $this->pageStack->getPageResponse()->loadAssetFileAtBottom($asset);
+        $this->pageStack->getPageResponse()->loadAssetFileAtBottom($asset, $contentType);
     }
 
 }
