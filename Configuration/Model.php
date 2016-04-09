@@ -681,7 +681,7 @@ class Model implements \ArrayAccess
         }
 
         foreach ($this->additionalNodes as $k => $v) {
-            $this->appendXmlValue($k, $v, $rootNode);
+            $this->appendXmlValue($k, $v, $rootNode, $printDefaults, $printComments);
         }
 
         foreach ($this->additionalAttributes as $k => $v) {
@@ -812,7 +812,7 @@ class Model implements \ArrayAccess
             return $node->appendChild($el);
         };
 
-        if ($printComments && isset($this->$key) && $comment = $this->getPropertyDescription($key)) {
+        if ($printComments && property_exists(get_called_class(), $key) && $comment = $this->getPropertyDescription($key)) {
             if (in_array($key, $this->attributes)) {
                 $comment = Tools::indentString($comment, 4);
                 $comment = sprintf("\n\n  Attribute %s:\n\n%s", $key, $comment);
@@ -852,7 +852,7 @@ class Model implements \ArrayAccess
                 $element = $doc->createElement(is_integer($key) ? ($this->arrayIndexNames[$arrayType] ?: 'item') : $key);
             }
             foreach ($value as $k => $v) {
-                $this->appendXmlValue($k, $v, $element, $key, $printDefaults);
+                $this->appendXmlValue($k, $v, $element, $key, $printDefaults, $printComments);
             }
             if (!$arrayName) {
                 $result = $append($element);
@@ -860,7 +860,7 @@ class Model implements \ArrayAccess
                 $result = $element;
             }
         } else if ($value instanceof Model) {
-            $result = $value->appendXml($node, $printDefaults);
+            $result = $value->appendXml($node, $printDefaults, $printComments);
         }
 
         return $result;
