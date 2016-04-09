@@ -341,7 +341,7 @@ class FrontendRouter
                     $controller = $pluginDefinition->getController();
 
                     $defaults = array(
-                        '_controller' => $controller,
+                        '_controller' => $route->getController() ?: $controller,
                         '_content' => $plugin,
                         '_title' => sprintf('%s: %s', $bundleName, $pluginDefinition->getLabel()),
                         'options' => isset($data['options']) && is_array($data['options']) ? $data['options'] : [],
@@ -360,7 +360,11 @@ class FrontendRouter
                         new SyRoute(
                             $url . '/' . $route->getPattern(),
                             $defaults,
-                            $route->getArrayRequirements() ?: array()
+                            $route->getArrayRequirements() ?: array(),
+                            [],
+                            '',
+                            [],
+                            $route->getMethods() ?: []
                         )
                     );
                 }

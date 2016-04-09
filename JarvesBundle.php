@@ -65,6 +65,7 @@ class JarvesBundle extends Bundle
 
             $twig = $this->container->get('twig');
             $twig->addGlobal('jarves_content_render', $this->container->get('jarves.content.render'));
+            $twig->addGlobal('pageStack', $this->container->get('jarves.page_stack'));
 
 
             if ($jarvesConfig->getSystemConfig()->getLogs(true)->isActive()) {
