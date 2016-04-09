@@ -4,7 +4,7 @@ namespace Jarves\Controller\Admin;
 
 use FOS\RestBundle\Request\ParamFetcher;
 use Jarves\ACL;
-use Jarves\Filesystem\Filesystem;
+use Jarves\Filesystem\WebFilesystem;
 use Jarves\Jarves;
 use Jarves\Objects;
 use Jarves\PageStack;
@@ -38,7 +38,7 @@ class FileController extends Controller
     protected $pageStack;
 
     /**
-     * @var Filesystem
+     * @var WebFilesystem
      */
     protected $webFilesystem;
 

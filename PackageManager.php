@@ -537,7 +537,6 @@ class PackageManager implements ContainerAwareInterface
                 $oContent->setNodeId($pNode->getId());
                 $oContent->setBoxId($boxId);
                 $oContent->setType($content[0]);
-                $oContent->setTitle($content[1]);
                 $oContent->setTemplate($content[2]);
                 $oContent->setContent($content[3]);
                 $oContent->save();

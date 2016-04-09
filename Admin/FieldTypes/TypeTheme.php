@@ -14,17 +14,7 @@
 
 namespace Jarves\Admin\FieldTypes;
 
-
-class TypeUserInterfaceOnly extends AbstractSingleColumnType
+class TypeTheme extends TypeText
 {
-    public function getRequiredRegex()
-    {
-        return '.*';
-    }
-
-    public function validate()
-    {
-        return [];
-    }
-
-} 
+    protected $name = 'Theme';
+}

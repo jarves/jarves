@@ -25,7 +25,7 @@ class Configs implements \IteratorAggregate
 
     /**
      * @param Jarves $core
-     * @param array $bundles
+     * @param string[] $bundles
      */
     public function __construct(Jarves $core, array $bundles = null)
     {
@@ -241,6 +241,10 @@ class Configs implements \IteratorAggregate
     public function getConfig($bundleName)
     {
         $bundleName = $this->normalizeBundleName($bundleName);
+        if (!isset($this->configElements[$bundleName]) && isset($this->configElements[$bundleName . 'bundle'])) {
+            $bundleName .= 'bundle';
+        }
+
         return isset($this->configElements[$bundleName]) ? $this->configElements[$bundleName] : null;
     }
 

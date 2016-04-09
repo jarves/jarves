@@ -60,6 +60,14 @@ class JarvesBundle extends Bundle
 
         $this->configure();
 
+        if (function_exists('ppm_log')) {
+            //In an environment like PPM with several workers Propel's not distributed cache will
+            //lead to inconsistent states across all workers, so we need to disable it here completely.
+            //Jarves already caches using a distributed cache where all workers are notified when
+            //a change changes, so we don't really need Propel's cache here.
+            Propel::disableInstancePooling();
+        }
+
         if (!$this->booted) {
 
             /** @var $jarves Jarves */

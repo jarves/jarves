@@ -3,6 +3,7 @@
 namespace Jarves\Configuration;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Jarves\Extractor\ClassExtractor;
 use Jarves\Jarves;
 use \Jarves\Exceptions\FileNotWritableException;
 use Jarves\Tools;
@@ -753,33 +754,7 @@ class Model implements \ArrayAccess
      */
     public function getPropertyDescription($property)
     {
-        $propertyReflection = new \ReflectionProperty($this, $property);
-        if ($comment = $propertyReflection->getDocComment()) {
-
-            //start
-            $comment = preg_replace('/^\s*\/\*\*$/mu', '', $comment);
-//            $comment = preg_replace('/^\s*\/\*\s*/m', '', $comment);
-
-            $comment = trim($comment);
-
-            //detect how much spaces need to be removed
-            preg_match('/^\s*\*([ \t]*)/', $comment, $matches);
-            $cut = 0;
-            if (isset($matches[1])) {
-                $cut = strlen($matches[1]);
-            }
-
-            //middle
-            // {' . $cut . '}
-            $comment = preg_replace('/^[ \t]*\*[ \t]{' . $cut . '}/m', '', $comment);
-            $comment = preg_replace('/^[ \t]*\*$/m', '', $comment);
-
-            //end
-            $comment = preg_replace('/^\s*\*\//mu', '', $comment);
-            return rtrim($comment);
-        }
-
-        return null;
+        return ClassExtractor::create($this)->getPropertyComment($property);
     }
 
     protected $lastRootElementComment;

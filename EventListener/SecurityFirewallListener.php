@@ -52,7 +52,7 @@ class SecurityFirewallListener
                     [
                         'status' => 403,
                         'error' => 'AccessDeniedException',
-                        'message' => 'Access denied.'
+                        'message' => 'Access denied.' . (!$pageStack->getAdminClient()->getUser() ? ' Not logged in.' : ''),
                     ],
                     JSON_PRETTY_PRINT
                 ), 403);

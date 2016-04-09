@@ -23,7 +23,7 @@ class TypeMarkdown extends AbstractType
     public function render()
     {
         if ($content = $this->getContent()->getContent()) {
-            return $this->markdowner->transform($content);
+            return '<div class="markdown">' . $this->markdowner->transform($content) . '</div>';
         }
     }
 }

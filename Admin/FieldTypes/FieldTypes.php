@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class FieldTypes {
 
     /**
-     * @var AbstractSingleColumnType[]
+     * @var AbstractType[]
      */
     protected $types;
 
@@ -55,6 +55,20 @@ class FieldTypes {
         }
 
         throw new TypeNotFoundException(sprintf('FieldType `%s` not found. You should create a service that implements Jarves\Admin\FieldTypes\TypeInterface and tag it with `jarves.field.type`', $alias));
+    }
+
+    /**
+     * @return AbstractType[]
+     */
+    public function getTypes()
+    {
+        $types = [];
+
+        foreach ($this->types as $id => $service) {
+            $types[$id] = $this->container->get($service);
+        }
+
+        return $types;
     }
 
 }

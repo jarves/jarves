@@ -4,11 +4,10 @@
     <column name="node_id" type="INTEGER"/>
     <column name="box_id" type="INTEGER"/>
     <column name="sort" type="INTEGER"/>
-    <column name="title" type="VARCHAR" size="255"/>
     <column name="content" type="LONGVARCHAR"/>
-    <column name="template" type="VARCHAR" size="255"/>
-    <column name="type" type="VARCHAR" size="255"/>
-    <column name="hide" type="BOOLEAN"/>
+    <column name="template" type="VARCHAR" size="255" default="JarvesBundle:Default:content.html.twig"/>
+    <column name="type" type="VARCHAR" size="255" default="text"/>
+    <column name="hide" type="BOOLEAN" default="false"/>
     <column name="unsearchable" type="VARCHAR" size="255"/>
     <column name="access_from" type="INTEGER"/>
     <column name="access_to" type="INTEGER"/>

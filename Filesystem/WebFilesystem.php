@@ -2,13 +2,16 @@
 
 namespace Jarves\Filesystem;
 
+use Jarves\File\FileInfoInterface;
 use Jarves\Filesystem\Adapter\Local;
 use Jarves\Jarves;
 use Jarves\File\FileInfo;
 use Jarves\Filesystem\Adapter\AdapterInterface;
 use Jarves\JarvesConfig;
+use Jarves\Model\File;
 use Jarves\Model\FileQuery;
 use Jarves\Utils;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
@@ -144,6 +147,72 @@ class WebFilesystem extends Filesystem
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getFile($path)
+    {
+        return $this->wrap(parent::getFile($path));
+    }
+
+    /**
+     * Returns a File object. If the file behind the file's 'path'
+     * does not exists in the database, it will be created.
+     *
+     * This maintains the file references. Jarves does not store the actual path
+     * in references but an ID. This ID is related to the path. If a file path is changed
+     * we need only to change one place (system_file table) instead of all references.
+     *
+     * @param FileInfoInterface|FileInfoInterface[] $fileInfo
+     *
+     * @return FileInfoInterface|FileInfoInterface[]|File
+     */
+    public function wrap($fileInfo)
+    {
+        if (is_array($fileInfo)) {
+            $result = [];
+            $paths = [];
+            foreach ($fileInfo as $file) {
+                if ($file instanceof File) {
+                    return $fileInfo; //it's already a `File` array, return it.
+                }
+                $paths[] = $file->getPath();
+            }
+
+            $files = FileQuery::create()
+                ->orderById(Criteria::ASC)
+                ->filterByPath($paths)
+                ->groupByPath()
+                ->find()
+                ->toKeyIndex('path');
+
+            foreach ($fileInfo as $file) {
+                if (isset($files[$file->getPath()])) {
+                    $this->checkFileValues($file, $files[$file->getPath()]);
+                    $result[] = $files[$file->getPath()];
+                } else {
+                    $result[] = $this->createFromPathInfo($file);
+                }
+            }
+
+            return $result;
+        } else {
+            if ($fileInfo instanceof File) {
+                return $fileInfo; //it's already a `File`, return it.
+            }
+
+            $path = $fileInfo->getPath();
+            $fileObj = FileQuery::create()->orderById()->filterByPath($path)->groupByPath()->findOne();
+            if (!$fileObj) {
+                $fileObj = $this->createFromPathInfo($fileInfo);
+            } else {
+                $this->checkFileValues($fileInfo, $fileObj);
+            }
+
+            return $fileObj;
+        }
+    }
+
+    /**
      * @param string $serviceId
      * @param string $mountPath
      * @param array $params
@@ -183,7 +252,7 @@ class WebFilesystem extends Filesystem
             }
         }
 
-        return $items;
+        return $this->wrap($items);
     }
 
 

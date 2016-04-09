@@ -657,6 +657,15 @@ class Propel extends AbstractStorage
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function export(Condition $condition = null)
+    {
+        $options['fields'] = 'title';
+        return $this->getItems(null, $condition, $options);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getItems(array $filter = null, Condition $condition = null, $options = null)

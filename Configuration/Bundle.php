@@ -375,6 +375,9 @@ class Bundle extends Model
         return $this->getJarves()->getBundle($this->bundleClass);
     }
 
+    /**
+     * @return string
+     */
     public function getPath()
     {
         return $this->getBundleClass()->getPath();

@@ -25,7 +25,7 @@
             <parameter name="Charset" value="utf8"/>
         </vendor>
     </table>
-    <table name="system_file" phpName="File">
+    <table name="system_file" phpName="File" allowPkInsert="true">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
         <column name="path" type="VARCHAR" size="255"/>
         <column name="hash" type="VARCHAR" size="64"/>

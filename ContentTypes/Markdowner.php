@@ -27,14 +27,12 @@ class Markdowner
     {
         $parser = new MarkdownExtra;
 
-
         if (false !== stripos($text, '```')) {
             //add highlightjs to PageResponse
             $this->pageStack->getPageResponse()->addJsFile('@Jarves/highlightjs/highlight.pack.js');
             $this->pageStack->getPageResponse()->addJsAtBottom('hljs.initHighlightingOnLoad();');
             $this->pageStack->getPageResponse()->addCssFile('@Jarves/highlightjs/styles/github.css');
         }
-
 
         return $parser->transform($text);
     }

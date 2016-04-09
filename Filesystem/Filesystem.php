@@ -101,70 +101,14 @@ class Filesystem implements FilesystemInterface
      *
      * @param string $path
      *
-     * @return File
+     * @return FileInfoInterface
      */
     public function getFile($path)
     {
         $fs = $this->getAdapter($path);
         $path = $this->normalizePath($path);
 
-        $file = $fs->getFile($path);
-
-        return $this->wrap($file);
-    }
-
-    /**
-     * Returns a File object. If the file behind the file's 'path'
-     * does not exists in the database, it will be created.
-     *
-     * @param FileInfoInterface|FileInfoInterface[] $fileInfo
-     *
-     * @return FileInfoInterface|FileInfoInterface[]|File
-     */
-    public function wrap($fileInfo)
-    {
-        if (is_array($fileInfo)) {
-            $result = [];
-            $paths = [];
-            foreach ($fileInfo as $file) {
-                if ($file instanceof File) {
-                    return $fileInfo; //it's already a `File` array, return it.
-                }
-                $paths[] = $file->getPath();
-            }
-
-            $files = FileQuery::create()
-                ->orderById(Criteria::ASC)
-                ->filterByPath($paths)
-                ->groupByPath()
-                ->find()
-                ->toKeyIndex('path');
-
-            foreach ($fileInfo as $file) {
-                if (isset($files[$file->getPath()])) {
-                    $this->checkFileValues($file, $files[$file->getPath()]);
-                    $result[] = $files[$file->getPath()];
-                } else {
-                    $result[] = $this->createFromPathInfo($file);
-                }
-            }
-
-            return $result;
-        } else {
-            if ($fileInfo instanceof File) {
-                return $fileInfo; //it's already a `File`, return it.
-            }
-
-            $path = $fileInfo->getPath();
-            $fileObj = FileQuery::create()->orderById()->filterByPath($path)->groupByPath()->findOne();
-            if (!$fileObj) {
-                $fileObj = $this->createFromPathInfo($fileInfo);
-            } else {
-                $this->checkFileValues($fileInfo, $fileObj);
-            }
-
-            return $fileObj;
-        }
+        return $fs->getFile($path);
     }
 
     public function checkFileValues(FileInfo $file, File $databaseFile)
@@ -347,9 +291,6 @@ class Filesystem implements FilesystemInterface
         if (count($items) == 0) {
             return array();
         }
-
-        $items = $this->wrap($items);
-
 
         usort(
             $items,

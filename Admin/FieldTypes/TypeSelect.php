@@ -20,5 +20,5 @@ class TypeSelect extends AbstractSingleColumnType
 
     protected $phpDataType = 'string';
 
-    protected $sqlDataType = 'string';
+    protected $sqlDataType = '';
 }

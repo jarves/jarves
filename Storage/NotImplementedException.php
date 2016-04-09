@@ -12,19 +12,9 @@
  * LICENSE file, that was distributed with this source code.
  */
 
-namespace Jarves\Admin\FieldTypes;
+namespace Jarves\Storage;
 
-
-class TypeUserInterfaceOnly extends AbstractSingleColumnType
+class NotImplementedException extends \RuntimeException
 {
-    public function getRequiredRegex()
-    {
-        return '.*';
-    }
 
-    public function validate()
-    {
-        return [];
-    }
-
-} 
+}

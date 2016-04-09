@@ -99,6 +99,18 @@ abstract class AbstractStorage
     }
 
     /**
+     * Exports all data as array 
+     * 
+     * @param Condition|null $condition
+     * 
+     * @return array
+     */
+    public function export(Condition $condition = null)
+    {
+        throw new NotImplementedException('export is not implemented in ' . get_called_class());
+    }
+
+    /**
      * Returns a field definition.
      *
      * @param  string $fieldKey

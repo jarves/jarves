@@ -20,6 +20,6 @@ class TypeLayout extends AbstractSingleColumnType
 
     protected $phpDataType = 'string';
 
-    protected $sqlDataType = 'LONGVARCHAR';
+    protected $sqlDataType = 'VARCHAR(255)';
 
 }

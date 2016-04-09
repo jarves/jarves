@@ -273,7 +273,6 @@
           </field>
           <field id="boxId" type="number"/>
           <field id="sort" type="number"/>
-          <field id="title" type="text"/>
           <field id="content" type="textarea"/>
           <field id="template" type="text"/>
           <field id="type" type="text"/>

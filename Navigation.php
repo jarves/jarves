@@ -38,16 +38,15 @@ class Navigation
 
     public function arrayLevel($array, $level)
     {
-        return $array[$level - 2];
+        return $array[$level - 1];
     }
 
     public function getRendered($options, \Twig_Environment $twig)
     {
         $options['noCache'] = isset($options['noCache']) ? $options['noCache'] : false;
         $view = $options['template'] ?: $options['view'];
-        $cacheKey = 'core/navigation/' . $this->pageStack->getCurrentPage()->getDomainId() . '.' . $this->pageStack->getCurrentPage()->getId() . '_' . md5(
-                json_encode($options)
-            );
+        $cacheKey = 'core/navigation/' . $this->pageStack->getCurrentPage()->getDomainId()
+            . '.' . $this->pageStack->getCurrentPage()->getId() . '_' . md5(json_encode($options));
         $fromCache = false;
 
         $viewPath = $this->jarves->resolvePath($view, 'Resources/views/');
