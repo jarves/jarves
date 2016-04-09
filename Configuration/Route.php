@@ -4,7 +4,7 @@ namespace Jarves\Configuration;
 
 class Route extends Model
 {
-    protected $attributes = ['id', 'pattern'];
+    protected $attributes = ['id', 'pattern', 'methods', 'controller'];
 
     protected $elementToArray = ['requirement' => 'requirements', 'default' => 'defaults'];
 
@@ -27,6 +27,52 @@ class Route extends Model
      * @var RouteRequirement[]
      */
     protected $requirements;
+
+    /**
+     * Per default all methods are allowed. Use 'GET', 'POST', or 'GET|POST' to limit it.
+     *
+     * @var string[]
+     */
+    protected $methods;
+
+    /**
+     * Overwrites the controller for this route. Per default the controller of the plugin is used.
+     *
+     * @var string
+     */
+    protected $controller;
+
+    /**
+     * @return string[]
+     */
+    public function getMethods()
+    {
+        return $this->methods;
+    }
+
+    /**
+     * @param string[] $methods
+     */
+    public function setMethods($methods)
+    {
+        $this->methods = $methods;
+    }
+
+    /**
+     * @return string
+     */
+    public function getController()
+    {
+        return $this->controller;
+    }
+
+    /**
+     * @param string $controller
+     */
+    public function setController($controller)
+    {
+        $this->controller = $controller;
+    }
 
     /**
      * @param RouteDefault[] $defaults

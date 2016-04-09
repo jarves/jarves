@@ -271,7 +271,7 @@ class PageStack
 
     /**
      * @param        $nodeOrId
-     * @param bool $fullUrl
+     * @param bool $fullUrl with http://
      * @param bool $suppressStartNodeCheck
      * @param Domain $domain
      *
@@ -290,9 +290,13 @@ class PageStack
         }
 
         $domainId = $nodeOrId instanceof Node ? $nodeOrId->getDomainId() : $this->getDomainOfPage($id);
-        $currentDomain = $domain ?: $this->getCurrentDomain();
+        $domain = $this->getCurrentDomain();
 
-        if (!$suppressStartNodeCheck && $currentDomain->getStartnodeId() === $id) {
+        if (!$domain || $domainId !== $domain->getId()) {
+            $domain = $this->getDomain($domainId);
+        }
+
+        if (!$suppressStartNodeCheck && $domain->getStartnodeId() === $id) {
             $url = '/';
         } else {
             $urls = $this->getCachedPageToUrl($domainId);
@@ -312,33 +316,27 @@ class PageStack
             $url = substr($prefix, 1) . $url;
         }
 
-        if ($fullUrl || !$currentDomain || $domainId != $currentDomain->getId()) {
-            $domain = $currentDomain ?: $this->getDomain($domainId);
-
-            $domainName = $domain->getRealDomain();
-            if ($domain->getMaster() != 1) {
-                $url = $domainName . $domain->getPath() . $domain->getLang() . '/' . $url;
-            } else {
-                $url = $domainName . $domain->getPath() . $url;
-            }
-
-            $isSecure = $this->getRequest() ? $this->getRequest()->isSecure() : false;
-
-            $url = 'http' . ($isSecure ? 's' : '') . '://' . $url;
-        }
-
-        //crop last /
-        if (substr($url, -1) == '/') {
-            $url = substr($url, 0, -1);
-        }
-
         //crop first /
         if (substr($url, 0, 1) == '/') {
             $url = substr($url, 1);
         }
 
-        if ($url == '/') {
-            $url = '.';
+        $domainName = $domain->getRealDomain();
+        if ($domain->getMaster() != 1) {
+            $url = $domain->getPath() . $domain->getLang() . '/' . $url;
+        } else {
+            $url = $domain->getPath() . $url;
+        }
+
+        if ($fullUrl) {
+            $isSecure = $this->getRequest() ? $this->getRequest()->isSecure() : false;
+
+            $url = 'http' . ($isSecure ? 's' : '') . '://' . $domainName . $url;
+        }
+
+        //crop last /
+        if (substr($url, -1) == '/') {
+            $url = substr($url, 0, -1);
         }
 
         return $url;

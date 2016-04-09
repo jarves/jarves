@@ -1,1 +1,15 @@
-Whatup
+<form action="{{ currentUrl() }}/login" method="post">
+
+    {{ app.request.query.all|json_encode }}
+    {% if app.request.get('success') %}
+        <div class="messsage message-error">Login Failed</div>
+    {% endif %}
+
+    <input type="hidden" name="action" value="jarves.login">
+
+    <input type="text" name="email" value="{{ app.request.get('email') }}">
+    <input type="password" name="password">
+
+    <button type="submit">Log in</button>
+
+</form>

@@ -3,8 +3,17 @@
     <plugins>
       <plugin id="login">
         <label>User Login</label>
-        <controller>jarves.plugin.userlogin:login</controller>
+        <controller>jarves.plugin.userlogin:loginForm</controller>
+        <routes>
+          <route pattern="login" methods="POST" controller="jarves.plugin.userlogin:doLogin">
+            <requirement key="username">.+</requirement>
+            <requirement key="password">.+</requirement>
+          </route>
+          <route pattern="logout" methods="GET" controller="jarves.plugin.userlogin:doLogout"/>
+          <route pattern="register" methods="GET" controller="jarves.plugin.userlogin:registerForm"/>
+          <route pattern="register" methods="POST" controller="jarves.plugin.userlogin:doRegister"/>
+        </routes>
       </plugin>
-  </plugins>
-</bundle>
+    </plugins>
+  </bundle>
 </config>

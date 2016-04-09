@@ -372,6 +372,7 @@ abstract class ClientAbstract
             $this->start();
         }
         $this->setUser();
+        $this->syncStore();
     }
 
     /**
@@ -732,6 +733,14 @@ abstract class ClientAbstract
         }
 
         return $hash;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isLoggedIn()
+    {
+       return $this->hasSession() && $this->getSession()->getUserId() > 0;
     }
 
     /**
