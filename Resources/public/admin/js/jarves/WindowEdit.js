@@ -820,7 +820,6 @@ jarves.WindowEdit = new Class({
         }
 
         var req = this.fieldForm.getValue(null, patch);
-        console.log('retrieveData', req);
 
         if (this.languageSelect) {
             if (!withoutEmptyCheck && this.languageSelect.getValue() == '') {
@@ -934,7 +933,6 @@ jarves.WindowEdit = new Class({
             this.lastSaveRq.cancel();
         }
 
-        console.log('----save----');
         var request = this.buildRequest(this.classProperties.usePatch);
 
         if (typeOf(request) != 'null') {

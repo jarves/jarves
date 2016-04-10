@@ -119,7 +119,7 @@ class AdminAssets
             '
         window._path = window._baseUrl = ' . json_encode($request->getBasePath() . '/') . '
         window._pathAdmin = ' . json_encode($request->getBaseUrl() . '/' . $prefix . '/')
-        );
+        , 3001);
 
         if ($this->jarves->isDebugMode()) {
             foreach ($this->jarves->getConfigs() as $bundleConfig) {
