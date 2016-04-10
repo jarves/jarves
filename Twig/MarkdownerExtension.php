@@ -43,7 +43,7 @@ class MarkdownerExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            new \Twig_SimpleFilter('markdowner', array($this, 'markdown'), array('pre_escape' => 'html', 'is_safe' => array('html'))),
+            new \Twig_SimpleFilter('markdowner', array($this, 'markdown'), array('is_safe' => array('html'))),
         );
     }
 

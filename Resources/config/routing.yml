@@ -3,7 +3,7 @@ jarves_admin_login:
     type:     annotation
 
 jarves_admin:
-    prefix: %jarves_admin_prefix%
+    prefix: "%jarves_admin_prefix%"
     resource: "@JarvesBundle/Controller/Admin/"
     type:     annotation
 

@@ -187,15 +187,13 @@ class ContentImportCommand extends AbstractCommand
 
                     $nodes[substr($path, 0, -4)] = $node;
 
-
                     $end = isset($parentNodeQueue[$parentPath]) ? count($parentNodeQueue[$parentPath]) : 1;
                     $position = isset($nodeFromYml['sort']) ? $nodeFromYml['sort'] : $end;
-                    $parentNodeQueue[$parentPath][$position] = $node;
-
+                    $parentNodeQueue[$parentPath][$position][] = $node;
 
                     if (isset($nodeFromYml['contents'])) {
                         foreach ($nodeFromYml['contents'] as $idx => $contentFromYaml) {
-                            if (is_array($contentFromYaml['content'])) {
+                            if (isset($contentFromYaml['content']) && is_array($contentFromYaml['content'])) {
                                 $contentFromYaml['content'] = json_encode($contentFromYaml['content']);
                             }
 
@@ -217,9 +215,11 @@ class ContentImportCommand extends AbstractCommand
                 ksort($nodesQueue); //key is sort
 
                 /** @var Node $node */
-                foreach ($nodesQueue as $position => $node) {
-                    $node->insertAsLastChildOf($nodes[$parentPath]);
-                    $node->save(); //saves Content as well.
+                foreach ($nodesQueue as $position => $nodesToInsert) {
+                    foreach ($nodesToInsert as $node) {
+                        $node->insertAsLastChildOf($nodes[$parentPath]);
+                        $node->save(); //saves Content as well.
+                    }
                 }
             }
             $domain->save();

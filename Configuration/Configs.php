@@ -279,9 +279,11 @@ class Configs implements \IteratorAggregate
     public function getObject($objectKey)
     {
         $objectKey = Objects::normalizeObjectKey($objectKey);
+
         if (false === strpos($objectKey, '/')) {
             return null;
         }
+
         list($bundleName, $objectName) = explode('/', $objectKey);
 
         if ('bundle' !== substr($bundleName, -6)) {
@@ -296,6 +298,22 @@ class Configs implements \IteratorAggregate
     }
 
     /**
+     * @return Object[]
+     */
+    public function getObjects()
+    {
+        $result = [];
+
+        foreach ($this->getConfigs() as $config) {
+            if ($items = $config->getObjects()) {
+                $result = array_merge($result, $items);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * @param string $themeId
      * @return Theme|null
      */
@@ -304,6 +322,78 @@ class Configs implements \IteratorAggregate
         foreach ($this->configElements as $config) {
             if ($theme = $config->getTheme($themeId)) {
                 return $theme;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return ContentType[]
+     */
+    public function getContentTypes()
+    {
+        $result = [];
+
+        foreach ($this->getConfigs() as $config) {
+            if ($items = $config->getContentTypes()) {
+                $result = array_merge($result, $items);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return ContentType|null
+     */
+    public function getContentType($id)
+    {
+        foreach ($this->getConfigs() as $config) {
+            if ($items = $config->getContentTypes()) {
+                foreach ($items as $item) {
+                    if ($item->getId() === $id) {
+                        return $item;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return FieldType[]
+     */
+    public function getFieldTypes()
+    {
+        $result = [];
+
+        foreach ($this->getConfigs() as $config) {
+            if ($items = $config->getFieldTypes()) {
+                $result = array_merge($result, $items);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return FieldType|null
+     */
+    public function getFieldType($id)
+    {
+        foreach ($this->getConfigs() as $config) {
+            if ($items = $config->getFieldTypes()) {
+                foreach ($items as $item) {
+                    if ($item->getId() === $id) {
+                        return $item;
+                    }
+                }
             }
         }
 
@@ -326,7 +416,7 @@ class Configs implements \IteratorAggregate
         $result = array();
         foreach ($this->configElements as $config) {
             $value = $config->toArray();
-            $value['composer'] = $config->getComposer() ? : [];
+            $value['composer'] = $config->getComposer() ?: [];
             $result[$config->getBundleName()] = $value;
         }
 

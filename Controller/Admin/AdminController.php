@@ -79,30 +79,30 @@ class AdminController extends Controller
     }
 
 
+//    /**
+//     * @ApiDoc(
+//     *  section="Administration",
+//     *  description="Returns a layout template/view with placeholder for Jarves page editor."
+//     * )
+//     *
+//     * @Rest\QueryParam(name="template", requirements=".+", strict=true, description="The template/view to be used for this content")
+//     * @Rest\QueryParam(name="type", requirements=".+", strict=true, description="The content type")
+//     *
+//     * @Rest\Get("/admin/content/template")
+//     *
+//     * @param ParamFetcher $paramFetcher
+//     *
+//     * @return array
+//     */
+//    public function getInlineEditorAction()
+//    {
+//
+//    }
+
     /**
      * @ApiDoc(
      *  section="Administration",
-     *  description="Returns a layout template/view with placeholder for jarves.Editor."
-     * )
-     *
-     * @Rest\QueryParam(name="template", requirements=".+", strict=true, description="The template/view to be used for this content")
-     * @Rest\QueryParam(name="type", requirements=".+", strict=true, description="The content type")
-     *
-     * @Rest\Get("/admin/content/template")
-     *
-     * @param ParamFetcher $paramFetcher
-     *
-     * @return array
-     */
-    public function getInlineEditorAction()
-    {
-
-    }
-
-    /**
-     * @ApiDoc(
-     *  section="Administration",
-     *  description="Returns a content template/view with placeholder for jarves.Editor."
+     *  description="Returns a content template/view with placeholder for Jarves page editor."
      * )
      *
      * @Rest\QueryParam(name="template", requirements=".+", strict=true, description="The template/view to be used for this content")
@@ -138,7 +138,7 @@ class AdminController extends Controller
     /**
      * @ApiDoc(
      *  section="Administration",
-     *  description="Returns a renderer content element as preview for jarves.Editor"
+     *  description="Returns a renderer content element as preview for Jarves page editor"
      * )
      *
      * @Rest\QueryParam(name="template", requirements=".+", strict=true,

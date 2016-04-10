@@ -270,6 +270,22 @@ class PageStack
     }
 
     /**
+     * Returns the affix relative to current page.
+     * 
+     * If the current page is : /documentation/field,
+     * but the actual loaded route is: /documentation/field/field-name,
+     * then '/field-name' is returned. 
+     * 
+     * This can be the case, when a plugin added own routes and returned a result for '/field-name'.
+     * 
+     * @return string
+     */
+    public function getCurrentUrlAffix()
+    {
+       return substr($this->getRequest()->getPathInfo(), strlen($this->getCurrentUrl()));
+    }
+
+    /**
      * @param        $nodeOrId
      * @param bool $fullUrl with http://
      * @param bool $suppressStartNodeCheck

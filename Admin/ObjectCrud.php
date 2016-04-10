@@ -915,7 +915,7 @@ class ObjectCrud implements ObjectCrudInterface
 
                 $this->_fields[$fields->getId()] = $fields;
 
-                if ($fields->getType()) {
+                if ($fields->getType() && $fields->hasFieldType()) {
                     foreach ($fields->getFieldType()->getRequiredFields() as $fieldName) {
                         $this->_fields[$fieldName] = $this->getObjectDefinition()->getField($fieldName);
                         $this->prepareFieldItem($this->_fields[$fieldName]);

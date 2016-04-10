@@ -118,6 +118,14 @@ class ContentRender
     }
 
     /**
+     * @return ContentTypes\AbstractType[]
+     */
+    public function getContentTypes()
+    {
+        return $this->types;
+    }
+
+    /**
      * @param integer $nodeId
      * @param integer $slotId
      * @param array   $params
@@ -256,6 +264,7 @@ class ContentRender
         }
 
         $count = count($filteredContents);
+
         /*
          * Compatibility
          */
@@ -274,6 +283,15 @@ class ContentRender
 
         if ($count > 0) {
             foreach ($filteredContents as $content) {
+
+                if ('stopper' === $content->getType()) {
+                    if ($html) {
+                        break;
+                    }
+
+                    continue;
+                }
+                
                 if ($i == $count) {
                     $data['layoutContentsIsLast'] = true;
                 }
@@ -309,6 +327,10 @@ class ContentRender
     public function renderContent(ContentInterface $content, $parameters = array())
     {
         $type = $content->getType() ?: 'text';
+        if ('stopper' === $type) {
+            return '';
+        }
+
         $title = sprintf('Content %d [%s]', $content->getId(), $type);
         $this->stopwatch->start($title, 'Jarves');
 
@@ -344,17 +366,19 @@ class ContentRender
             $unsearchable = true;
         }
 
-        if ($content->getTemplate() == '' || $content->getTemplate() == '-') {
-            if ($unsearchable) {
-                $result = '<!--unsearchable-begin-->' . $data['html'] . '<!--unsearchable-end-->';
+        if ($html) {
+            if ($content->getTemplate() == '' || $content->getTemplate() == '-') {
+                if ($unsearchable && $data['html']) {
+                    $result = '<!--unsearchable-begin-->' . $data['html'] . '<!--unsearchable-end-->';
+                } else {
+                    $result = $data['html'];
+                }
             } else {
-                $result = $data['html'];
-            }
-        } else {
-            $result = $this->templating->render($content->getTemplate(), $data);
+                $result = $this->templating->render($content->getTemplate(), $data);
 
-            if ($unsearchable) {
-                $result = '<!--unsearchable-begin-->' . $result . '<!--unsearchable-end-->';
+                if ($unsearchable && $result) {
+                    $result = '<!--unsearchable-begin-->' . $result . '<!--unsearchable-end-->';
+                }
             }
         }
 

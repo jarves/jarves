@@ -5,6 +5,9 @@ namespace Jarves\ContentTypes;
 use Jarves\PageStack;
 use Michelf\MarkdownExtra;
 
+/**
+ * Markdown content type.
+ */
 class TypeMarkdown extends AbstractType
 {
     /**

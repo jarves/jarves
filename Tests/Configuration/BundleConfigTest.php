@@ -825,4 +825,56 @@ class BundleConfigTest extends KernelAwareTestCase
 
         $this->assertEquals(['dir' => '#icon-folder-4'], $object->toArray()['treeIconMapping']);
     }
+
+    public function testContentTypes()
+    {
+        $xml = '
+<bundle>
+    <content-types>
+      <content-type id="text" service="jarves.content.types.text">
+        <label>Text</label>
+      </content-type>
+    </content-types>
+</bundle>
+        ';
+
+        $bundleConfig = new Bundle('MyBundle');
+        $bundleConfig->initialize($xml);
+
+        $this->assertEquals(1, count($bundleConfig->getContentTypesArray()));
+        $this->assertEquals('jarves.content.types.text', $bundleConfig->getContentTypes()[0]->getService());
+        $this->assertEquals('text', $bundleConfig->getContentTypes()[0]->getId());
+    }
+
+    /**
+     * @group test
+     */
+    public function testFieldTypes()
+    {
+        $xml = <<<EOF
+<bundle>
+  <fieldTypes>
+    <field-type id="text" service="jarves.field.types.text">
+      <label>Text</label>
+    </field-type>
+    <field-type id="tab" service="jarves.field.types.tab" userInterfaceOnly="true">
+      <label>Tab</label>
+    </field-type>
+  </fieldTypes>
+</bundle>
+EOF;
+
+        $bundleConfig = new Bundle('MyBundle');
+        $bundleConfig->initialize($xml);
+
+        $this->assertEquals(2, count($bundleConfig->getFieldTypesArray()));
+        $this->assertEquals('jarves.field.types.text', $bundleConfig->getFieldTypes()[0]->getService());
+        $this->assertEquals('text', $bundleConfig->getFieldTypes()[0]->getId());
+        
+        $this->assertEquals(false, $bundleConfig->getFieldTypes()[0]->isUserInterfaceOnly());
+        $this->assertEquals(true, $bundleConfig->getFieldTypes()[1]->isUserInterfaceOnly());
+
+        $exportedXml =$bundleConfig->toXml();
+        $this->assertEquals($xml, $exportedXml);
+    }
 }

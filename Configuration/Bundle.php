@@ -20,6 +20,8 @@ class Bundle extends Model
         'entryPoints' => 'jarves.entryPoints.xml',
         'themes' => 'jarves.themes.xml',
         'plugins' => 'jarves.plugins.xml',
+        'contentTypes' => 'jarves.content-types.xml',
+        'fieldTypes' => 'jarves.field-types.xml',
     ];
 
     protected $_excludeFromExport = ['bundleName'];
@@ -40,6 +42,16 @@ class Bundle extends Model
      * @var Plugin[]
      */
     protected $plugins;
+
+    /**
+     * @var ContentType[]
+     */
+    protected $contentTypes;
+
+    /**
+     * @var FieldType[]
+     */
+    protected $fieldTypes;
 
     /**
      * @var Theme[]
@@ -424,6 +436,68 @@ class Bundle extends Model
             foreach ($imported as $property) {
                 $this->imported[$property] = Tools::getRelativePath($file, $root);
             }
+        }
+    }
+
+    /**
+     * @return ContentType[]
+     */
+    public function getContentTypes()
+    {
+        return $this->contentTypes;
+    }
+
+    /**
+     * @param ContentType[] $contentTypes
+     */
+    public function setContentTypes(array $contentTypes)
+    {
+        $this->contentTypes = $contentTypes;
+    }
+
+    /**
+     * @return ContentType[]
+     */
+    public function getContentTypesArray()
+    {
+        if ($this->contentTypes) {
+            $result = [];
+            foreach ($this->contentTypes as $contentType) {
+                $result[$contentType->getId()] = $contentType->toArray();
+            }
+
+            return $result;
+        }
+    }
+
+    /**
+     * @return FieldType[]
+     */
+    public function getFieldTypes()
+    {
+        return $this->fieldTypes;
+    }
+
+    /**
+     * @param FieldType[] $fieldTypes
+     */
+    public function setFieldTypes(array $fieldTypes)
+    {
+        $this->fieldTypes = $fieldTypes;
+    }
+
+    /**
+     * @return FieldType[]
+     */
+    public function getFieldTypesArray()
+    {
+        if ($this->fieldTypes) {
+            $result = [];
+            foreach ($this->fieldTypes as $fieldType) {
+                $result[$fieldType->getId()] = $fieldType->toArray();
+            }
+
+            return $result;
         }
     }
 

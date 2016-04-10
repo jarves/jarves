@@ -26,11 +26,11 @@ class Field extends Model
     protected $label;
 
     /**
-     * Shows a grayed description text. __Warning__: This value is set as HTML. So escape `<` and `>`.
+     * Shows a grayed description text. Use markdown to format stuff.
      *
      * @var string
      */
-    protected $desc;
+    protected $description;
 
     /**
      * @var string
@@ -115,16 +115,22 @@ class Field extends Model
     /**
      * The key of the field this is representing. Primarily for types 'predefined'.
      *
+     * @internal
      * @var string
      */
     protected $field;
 
     /**
+     * Not in use.
+     *
      * @var string
      */
     protected $layout;
 
     /**
+     * Only used when this field is a object attribute (extends another foreign object)
+     *
+     * @internal
      * @var string
      */
     protected $target;
@@ -137,19 +143,25 @@ class Field extends Model
     protected $attribute = false;
 
     /**
-     * @var mixed
+     * When defined, this field is hidden as long as the parent does not have the given value in `needValue`.
+     * Per default, this is checked against the parent (when this field is in a `children` section of another field),
+     * however, you can change that by using `againstField`.
+     *
+     * @var string|null
      */
     protected $needValue;
 
     /**
-     * @var string
+     * Works only with `needValue`. A field id from another field.
+     *
+     * @var string|null
      */
     protected $againstField;
 
     /**
      * The default/initial value.
      *
-     * @var mixed
+     * @var mixed|null
      */
     protected $default = null;
 
@@ -164,7 +176,7 @@ class Field extends Model
     private $form;
 
     /**
-     * If this field starts with a empty value (on initialisation).
+     * If this field starts with a empty value (on initialisation). (Good fit for password fields)
      *
      * @var bool
      */
@@ -278,6 +290,14 @@ class Field extends Model
      */
     private $fieldType;
 
+
+    /**
+     * Temporarily value for fields without field type.
+     *
+     * @var mixed
+     */
+    private $tempValue;
+
     /**
      * If this is a virtual field or not. Virtual fields a technical implementation
      * fields to keep for example arelation between object fields in sync or if a fieldType needs
@@ -318,11 +338,19 @@ class Field extends Model
     {
         $array = parent::toArray($printDefaults);
 
-        if ($this->getType()) {
+        if ($this->getType() && $this->hasFieldType()) {
             $array['selection'] = $this->getFieldType()->getSelection();
         }
 
         return $array;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasFieldType()
+    {
+        return $this->getJarves()->getFieldTypes()->hasType($this->getType());
     }
 
     /**
@@ -424,7 +452,9 @@ class Field extends Model
      */
     public function bootRunTime(Object $object, Configs $configs)
     {
-        $this->getFieldType()->bootRunTime($object, $configs);
+        if ($this->hasFieldType()){
+            $this->getFieldType()->bootRunTime($object, $configs);
+        }
     }
 
     /**
@@ -566,19 +596,19 @@ class Field extends Model
     }
 
     /**
-     * @param string $desc
+     * @param string $description
      */
-    public function setDesc($desc)
+    public function setDescription($description)
     {
-        $this->desc = $desc;
+        $this->description = $description;
     }
 
     /**
      * @return string
      */
-    public function getDesc()
+    public function getDescription()
     {
-        return $this->desc;
+        return $this->description;
     }
 
     /**
@@ -932,7 +962,11 @@ class Field extends Model
      */
     public function setValue($value)
     {
-        $this->getFieldType()->setValue($value);
+        if ($this->hasFieldType()) {
+            $this->getFieldType()->setValue($value);
+        } else {
+            $this->tempValue = $value;
+        }
     }
 
     /**
@@ -940,12 +974,20 @@ class Field extends Model
      */
     public function getValue()
     {
-        return $this->getFieldType()->getValue();
+        if ($this->hasFieldType()) {
+            return $this->getFieldType()->getValue();
+        } else {
+            return $this->tempValue;
+        }
     }
 
     public function mapValues(array &$data)
     {
-        return $this->getFieldType()->mapValues($data);
+        if ($this->hasFieldType()) {
+            return $this->getFieldType()->mapValues($data);
+        } else {
+            $data[$this->getId()] = $this->getValue();
+        }
     }
 
     public function canPropertyBeExported($k)
@@ -982,7 +1024,11 @@ class Field extends Model
      */
     public function getPhpDataType()
     {
-        return $this->getFieldType()->getPhpDataType();
+        if ($this->hasFieldType()) {
+            return $this->getFieldType()->getPhpDataType();
+        } else {
+            return 'string';
+        }
     }
 
     /**
@@ -992,6 +1038,10 @@ class Field extends Model
      */
     public function isHidden()
     {
+        if (!$this->hasFieldType()) {
+            return false;
+        }
+
         if ($parentField = $this->getParentField()) {
             if ($parentField->isHidden()) {
                 return true;
@@ -1031,6 +1081,10 @@ class Field extends Model
      */
     public function validate()
     {
+        if (!$this->hasFieldType()){
+            return true;
+        }
+
         if ($this->isVirtual()) {
             return [];
         }

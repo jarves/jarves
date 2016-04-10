@@ -100,7 +100,7 @@ class ObjectCrudHandler implements HandlerInterface
 //                        [
 //                            'requirement' => $field->getRequiredRegex(),
 //                            'dataType' => $field->getPhpDataType(),
-//                            'description' => '(' . $objectParent->getId() . ') ' . $field->getDesc()
+//                            'description' => '(' . $objectParent->getId() . ') ' . $field->getDescription()
 //                        ]
 //                    );
 //                }
@@ -109,6 +109,10 @@ class ObjectCrudHandler implements HandlerInterface
 
         if ($requirePk) {
             foreach ($object->getFields() as $field) {
+                if (!$field->hasFieldType()){
+                    continue;
+                }
+
                 if ($field->isPrimaryKey()) {
 
                     $annotation->addRequirement(
@@ -116,7 +120,7 @@ class ObjectCrudHandler implements HandlerInterface
                         [
                             'requirement' => $field->getRequiredRegex(),
                             'dataType' => $field->getPhpDataType(),
-                            'description' => ($isRelationRoute ? '(' . $object->getId() . ') ' : '') . $field->getDesc()
+                            'description' => ($isRelationRoute ? '(' . $object->getId() . ') ' : '')
                         ]
                     );
                 }
@@ -126,13 +130,17 @@ class ObjectCrudHandler implements HandlerInterface
         //add all fields to some actions
         if (in_array($method, ['addItemAction', 'patchItemAction', 'updateItemAction'])) {
             foreach ($object->getFields() as $field) {
+                if (!$field->hasFieldType()){
+                    continue;
+                }
+
                 if ($field->isRequired() && !$field->getDefault()) {
                     $annotation->addRequirement(
                         $field->getId(),
                         array(
                             'requirement' => $field->getRequiredRegex(),
                             'dataType' => $field->getPhpDataType(),
-                            'description' => ($isRelationRoute ? '(' . $object->getId() . ') ' : '') . $field->getLabel() . ' ' . $field->getDesc(),
+                            'description' => ($isRelationRoute ? '(' . $object->getId() . ') ' : '') . $field->getLabel(),
                         )
                     );
                 } else {

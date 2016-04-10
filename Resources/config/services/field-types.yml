@@ -17,8 +17,6 @@ parameters:
      jarves.field.types.filelist.class: Jarves\Admin\FieldTypes\TypeFilelist
      jarves.field.types.layoutelement.class: Jarves\Admin\FieldTypes\TypeLayoutElement
      jarves.field.types.view.class: Jarves\Admin\FieldTypes\TypeView
-     jarves.field.types.tab.class: Jarves\Admin\FieldTypes\TypeTab
-     jarves.field.types.childrenSwitcher.class: Jarves\Admin\FieldTypes\TypeChildrenSwitcher
      jarves.field.types.array.class: Jarves\Admin\FieldTypes\TypeArray
      jarves.field.types.pageContents.class: Jarves\Admin\FieldTypes\TypePageContents
      jarves.field.types.wysiwyg.class: Jarves\Admin\FieldTypes\TypeWysiwyg
@@ -34,132 +32,98 @@ services:
 
      jarves.field.types.text:
          class: "%jarves.field.types.text.class%"
-         tags:
-             - { name: jarves.field.type, alias: text }
+         shared: false
 
      jarves.field.types.theme:
          class: "%jarves.field.types.theme.class%"
-         tags:
-             - { name: jarves.field.type, alias: theme }
+         shared: false
 
      jarves.field.types.number:
          class: "%jarves.field.types.number.class%"
-         tags:
-             - { name: jarves.field.type, alias: number }
+         shared: false
 
      jarves.field.types.object:
          class: "%jarves.field.types.object.class%"
          arguments: ["@jarves.objects"]
-         tags:
-             - { name: jarves.field.type, alias: object }
+         shared: false
 
      jarves.field.types.datetime:
          class: "%jarves.field.types.datetime.class%"
-         tags:
-             - { name: jarves.field.type, alias: datetime }
+         shared: false
 
      jarves.field.types.select:
          class: "%jarves.field.types.select.class%"
-         tags:
-             - { name: jarves.field.type, alias: select }
+         shared: false
 
      jarves.field.types.textboxList:
          class: "%jarves.field.types.textboxList.class%"
-         tags:
-             - { name: jarves.field.type, alias: textboxList }
+         shared: false
 
      jarves.field.types.checkbox:
          class: "%jarves.field.types.checkbox.class%"
-         tags:
-             - { name: jarves.field.type, alias: checkbox }
+         shared: false
 
      jarves.field.types.page:
          class: "%jarves.field.types.page.class%"
-         tags:
-             - { name: jarves.field.type, alias: page }
+         shared: false
 
      jarves.field.types.layout:
          class: "%jarves.field.types.layout.class%"
-         tags:
-             - { name: jarves.field.type, alias: layout }
+         shared: false
 
      jarves.field.types.lang:
          class: "%jarves.field.types.lang.class%"
-         tags:
-             - { name: jarves.field.type, alias: lang }
+         shared: false
 
      jarves.field.types.textarea:
          class: "%jarves.field.types.textarea.class%"
-         tags:
-             - { name: jarves.field.type, alias: textarea }
+         shared: false
 
      jarves.field.types.wysiwyg:
          class: "%jarves.field.types.wysiwyg.class%"
-         tags:
-             - { name: jarves.field.type, alias: wysiwyg }
+         shared: false
 
      jarves.field.types.file:
          class: "%jarves.field.types.file.class%"
-         tags:
-             - { name: jarves.field.type, alias: file }
+         shared: false
 
      jarves.field.types.image:
          class: "%jarves.field.types.image.class%"
-         tags:
-             - { name: jarves.field.type, alias: image }
+         shared: false
 
      jarves.field.types.filelist:
          class: "%jarves.field.types.filelist.class%"
-         tags:
-             - { name: jarves.field.type, alias: filelist }
+         shared: false
 
      jarves.field.types.layoutelement:
          class: "%jarves.field.types.layoutelement.class%"
-         tags:
-             - { name: jarves.field.type, alias: layoutelement }
+         shared: false
 
      jarves.field.types.view:
          class: "%jarves.field.types.view.class%"
-         tags:
-             - { name: jarves.field.type, alias: view }
-
-     jarves.field.types.tab:
-         class: "%jarves.field.types.tab.class%"
-         tags:
-             - { name: jarves.field.type, alias: tab }
-
-     jarves.field.types.childrenSwitcher:
-         class: "%jarves.field.types.childrenSwitcher.class%"
-         tags:
-             - { name: jarves.field.type, alias: childrenSwitcher }
+         shared: false
 
      jarves.field.types.array:
          class: "%jarves.field.types.array.class%"
-         tags:
-             - { name: jarves.field.type, alias: array }
+         shared: false
 
      jarves.field.types.pageContents:
          class: "%jarves.field.types.pageContents.class%"
-         tags:
-             - { name: jarves.field.type, alias: pageContents }
+         shared: false
 
      jarves.field.types.password:
          class: "%jarves.field.types.password.class%"
-         tags:
-             - { name: jarves.field.type, alias: password }
+         shared: false
 
      jarves.field.types.userPassword:
          class: "%jarves.field.types.userPassword.class%"
          arguments: ["@jarves.config"]
-         tags:
-             - { name: jarves.field.type, alias: userPassword }
+         shared: false
 
      jarves.field.types.contentElements:
          class: "%jarves.field.types.contentElements.class%"
-         tags:
-             - { name: jarves.field.type, alias: contentElements }
+         shared: false
 
      jarves.field.types.properties:
          class: "%jarves.field.types.properties.class%"
-         tags:
-             - { name: jarves.field.type, alias: properties }
+         shared: false

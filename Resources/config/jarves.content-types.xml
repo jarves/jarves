@@ -1,0 +1,75 @@
+<!--
+  ~ This file is part of Jarves.
+  ~
+  ~ (c) Marc J. Schmidt <marc@marcjschmidt.de>
+  ~
+  ~     J.A.R.V.E.S - Just A Rather Very Easy [content management] System.
+  ~
+  ~     http://jarves.io
+  ~
+  ~ To get the full copyright and license information, please view the
+  ~ LICENSE file, that was distributed with this source code.
+  -->
+
+<config>
+  <bundle>
+    <content-types>
+      <content-type id="text" service="jarves.content.types.text">
+        <label>Text</label>
+        <description>Rich text, entered through a WYSIWYG editor in the Jarved editor.</description>
+      </content-type>
+      <content-type id="image" service="jarves.content.types.image">
+        <label>Image</label>
+        <description>Renders an image with given options (width, src, etc.)</description>
+      </content-type>
+      <content-type id="html" service="jarves.content.types.html">
+        <label>HTML</label>
+        <description>Render just the HTML as entered.</description>
+      </content-type>
+      <content-type id="plugin" service="jarves.content.types.plugin">
+        <label>Plugin</label>
+        <description><![CDATA[
+Executes a configured plugin. Plugins can be configured through the `<plugin>` configuration (under `<bundle><plugins>`).
+
+A plugin is usually just a Symfony controller, that will be called using a HttpKernel SubRequest.
+        ]]></description>
+      </content-type>
+      <content-type id="stopper" service="undefined">
+        <label>Stopper</label>
+        <description><![CDATA[
+This is a special content type, which stops the content output of the current `boxId` (first argument to `{% contents boxId %}`),
+when the contents above this stopper already produced some output.
+
+This is very usefull if you place a plugin above a text, whereas the text below should only displayed when the plugin
+displayed already content (which is for example the case when the plugin is responsible for a particular slug in the url)
+        ]]></description>
+      </content-type>
+      <content-type id="tray" service="jarves.content.types.tray">
+        <label>Tray</label>
+      </content-type>
+      <content-type id="markdown" service="jarves.content.types.markdown">
+        <label>Markdown</label>
+        <description><![CDATA[
+Uses https://github.com/michelf/php-markdown as engine and highlight.js as code highlighting as soon as three ` is found.
+
+Example:
+      <b>hi</b>
+
+```yml
+contents:
+  -
+    type: markdown
+    content: |
+      # Markdown Headline 1
+
+      Some text
+
+      ```php
+      <?php
+      echo "we can highlight code :)";
+```
+        ]]></description>
+      </content-type>
+    </content-types>
+  </bundle>
+</config>

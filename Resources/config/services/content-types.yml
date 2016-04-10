@@ -10,33 +10,21 @@ parameters:
 services:
      jarves.content.types.text:
          class: "%jarves.content.types.text.class%"
-         tags:
-             - { name: jarves.content.type, alias: text }
 
      jarves.content.types.image:
          class: "%jarves.content.types.image.class%"
          arguments: ["@jarves"]
-         tags:
-             - { name: jarves.content.type, alias: image }
 
      jarves.content.types.html:
          class: "%jarves.content.types.html.class%"
-         tags:
-             - { name: jarves.content.type, alias: html }
 
      jarves.content.types.plugin:
          class: "%jarves.content.types.plugin.class%"
          arguments: ["@jarves", "@jarves.page_stack", "@kernel", "@event_dispatcher", "@jarves.page_response.factory"]
-         tags:
-             - { name: jarves.content.type, alias: plugin }
 
      jarves.content.types.markdown:
          class: "%jarves.content.types.markdown.class%"
          arguments: ["@jarves.markdowner"]
-         tags:
-             - { name: jarves.content.type, alias: markdown }
 
      jarves.content.types.tray:
          class: "%jarves.content.types.tray.class%"
-         tags:
-             - { name: jarves.content.type, alias: tray }

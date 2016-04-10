@@ -20,6 +20,16 @@ class Tools {
         return $return;
     }
 
+    public static function camelcase2Underscore($value)
+    {
+        return static::camelcase2Char($value, '_');
+    }
+
+    public static function camelcase2Char($value, $char = '_')
+    {
+        return strtolower(preg_replace('/([a-z0-9])([A-Z])/', '$1' . $char . '$2', $value));
+    }
+
     public static function indentString($string, $size = 2, $char = ' ')
     {
         return preg_replace('/^/mu', str_repeat($char, $size), $string);
@@ -45,11 +55,6 @@ class Tools {
         }
 
         return $trace;
-    }
-
-    public static function camelcase2Underscore($value)
-    {
-        return strtolower(preg_replace('/([a-z0-9])([A-Z])/', '$1_$2', $value));
     }
 
     /**

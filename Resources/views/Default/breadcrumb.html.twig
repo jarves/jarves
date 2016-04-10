@@ -1,4 +1,4 @@
-<div class="navigation-breadcrumb">
+<nav class="breadcrumb">
     <a href="{{ baseUrl }}">{{ domain.getDomain() }}</a>
 
 {% for crumb in breadcrumbs %}
@@ -6,4 +6,4 @@
 {% endfor %}
 
     » <a href="{{ currentPage|url }}">{{ currentPage.getTitle() }}</a>
-</div>
+</nav>

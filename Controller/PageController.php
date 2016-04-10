@@ -78,8 +78,7 @@ class PageController
         }
 
         if ($this->editMode->isEditMode()) {
-            $adminAssets = new AdminAssets($this->jarves, $this->pageStack, $this->acl);
-            $adminAssets->handleKEditor();
+            $this->newAdminAssets()->handleKEditor();
         }
 
         $pageResponse = $this->pageStack->getPageResponse();
@@ -87,6 +86,14 @@ class PageController
         $pageResponse->renderContent();
 
         return $pageResponse; //new Response('<body>ho</body>');
+    }
+
+    /**
+     * @return AdminAssets
+     */
+    public function newAdminAssets()
+    {
+        return new AdminAssets($this->jarves, $this->pageStack, $this->acl);
     }
 
     /**

@@ -77,6 +77,10 @@ class BreadcrumbExtension extends \Twig_Extension
         }
 
         foreach ($page->getParents() as $parent) {
+            if ($parent->getLevel() === 0) {
+                continue;
+            }
+
             if ($parent->getType() >= 2) {
                 continue;
             }

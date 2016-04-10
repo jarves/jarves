@@ -4,11 +4,16 @@ namespace Jarves\Formatter;
 
 use Nelmio\ApiDocBundle\Formatter\HtmlFormatter;
 
-class ApiDocFormatter extends HtmlFormatter {
+class ApiDocFormatter extends HtmlFormatter
+{
+    protected function getTemplate()
+    {
+        return 'JarvesBundle:Admin:ApiDoc/resources.html.twig';
+    }
 
     protected function render(array $collection)
     {
-        return $this->engine->render('JarvesBundle:Admin:ApiDoc/resources.html.twig', array(
+        return $this->engine->render($this->getTemplate(), array(
             'resources' => $collection,
             'apiName' => 'Jarves cms REST Api Documentation',
             'css' => file_get_contents(__DIR__ . '/../Resources/public/admin/doc/screen.css'),

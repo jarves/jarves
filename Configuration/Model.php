@@ -330,6 +330,9 @@ class Model implements \ArrayAccess
 
             $elementToArrayProperty = isset($this->elementToArray[$nodeName]) ? $this->elementToArray[$nodeName] : null;
             $propertyName = $elementToArrayProperty ?: $nodeName;
+
+            $propertyName = Tools::char2Camelcase($propertyName, '-');
+
             $setter = 'set' . ucfirst($propertyName);
             $getter = 'get' . ucfirst($propertyName);
             $setterValue = $value;
@@ -421,11 +424,12 @@ class Model implements \ArrayAccess
         foreach ($element->attributes as $attribute) {
             $nodeName = $attribute->nodeName;
             $value = $attribute->nodeValue;
-
+            $nodeName = lcfirst(Tools::char2Camelcase($nodeName, '-'));
             $setter = 'set' . ucfirst($nodeName);
+
             if (is_callable(array($this, $setter))) {
                 $this->$setter($value);
-            } else if (!isset($this->$nodeName)) {
+            } else {
                 $this->additionalAttributes[$nodeName] = $value;
             }
 
@@ -438,16 +442,6 @@ class Model implements \ArrayAccess
     public function getNamespacePath()
     {
         return substr(get_called_class(), 0, strrpos(get_called_class(), '\\') + 1);
-    }
-
-    private function char2Camelcase($value, $char = '_')
-    {
-        $ex = explode($char, $value);
-        $return = '';
-        foreach ($ex as $str) {
-            $return .= ucfirst($str);
-        }
-        return $return;
     }
 
     /**
@@ -803,7 +797,7 @@ class Model implements \ArrayAccess
             $textNode = $doc->createTextNode($value);
             $result = $append($textNode);
         } else if (is_scalar($value) || null === $value) {
-            $value = is_bool($value) ? $value ? 'true' : 'false' : (string)$value;
+            $value = is_bool($value) ? ($value ? 'true' : 'false') : (string)$value;
             if ($arrayType) {
                 $element = $doc->createElement(@$this->arrayIndexNames[$arrayType] ?: 'item');
                 if (!is_integer($key)) {
@@ -813,9 +807,13 @@ class Model implements \ArrayAccess
                 $result = $append($element);
             } else {
                 if (in_array($key, $this->attributes)) {
+//                    $key = Tools::camelcase2Char($key, '-');
                     $result = $node->setAttribute($key, $value);
                 } else {
-                    $element = $doc->createElement(is_integer($key) ? ($this->arrayIndexNames[$arrayType] ?: 'item') : $key);
+                    $elementName = is_integer($key) ? ($this->arrayIndexNames[$arrayType] ?: 'item') : $key;
+//                    $elementName = Tools::camelcase2Char($elementName, '-');
+
+                    $element = $doc->createElement($elementName);
                     $element->nodeValue = $value;
                     $result = $append($element);
                 }
@@ -824,7 +822,10 @@ class Model implements \ArrayAccess
             if ($arrayName = $this->getElementArrayName($key)) {
                 $element = $node;
             } else {
-                $element = $doc->createElement(is_integer($key) ? ($this->arrayIndexNames[$arrayType] ?: 'item') : $key);
+                $elementName = is_integer($key) ? ($this->arrayIndexNames[$arrayType] ?: 'item') : $key;
+//                $elementName = Tools::camelcase2Char($elementName, '-');
+
+                $element = $doc->createElement($elementName);
             }
             foreach ($value as $k => $v) {
                 $this->appendXmlValue($k, $v, $element, $key, $printDefaults, $printComments);
@@ -1006,6 +1007,7 @@ class Model implements \ArrayAccess
             $reflectionMethodGet = $reflection->getMethod($getter);
             $parameters = $reflectionMethod->getParameters();
             $phpDocs = $this->getMethodMetaData($reflectionMethodGet);
+
             if (1 <= count($parameters)) {
                 $firstParameter = $parameters[0];
                 if ($firstParameter->getClass() && $className = $firstParameter->getClass()->name) {

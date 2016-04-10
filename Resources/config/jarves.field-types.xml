@@ -1,0 +1,213 @@
+<!--
+  ~ This file is part of Jarves.
+  ~
+  ~ (c) Marc J. Schmidt <marc@marcjschmidt.de>
+  ~
+  ~     J.A.R.V.E.S - Just A Rather Very Easy [content management] System.
+  ~
+  ~     http://jarves.io
+  ~
+  ~ To get the full copyright and license information, please view the
+  ~ LICENSE file, that was distributed with this source code.
+  -->
+
+<config>
+  <bundle>
+    <field-types>
+      <field-type id="text" service="jarves.field.types.text">
+        <label>Text</label>
+        <javascript>@Jarves/admin/js/jarves/FieldTypes/Text.js</javascript>
+        <description><![CDATA[
+Very simple input type for text without newline.
+        ]]></description>
+        <options>
+          <field id="modifier" type="text" label="Value modifier">
+            <description>
+A pipe separated list of modifiers. Example: `trim|ucfirst|camelcase`.
+
+Possible: trim, lower, ucfirst, lcfirst, phpfunction, phpclass, underscore, camelcase, dash, url
+            </description>
+          </field>
+          <field id="redirectValue" type="text" label="Redirect this value always">
+            <description>
+Redirect this value always to another field (and overwrites it always).
+
+Example: `fieldName:modifier1|modifier2,fieldName2:modifier3`
+            </description>
+          </field>
+          <field id="redirectSameValue" type="text" label="Redirect this value">
+            <description>
+Redirect this value to another field with the same result as value.
+
+Example: `fieldName:modifier1|modifier2,fieldName2:modifier3`
+
+Use case: `urlField:url` (when the current field is a title for example)
+            </description>
+          </field>
+        </options>
+      </field-type>
+      <field-type id="theme" service="jarves.field.types.theme">
+        <label>Theme</label>
+      </field-type>
+      <field-type id="number" service="jarves.field.types.number">
+        <label>Number</label>
+      </field-type>
+      <field-type id="object" service="jarves.field.types.object">
+        <label>Object</label>
+      </field-type>
+      <field-type id="datetime" service="jarves.field.types.datetime">
+        <label>Datetime</label>
+      </field-type>
+      <field-type id="select" service="jarves.field.types.select">
+        <label>Select</label>
+      </field-type>
+      <field-type id="textboxList" service="jarves.field.types.textboxList">
+        <label>Textbox List</label>
+      </field-type>
+      <field-type id="checkbox" service="jarves.field.types.checkbox">
+        <label>Checkbox</label>
+      </field-type>
+      <field-type id="page" service="jarves.field.types.page">
+        <label>Page</label>
+      </field-type>
+      <field-type id="layout" service="jarves.field.types.layout">
+        <label>Layout</label>
+      </field-type>
+      <field-type id="lang" service="jarves.field.types.lang">
+        <label>lang</label>
+      </field-type>
+      <field-type id="textarea" service="jarves.field.types.textarea">
+        <label>textarea</label>
+      </field-type>
+      <field-type id="wysiwyg" service="jarves.field.types.wysiwyg">
+        <label>wysiwyg</label>
+      </field-type>
+      <field-type id="file" service="jarves.field.types.file">
+        <label>file</label>
+      </field-type>
+      <field-type id="image" service="jarves.field.types.image">
+        <label>image</label>
+      </field-type>
+      <field-type id="filelist" service="jarves.field.types.filelist">
+        <label>filelist</label>
+      </field-type>
+      <field-type id="layoutelement" service="jarves.field.types.layoutelement">
+        <label>Layout element</label>
+      </field-type>
+      <field-type id="view" service="jarves.field.types.view">
+        <label>view</label>
+      </field-type>
+      <field-type id="tab" userInterfaceOnly="true">
+        <label>tab</label>
+      </field-type>
+      <field-type id="childrenSwitcher" userInterfaceOnly="true">>
+        <label>childrenSwitcher</label>
+      </field-type>
+      <field-type id="array" service="jarves.field.types.array">
+        <label>array</label>
+        <options>
+            <field id="asHash" type="boolean"/>
+            <field id="asArray" type="boolean"/>
+            <field id="fields" type="array" description="Array of fields"/>
+            <field id="columns" type="array" description="Array of {label: 'Column title', width: 'optional width in px'}"/>
+            <field id="startWith" type="number" description="If defined the field is initialized with x empty items"/>
+            <field id="addText" type="text" description="If defined overwrites the label of the add button"/>
+            <field id="withoutRemove" type="boolean" description="Removes the remove button"/>
+            <field id="tableLayout" type="boolean" description="Whether it should be displayed as table layout"/>
+        </options>
+          <description><![CDATA[
+
+Array of fields.
+
+## Result values
+
+If `asHash` is `true` and `fields` contains exactly two items:
+```javascript
+{
+    valueFromField1: valueFromField2,
+    valueFromField1: valueFromField2,
+    ...
+}
+```
+
+If `asHash` is `true` and `fields` contains more than two items:
+```javascript
+{
+    valueFromField1: [field2: valueFromField2, field2: valueFromField3],
+    valueFromField1: [field2: valueFromField2, field2: valueFromField3],
+    ...
+}
+```
+
+If `asArray` is `true` and you have only one `fields` item:
+```javascript
+[
+    valueFromField1,
+    valueFromField1,
+    ...
+]
+```
+
+If `asArray` is `true` and you more than one `fields` item:
+```javascript
+[
+    [valueFromField1, valueFromField2],
+    [valueFromField1, valueFromField2],
+    ...
+]
+```
+
+All other cases:
+```javascript
+[
+    {field1: valueFromField1, field2: valueFromField2},
+    {field1: valueFromField1, field2: valueFromField2},
+    ...
+]
+```
+
+Examples:
+
+```javascript
+{
+    label: 'Names',
+    type: 'array',
+    options: {
+        columns: [
+            {label: 'Name', width: '50%'},
+            {label: 'Last Name'}
+        ],
+        fields: {
+            name: {
+                type: 'text',
+                required: true
+            },
+            lastName: {
+                type: 'text'
+            }
+        }
+    }
+}
+```
+
+__Notice__: In the last example all fields in `options.fields` are regular jarves.Fields but with the property `noWrapper=true` set automatically.
+          ]]></description>
+      </field-type>
+      <field-type id="pageContents" service="jarves.field.types.pageContents">
+        <label>pageContents</label>
+      </field-type>
+      <field-type id="password" service="jarves.field.types.password">
+        <label>password</label>
+      </field-type>
+      <field-type id="userPassword" service="jarves.field.types.userPassword">
+        <label>userPassword</label>
+      </field-type>
+      <field-type id="contentElements" service="jarves.field.types.contentElements">
+        <label>contentElements</label>
+      </field-type>
+      <field-type id="properties" service="jarves.field.types.properties">
+        <label>properties</label>
+      </field-type>
+    </field-types>
+  </bundle>
+</config>

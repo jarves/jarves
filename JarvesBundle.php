@@ -18,7 +18,6 @@ use Jarves\Cache\Cacher;
 use Jarves\Configuration\Connection;
 use Jarves\Configuration\Database;
 use Jarves\DependencyInjection\AssetCompilerCompilerPass;
-use Jarves\DependencyInjection\ContentTypesCompilerPass;
 use Jarves\DependencyInjection\FieldTypesCompilerPass;
 use Jarves\DependencyInjection\ModelBuilderCompilerPass;
 use Propel\Runtime\Connection\ConnectionManagerMasterSlave;
@@ -26,6 +25,7 @@ use Propel\Runtime\Connection\ConnectionManagerSingle;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ServiceContainer\StandardServiceContainer;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class JarvesBundle extends Bundle
@@ -38,11 +38,8 @@ class JarvesBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
-        $container->addCompilerPass(new ContentTypesCompilerPass());
-        $container->addCompilerPass(new FieldTypesCompilerPass());
         $container->addCompilerPass(new ModelBuilderCompilerPass());
         $container->addCompilerPass(new AssetCompilerCompilerPass());
-//        $container->addCompilerPass(new TwigGlobalsCompilerPass());
 
         //necessary to get fos_rest_bundle working
         $container->loadFromExtension('framework', [
@@ -69,23 +66,25 @@ class JarvesBundle extends Bundle
         }
 
         if (!$this->booted) {
+            /** @var ContainerInterface $container */
+            $container = $this->container;
 
             /** @var $jarves Jarves */
-            $jarves = $this->container->get('jarves');
+            $jarves = $container->get('jarves');
 
             /** @var JarvesConfig $jarvesConfig */
-            $jarvesConfig = $this->container->get('jarves.config');
+            $jarvesConfig = $container->get('jarves.config');
 
-            $twig = $this->container->get('twig');
-            $twig->addGlobal('jarves_content_render', $this->container->get('jarves.content.render'));
-            $twig->addGlobal('pageStack', $this->container->get('jarves.page_stack'));
+            $twig = $container->get('twig');
+            $twig->addGlobal('jarves_content_render', $container->get('jarves.content.render'));
+            $twig->addGlobal('pageStack', $container->get('jarves.page_stack'));
 
 
             if ($jarvesConfig->getSystemConfig()->getLogs(true)->isActive()) {
                 /** @var $logger \Symfony\Bridge\Monolog\Logger */
-                $logger = $this->container->get('logger');
+                $logger = $container->get('logger');
 
-                $logger->pushHandler($this->container->get('jarves.logger.handler'));
+                $logger->pushHandler($container->get('jarves.logger.handler'));
             }
         }
 
@@ -97,23 +96,119 @@ class JarvesBundle extends Bundle
      */
     public function configure()
     {
+        /** @var ContainerInterface $container */
+        $container = $this->container;
+
         /** @var $jarves Jarves */
-        $jarves = $this->container->get('jarves');
+        $jarves = $container->get('jarves');
 
         /** @var Cacher $cacher */
-        $cacher = $this->container->get('jarves.cache.cacher');
+        $cacher = $container->get('jarves.cache.cacher');
 
         /** @var JarvesConfig $jarvesConfig */
-        $jarvesConfig = $this->container->get('jarves.config');
+        $jarvesConfig = $container->get('jarves.config');
 
         /** @var $jarvesEventDispatcher JarvesEventDispatcher */
-        $jarvesEventDispatcher = $this->container->get('jarves.event_dispatcher');
+        $jarvesEventDispatcher = $container->get('jarves.event_dispatcher');
+
+        if ($bootNeeded = $jarves->loadBundleConfigs($cacher)) {
+            $this->registerContentTypes($jarves, $container);
+            $this->registerFieldTypes($jarves, $container);
+            $jarves->getConfigs()->boot();
+        }
 
         $jarves->prepareWebSymlinks();
-        $jarves->loadBundleConfigs($cacher);
         $this->loadPropelConfig($jarvesConfig->getSystemConfig()->getDatabase());
 
         $jarvesEventDispatcher->registerBundleEvents($jarves->getConfigs());
+
+    }
+
+    protected function registerFieldTypes(Jarves $jarves, ContainerInterface $container)
+    {
+        foreach ($jarves->getConfigs() as $bundleConfig) {
+            if ($bundleConfig->getFieldTypes()) {
+                foreach ($bundleConfig->getFieldTypes() as $fieldType) {
+
+                    if ($fieldType->isUserInterfaceOnly()) {
+                        continue;
+                    }
+                    
+                    if (!$fieldType->getService()) {
+                        throw new \RuntimeException(sprintf(
+                            'For field type %s:%s is no service defined. If it does not handle model related persisting, ' .
+                            'you should add interface-only="true"',
+                            $bundleConfig->getName(),
+                            $fieldType->getId()
+                        ));
+                    }
+                    
+                    if (!$container->has($fieldType->getService())) {
+                        throw new \RuntimeException(sprintf(
+                            'Service `%s` for field type %s:%s does not exist',
+                            $fieldType->getService(),
+                            $bundleConfig->getName(),
+                            $fieldType->getId()
+                        ));
+                    }
+
+                    $jarves->getFieldTypes()->addType(
+                        $fieldType->getId(),
+                        $fieldType->getService()
+                    );
+                }
+            }
+        }
+    }
+    
+    
+    protected function registerContentTypes(Jarves $jarves, ContainerInterface $container)
+    {
+        /** @var ContentRender $jarvesContentRender */
+        $jarvesContentRender = $container->get('jarves.content.render');
+
+        foreach ($jarves->getConfigs() as $bundleConfig) {
+            if ($bundleConfig->getContentTypes()) {
+                foreach ($bundleConfig->getContentTypes() as $contentType) {
+
+                    if ('stopper' === $contentType->getId()) {
+                        continue;
+                    }
+
+                    if (!$contentType->getService()) {
+                        throw new \RuntimeException(sprintf(
+                            'For content type %s:%s is no service defined',
+                            $bundleConfig->getName(),
+                            $contentType->getId()
+                        ));
+                    }
+                    if (!$container->has($contentType->getService())) {
+                        throw new \RuntimeException(sprintf(
+                            'Service `%s` for content type %s:%s does not exist',
+                            $contentType->getService(),
+                            $bundleConfig->getName(),
+                            $contentType->getId()
+                        ));
+                    }
+
+                    $instance = $container->get($contentType->getService());
+
+                    if ($instance instanceof ContentTypes\AbstractType) {
+                        $jarvesContentRender->addType(
+                            $contentType->getId(),
+                            $container->get($contentType->getService())
+                        );
+                    } else {
+                        throw new \RuntimeException(sprintf(
+                            'Content type %s:%s with service %s has wrong parent class',
+                            $bundleConfig->getName(),
+                            $contentType->getId(),
+                            $contentType->getService()
+                        ));
+                    }
+                }
+            }
+        }
     }
 
     /**

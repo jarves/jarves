@@ -18,5 +18,9 @@ use Jarves\Model\Base\Content as BaseContent;
 
 class Content extends BaseContent implements ContentInterface
 {
+    public function setType($v)
+    {
+        return parent::setType(strtolower($v));
+    }
 
 }

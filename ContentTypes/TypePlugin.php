@@ -202,12 +202,13 @@ class TypePlugin extends AbstractType
                     KernelEvents::EXCEPTION,
                     $callable
                 );
+
                 $dispatcher->removeListener(
                     KernelEvents::VIEW,
                     $fixResponse
                 );
 
-                return $ob . $response->getContent();
+                return trim($ob) . $response->getContent();
             } else {
                 return sprintf(
                     'Plugin `%s` in bundle `%s` does not exist. You probably have to install the bundle first.',

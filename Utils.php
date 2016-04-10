@@ -70,7 +70,7 @@ class Utils
 
         $changes = [];
         foreach ($definition->getFields() as $field) {
-            if (!$field->getFieldType()->isDiffAllowed()) {
+            if ($field->hasFieldType() && !$field->getFieldType()->isDiffAllowed()) {
                 //todo, made $field->isDiffAllowed() as well
                 continue;
             }

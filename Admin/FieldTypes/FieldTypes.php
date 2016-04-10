@@ -35,26 +35,36 @@ class FieldTypes {
 
 
     /**
-     * @param string $alias
+     * @param string $id
      * @param string $fieldTypeServiceId
      */
-    public function addType($alias, $fieldTypeServiceId)
+    public function addType($id, $fieldTypeServiceId)
     {
-        $this->types[strtolower($alias)] = $fieldTypeServiceId;
+        $this->types[strtolower($id)] = $fieldTypeServiceId;
     }
 
     /**
-     * @param string $alias
+     * @param string $id
      * @return TypeInterface
      * @throws TypeNotFoundException
      */
-    public function newType($alias)
+    public function newType($id)
     {
-        if ($serviceId = @$this->types[strtolower($alias)]) {
+        if ($serviceId = @$this->types[strtolower($id)]) {
             return $this->container->get($serviceId);
         }
 
-        throw new TypeNotFoundException(sprintf('FieldType `%s` not found. You should create a service that implements Jarves\Admin\FieldTypes\TypeInterface and tag it with `jarves.field.type`', $alias));
+        throw new TypeNotFoundException(sprintf('FieldType `%s` not found. You should create a service that implements ' .
+            'Jarves\Admin\FieldTypes\TypeInterface and add a <field-type> configuration', $id));
+    }
+
+    /**
+     * @param string $id
+     * @return bool
+     */
+    public function hasType($id)
+    {
+        return isset($this->types[strtolower($id)]);
     }
 
     /**

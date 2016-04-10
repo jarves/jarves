@@ -28,11 +28,9 @@ Installation
 
 This describes the customized installation, usually used by developers.
 
-A end-user zip package can be downloaded at http://jarves.io when we've released the first alpha version
+Read the [development installation documentation](http://jarves.io/documentation/quick-start/installation).
 
-Read the [development installation documentation](Resources/doc/installation.md).
-
-Read the [Create A Theme documentation](Resources/doc/create-a-theme.md), to create layouts for your website.
+Read the [Create A Theme documentation](http://jarves.io/documentation/quick-start/create-a-theme), to create layouts for your website.
 
 Extensions
 ----------
@@ -75,12 +73,12 @@ Features
 Screenshot
 ----------
 
-![Administration Login](http://jarves.io/screens/0.png)
+![Administration Login](http://jarves.io/bundles/app/images/screenhots/admin-login.png)
 
 ### Frontend inline editing
 
-![Administration Frontend Edit](Resources/doc/images/admin-frontend-edit.png)
-![Administration Frontend Edit 2](Resources/doc/images/admin-frontend-edit-content-elements.png)
+![Administration Frontend Edit](http://jarves.io/bundles/app/images/screenhots/admin-frontend-edit.png)
+![Administration Frontend Edit 2](http://jarves.io/bundles/app/images/screenhots/admin-frontend-edit-content-elements.png)
 
 ### File manager
 
