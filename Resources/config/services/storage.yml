@@ -1,4 +1,8 @@
 services:
+  jarves.storage_factory:
+    class: Jarves\Storage\StorageFactory
+    arguments: ["@service_container"]
+
   jarves.storage.propel:
     class: Jarves\Storage\Propel
     shared: false

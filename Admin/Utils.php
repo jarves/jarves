@@ -28,31 +28,6 @@ class Utils
     {
         $this->jarves = $jarves;
     }
-
-    public function clearCache()
-    {
-//        \Jarves\TempFile::remove('cache-object');
-//        \Jarves\TempFile::remove('smarty-compile');
-//
-//        \Jarves\WebFile::remove('cache');
-//        \Jarves\WebFile::createFolder('cache');
-
-        foreach ($this->jarves->getBundles() as $bundleName => $bundle) {
-            $this->clearBundleCache($bundleName);
-        }
-
-        return true;
-    }
-
-    public function clearBundleCache($bundleName)
-    {
-        $config = $this->jarves->getBundle($bundleName);
-
-//        if ($config) {
-//            $this->jarves->invalidateCache(strtolower($config->getName()));
-//        }
-    }
-
     /**
      * Gets the item from the administration entry points defined in the config.json, by the given code.
      *

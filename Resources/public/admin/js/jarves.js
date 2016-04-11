@@ -1094,6 +1094,8 @@ jarves.loadSettings = function(keyLimitation, callback) {
  */
 jarves.getConfig = function(bundleName) {
     if (!bundleName) return;
+
+    bundleName = bundleName.split('/')[0];
     return jarves.settings.configs[bundleName] || jarves.settings.configs[bundleName.toLowerCase()] || jarves.settings.configsAlias[bundleName] || jarves.settings.configsAlias[bundleName.toLowerCase()];
 };
 

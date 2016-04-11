@@ -1,4 +1,16 @@
 <?php
+/**
+ * This file is part of Jarves.
+ *
+ * (c) Marc J. Schmidt <marc@marcjschmidt.de>
+ *
+ *     J.A.R.V.E.S - Just A Rather Very Easy [content management] System.
+ *
+ *     http://jarves.io
+ *
+ * To get the full copyright and license information, please view the
+ * LICENSE file, that was distributed with this source code.
+ */
 
 namespace Jarves\Storage;
 
@@ -11,6 +23,8 @@ use Jarves\Exceptions\NotADirectoryException;
 use Jarves\Filesystem\WebFilesystem;
 use Jarves\Jarves;
 use Jarves\Tools;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 class FileStorage extends AbstractStorage
 {
@@ -44,6 +58,54 @@ class FileStorage extends AbstractStorage
         $this->webFilesystem = $webFilesystem;
         $this->acl = $acl;
         $this->conditionOperator = $conditionOperator;
+    }
+
+    public function search($query, Condition $condition = null, $max = 20)
+    {
+        $result = [];
+
+        $finder = Finder::create()
+            ->in('web')
+            ->followLinks()
+            ->exclude('cache')
+            ->exclude('bundles/jarves')
+        ;
+
+        $query = trim($query);
+
+        $regexSearch = true;
+        $regex = '/' . str_replace(['\*', '_'], ['.*', '.'], preg_quote($query, '/'))  . '/';
+        if (preg_match('/^[a-zA-Z\_\-\.]+\*?$/', $query)) {
+            //onl query like 'test*';
+            $regexSearch = false;
+            $query = rtrim($query, '*');
+        }
+
+        /** @var SplFileInfo $file */
+        foreach ($finder as $file) {
+            $path = substr($file->getPath() . '/'. $file->getFilename(), 4);
+
+            if ($regexSearch) {
+                if (!preg_match($regex, $file->getFilename())) {
+                    continue;
+                }
+            } else {
+                if (0 !== strpos($file->getFilename(), $query)) {
+                    continue;
+                }
+            }
+
+            $result[] = [
+                'path' => $path,
+                '_label' => $path
+            ];
+
+            if (count($result) >= $result) {
+                return $result;
+            }
+        }
+
+        return $result;
     }
 
     public function patch($pk, $values)

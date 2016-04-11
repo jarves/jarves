@@ -5,11 +5,16 @@ namespace Jarves\Controller\Admin;
 use FOS\RestBundle\Request\ParamFetcher;
 use Jarves\ACL;
 use Jarves\Admin\Utils;
+use Jarves\Cache\Cacher;
+use Jarves\Configuration\Condition;
+use Jarves\Filesystem\Filesystem;
 use Jarves\Jarves;
 use Jarves\Model\Base\GroupQuery;
 use Jarves\Model\LanguageQuery;
 use Jarves\PageStack;
 use Jarves\Properties;
+use Jarves\Storage\AbstractStorage;
+use Jarves\Storage\StorageFactory;
 use Jarves\Tools;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -17,6 +22,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class BackendController extends Controller
@@ -54,6 +60,53 @@ class BackendController extends Controller
     /**
      * @ApiDoc(
      *  section="Backend",
+     *  description="Search in all objects"
+     * )
+     *
+     * @Rest\QueryParam(name="query", requirements=".+", strict=true, description="A query")
+     *
+     * @Rest\Get("/admin/backend/search")
+     *
+     * @return bool
+     */
+    public function searchAction(ParamFetcher $paramFetcher)
+    {
+        $query = $paramFetcher->get('query');
+        $result = [
+            'errors' => [],
+            'items' => []
+        ];
+
+        /** @var StorageFactory $storageFactory */
+        $storageFactory = $this->get('jarves.storage_factory');
+
+        $condition = new Condition();
+
+        foreach ($this->jarves->getConfigs()->getConfigs() as $bundleConfig) {
+            if (!$bundleConfig->getObjects()) {
+                continue;
+            }
+
+            foreach ($bundleConfig->getObjects() as $object) {
+                /** @var AbstractStorage $storage */
+                $storage = $storageFactory->createStorage($object);
+
+                try {
+                    if ($searchResult = $storage->search($query, clone $condition)) {
+                        $result['items'][$object->getKey()] = $searchResult;
+                    };
+                } catch (\Exception $e) {
+                    $result['errors'][$object->getKey()] = get_class($e) . ': ' . $e->getMessage();
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @ApiDoc(
+     *  section="Backend",
      *  description="Clears the cache"
      * )
      *
@@ -63,9 +116,29 @@ class BackendController extends Controller
      */
     public function clearCacheAction()
     {
-        $utils = new Utils($this->jarves);
+        /** @var Cacher $cacher */
+        $cacher = $this->get('jarves.cache.cacher');
 
-        $utils->clearCache();
+        /** @var \AppKernel $kernel */
+        $kernel = $this->get('kernel');
+
+        /** @var Filesystem $localFilesystem */
+        $localFilesystem = $this->get('jarves.filesystem.local');
+        $localFilesystem->remove($kernel->getCacheDir());
+        $localFilesystem->mkdir($kernel->getCacheDir());
+
+        /** @var StorageFactory $storageFactory */
+        $storageFactory = $this->get('jarves.storage_factory');
+
+        foreach ($this->jarves->getConfigs()->getConfigs() as $bundleConfig) {
+            $cacher->invalidateCache($bundleConfig->getName());
+
+            foreach ($bundleConfig->getObjects() as $object) {
+                /** @var AbstractStorage $storage */
+                $storage = $storageFactory->createStorage($object);
+                $storage->clearCache();
+            }
+        }
 
         return true;
     }

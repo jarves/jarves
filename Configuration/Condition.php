@@ -1,4 +1,16 @@
 <?php
+/**
+ * This file is part of Jarves.
+ *
+ * (c) Marc J. Schmidt <marc@marcjschmidt.de>
+ *
+ *     J.A.R.V.E.S - Just A Rather Very Easy [content management] System.
+ *
+ *     http://jarves.io
+ *
+ * To get the full copyright and license information, please view the
+ * LICENSE file, that was distributed with this source code.
+ */
 
 namespace Jarves\Configuration;
 
@@ -366,5 +378,14 @@ class Condition extends Model
     public function setRules($rules)
     {
         $this->rules = $rules;
+    }
+
+    public function __clone()
+    {
+        foreach ($this->rules as $key => $rule) {
+            if (is_object($rule)) {
+                $this->rules[$key] = clone $rule;
+            }
+        }
     }
 }

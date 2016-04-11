@@ -1,6 +1,19 @@
 <?php
+/**
+ * This file is part of Jarves.
+ *
+ * (c) Marc J. Schmidt <marc@marcjschmidt.de>
+ *
+ *     J.A.R.V.E.S - Just A Rather Very Easy [content management] System.
+ *
+ *     http://jarves.io
+ *
+ * To get the full copyright and license information, please view the
+ * LICENSE file, that was distributed with this source code.
+ */
 
 namespace Jarves\Storage;
+
 use Jarves\Configuration\Condition;
 use Jarves\Jarves;
 use Jarves\Tools;
@@ -82,6 +95,25 @@ abstract class AbstractStorage
 
     }
 
+    /**
+     * Executes a search to this object, filter by $query and optional by a more complet condition $condition.
+     *
+     * Returns a array of object items. Necessary fields are all primary keys and the label field, defined
+     * in Object::$labelField or Object::$treeLabel.
+     *
+     * Optional is a field key '_label', which is being used as label in the search interfaces as label.
+     *
+     * @param string $query
+     * @param Condition|null $condition
+     * @param int $max
+     *
+     * @return array|null
+     */
+    public function search($query, Condition $condition = null, $max = 20)
+    {
+
+    }
+
     public function getDefinition()
     {
         return $this->definition;
@@ -117,7 +149,7 @@ abstract class AbstractStorage
      *
      * @return array
      */
-    public function &getField($fieldKey)
+    public function getField($fieldKey)
     {
         return $this->definition['fields'][$fieldKey];
     }

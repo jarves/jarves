@@ -171,6 +171,7 @@ class TypeObject extends AbstractType
             if (!$crossObject = $configs->getObject($possibleObjectKey)) {
                 $crossObject = new Object(null, $objectDefinition->getJarves());
                 $crossObject->setId($possibleObjectName);
+                $crossObject->setSearchable(false);
                 $crossObject->setTable(
                     $objectDefinition->getTable() . '_' . Tools::camelcase2Underscore($foreignObjectDefinition->getId())
                 );

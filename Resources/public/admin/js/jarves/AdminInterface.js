@@ -260,7 +260,9 @@ jarves.AdminInterface = new Class({
 
         this.mainMenuSearchInput = new Element('input', {
             'class': 'jarves-Input-text jarves-main-menu-actions-search-input'
-        }).inject(this.mainMenuActions);
+        })
+            .addEvent('keyup', this.searchKeyUp.bind(this))
+            .inject(this.mainMenuActions);
 
         this.mainMenuActionsLinks = new Element('div', {
             'class': 'jarves-main-menu-actions-links'
@@ -268,11 +270,14 @@ jarves.AdminInterface = new Class({
 
         this.mainMenuActionsSearchBtn = new Element('a', {
             text: 'Search'
-        }).inject(this.mainMenuActionsLinks);
+        })
+            .inject(this.mainMenuActionsLinks);
 
         this.mainMenuActionsCacheBtn = new Element('a', {
             text: 'Wipe Cache'
-        }).inject(this.mainMenuActionsLinks);
+        })
+            .addEvent('click', this.clearCache.bind(this))
+            .inject(this.mainMenuActionsLinks);
 
         this.mainMenuActionsLogoutBtn = new Element('a', {
             text: 'Logout'
@@ -340,14 +345,52 @@ jarves.AdminInterface = new Class({
     },
 
     clearCache: function() {
+
         if (!this.cacheToolTip) {
-            this.cacheToolTip = new jarves.Tooltip(this.clearCacheBtn, t('Clearing cache ...'), 'top');
+            this.cacheToolTip = new jarves.Tooltip(this.mainMenuActionsCacheBtn, t('Clearing cache ...'), 'top');
         }
         this.cacheToolTip.show();
 
         new Request.JSON({url: _pathAdmin + 'admin/backend/cache', noCache: 1, onComplete: function(res) {
             this.cacheToolTip.stop(t('Cache cleared'));
         }.bind(this)}).requestDelete();
+    },
+
+    lastSearchTimer: null,
+
+    searchKeyUp: function(event){
+        if ('esc' === event.key) {
+            clearTimeout(this.lastSearchTimer);
+            this.closeSearch();
+            return;
+        }
+
+        var query = this.mainMenuSearchInput.value;
+
+        if (this.lastSearchTimer) {
+            clearTimeout(this.lastSearchTimer);
+        }
+
+        this.lastSearchTimer = setTimeout(function() {
+            this.lastSearchTimer = null;
+            this.doSearch(query);
+        }.bind(this), 100);
+    },
+
+    doSearch: function(query) {
+        new Request.JSON({url: _pathAdmin + 'admin/backend/search', noCache: 1, onComplete: function(res) {
+            if (!res.data) return;
+
+            this.showSearch(res.data);
+        }.bind(this)}).get({query: query});
+    },
+
+    showSearch: function(data){
+
+    },
+
+    closeSearch: function() {
+        this.searchResultContainer.addClass('close');
     },
 
     /*

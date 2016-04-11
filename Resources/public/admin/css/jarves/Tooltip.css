@@ -52,16 +52,16 @@
     bottom: -6px;
 }
 
-.jarves-tooltip-corner-top {
-    background-image: url(../images/jarves-tooltip-corner-top.png);
-    bottom: 17px;
-}
+/*.jarves-tooltip-corner-top {*/
+    /*background-image: url(../images/jarves-tooltip-corner-top.png);*/
+    /*bottom: 17px;*/
+/*}*/
 
-.jarves-tooltip-corner-left {
-    background-image: url(../images/jarves-tooltip-corner-left.png);
-    bottom: 5px;
-    left: -18px;
-}
+/*.jarves-tooltip-corner-left {*/
+    /*background-image: url(../images/jarves-tooltip-corner-left.png);*/
+    /*bottom: 5px;*/
+    /*left: -18px;*/
+/*}*/
 
 .jarves-tooltip-text {
     padding: 5px 8px;

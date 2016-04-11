@@ -1,4 +1,16 @@
 <?php
+/**
+ * This file is part of Jarves.
+ *
+ * (c) Marc J. Schmidt <marc@marcjschmidt.de>
+ *
+ *     J.A.R.V.E.S - Just A Rather Very Easy [content management] System.
+ *
+ *     http://jarves.io
+ *
+ * To get the full copyright and license information, please view the
+ * LICENSE file, that was distributed with this source code.
+ */
 
 namespace Jarves\Storage;
 
@@ -105,6 +117,73 @@ class Propel extends AbstractStorage
         $class::clearInstancePool();
         $class::clearRelatedInstancePool();
     }
+
+    public function search($query, Condition $condition = null, $max = 20)
+    {
+        if (!$this->definition->isSearchable()) {
+            return null;
+        }
+
+        $fields = [];
+        $options = [];
+        $filter = [];
+        $queryCondition = new Condition();
+
+        if ($fieldName = $this->definition->getLabelField()) {
+            $fields[] = $fieldName;
+
+            $queryCondition->addAnd([
+                $fieldName,
+                'LIKE',
+                str_replace('*', '%', $query)
+            ]);
+
+            $condition->addAnd($queryCondition);
+        }
+
+        if ($this->definition->getTreeLabel()) {
+            $fields[] = $this->definition->getTreeLabel();
+        }
+
+        $this->init();
+        $query = $this->getQueryClass();
+        list($fields, $relations, $relationFields) = $this->getFields($fields);
+        $selects = array_keys($fields);
+
+        $query->limit($max);
+
+        $this->mapOptions($query, $options);
+        $this->mapToOneRelationFields($query, $relations, $relationFields);
+        $this->mapFilter($query, $filter);
+
+        if ($this->definition->isNested()) {
+            $query->filterByLft(1, Criteria::GREATER_THAN);
+            $selects[] = 'Lft';
+            $selects[] = 'Rgt';
+            $selects[] = 'Lvl';
+        }
+
+        $query->select($selects);
+
+        $stmt = $this->getStm($query, $condition);
+
+        $clazz = $this->getPhpName();
+
+        $result = [];
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $result[] = $this->populateRow(
+                $clazz,
+                $row,
+                $selects,
+                $relations,
+                $relationFields,
+                isset($options['permissionCheck']) ? $options['permissionCheck'] : null
+            );
+        }
+
+        return $result;
+    }
+
 
     /**
      * Propel uses for his nested-set objects `lft` and `rgt` fields.
@@ -488,7 +567,12 @@ class Propel extends AbstractStorage
         }
 
         /** @var \PDOStatement $stmt */
-        $stmt = $con->prepare($sql);
+        try {
+            $stmt = $con->prepare($sql);
+        } catch (\PDOException $e) {
+            echo $sql;
+            throw $e;
+        }
         $db->bindValues($stmt, $params, $dbMap);
 
         if ($condition2Params) {

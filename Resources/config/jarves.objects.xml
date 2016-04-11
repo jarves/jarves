@@ -214,6 +214,7 @@
       <object id="Language">
         <label>Language</label>
         <table>system_langs</table>
+        <searchable>false</searchable>
         <storageService>jarves.storage.language</storageService>
         <labelField>title</labelField>
         <labelTemplate>{{title}} ({{langtitle}}, {{code}})</labelTemplate>
@@ -230,6 +231,7 @@
       <object id="Workspace">
         <label>Workspace</label>
         <table>system_workspace</table>
+        <searchable>false</searchable>
         <fields>
           <field id="id" type="number" primaryKey="true" autoIncrement="true"/>
           <field id="title" type="text">
@@ -371,10 +373,11 @@
           <field id="description" type="text"/>
         </browserColumns>
       </object>
-      <object id="NewsFeed" crossRef="false">
+      <object id="NewsFeed">
         <label>News Feed</label>
         <table>system_news_feed</table>
         <labelField>title</labelField>
+        <searchable>false</searchable>
         <fields>
           <field id="id" type="number" primaryKey="true" autoIncrement="true">
             <label>id</label>

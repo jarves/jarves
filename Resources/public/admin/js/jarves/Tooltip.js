@@ -45,10 +45,10 @@ jarves.Tooltip = new Class({
         var tparent = this.target.getParent('div.jarves-Window-border');
 
         if (!tparent) {
-            if (this.target.get('class').contains('jarves-Button')) {
+            if (this.target.hasClass('jarves-Button')) {
                 tparent = this.target.getParent();
             } else {
-                tparent = document.body;
+                tparent = this.target.getParent('.jarves-admin');
             }
         }
 

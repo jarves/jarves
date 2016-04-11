@@ -1,4 +1,16 @@
 <?php
+/**
+ * This file is part of Jarves.
+ *
+ * (c) Marc J. Schmidt <marc@marcjschmidt.de>
+ *
+ *     J.A.R.V.E.S - Just A Rather Very Easy [content management] System.
+ *
+ *     http://jarves.io
+ *
+ * To get the full copyright and license information, please view the
+ * LICENSE file, that was distributed with this source code.
+ */
 
 namespace Jarves\Configuration;
 
@@ -375,6 +387,13 @@ class Object extends Model
      * @var bool
      */
     protected $crossRef = false;
+
+    /**
+     * Whether this object can be searched in the administration search.
+     *
+     * @var bool
+     */
+    protected $searchable = true;
 
     /**
      * Do whatever is needed to setup the runtime environment correctly.
@@ -1473,5 +1492,29 @@ class Object extends Model
     public function getListEntryPoint()
     {
         return $this->listEntryPoint;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isSearchable()
+    {
+        return $this->searchable;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getSearchable()
+    {
+        return $this->searchable;
+    }
+
+    /**
+     * @param boolean $searchable
+     */
+    public function setSearchable($searchable)
+    {
+        $this->searchable = $this->bool($searchable);
     }
 }
