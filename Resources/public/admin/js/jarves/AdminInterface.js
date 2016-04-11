@@ -1069,10 +1069,10 @@ jarves.AdminInterface = new Class({
 
         this.mainMenuContainer.empty();
 
-        this.btnOpenDashboard = new Element('a', {
-            text: 'Dashboard',
-            'class': 'jarves-mainMenu-link icon-stats-up'
-        }).addEvent('click', this.openDashboard.bind(this)).inject(this.mainMenuContainer);
+        // this.btnOpenDashboard = new Element('a', {
+        //     text: 'Dashboard',
+        //     'class': 'jarves-mainMenu-link icon-stats-up'
+        // }).addEvent('click', this.openDashboard.bind(this)).inject(this.mainMenuContainer);
 
         this.mainMenu = new jarves.MainMenu(this.mainMenuContainer, this.getMenuItems());
     },

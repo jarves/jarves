@@ -9,7 +9,7 @@
           </entryPoint>
         </children>
       </entryPoint>
-      <entryPoint path="dashboard" icon="#icon-chart-5">
+      <entryPoint path="dashboard" type="custom" icon="#icon-stats-up" link="true">
         <label>Dashboard</label>
       </entryPoint>
       <entryPoint path="pages" type="custom" icon="#icon-monitor" link="true">

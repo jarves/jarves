@@ -1114,7 +1114,12 @@ jarves.Window = new Class({
         return this.mainLayout;
     },
 
+    hideHead: function() {
+        this.mainLayout.hideRow(1);
+    },
+
     extendHead: function () {
+        this.mainLayout.showRow(1);
     },
 
     addTabGroup: function () {

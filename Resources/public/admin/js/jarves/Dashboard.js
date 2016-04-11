@@ -49,6 +49,7 @@ jarves.Dashboard = new Class({
             'jarves.DashboardWidgets.Latency',
             'jarves.DashboardWidgets.LatencyChart',
             'jarves.DashboardWidgets.Uptime',
+            'jarves.DashboardWidgets.NewsFeed',
             'jarves.DashboardWidgets.Load',
             'jarves.DashboardWidgets.Space',
             'jarves.DashboardWidgets.Apc'
@@ -57,12 +58,12 @@ jarves.Dashboard = new Class({
             this.widgets.push(new clazz(this.main));
         }.bind(this));
 
-        [
-            'jarves.DashboardWidgets.NewsFeed'
-        ].each(function (clazz) {
-            clazz = jarves.getClass(clazz);
-            this.widgets.push(new clazz(this.main));
-        }.bind(this));
+        // [
+        //     'jarves.DashboardWidgets.NewsFeed'
+        // ].each(function (clazz) {
+        //     clazz = jarves.getClass(clazz);
+        //     this.widgets.push(new clazz(this.main));
+        // }.bind(this));
 
 
 
