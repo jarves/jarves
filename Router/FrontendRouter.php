@@ -242,7 +242,7 @@ class FrontendRouter
 
     public function registerMainPage(Node $page)
     {
-        $domain = $page->getDomain();
+        $domain = $this->pageStack->getDomain($page->getDomainId());
 
         $clazz = 'jarves.page_controller';
         $domainUrl = $domain->getMaster() ? '' : '/' . $domain->getLang();
@@ -279,7 +279,7 @@ class FrontendRouter
 
     public function registerPluginRoutes(Node $page)
     {
-        $domain = $page->getDomain();
+        $domain = $this->pageStack->getDomain($page->getDomainId());
 
         $this->stopwatch->start('Register Plugin Routes');
         //add all router to current router and fire sub-request

@@ -50,6 +50,11 @@ class AuthTestCase extends KernelAwareTestCase
                 'groups' => [$this->testGroupPk['id']]
             ]
         );
+
+        $user = $this->getObjects()->get('jarves/user', $this->userPk['id']);
+
+        $this->assertEquals(1, count($user['groups']));
+        $this->assertEquals($this->testGroupPk['id'], $user['groups'][0]['id']);
     }
 
     public function tearDown()

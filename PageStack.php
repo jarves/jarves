@@ -232,7 +232,8 @@ class PageStack
 
 
     /**
-     * Returns Domain object
+     * Returns Domain object. This tries to cache the domain, so its a faster access method than using
+     * DomainQuery classes.
      *
      * @param int $domainId If not defined, it returns the current domain.
      *
@@ -395,7 +396,7 @@ class PageStack
     {
         $id2 = null;
 
-        $page2Domain = $this->cacher->getDistributedCache('core/node/toDomains');
+        $page2Domain = $this->cacher->getDistributedCache('core/node/to-domain');
 
         if (!is_array($page2Domain)) {
             $page2Domain = $this->updatePage2DomainCache();
@@ -423,7 +424,7 @@ class PageStack
             $r2d[$item['DomainId']] = (isset($r2d[$item['DomainId']]) ? $r2d[$item['DomainId']] : '') . $item['Id'] . ',';
         }
 
-        $this->cacher->setDistributedCache('core/node/toDomains', $r2d);
+        $this->cacher->setDistributedCache('core/node/to-domain', $r2d);
 
         return $r2d;
     }

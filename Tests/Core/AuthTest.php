@@ -61,6 +61,7 @@ class AuthTest extends AuthTestCase
             TableMap::TYPE_CAMELNAME
         );
         $acl->save();
+        $this->getCacher()->invalidateCache('core/acl');
 
         $response = $this->restCall('/jarves/admin/login', 'POST', ['username' => 'test', 'password' => 'test']);
 

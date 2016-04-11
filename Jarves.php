@@ -621,7 +621,7 @@ class Jarves
      * Loads all configurations from all registered bundles (BundleName/Resources/config/jarves*.xml)
      * @param Cacher $cacher
      *
-     * @return bool return true when configs didn't come from the cache and needs a boot first
+     * @return null|callable returns a callable that should be called when config stuff have been registered
      */
     public function loadBundleConfigs(Cacher $cacher)
     {
@@ -646,16 +646,17 @@ class Jarves
 
         if (!$this->configs) {
             $this->configs = new Configuration\Configs($this, $bundles);
-            $cached = serialize(
-                [
-                    'md5' => $hash,
-                    'data' => $this->configs
-                ]
-            );
 
-            $cacher->setFastCache('core/configs', $cached);
+            return function() use ($hash, $cacher) {
+                $cached = serialize(
+                    [
+                        'md5' => $hash,
+                        'data' => $this->configs
+                    ]
+                );
 
-            return true;
+                $cacher->setFastCache('core/configs', $cached);
+            };
         }
     }
 

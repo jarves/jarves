@@ -111,10 +111,12 @@ class JarvesBundle extends Bundle
         /** @var $jarvesEventDispatcher JarvesEventDispatcher */
         $jarvesEventDispatcher = $container->get('jarves.event_dispatcher');
 
-        if ($bootNeeded = $jarves->loadBundleConfigs($cacher)) {
-            $this->registerContentTypes($jarves, $container);
-            $this->registerFieldTypes($jarves, $container);
+        $bootNeededCallback = $jarves->loadBundleConfigs($cacher);
+        $this->registerContentTypes($jarves, $container);
+        $this->registerFieldTypes($jarves, $container);
+        if ($bootNeededCallback) {
             $jarves->getConfigs()->boot();
+            $bootNeededCallback();
         }
 
         $jarves->prepareWebSymlinks();

@@ -158,9 +158,9 @@ class FrontendRouteListener extends RouterListener
                     $route = $this->routes->get($name);
                     $nodeId = $route->getDefault('nodeId');
 
-                    $node = NodeQuery::create()->joinWithDomain()->findPk($nodeId);
+                    $node = $this->pageStack->getPage($nodeId);
                     $this->pageStack->setCurrentPage($node);
-                    $this->pageStack->setCurrentDomain($node->getDomain());
+                    $this->pageStack->setCurrentDomain($this->pageStack->getDomain($node->getDomainId()));
                 }
             }
         } catch (MethodNotAllowedException $e) {

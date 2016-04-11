@@ -106,19 +106,23 @@ class Files extends AbstractCache
             $tries++;
         }
 
-        if (!$this->useJson) {
-            $value = include($path);
-        } else {
+        if ($this->useJson) {
             $value = '';
             while (!feof($h)) {
                 $value .= fread($h, 8192);
             }
+        } else {
+            $value = include($path);
         }
 
         flock($h, LOCK_UN);
         fclose($h);
 
-        return $value;
+        if ($this->useJson) {
+            return json_decode($value, true);
+        } else {
+            return $value;
+        }
     }
 
     /**
@@ -131,10 +135,10 @@ class Files extends AbstractCache
             mkdir(dirname($path), 0777, true);
         }
 
-        if (!$this->useJson) {
-            $value = '<' . "?php \nreturn " . var_export($value, true) . ";\n";
-        } else {
+        if ($this->useJson) {
             $value = json_encode($value);
+        } else {
+            $value = '<' . "?php \nreturn " . var_export($value, true) . ";\n";
         }
 
         $h = fopen($path, 'w');

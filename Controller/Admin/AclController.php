@@ -111,7 +111,6 @@ class AclController extends Controller
         }
 
         $this->cacher->invalidateCache('core/acl');
-        $this->cacher->invalidateCache('core/acl-rules');
 
         return true;
     }

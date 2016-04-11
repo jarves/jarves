@@ -160,7 +160,7 @@ class ACL
      * @return mixed
      *
      */
-    public function &getRules($objectKey, $mode = 1, $targetType = null, $targetId = null)
+    public function getRules($objectKey, $mode = 1, $targetType = null, $targetId = null)
     {
         $objectKey = Objects::normalizeObjectKey($objectKey);
 
@@ -188,7 +188,7 @@ class ACL
         $cacheKey = '';
         if ($this->getCaching()) {
             $cacheKey = md5($targetType.'.'.$targetId.'.'.$inGroups.'.'.$objectKey . '.' . $mode);
-            $cached = $this->cacher->getDistributedCache('core/acl-rules/' . $cacheKey);
+            $cached = $this->cacher->getDistributedCache('core/acl/rules/' . $cacheKey);
             if (null !== $cached) {
                 return $cached;
             }
@@ -245,7 +245,7 @@ class ACL
         }
 
         if ($this->getCaching()) {
-            $this->cacher->setDistributedCache('core/acl-rules/' . $cacheKey, $rules);
+            $this->cacher->setDistributedCache('core/acl/rules/' . $cacheKey, $rules);
             return $rules;
         } else {
             return $rules;
@@ -273,7 +273,7 @@ class ACL
     {
         $objectKey = Objects::normalizeObjectKey($objectKey);
         $obj = $this->getObjects()->getStorageController($objectKey);
-        $rules =& self::getRules($objectKey, static::LISTING);
+        $rules = self::getRules($objectKey, static::LISTING);
 
         if (count($rules) == 0) {
             return null;
@@ -281,7 +281,7 @@ class ACL
 
         if ($this->getCaching()) {
             $cacheKey = md5($objectKey);
-            $cached = $this->cacher->getDistributedCache('core/acl-listing/' . $cacheKey);
+            $cached = $this->cacher->getDistributedCache('core/acl/listing/' . $cacheKey);
             if (null !== $cached) {
                 return $cached;
             }
@@ -342,7 +342,8 @@ class ACL
         }
 
         if ($this->getCaching()) {
-            $this->cacher->setDistributedCache('core/acl-listing/' . $cacheKey, $conditionObject);
+            $cacheKey = md5($objectKey);
+            $this->cacher->setDistributedCache('core/acl/listing/' . $cacheKey, $conditionObject);
         }
 
         return $conditionObject;
@@ -676,7 +677,6 @@ class ACL
         }
 
         $rules = self::getRules($objectKey, $mode, $targetType, $targetId);
-
         if (count($rules) == 0) {
             return false;
         }
@@ -881,7 +881,7 @@ class ACL
     {
 
         self::normalizeCode($code);
-        $acls =& self::getRules($object);
+        $acls = self::getRules($object);
 
         foreach ($acls as $item) {
             $code2 = str_replace('%', '', $item['code']);

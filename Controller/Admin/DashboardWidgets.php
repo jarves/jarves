@@ -198,9 +198,11 @@ class DashboardWidgets
     public function getRamSize()
     {
         if ('darwin' == strtolower(PHP_OS)) {
-            $sysctl = `sysctl hw.memsize`;
-            $matches = array();
+            $sysctl = `/usr/sbin/sysctl hw.memsize`;
             preg_match('/hw.memsize: ([0-9\.]*)/', $sysctl, $matches);
+            if (!$matches) {
+                return 0;
+            }
             return ($matches[1] + 0) / 1024;
         } else if ('linux' === strtolower(PHP_OS)) {
             $sysctl = `free`;
@@ -215,9 +217,12 @@ class DashboardWidgets
     public function getCpuCoreCount()
     {
         if ('darwin' === strtolower(PHP_OS)) {
-            $sysctl = `sysctl hw.ncpu`;
+            $sysctl = `/usr/sbin/sysctl hw.ncpu`;
             $matches = array();
             preg_match('/hw.ncpu: ([0-9\.]*)/', $sysctl, $matches);
+            if (!$matches) {
+                return 0;
+            }
             return $matches[1] + 0;
         } else if ('linux' === strtolower(PHP_OS)) {
             return (`nproc`) + 0;
@@ -232,7 +237,11 @@ class DashboardWidgets
         $cpuUsage = str_replace(' ', '', `ps -A -o %cpu`);
         $processes = explode("\n", $cpuUsage);
         $cpuUsage = array_sum($processes);
-        return $cpuUsage / self::getCpuCoreCount();
+        if (self::getCpuCoreCount()) {
+            return $cpuUsage / self::getCpuCoreCount();
+        } else {
+            return 0;
+        }
     }
 
 }

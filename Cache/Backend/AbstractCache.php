@@ -39,23 +39,6 @@ abstract class AbstractCache implements CacheInterface
     public $cache = array();
 
     /**
-     * This activates the invalidate() mechanism
-     *
-     * @type bool
-     *
-     * If activated, each time get() is called, the function searched
-     * for parents based on a exploded string by '/'. If a parent is
-     * found is a invalidated cache, the call is ignored and false will be returned.
-     * Example: call get('workspace/tables/tableA')
-     *          => checks 'workspace/tables' for invalidating (getInvalidate('workspace/tables'))
-     *          => if 'workspace/tables' was flagged as invalidate (invalidate('workspace/tables')), return false
-     *          => checks 'workspace' for invalidating (getInvalidate('workspace'))
-     *          => if 'workspace' was flagged as invalidate (invalidate('workspace')), return false
-     * So you can invalidate multiple keys with just one call.
-     */
-    public $withInvalidationChecks = true;
-
-    /**
      * All config values as array.
      *
      * @var array
@@ -117,7 +100,7 @@ abstract class AbstractCache implements CacheInterface
      * This should also check whether the driver can be used in general or not (like if a necessary php module
      * is loaded or not).
      *
-     * @param  array   $config
+     * @param  array $config
      *
      * @return boolean returns true if everything is fine, if not it should throw an exception with the detailed issue.
      */
@@ -131,16 +114,16 @@ abstract class AbstractCache implements CacheInterface
      *
      * @param  string $pKey
      *
-     * @return mixed
+     * @return mixed|false return false when cache does not exist
      */
     abstract protected function doGet($pKey);
 
     /**
      * Sets data for a key with a timeout.
      *
-     * @param  string  $pKey
-     * @param  mixed   $pValue
-     * @param  int     $pTimeout
+     * @param  string $pKey
+     * @param  mixed $pValue
+     * @param  int $pTimeout
      *
      * @return boolean
      */
@@ -153,82 +136,44 @@ abstract class AbstractCache implements CacheInterface
      */
     abstract protected function doDelete($pKey);
 
-
     /**
      * Returns data of the specified cache-key.
      *
      * @param string $key
-     * @param bool $withoutValidationCheck
      *
-     * @return string to data
+     * @return mixed
      */
-    public function get($key, $withoutValidationCheck = false)
+    public function get($key)
     {
-        if (!isset($this->cache[$key])) {
-            $this->cache[$key] = $this->doGet($key);
-        }
-
-        if (!$this->cache[$key]) {
-            $rv = null;
-            return $rv;
-        }
-
-        if ($this->withInvalidationChecks && !$withoutValidationCheck) {
-
-//            if ($withoutValidationCheck == true) {
-//                if (!$this->cache[$key]['value'] || !$this->cache[$key]['time']
-//                    || $this->cache[$key]['timeout'] < microtime(true)
-//                ) {
-//                    $null = null;
-//                    return $null;
-//                }
-//
-//                return $this->cache[$key]['value'];
-//            }
-
-            //valid cache
-            //search if a parent has been flagged as invalid
-            if (strpos($key, '/') !== false) {
-
-                $parents = explode('/', $key);
-                $code = '';
-                if (is_array($parents)) {
-                    foreach ($parents as $parent) {
-                        $code .= $parent;
-                        $invalidateTime = $this->getInvalidate($code);
-                        if (is_array($this->cache[$key]) && $invalidateTime && $invalidateTime >= $this->cache[$key]['time']) {
-                            $null = null;
-                            return $null;
-                        }
-                        $code .= '/';
-                    }
-                }
-            }
-        }
-
-        if ($this->withInvalidationChecks && !$withoutValidationCheck) {
-            if (is_array($this->cache[$key])) {
-                return $this->cache[$key]['value'];
-            } else {
-                $null = null;
-                return $null;
-            }
-        } else {
+        if (isset($this->cache[$key])) {
             return $this->cache[$key];
         }
 
+        $cache = $this->doGet($key);
+
+        if (false === $cache) {
+            return null;
+        }
+
+        $this->cache[$key] = json_decode($cache, true);
+
+        return $this->cache[$key];
     }
 
     /**
-     * Returns the invalidation time.
+     * Returns latest invalidation timestamp for the given $key.
      *
-     * @param  string $key
+     * Returns an timestamp as integer which tells the cache handler that all stored caches
+     * before this timestamp are automatically invalidated.
      *
-     * @return string
+     * @param string $key
+     *
+     * @return integer|null
      */
     public function getInvalidate($key)
     {
-        return doubleval($this->get('invalidate-' . $key, true));
+        //do not use internal $cache here, because invalidation should come from one single point of truth.
+        return doubleval($this->doGet('invalidate-' . $key));
     }
 
     /**
@@ -236,15 +181,27 @@ abstract class AbstractCache implements CacheInterface
      *
      * @param string $key
      * @param bool|int $time
-     * 
+     *
      * @return bool
      */
     public function invalidate($key, $time = null)
     {
-        $this->cache['invalidate-' . $key] = $time;
+        if (!$time) {
+            $time = microtime(true);
+        }
 
         $result = $this->doSet('invalidate-' . $key, $time);
         return $result;
+    }
+
+    /**
+     * Removes a invalidation
+     *
+     * @param string $key
+     */
+    public function deleteInvalidate($key)
+    {
+        $this->doDelete('invalidate-' . $key);
     }
 
     /**
@@ -253,7 +210,7 @@ abstract class AbstractCache implements CacheInterface
      * If you want to save php class objects, you should serialize it before.
      *
      * @param string $key
-     * @param mixed $value
+     * @param mixed $value Do not pass objects, use serialize if you want to store php objects
      * @param int $lifeTime In seconds. Default is one hour
      * @param bool $withoutValidationData
      *
@@ -269,17 +226,9 @@ abstract class AbstractCache implements CacheInterface
             $lifeTime = 3600;
         }
 
-        if ($this->withInvalidationChecks && !$withoutValidationData) {
-            $value = array(
-                'timeout' => microtime(true) + $lifeTime,
-                'time' => microtime(true),
-                'value' => $value
-            );
-        }
-
         $this->cache[$key] = $value;
 
-        $result = $this->doSet($key, $value, $lifeTime);
+        $result = $this->doSet($key, json_encode($value), $lifeTime);
         return $result;
     }
 
