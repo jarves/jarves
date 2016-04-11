@@ -202,6 +202,14 @@ jarves.Layout = new Class({
         }
     },
 
+    hideRow: function(row) {
+        this.getRow(row).setStyle('display', 'none');
+    },
+
+    showRow: function(row) {
+        this.getRow(row).setStyle('display', 'table-row');
+    },
+
     getRow: function (row) {
         return this.getVertical().getRow(row);
     },

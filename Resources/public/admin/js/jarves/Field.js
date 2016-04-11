@@ -336,6 +336,9 @@ jarves.Field = new Class({
         var clazz = jarves.FieldTypes[options.type] || jarves.FieldTypes[options.type.capitalize()];
 
         options = Object.merge(options, this.options.options || {});
+        // var fieldOptions = Object.clone(options.options);
+        // delete options.options;
+        // options = Object.merge(options, fieldOptions || {});
 
         if (clazz) {
             this.fieldObject = new clazz(this, options);

@@ -24,6 +24,9 @@ jarves.FieldTypes.PageContents = new Class({
     preview: 0,
     currentNode: null,
     currentDomain: null,
+    currentLayout: null,
+    backupedPageLayout: null,
+    lastKnownPageType: null,
 
     currentContents: null,
 
@@ -45,6 +48,30 @@ jarves.FieldTypes.PageContents = new Class({
             this.container = this.mainLayout.getCell(2, 1);
             this.container.addClass('jarves-ActionBar jarves-Field-Content-ActionBar');
             this.mainLayout.getTd(1, 1).set('colspan', 2);
+
+            if (this.getForm().getField('type')) {
+                this.getForm().getField('type').addEvent('change', function (typeValue) {
+
+                    if (!this.layoutSelection) {
+                        //editor not yet completely loaded through setValue() call, so ignore
+                        return;
+                    }
+
+                    this.updateLayout(typeValue);
+                    // console.log('change type', typeValue, this.lastKnownPageType);
+
+                    if (!this.lastKnownPageType || typeValue !== this.lastKnownPageType) {
+                        if (0 === typeValue) {
+                            //switched from tray to page, so set as layout not `_tray`.
+                            this.loadEditor(this.currentDomain, this.currentNode, this.currentContents, this.backupedPageLayout);
+                        } else {
+                            this.backupedPageLayout = this.currentLayout;
+                            this.loadEditor(this.currentDomain, this.currentNode, this.currentContents, '_tray');
+                        }
+                    }
+                    this.lastKnownPageType = typeValue;
+                }.bind(this))
+            }
         }
 
         this.headerLayout = new jarves.Layout(this.titleContainer, {
@@ -277,7 +304,7 @@ jarves.FieldTypes.PageContents = new Class({
         var content = this.editor ? this.editor.getValue() : this.currentContents;
 
         return new jarves.MultiValue(content, {
-            layout: this.layoutSelection ? this.layoutSelection.getValue() : this.firstSelectedLayout
+            layout: this.currentLayout || this.firstSelectedLayout
         });
     },
 
@@ -306,24 +333,46 @@ jarves.FieldTypes.PageContents = new Class({
 
         var typeValue = this.getField().getForm().getValue('type');
 
-        if (0 != typeValue && 1 != typeValue) {
+        if (0 != typeValue && 3 != typeValue) {
             return;
         }
 
-        this.reloadLayoutSelection(value.theme || originValue.domain.theme, value.layout);
+        this.lastKnownPageType = typeValue;
+        this.updateLayout(typeValue);
+
+        if (3 === typeValue){
+            //tray
+            this.currentLayout = '_tray';
+        } else {
+            this.backupedPageLayout = value.layout;
+            this.currentLayout = value.layout;
+        }
+
+        this.reloadLayoutSelection(value.theme || originValue.domain.theme, this.currentLayout);
 
         // this.currentNode = originValue.id;
         // this.currentDomain = originValue.domainId;
         this.loadEditor(originValue.domainId, originValue.id, this.currentContents);
     },
 
+    updateLayout: function(nodeType) {
+        if (3 === nodeType){
+            //tray
+            this.mainLayout.hideRow(1);
+        } else {
+            this.mainLayout.showRow(1);
+        }
+    },
+
     onLayoutSelectFirst: function(layout) {
         this.firstSelectedLayout = layout;
+        this.backupedPageLayout = layout;
     },
 
     onLayoutChange: function(layout) {
-        this.currentContents = this.editor ? this.editor.getValue() : this.currentContents;
-        this.loadEditor(this.currentDomain, this.currentNode, this.currentContents);
+        // console.error('onLayoutChange', layout);
+        // this.currentContents = this.editor ? this.editor.getValue() : this.currentContents;
+        this.loadEditor(this.currentDomain, this.currentNode, this.currentContents, layout);
     },
 
     reloadLayoutSelection: function(themeId, layoutId) {
@@ -341,17 +390,26 @@ jarves.FieldTypes.PageContents = new Class({
         }, this.layoutSelectionContainer);
     },
 
-    loadEditor: function(domainId, nodeId, contents) {
+    loadEditor: function(domainId, nodeId, contents, targetLayout) {
         var options = {
             standalone: this.options.standalone
         };
 
-        var targetLayout = this.layoutSelection ? this.layoutSelection.getValue() : this.firstSelectedLayout;
+        // console.log('loadEditor', targetLayout, this.currentLayout || this.firstSelectedLayout);
+
+        if (!targetLayout) {
+            targetLayout = this.currentLayout || this.firstSelectedLayout;
+        }
 
         if (this.currentNode && this.currentNode == nodeId && this.currentLayout == targetLayout && this.getEditor()) {
             this.getEditor().setValue(contents);
             return;
         }
+
+        this.currentLayout = targetLayout;
+        this.layoutSelection.setValue(targetLayout);
+
+        // this.layoutSelection.setValue(targetLayout);
 
         this.editor = null;
 
@@ -405,7 +463,7 @@ jarves.FieldTypes.PageContents = new Class({
             '_jarves_editor_id': id,
             '_jarves_editor_node': nodeId,
             '_jarves_editor_domain': domainId,
-            '_jarves_editor_layout': !this.layoutSelection || this.layoutSelection.isDisabled() ? null : targetLayout,
+            '_jarves_editor_layout': targetLayout,
             '_jarves_editor_options': options
         };
 
@@ -488,7 +546,7 @@ jarves.FieldTypes.PageContents = new Class({
                             this.saveBtn.doneLoading(t('Saved!'));
                             this.saveBtn.setProgress(false);
                         }.bind(this)
-                    }).patch({content: value, layout: this.layoutSelection.getValue()});
+                    }).patch({content: value, layout: this.currentLayout || this.firstSelectedLayout});
                 }.bind(this),
                 onError: function(progressWatch) {
                     this.saveBtn.startLoading(t('Failed'));

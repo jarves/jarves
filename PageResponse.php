@@ -6,6 +6,7 @@ use Jarves\AssetHandler\AssetInfo;
 use Jarves\AssetHandler\Container;
 use Jarves\AssetHandler\CssHandler;
 use Jarves\AssetHandler\JsHandler;
+use Jarves\Configuration\ThemeLayout;
 use Jarves\Model\Content;
 use Jarves\Model\ContentInterface;
 use Jarves\Model\Node;
@@ -623,13 +624,20 @@ class PageResponse extends Response
         }
 
         $layoutKey = $this->getLayout($page);
+        $layout = $theme->getLayoutByKey($layoutKey);
 
-        if (!$layout = $theme->getLayoutByKey($layoutKey)) {
+        if ('_tray' === $layoutKey && !$layout) {
+            $layout = new ThemeLayout();
+            $layout->setFile('JarvesBundle:Default:tray.html.twig');
+        }
+
+        if (!$layout) {
             $this->stopwatch->stop('Build PageBody');
             throw new \LogicException(
                 sprintf('Layout for `%s` in theme `%s` not found.', $layoutKey, $themeId)
             );
         }
+
         $layoutPath = $layout->getFile();
 
         try {

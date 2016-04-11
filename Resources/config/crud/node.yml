@@ -94,7 +94,7 @@ fields:
     __Content__:
         label: Content
         type: tab
-        needValue: 0
+        needValue: [0,3]
         againstField: type
         children:
             content:
