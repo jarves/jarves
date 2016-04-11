@@ -12,13 +12,13 @@
  */
 
 .jarves-FileUploader-smallProgressBar {
-    float: right;
-    color: #E2E2E2;
-    position: relative;
+    color: #2B9ED2;
+    position: absolute;
+    top: -25px;
+    right: 0px;
+    text-align: right;
     font-size: 12px;
     line-height: 23px;
-    top: 29px;
-    padding-right: 15px;
     cursor: pointer;
 }
 
@@ -31,6 +31,7 @@
     text-align: right;
     border-bottom: 1px dashed #DDD;
     padding-bottom: 15px;
+    padding-top: 15px;
 }
 
 .jarves-FilesUpload-topBarLeft {

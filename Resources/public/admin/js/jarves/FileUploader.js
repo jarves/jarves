@@ -57,7 +57,7 @@ jarves.FileUploader = new Class({
         this.prepareDialog();
 
         this.fileUploadMinimizeBtn.show();
-        this.fileUploadCancelBtn.setText(t('Cancel'));
+        // this.fileUploadCancelBtn.setText(t('Cancel'));
 
         this.uploadFilesCount++;
 
@@ -150,13 +150,15 @@ jarves.FileUploader = new Class({
                 'class': 'jarves-FilesUpload-topBar'
             }).inject(this.dialog.getContentContainer());
 
-            this.fileUploadCancelBtn = new jarves.Button(t('Clear')).addEvent('click', this.clear.bind(this)).inject(this.dialog.topBar);
+            new jarves.Button(t('Clear'))
+                .addEvent('click', this.clear.bind(this))
+                .inject(this.dialog.topBar);
 
             this.fileUploadCancelBtn = new jarves.Button(t('Cancel All')).addEvent('click', function(){
                 this.cancelUploads(true);
             }.bind(this)).inject(this.dialog.topBar);
 
-            this.fileUploadMinimizeBtn = new jarves.Button(t('Minimize')).addEvent('click', this.minimizeUpload.bind(this)).inject(this.dialog.topBar);
+            this.fileUploadMinimizeBtn = new jarves.Button(t('Close')).addEvent('click', this.minimizeUpload.bind(this)).inject(this.dialog.topBar);
 
             var table = new Element('table', {style: 'width: 100%;', 'class': 'jarves-file-uploadtable'}).inject(this.dialog.content);
             this.fileUploadTBody = new Element('tbody').inject(table);
@@ -421,8 +423,7 @@ jarves.FileUploader = new Class({
 
             if (!tr.canceled && !tr.error) {
                 if (tr.loaded) loaded += tr.loaded;
-                if (tr.error) all += tr.file.size;
-                ;
+                all += tr.file.size;
             }
 
             if (tr.complete == true) {
@@ -443,6 +444,7 @@ jarves.FileUploader = new Class({
         this.fileUploadCalcSpeed();
 
         var percent = count > 0 ? Math.ceil((loaded / all) * 100) : 0;
+
         if (count && done == count) {
             percent = 100;
         }
@@ -452,6 +454,7 @@ jarves.FileUploader = new Class({
     },
 
     updateSmallProgressBar: function(uploadedCount, maxCount, uploadedBytes, allBytes) {
+        console.log('updateSmallProgressBar', uploadedCount, maxCount, uploadedBytes, allBytes);
         if (this.smallProgressBarHiderTimeout) {
             clearTimeout(this.smallProgressBarHiderTimeout);
         }
@@ -459,22 +462,24 @@ jarves.FileUploader = new Class({
         if (!this.smallProgressBar) {
             this.smallProgressBar = new Element('div', {
                 'class': 'jarves-FileUploader-smallProgressBar'
-            }).inject(jarves.getAdminInterface().mainMenuUser, 'after');
+            }).inject(jarves.getAdminInterface().mainMenuUser);
 
             this.smallProgressBar.addEvent('click', this.toggleDialog.bind(this));
         } else if (this.smallProgressBar.getStyle('opacity') != 1) {
             this.smallProgressBar.tween('opacity', 1);
         }
 
-        var percent = Math.ceil((uploadedCount / maxCount) * 100);
+        var percent = Math.ceil((uploadedBytes / allBytes) * 100);
+
         var speed = this.fileUploadCalcSpeed(true);
+
         if (!speed) {
             speed = ' -- KB/s';
         } else {
             speed = ' ' + jarves.bytesToSize(speed) + '/s';
         }
 
-        var text = tf('Uploading %s/%s (%s%%) %s', uploadedCount, maxCount, percent, speed);
+        var text = tf('Uploading %s/%s (%s%%) %s', uploadedCount, maxCount, percent.toFixed(2), speed);
         if (uploadedCount == maxCount) {
             text = t('Files uploaded.');
             this.smallProgressBarHiderTimeout = (function() {
@@ -494,7 +499,6 @@ jarves.FileUploader = new Class({
         }
 
         var speed = ' -- KB/s, ' + _('%s minutes left').replace('%s', '--:--');
-        var again = false;
 
         if (this.fileUploadSpeedLastCheck == 0) {
             this.fileUploadSpeedLastCheck = (new Date()).getTime() - 1000;
@@ -502,6 +506,10 @@ jarves.FileUploader = new Class({
 
         var timeDiff = (new Date()).getTime() - this.fileUploadSpeedLastCheck;
         var bytesDiff = this.fileUploadedLoadedBytes - this.fileUploadedSpeedLastLoadedBytes;
+
+        if (bytesDiff <= 0) {
+            return;
+        }
 
         var d = timeDiff / 1000;
 
@@ -512,9 +520,11 @@ jarves.FileUploader = new Class({
         }
 
         var residualBytes = this.fileUploadedTotalBytes - this.fileUploadedLoadedBytes;
-        var time = '<span style="color: green;">' + _('Done') + '</span>';
-        if (residualBytes > 0) {
+        console.log(this.fileUploadedLoadedBytes, bytesDiff, timeDiff, residualBytes);
 
+        var time = '<span style="color: green;">' + _('Done') + '</span>';
+
+        if (residualBytes > 0) {
             var timeLeftSeconds = residualBytes / byteSpeed;
             var timeLeft = (timeLeftSeconds / 60).toFixed(2);
 
@@ -666,7 +676,6 @@ jarves.FileUploader = new Class({
         this.fileUploadSpeedLastCheck = 0;
         this.fileUploadedSpeedLastLoadedBytes = 0;
 
-        this.fileUploadedLoadedBytes = 0;
         this.fileUploadSpeedLastByteSpeed = 0;
 
         delete this.fileUploadSpeedInterval;
