@@ -330,6 +330,10 @@ class Filesystem implements FilesystemInterface
         $widthOriginal = $image->getWidth();
         $heightOriginal = $image->getHeight();
 
+        if ($width > $widthOriginal && $height > $heightOriginal) {
+            return $image;
+        }
+
         $newWidth = null;
         $newHeight = null;
 

@@ -2306,7 +2306,11 @@ jarves.Files = new Class({
             return;
         }
 
-        var img = this.lastPreviewedItem.getElement('img') || this.lastPreviewedItem.getElement('div');
+        var img = this.lastPreviewedItem.getElement('img') || this.lastPreviewedItem.getElement('div') || this.lastPreviewedItem.getElement('.icon-picture');
+        if (!img) {
+            return;
+        }
+
         var position = img.getPosition(this.container);
         var size = img.getSize();
 
@@ -2448,11 +2452,7 @@ jarves.Files = new Class({
                 style: 'display: none;'
             }).inject(this.container);
 
-            this.previewDivResizer = new Element('div', {
-                style: 'position: absolute;right: -1px;bottom: -1px;width: 9px;' + 'height: 9px; opacity: 0.7; background-image: url(' + _path + 'bundles/jarves/admin/images/win-bottom-resize.png);' + 'cursor: se-resize; background-position: 0px 11px;'
-            }).inject(this.previewDiv);
-
-            var img = this.lastPreviewedItem.getElement('img') || this.lastPreviewedItem.getElement('div');
+            var img = this.lastPreviewedItem.getElement('img') || this.lastPreviewedItem.getElement('div') || this.lastPreviewedItem.getElement('.icon-picture');
             var position = img.getPosition(this.container);
             var size = img.getSize();
 
