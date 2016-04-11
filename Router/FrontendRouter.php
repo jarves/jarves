@@ -471,7 +471,7 @@ class FrontendRouter
                 $langKey = '';
 
                 if (!$domain->getMaster()) {
-                    $langKey = '/' . $domain->getLanguage();
+                    $langKey = '/' . $domain->getLang();
                 }
 
                 $cachedDomains[$key . $langKey] = $domain;
