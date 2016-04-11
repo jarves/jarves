@@ -170,10 +170,9 @@ jarves.FileUploader = new Class({
             this.fileUploadDialogProgress = new jarves.Progress();
             document.id(this.fileUploadDialogProgress).inject(this.dialog.topBarLeft);
             document.id(this.fileUploadDialogProgress).setStyle('width', 132);
-            document.id(this.fileUploadDialogProgress).setStyle('display', 'inline-block');
 
             this.fileUploadDialogAll = new Element('div', {
-                style: 'color: gray;'
+                style: 'color: #5A5A5A; padding-left: 3px;'
             }).inject(this.dialog.topBarLeft);
 
             this.fileUploadDialogAllText = new Element('span').inject(this.fileUploadDialogAll);
@@ -526,9 +525,15 @@ jarves.FileUploader = new Class({
 
         if (residualBytes > 0) {
             var timeLeftSeconds = residualBytes / byteSpeed;
-            var timeLeft = (timeLeftSeconds / 60).toFixed(2);
 
-            time = _('%s minutes left').replace('%s', timeLeft);
+            time = humanizeDuration(timeLeftSeconds.toFixed(0) * 1000, {
+                units: ['y', 'mo', 'd', 'm', 's']
+            });
+
+            time += ' left';
+            // var timeLeft = (timeLeftSeconds / 60).toFixed(2);
+            //
+            // time = _('%s minutes left').replace('%s', timeLeft);
         } else {
             //done
             clearInterval(this.fileUploadSpeedInterval);
