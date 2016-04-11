@@ -83,6 +83,10 @@ class Form
                 $value = isset($defaultData[$key]) ? $defaultData[$key] : null;
             }
 
+            if (null === $value && $field->getDefault()) {
+                $value = $field->getDefault();
+            }
+
             if ($field['customValue'] && method_exists($this, $method = $field['customValue'])) {
                 $value = $this->$method($field, $key);
             }
