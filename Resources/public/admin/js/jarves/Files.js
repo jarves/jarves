@@ -601,6 +601,9 @@ jarves.Files = new Class({
                 //is dir
                 enabled.optionsBarOpenExternal = false;
             }
+            if (jarves.getClipboard().type !== 'filemanager' && jarves.getClipboard().type !== 'filemanagerCut') {
+                enabled.optionsBarPaste = false;
+            }
 
         }.bind(this));
 
@@ -907,13 +910,6 @@ jarves.Files = new Class({
         }.bind(this));
     },
 
-    /**
-     * Updates the actions bar, depending what in the current clipboard is
-     */
-    syncClipboard: function() {
-
-    },
-
     copyLink: function() {
         var selectedFiles = this.getSelectedFilesAsArray();
         if (!selectedFiles.length) {
@@ -950,7 +946,7 @@ jarves.Files = new Class({
     },
 
     paste: function() {
-        if (!jarves.getClipboard().type == 'filemanager' && !jarves.getClipboard().type == 'filemanagerCut') {
+        if (jarves.getClipboard().type !== 'filemanager' && jarves.getClipboard().type !== 'filemanagerCut') {
             return;
         }
 
@@ -972,11 +968,16 @@ jarves.Files = new Class({
             });
         }
 
+        if (files.length === 0) {
+            this.optionsBarPaste.failedLoading('Nothing Pasted');
+            return;
+        }
+
         var done = function(success) {
             if (success) {
                 this.optionsBarPaste.doneLoading('Pasted!');
                 jarves.clearClipboard();
-                this.syncClipboard()
+                this.updateSidebar();
             } else {
                 this.optionsBarPaste.failedLoading('Paste failed');
             }

@@ -67,6 +67,11 @@ jarves.AdminInterface = new Class({
         return this.kaFilesFileUploader;
     },
 
+    /**
+     * Fires the objectChanged event.
+     * 
+     * @param object
+     */
     objectChanged: function(object) {
         object = jarves.normalizeObjectKey(object);
 

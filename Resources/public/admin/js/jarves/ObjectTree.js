@@ -472,7 +472,7 @@ jarves.ObjectTree = new Class({
         var overwriteDefinition = {
             treeTemplate: this.objectDefinition.treeRootFieldTemplate,
             treeLabel: this.objectDefinition.treeRootFieldLabel
-        }
+        };
 
         a.span.set('html', jarves.getObjectLabelByItem(this.options.rootObject, item, 'tree', overwriteDefinition));
         //this.renderLabel(a.span, item, this.options.rootObject, definition);
@@ -1038,7 +1038,8 @@ jarves.ObjectTree = new Class({
     },
 
     deselect: function() {
-        this.container.getElements('.jarves-objectTree-item-selected').removeClass('jarves-objectTree-item-selected');
+
+        this.main.getElements('.jarves-objectTree-item-selected').removeClass('jarves-objectTree-item-selected');
 
         this.lastSelectedItem = false;
         this.lastSelectedObject = false;
@@ -1338,17 +1339,17 @@ jarves.ObjectTree = new Class({
     },
 
     hasSelected: function() {
-        var selected = this.container.getElement('.jarves-objectTree-item-selected');
+        var selected = this.main.getElement('.jarves-objectTree-item-selected');
         return selected != null;
     },
 
     getSelected: function() {
-        var selected = this.container.getElement('.jarves-objectTree-item-selected');
+        var selected = this.main.getElement('.jarves-objectTree-item-selected');
         return selected ? selected.objectEntry : false;
     },
 
     getSelectedElement: function() {
-        var selected = this.container.getElement('.jarves-objectTree-item-selected');
+        var selected = this.main.getElement('.jarves-objectTree-item-selected');
         return selected ? selected : false;
     },
 
@@ -1422,7 +1423,6 @@ jarves.ObjectTree = new Class({
             return;
         }
 
-//        console.log(this.options.objectKey, objectKey, id, pPk);
         if (this.options.objectKey != objectKey) {
             //root item selected
             this.rootA.addClass('jarves-objectTree-item-selected');

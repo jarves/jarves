@@ -137,6 +137,9 @@ jarves.FieldTypes.Tree = new Class({
         objectFields: ''
     },
 
+    /**
+     * @var {jarves.ObjectTree[]}
+     */
     trees: [],
 
     definition: {},
@@ -256,7 +259,7 @@ jarves.FieldTypes.Tree = new Class({
         if (this.selectItem) {
             options.selectObject = this.selectItem;
         }
-
+        /** @var {jarves.ObjectTree} tree */
         var tree = new clazz(this.treesContainer, options);
         tree.addEvent('select', this.selected);
         tree.addEvent('select', this.fireChange.bind(this));

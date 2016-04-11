@@ -943,7 +943,7 @@ jarves.WindowCombine = new Class({
         //pDom.objectKey
         //pDom.id
         //pDom.url
-        if (pDom.objectKey == this.classProperties.object) {
+        if (pDom.objectKey === this.classProperties.object) {
             this.loadItem(pItem, pDom.objectKey);
         } else {
             this.loadRootItem(pItem, pDom.objectKey);
