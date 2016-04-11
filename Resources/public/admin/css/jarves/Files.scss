@@ -338,15 +338,14 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
 }
 
 .jarves-Files-item-title-dimensions {
-    color: #5A86B2;
-    color: #999;
-    font-size: 11px;
+    color: #014888;
+    font-size: 12px;
 }
 
-//.jarves-Files-item-selected .jarves-Files-item-title-dimensions,
-//.jarves-Files-item-drag-selected .jarves-Files-item-title-dimensions {
-//    color: white;
-//}
+.jarves-Files-item-selected .jarves-Files-item-title-dimensions,
+.jarves-Files-item-drag-selected .jarves-Files-item-title-dimensions {
+    color: white;
+}
 
 .jarves-Files-item:hover div.jarves-Files-item-title,
 .jarves-Files-item-miniatur:hover .jarves-Files-item-miniatur-name {
@@ -394,7 +393,7 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
 //    -webkit-border-radius: 5px;
 //    border-radius: 5px;
 //    outline: 1px dotted darken($mainColor, 15%);
-    background-color: darken($mainColor, 6%);
+    background-color: #4F9EC1;
 }
 
 /* listType: miniatur */

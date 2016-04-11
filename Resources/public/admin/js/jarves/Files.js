@@ -73,6 +73,10 @@ jarves.Files = new Class({
     sidebarFiles: {},
 
     container: false,
+
+    /**
+     * {jarves.Window}
+     */
     win: false,
 
     initialize: function(pContainer, pOptions, pWindowApi, pObjectKey) {
@@ -282,10 +286,9 @@ jarves.Files = new Class({
             'class': 'jarves-Window-sidebar-title'
         }).inject(sidebar);
 
-        var boxAction = new jarves.ButtonGroup(sidebar);
-        this.boxAction = boxAction;
-        boxAction.addButton(t('New File'), '#icon-file-add', this.newFile.bind(this));
-        boxAction.addButton(t('New Folder'), '#icon-folder-4', this.newFolder.bind(this));
+        this.boxAction = new jarves.ButtonGroup(sidebar);
+        this.boxAction.addButton(t('New File'), '#icon-file-add', this.newFile.bind(this));
+        this.boxAction.addButton(t('New Folder'), '#icon-folder-4', this.newFolder.bind(this));
 
         this.newUploadBtn();
 
@@ -732,7 +735,6 @@ jarves.Files = new Class({
                 this.optionsBarMoreInformation.inject(this.optionsBarCopyLink, 'after');
             }
         }.bind(this));
-
     },
 
     showFileOptions: function() {
@@ -905,6 +907,48 @@ jarves.Files = new Class({
         }.bind(this));
     },
 
+    /**
+     * Updates the actions bar, depending what in the current clipboard is
+     */
+    syncClipboard: function() {
+
+    },
+
+    copyLink: function() {
+        var selectedFiles = this.getSelectedFilesAsArray();
+        if (!selectedFiles.length) {
+            selectedFiles = [this.currentFile];
+        }
+
+        var path = selectedFiles[0].path;
+
+        var element = new Element('div', {
+            text: 'Path '
+        });
+
+        var baseDir = location.href.substr(0, location.href.indexOf('#'));
+        baseDir = baseDir.slice(0, -7); //minus '/jarves'
+
+        var code = new Element('code', {
+        }).inject(element);
+
+        new Element('a', {
+            href:baseDir + path,
+            'target': '_blank',
+            text: baseDir + path
+        }).inject(code);
+
+        this.getWindow().alert(element);
+    },
+
+    /**
+     *
+     * @returns {jarves.Window}
+     */
+    getWindow: function() {
+        return this.win;
+    },
+
     paste: function() {
         if (!jarves.getClipboard().type == 'filemanager' && !jarves.getClipboard().type == 'filemanagerCut') {
             return;
@@ -931,6 +975,8 @@ jarves.Files = new Class({
         var done = function(success) {
             if (success) {
                 this.optionsBarPaste.doneLoading('Pasted!');
+                jarves.clearClipboard();
+                this.syncClipboard()
             } else {
                 this.optionsBarPaste.failedLoading('Paste failed');
             }
@@ -944,6 +990,10 @@ jarves.Files = new Class({
     },
 
     moveFiles: function(filePaths, targetDirectory, overwrite, callback) {
+        if (!overwrite){
+            overwrite = false;
+        }
+
         if ('/' !== targetDirectory.substr(targetDirectory.length - 1)) {
             targetDirectory += '/';
         }
@@ -978,6 +1028,10 @@ jarves.Files = new Class({
     },
 
     copyFiles: function(filePaths, targetDirectory, overwrite, callback) {
+        if (!overwrite){
+            overwrite = false;
+        }
+
         if ('/' !== targetDirectory.substr(targetDirectory.length - 1)) {
             targetDirectory += '/';
         }
@@ -1407,6 +1461,7 @@ jarves.Files = new Class({
                 var modes = {
                     'php': 'php',
                     'js': 'javascript',
+                    'scss': 'css',
                     'css': 'css'
                 };
 
@@ -2227,7 +2282,6 @@ jarves.Files = new Class({
         if (event.rightClick && file) {
             this.openContext(file, event);
         }
-
     },
 
     selectItem: function(pItem) {
@@ -2747,7 +2801,7 @@ jarves.Files = new Class({
         if (fileIcon && pFile.dimensions) {
             new Element('div', {
                 'class': 'jarves-Files-item-title-dimensions',
-                text: pFile.dimensions.width + 'x' + pFile.dimensions.height + ', ' + jarves.bytesToSize(pFile.size)
+                text: pFile.dimensions.width + 'x' + pFile.dimensions.height // + ', ' + jarves.bytesToSize(pFile.size)
             }).inject(title, 'top');
         }
 

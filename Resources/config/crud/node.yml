@@ -144,6 +144,9 @@ nestedRootAddEntrypoint: root/
 nestedRootAddLabel: '[[New Domain]]'
 nestedRootEditEntrypoint: root/
 nestedRootRemoveEntrypoint: root/
+nestedRootEdit: true
+nestedRootAdd: true
+nestedRootRemove: true
 startCombine: true
 
 addMultipleFixedFields:

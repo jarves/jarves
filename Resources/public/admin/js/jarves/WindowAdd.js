@@ -468,9 +468,9 @@ jarves.WindowAdd = new Class({
             return this.multipleAdd();
         }
 
-        var request = this.buildRequest();
-        if (typeOf(request) != 'null') {
+        var request = this.buildRequest(false);
 
+        if (typeOf(request) != 'null') {
             if (this.addItemToAdd) {
                 request._position = this.addItemToAdd.position;
                 request._pk = this.addItemToAdd.pk;
