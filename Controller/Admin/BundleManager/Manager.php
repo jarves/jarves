@@ -14,6 +14,6 @@ class Manager {
      */
     public static function prepareName(&$name)
     {
-        $name = preg_replace('/[^a-zA-Z0-9-_\\\\]/', '', $name);
+        $name = trim(preg_replace('/[^a-zA-Z0-9-_\\\\]/', '', $name), '\\');
     }
 } 

@@ -51,6 +51,10 @@ class Controller extends SymfonyController
         list($objectKey, $object_id) = $this->getObjects()->parseUrl($url);
 
         $definition = $this->getObjects()->getDefinition($objectKey);
+        if ($definition->getExcludeFromREST()) {
+            return null;
+        }
+
         if (!$definition) {
             throw new ObjectNotFoundException(sprintf('Object %s does not exists.', $objectKey));
         }
@@ -79,7 +83,6 @@ class Controller extends SymfonyController
      */
     public function getItemsByUrlAction(ParamFetcher $paramFetcher)
     {
-
         $url = $paramFetcher->get('url');
         $fields = $paramFetcher->get('fields');
         $returnKey = filter_var($paramFetcher->get('returnKey'), FILTER_VALIDATE_BOOLEAN);
@@ -94,6 +97,9 @@ class Controller extends SymfonyController
         $definition = $this->getObjects()->getDefinition($objectKey);
         if (!$definition) {
             throw new ObjectNotFoundException(sprintf('Object %s can not be found.', $objectKey));
+        }
+        if ($definition->getExcludeFromREST()) {
+            return null;
         }
 
         $options['extraFields'] = $fields;

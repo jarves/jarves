@@ -104,6 +104,10 @@ jarves.WindowList = new Class({
     },
 
     columnHeaderClick: function (pName, pSort) {
+        if (!this.columnsIds || -1 === this.columnsIds.indexOf(pName)) {
+            return;
+        }
+
         var idx = this.columnsIds.indexOf(pName) + 1;
         var th = this.table.getColumn(idx);
 
@@ -413,10 +417,11 @@ jarves.WindowList = new Class({
 
         this.columns = {};
         if (!this.classProperties.columns || this.classProperties.columns.length == 0) {
-            this.win.alert(t('This class does not contain any columns.'), function () {
-                this.win.close();
-            }.bind(this));
-            throw 'Class does not contain columns.';
+            // this.win.alert(t('This class does not contain any columns.'), function () {
+            //     this.win.close();
+            // }.bind(this));
+            return;
+            // throw 'Class does not contain columns.';
         }
 
         this.columnsIds = 1 === indexOffset ? [false] : [];

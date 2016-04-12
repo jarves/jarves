@@ -100,7 +100,7 @@ class FileStorage extends AbstractStorage
                 '_label' => $path
             ];
 
-            if (count($result) >= $result) {
+            if (count($result) >= $max) {
                 return $result;
             }
         }
@@ -160,21 +160,13 @@ class FileStorage extends AbstractStorage
                     continue;
                 }
 
-                if (!is_numeric($value)) {
-                    try {
-                        $file = $this->webFilesystem->getFile(Tools::urlDecode($value));
-                    } catch (FileNotFoundException $e) {
-                        $file = null;
-                    }
-                    if ($file) {
-                        $value = $file->getId();
-                    } else {
-                        continue;
-                    }
+                if (is_numeric($value)) {
+                    $value = $this->webFilesystem->getPath($value);
+                } else {
+                    $value = Tools::urlDecode($value);
                 }
 
-                $item['id'] = $value;
-
+                $item['path'] = $value;
             }
 
             if (count($item) > 0) {
@@ -220,7 +212,7 @@ class FileStorage extends AbstractStorage
         $parentPath = null;
 
         if ($branchPk) {
-            $parentPath = is_numeric($branchPk['id']) ? $this->webFilesystem->getPath($branchPk['id']) : $branchPk['id'];
+            $parentPath = $this->getPathFromPK($branchPk);
         }
 
         $path = $parentPath ? $parentPath . $values['name'] : $values['name'];
@@ -237,10 +229,18 @@ class FileStorage extends AbstractStorage
     {
         $this->mapPrimaryKey($primaryKey);
 
-        $path = is_numeric($primaryKey['id']) ? $this->webFilesystem->getPath($primaryKey['id']) : $primaryKey['id'];
+        $path = $this->getPathFromPK($primaryKey);
         $this->webFilesystem->write($path, $values['content']);
 
         return parent::update($primaryKey, $values);
+    }
+
+    protected function getPathFromPK($pk){
+        if (is_numeric($pk['path'])) {
+            return $this->webFilesystem->getPath($pk['path']);
+        }
+
+        return $pk['path'];
     }
 
     /**
@@ -249,7 +249,7 @@ class FileStorage extends AbstractStorage
     public function getItem($primaryKey, $options = null)
     {
         if (is_array($primaryKey)) {
-            $path = is_numeric($primaryKey['id']) ? $this->webFilesystem->getPath($primaryKey['id']) : $primaryKey['id'];
+            $path = $this->getPathFromPK($primaryKey);
         } else {
             $path = $primaryKey ? : '/';
         }
@@ -270,7 +270,7 @@ class FileStorage extends AbstractStorage
 
     public function getParents($pk, $options = null)
     {
-        $path = is_numeric($pk['id']) ? $this->webFilesystem->getPath($pk['id']) : $pk['id'];
+        $path = $this->getPathFromPK($pk);
 
         if ('/' === $path) {
             return array();
@@ -296,7 +296,7 @@ class FileStorage extends AbstractStorage
      */
     public function getParent($pk, $options = null)
     {
-        $path = is_numeric($pk['id']) ? $this->webFilesystem->getPath($pk['id']) : $pk['id'];
+        $path = $this->getPathFromPK($pk);
 
         if ('/' === $path) {
             return array();
@@ -319,7 +319,7 @@ class FileStorage extends AbstractStorage
     public function getParentId($pk)
     {
         if ($pk) {
-            $path = is_numeric($pk['id']) ? $this->webFilesystem->getPath($pk['id']) : $pk['id'];
+            $path = $this->getPathFromPK($pk);
         } else {
             $path = '/';
         }
@@ -341,7 +341,7 @@ class FileStorage extends AbstractStorage
     public function move($pk, $targetPk, $position = 'first', $targetObjectKey = null, $overwrite = false)
     {
         if ($pk) {
-            $path = is_numeric($pk['id']) ? $this->webFilesystem->getPath($pk['id']) : $pk['id'];
+            $path = $this->getPathFromPK($pk);
         } else {
             $path = '/';
         }
@@ -393,7 +393,7 @@ class FileStorage extends AbstractStorage
     public function getBranch($pk = null, Condition $condition = null, $depth = 1, $scope = null, $options = null)
     {
         if ($pk) {
-            $path = is_numeric($pk['id']) ? $this->webFilesystem->getPath($pk['id']) : $pk['id'];
+            $path = $this->getPathFromPK($pk);
         } else {
             $path = '/';
         }
@@ -442,7 +442,7 @@ class FileStorage extends AbstractStorage
                 $children = array();
                 if ($file['type'] == 'dir') {
                     try {
-                        $children = self::getBranch(array('id' => $file['path']), $condition, $depth - 1);
+                        $children = self::getBranch(array('path' => $file['path']), $condition, $depth - 1);
                     } catch (FileNotFoundException $e){
                         $children = null;
                     }

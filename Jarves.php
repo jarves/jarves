@@ -312,6 +312,10 @@ class Jarves
      */
     public function getBundle($bundleName)
     {
+        if (false !== ($slash = strpos($bundleName, '/'))) {
+            $bundleName = substr($bundleName, 0, $slash);
+        }
+
         foreach ($this->getBundles() as $bundle) {
             if (strtolower($bundle->getName()) == strtolower($bundleName)
                 || $this->getShortBundleName($bundle->getName()) == strtolower($bundleName)
@@ -491,7 +495,7 @@ class Jarves
      *
      * @throws BundleNotFoundException
      */
-    public function getBundleFromPath($path, &$bundleName)
+    public function getBundleFromPath($path, &$bundleName = '')
     {
         $path = preg_replace('/:+/', '/', $path);
         preg_match('/\@?([a-zA-Z0-9\-_\.\\\\]+)/', $path, $matches);

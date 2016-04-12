@@ -371,7 +371,7 @@ jarves.Window = new Class({
                 var closeEvent = function () {
                     callback(false);
                 };
-                main.addEvent('close', closeEvent);
+                main.addEvent('closed', closeEvent);
             }
 
             new jarves.Button(t('Cancel')).addEvent('click', function () {
@@ -390,7 +390,7 @@ jarves.Window = new Class({
                         res = input.value;
                     }
                     if (callback) {
-                        main.removeEvent('close', closeEvent);
+                        main.removeEvent('closed', closeEvent);
                     }
                     main.close(true);
                     if (callback) {
@@ -404,7 +404,7 @@ jarves.Window = new Class({
         if (options && options['alert'] == 1) {
 
             if (callback) {
-                main.addEvent('close', callback);
+                main.addEvent('closed', callback);
             }
 
             ok = new jarves.Button('OK')
@@ -769,6 +769,7 @@ jarves.Window = new Class({
         }
 
         jarves.wm.close(this);
+        this.fireEvent('closed');
     },
 
     destroy: function () {

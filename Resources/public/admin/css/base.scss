@@ -44,7 +44,10 @@
 
 @mixin simple-button {
     background-color: $linkBgColor;
-    color: $linkColor;
+    color: #2F2F2F;
+    &::before {
+        color: #111;
+    }
     &:hover {
         color: $linkHoverColor;
         background-color: $linkHoverBgColor;

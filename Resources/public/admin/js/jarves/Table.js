@@ -325,6 +325,8 @@ jarves.Table = new Class({
 
     updateTableHeader: function () {
         if (this.options.absolute) {
+            if (!this.tableBody) return;
+
             var firstTr = this.tableBody.getElement('tr');
             if (firstTr) {
                 var columns = this.tableHead.getElement('tr').getChildren('th');

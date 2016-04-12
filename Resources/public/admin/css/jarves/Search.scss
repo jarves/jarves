@@ -1,0 +1,91 @@
+/*
+ * This file is part of Jarves.
+ *
+ * (c) Marc J. Schmidt <marc@marcjschmidt.de>
+ *
+ *     J.A.R.V.E.S - Just A Rather Very Easy [content management] System.
+ *
+ *     http://jarves.io
+ *
+ * To get the full copyright and license information, please view the
+ * LICENSE file, that was distributed with this source code.
+ */
+
+.jarves-main-search-container {
+  position: absolute;
+  min-width: 500px;
+  width: calc(60% - 300px);
+  left: 245px;
+  top: 0px;
+  bottom: 0;
+  background-color: #f8f8f8;
+  border: 1px solid silver;
+  padding: 15px;
+  z-index: 100001;
+}
+
+.jarves-main-search-closer-overlay {
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  right: 0;
+  left: 245px;
+  z-index: 100000;
+}
+
+.jarves-search-results {
+  position: absolute;
+  left: 0;
+  top: 70px;
+  right: 0;
+  padding-left: 15px;
+  bottom: 15px;
+  overflow: auto;
+}
+
+.jarves-search-closer {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #041114;
+  &:hover {
+    color: black;
+    background-color: #cacaca;
+  }
+}
+
+.jarves-search-result-object > h4 {
+  border-bottom: 1px dashed silver;
+  padding: 3px;
+  cursor: pointer;
+  &:hover {
+    background-color: #eee;
+  }
+
+  > .object-key {
+    color: #555555;
+    display: inline;
+    font-size: 13px;
+    font-weight: 300;
+  }
+}
+
+.jarves-search-results-items {
+  padding-left: 15px;
+}
+
+.jarves-search-results-item {
+  padding: 4px 0;
+
+  > a {
+    display: inline;
+    padding: 0;
+  }
+}
+
+.jarves-search-loading {
+  text-align: center;
+  color: gray;
+}

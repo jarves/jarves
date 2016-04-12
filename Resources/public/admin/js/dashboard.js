@@ -1,6 +1,13 @@
 var jarves_dashboard = new Class({
+    /**
+     * 
+     * @param {jarves.Window} pWindow
+     */
     initialize: function (pWindow) {
         pWindow.hideHead();
-        new jarves.Dashboard(pWindow.getContentContainer());
+        var dashboard = new jarves.Dashboard(pWindow.getContentContainer());
+        pWindow.addEvent('closed', function() {
+            dashboard.destroy();
+        });
     }
 });

@@ -50,6 +50,9 @@ var jarves_user_acl = new Class({
         this.query = new jarves.Field({
             type: 'text',
             noWrapper: true,
+            options: {
+                inputWidth: 200
+            },
             inputIcon: '#icon-search-8'
         }, this.win.titleGroups);
 
@@ -86,7 +89,7 @@ var jarves_user_acl = new Class({
         this.loadEntryPoints();
         this.loadObjects();
 
-        document.id(this.tabs.buttonGroup).setStyle('margin-left', 63);
+        document.id(this.tabs.buttonGroup).setStyle('margin-left', 16);
 
         this.loadList();
     },
@@ -795,7 +798,7 @@ var jarves_user_acl = new Class({
             }).inject(div);
 
             div.count = new Element('span', {
-                style: 'font-weight: normal; color: silver;'
+                style: 'font-weight: normal; color: gray;'
             }).inject(h2);
 
             if (object.desc) {
@@ -1006,7 +1009,7 @@ var jarves_user_acl = new Class({
             delete value.constraintCodeExact;
         }
 
-        if (!Object.getLength(value.fields)) {
+        if (!value.fields || !Object.getLength(value.fields)) {
             delete value.fields;
         } else {
             value.fields = JSON.encode(value.fields);
@@ -1190,8 +1193,6 @@ var jarves_user_acl = new Class({
         }
 
         this.editRuleKaObj = new jarves.FieldForm(this.editRuleDialog.content, fields, {
-            allTableItems: 1,
-            tableItemLabelWidth: 180,
             returnDefault: true
         }, {win: this.win});
 
@@ -1434,7 +1435,7 @@ var jarves_user_acl = new Class({
 
                     new Element('span', {
                         text: ' (' + item.ruleCount + ')',
-                        style: 'color: silver; font-size: 12px; font-weight: normal;'
+                        style: 'color: gray; font-size: 12px; font-weight: normal;'
                     }).inject(h2);
 
                     var subline = new Element('div', {
@@ -1496,7 +1497,7 @@ var jarves_user_acl = new Class({
 
                     new Element('span', {
                         text: ' (' + item.ruleCount + ')',
-                        style: 'color: silver; font-size: 12px; font-weight: normal;'
+                        style: 'color: gray; font-size: 12px; font-weight: normal;'
                     }).inject(h2);
 
                 }.bind(this));
@@ -1675,8 +1676,7 @@ var jarves_user_acl = new Class({
             }
         };
 
-        var kaFields = new jarves.FieldForm(fieldContainer, fields, {allTableItems: 1, tableItemLabelWidth: 180},
-            {win: this.win});
+        var kaFields = new jarves.FieldForm(fieldContainer, fields, {}, {win: this.win});
 
         var deleteRule = new jarves.Button([t('Delete rule'), '#icon-minus-5']).inject(fieldContainer);
 

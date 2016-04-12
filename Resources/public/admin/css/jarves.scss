@@ -31,7 +31,8 @@ $base-font-size: 13px;
     -webkit-font-smoothing: antialiased;
     text-rendering: geometricPrecision;
     font-smooth: never;
-    font-weight: 300;
+    color: #383838;
+    font-weight: 400;
 }
 
 ::-webkit-scrollbar {
@@ -401,13 +402,10 @@ $base-font-size: 13px;
     height: 30px;
     padding: 0 15px;
     padding-right: 25px;
-    background-color: darken($mainColor, 5%);
+    background-color: #DADADA;
     cursor: default;
     position: relative;
-
-    &:last-child {
-        border-right: 1px solid #e2e2e2;
-    }
+    border-right: 1px solid #D0D0D0;
 }
 
 .jarves-admin {

@@ -63,7 +63,11 @@ jarves.DashboardWidgets.NewsFeed = new Class({
         new Element('a', {
             'class': 'jarves-Dashboard-newsFeed-item-user',
             text: item.username
-        }).inject(div);
+        })
+            .addEvent('click', function() {
+                jarves.openObjectDetailEntryPoint('jarves/user', {'id': item.userId});
+            })
+            .inject(div);
 
         new Element('span', {
             'class': 'jarves-Dashboard-newsFeed-item-verb',
@@ -77,14 +81,22 @@ jarves.DashboardWidgets.NewsFeed = new Class({
                 new Element('a', {
                     'class': 'jarves-Dashboard-newsFeed-item-object-label',
                     text: objectLabel
-                }).inject(div);
+                })
+                    .addEvent('click', function() {
+                        jarves.openObjectListEntryPoint(item.targetObject);
+                    })
+                    .inject(div);
             }
         }
 
         new Element('a', {
             'class': 'jarves-Dashboard-newsFeed-item-label',
             text: item.targetLabel
-        }).inject(div);
+        })
+            .addEvent('click', function() {
+                jarves.openObjectDetailEntryPoint(item.targetObject, jarves.getObjectItemFromUrlId(item.targetObject, item.targetPk));
+            })
+            .inject(div);
 
         new Element('div', {
             'class': 'jarves-Dashboard-newsFeed-item-date',

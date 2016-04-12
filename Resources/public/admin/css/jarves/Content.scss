@@ -180,6 +180,12 @@
     text-indent: 0;
 }
 
+.jarves-content-type-plugin:hover {
+    background: rgba(175, 174, 179, 0.3) url(../../images/plugin-background.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
 .jarves-content-markdown textarea:focus {
     outline: 0;
     border-color: transparent;

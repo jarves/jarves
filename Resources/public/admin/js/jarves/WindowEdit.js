@@ -194,6 +194,12 @@ jarves.WindowEdit = new Class({
     },
 
     _loadItem: function(pItem) {
+        if (!pItem) {
+            this.win.setLoading(false);
+            this.win.alert(t('Not found or access denied.'));
+            return;
+        }
+
         this.item = pItem;
 
         this.setValue(pItem, true);

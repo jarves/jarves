@@ -89,9 +89,9 @@
             <entryPoint path="logs" type="custom" system="true" icon="#icon-list-9" link="true">
                 <label>Logs</label>
             </entryPoint>
-          <entryPoint path="settings" type="custom" system="true" icon="#icon-cog-4" link="false" multi="true">
-        <label>Settings</label>
-      </entryPoint>
+          <dentryPoint path="settings" type="custom" system="true" icon="#icon-cog-4" link="false" multi="true">
+            <label>Settings</label>
+          </dentryPoint>
           <entryPoint path="development" system="true" link="true">
             <label>Development</label>
             <children>
@@ -104,6 +104,9 @@
             </children>
           </entryPoint>
         </children>
+      </entryPoint>
+      <entryPoint path="object" system="true" link="false">
+        <label>Objects</label>
       </entryPoint>
       <entryPoint path="user" system="true" link="true">
         <label>User Management</label>

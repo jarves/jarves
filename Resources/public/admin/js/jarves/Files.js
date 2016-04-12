@@ -53,6 +53,7 @@ jarves.Files = new Class({
         search: true,
         path: '/',
         withSidebar: false,
+        standalone: false,
 
         onlyLocal: false, //only local files are selectable. So exludes all magic folders
         returnPath: false, //return the path instead of the object_id (like in version <= 0.9)
@@ -106,7 +107,9 @@ jarves.Files = new Class({
             this.cancelUploads();
         }.bind(this));
 
-        this.loadRoot();
+        if (!this.options.standalone) {
+            this.loadRoot();
+        }
 
         this.addEvent('select', this.updateStatusBar);
         this.addEvent('deselect', this.updateStatusBar);
@@ -143,9 +146,6 @@ jarves.Files = new Class({
 
     setTitle: function(path) {
         var folder = path;
-        if (folder.substr(0, 1) != '/') {
-            folder = '/' + folder;
-        }
 
         this.win.setTitle(folder);
     },
@@ -1338,7 +1338,11 @@ jarves.Files = new Class({
         this.address.setValue(path);
         this.addressFaker.set('text', path);
         this.parseAddressFaker();
-        this.setTitle(path);
+
+        var lastSlash = path.lastIndexOf('/');
+        var title = path.slice(lastSlash + 1);
+
+        this.setTitle('Files ' + title);
     },
 
     reRender: function() {

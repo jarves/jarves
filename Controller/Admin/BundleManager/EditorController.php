@@ -11,12 +11,16 @@ use Jarves\Configuration\Assets;
 use Jarves\Configuration\Model;
 use Jarves\Exceptions\ClassNotFoundException;
 use Jarves\Exceptions\FileAlreadyExistException;
+use Jarves\Exceptions\ModelBuildException;
 use Jarves\Filesystem\Filesystem;
 use Jarves\Jarves;
 use Jarves\JarvesBundle;
 use Jarves\Objects;
+use Jarves\ORM\Builder\Builder;
+use Jarves\ORM\Builder\Propel;
 use Jarves\Tools;
 use Jarves\Utils;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -584,23 +588,39 @@ class EditorController extends Controller
         return $this->localFilesystem->write($path, $model);
     }
 
-//    /**
-//     * @ApiDoc(
-//     *  section="Bundle Editor",
-//     *  description="Builds all model files and updates their model schema"
-//     * )
-//     *
-//     * @Rest\Post("/admin/system/bundle/editor/model/build")
-//     *
-//     * @return boolean
-//     * @throws ModelBuildException
-//     */
-//    public function setModelFromObjectsAction()
-//    {
-//        $modelBuilder = $this->jarves->getModelBuilder();
-//        $modelBuilder->build();
-//        return true;
-//    }
+    /**
+     * @ApiDoc(
+     *  section="Bundle Editor",
+     *  description="Builds all model files and updates their model schema"
+     * )
+     *
+     * @Rest\RequestParam(name="objectKey", requirements=".*", strict=true, description="The object key like jarves/node")
+     *
+     * @Rest\Post("/admin/system/bundle/editor/model/build")
+     *
+     * @return boolean
+     * @throws ModelBuildException
+     */
+    public function setModelFromObjectsAction($objectKey)
+    {
+        /** @var Builder $modelBuilder */
+        $modelBuilder = $this->get('jarves.model.builder');
+
+
+        /** @var Propel $builder */
+        $builder = $modelBuilder->getBuilder('propel');
+
+        $object = $this->jarves->getConfigs()->getObject($objectKey);
+
+        if (!$object) {
+            throw new \RuntimeException('Object not found ' . $objectKey);
+        }
+
+        $buffer = new BufferedOutput();
+        $builder->build([$object], $buffer, true);
+
+        return $buffer->fetch();
+    }
 
     /**
      * @ApiDoc(

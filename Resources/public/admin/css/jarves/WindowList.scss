@@ -332,13 +332,18 @@
     text-indent: 0;
     height: 28px;
     border: 0;
+    vertical-align: top;
 }
 
 .jarves-WindowList-actionBar-page-count {
     display: inline-block;
     min-width: 29px;
+    height: 28px;
     text-align: center;
-    line-height: 30px;
+    line-height: 28px;
+    font-size: 12px;
+    background-color: #D6D6D6;
+    vertical-align: top;
 }
 
 .jarves-WindowList-actionBar .actionBar img {
@@ -434,7 +439,7 @@ a.jarves-WindowList-search-button-active:link {
 }
 
 .jarves-WindowList-navigationBar {
-    margin-top: 1px;
+    margin-top: 5px;
 }
 
 .jarves-WindowList-navigationBar .jarves-buttonGroup-item,

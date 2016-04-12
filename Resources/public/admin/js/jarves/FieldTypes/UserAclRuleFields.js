@@ -28,7 +28,7 @@ jarves.FieldTypes.UserAclRuleFields = new Class({
         }).inject(this.fieldInstance.fieldPanel);
 
         new Element('div', {
-            style: 'color: silver; padding: 5px 0px;',
+            style: 'color: gray; padding: 5px 0px;',
             text: t('Please note that these fields are only for view/edit/add forms, not for the listing.')
         }).inject(this.main);
 

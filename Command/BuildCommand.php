@@ -31,8 +31,9 @@ class BuildCommand extends AbstractCommand
         parent::configure();
         $this
             ->setName('jarves:orm:build:propel')
-            ->addArgument('bundle', InputArgument::REQUIRED, 'Bundle name, like JarvesPublicationBundle')
-            ->addOption('overwrite', null, InputOption::VALUE_NONE)
+            ->addArgument('bundle', InputArgument::REQUIRED, 'filter by bundle, short version name')
+            ->addArgument('object-id', InputArgument::OPTIONAL, 'filter by given object-id')
+            ->addOption('overwrite', null, InputOption::VALUE_NONE, 'whether existing schema files should be overwritten')
             ->setDescription('Builds all ORM model schema files')
         ;
     }
@@ -44,17 +45,27 @@ class BuildCommand extends AbstractCommand
     {
         $modelBuilder = $this->getContainer()->get('jarves.model.builder');
 
-        $bundleName = $input->getArgument('bundle');
+        $filterByObjectId = $input->getArgument('object-id');
+        $filterByBundle = $input->getArgument('bundle');
         $overwrite = $input->getOption('overwrite');
 
-        $bundle = $this->getJarves()->getConfig($bundleName);
+        $bundle = $this->getJarves()->getConfig($filterByBundle);
         if (!$bundle) {
-            $output->write(sprintf('Bundle %s not found [%s]', $bundleName, implode(', ', array_keys($this->getJarves()->getBundles()))));
+            $output->write(sprintf('Bundle for %s not found [%s]', $filterByBundle, implode(', ', array_keys($this->getJarves()->getBundles()))));
             return;
+        }
+
+        $objects = [];
+        foreach ($bundle->getObjects() as $object) {
+            if ($filterByObjectId && strtolower($filterByObjectId) !== strtolower($object->getId())) {
+                continue;
+            }
+
+            $objects[] = $object;
         }
 
         /** @var Propel $builder */
         $builder = $modelBuilder->getBuilder('propel');
-        $builder->build($bundle->getObjects(), $output, $overwrite);
+        $builder->build($objects, $output, $overwrite);
     }
 }

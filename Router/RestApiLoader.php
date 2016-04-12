@@ -187,7 +187,7 @@ class RestApiLoader extends Loader
                 if ($objects = $config->getObjects()) {
                     foreach ($objects as $object) {
 
-                        if ($object->getExcludeFromREST()) {
+                        if ($object->isExcludeFromREST()) {
                             continue;
                         }
 

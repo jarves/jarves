@@ -585,9 +585,6 @@ var jarves_system_module_edit = new Class({
             noCache: 1,
             saveStatusButton: this.saveBtn,
             onComplete: function() {
-                if (true === andUpdate) {
-                    this.updateORM();
-                }
                 jarves.loadSettings();
             }.bind(this)}).post(req);
     },
@@ -1543,7 +1540,6 @@ var jarves_system_module_edit = new Class({
 			         }
 		        }.bind(this));
 		        theme.layouts = layouts;
-		        console.log(theme);
 	        }.bind(this));
 
             this.themes.setValue(themes);
@@ -1969,8 +1965,6 @@ var jarves_system_module_edit = new Class({
 
         var buttonBar = new jarves.ButtonBar(this.panes['objects']);
         this.saveButton = buttonBar.addButton(t('Save'), this.saveObjects.bind(this, false));
-        this.saveButtonORM = buttonBar.addButton(t('Save and build'), this.saveObjects.bind(this, true));
-        this.saveButtonORM.setButtonStyle('blue');
 
         this.lr = new Request.JSON({url: _pathAdmin + 'admin/system/bundle/editor/objects', noCache: 1,
             onComplete: function(response) {
@@ -1987,7 +1981,7 @@ var jarves_system_module_edit = new Class({
             }.bind(this)}).get({bundle: this.mod});
     },
 
-    modelBuild: function(callback) {
+    modelBuild: function(objectKey, callback) {
         if (this.lr) {
             this.lr.cancel();
         }
@@ -2022,56 +2016,34 @@ var jarves_system_module_edit = new Class({
                 }).inject(dialog.getContentContainer());
 
                 dialog.show();
+                callback(response);
 
             }.bind(this),
             onComplete: function(response) {
                 if (response.data) {
-                    var atLeastOneFailed = false;
-                    Object.each(response.data, function(success, id) {
-                        if (true !== success) {
-                            atLeastOneFailed = true;
-                        }
-                    });
-                    if (atLeastOneFailed) {
-                        var dialog = new jarves.Dialog(this.win);
-                        dialog.setStyle('width', '80%');
-                        dialog.setStyle('height', '90%');
+                    var dialog = new jarves.Dialog(this.win);
+                    dialog.setStyle('width', '80%');
+                    dialog.setStyle('height', '90%');
 
-                        var content = '';
+                    var content = '';
 
-                        new Element('h1', {
-                            text: t('One or more objects have errors.')
-                        }).inject(dialog.getContentContainer());
+                    new Element('h1', {
+                        text: t('Success')
+                    }).inject(dialog.getContentContainer());
 
-                        Object.each(response.data, function(success, id) {
-                            var div = new Element('div').inject(dialog.getContentContainer());
+                    new Element('div', {
+                        text: response.data,
+                        style: 'white-space: pre; border: 1px solid silver; padding: 15px;'
+                    }).inject(dialog.getContentContainer());
 
-                            new Element('h2', {
-                                text: id
-                            }).inject(div);
+                    dialog.center();
 
-                            if (true === success) {
-                                new Element('div', {
-                                    text: t('Success'),
-                                    style: 'padding: 5px; text-align: center; color: green; border: 1px solid silver;'
-                                }).inject(div);
-                            } else {
-                                new Element('div', {
-                                    text: success,
-                                    style: 'padding: 5px; color: red; border: 1px solid silver;'
-                                }).inject(div);
-                            }
-                        });
+                    new jarves.Button(t('Ok')).addEvent('click', dialog.close)
+                        .setButtonStyle('blue').inject(dialog.bottom);
 
-                        dialog.center();
-
-                        var ok = new jarves.Button(t('Ok')).addEvent('click', dialog.close).setButtonStyle('blue').inject(dialog.bottom);
-
-                    } else {
-                        callback(response);
-                    }
+                    callback(response);
                 }
-            }.bind(this)}).post();
+            }.bind(this)}).post({objectKey: objectKey});
     },
 
     printOrmError: function(pResponse) {
@@ -2101,13 +2073,13 @@ var jarves_system_module_edit = new Class({
         var ok = new jarves.Button(t('Ok')).addEvent('click', dialog.close).setButtonStyle('blue').inject(dialog.bottom);
     },
 
-    updateORM: function() {
-        this.currentButton.setProgress(50);
-        this.currentButton.startLoading(t('Saved. Write Models ...'));
+    updateORM: function(objectKey, actionButton) {
+        actionButton.setProgress(50);
+        actionButton.startLoading(t('Build ORM...'));
 
-        this.modelBuild(function() {
-            this.currentButton.setProgress(100);
-            this.currentButton.doneLoading(t('Done.'));
+        this.modelBuild(objectKey, function() {
+            actionButton.setProgress(100);
+            actionButton.doneLoading(t('Done.'));
         }.bind(this));
     },
 
@@ -2129,7 +2101,6 @@ var jarves_system_module_edit = new Class({
             this.lr.cancel();
         }
         this.currentButton = withBuildAndUpdate ? this.saveButtonORM : this.saveButton;
-        console.log(withBuildAndUpdate,this.currentButton);
 
         var req = {};
         req.objects = objects;
@@ -2144,11 +2115,7 @@ var jarves_system_module_edit = new Class({
             saveStatusButton: this.currentButton,
             onSuccess: function(response) {
                 jarves.loadSettings(['configs']);
-                if (withBuildAndUpdate) {
-                    this.updateORM();
-                }
             }.bind(this)}).post(req);
-
     },
 
     openObjectSettings: function(pTr) {
@@ -2649,6 +2616,10 @@ var jarves_system_module_edit = new Class({
 
         var fieldsBtn = new jarves.Button(t('Fields')).inject(actions);
         var crudBtn = new jarves.Button(t('CRUD')).inject(actions);
+        var buildOrmBtn = new jarves.Button(t('Build ORM')).inject(actions);
+        buildOrmBtn.addEvent('click', function(){
+           this.updateORM(this.mod + '/' + pKey, buildOrmBtn);
+        }.bind(this));
         new jarves.Button(t('Settings')).addEvent('click', this.openObjectSettings.bind(this, tr)).inject(actions);
 
 //        if (pDefinition) {

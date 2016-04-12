@@ -274,7 +274,11 @@ jarves.FieldTypes.PageContents = new Class({
         }, this.treeContainer);
 
         this.treeField.addEvent('change', function(value){
-            this.loadEditor(null, value.id);
+            if (this.currentNode && this.currentNode === value.id) {
+                return;
+            }
+
+            this.loadStandaloneEditor(domainId, value.id);
         }.bind(this));
 
         if (this.getEditor()) {
@@ -390,6 +394,12 @@ jarves.FieldTypes.PageContents = new Class({
         }, this.layoutSelectionContainer);
     },
 
+    loadStandaloneEditor: function(domainId, nodeId) {
+        this.currentLayout = null;
+        this.firstSelectedLayout = null;
+        this.loadEditor(domainId, nodeId, null, null);
+    },
+
     loadEditor: function(domainId, nodeId, contents, targetLayout) {
         var options = {
             standalone: this.options.standalone
@@ -401,13 +411,15 @@ jarves.FieldTypes.PageContents = new Class({
             targetLayout = this.currentLayout || this.firstSelectedLayout;
         }
 
-        if (this.currentNode && this.currentNode == nodeId && this.currentLayout == targetLayout && this.getEditor()) {
+        if (!this.options.standalone && this.currentNode && this.currentNode == nodeId && this.currentLayout == targetLayout && this.getEditor()) {
             this.getEditor().setValue(contents);
             return;
         }
 
         this.currentLayout = targetLayout;
-        this.layoutSelection.setValue(targetLayout);
+        if (this.layoutSelection) {
+            this.layoutSelection.setValue(targetLayout);
+        }
 
         // this.layoutSelection.setValue(targetLayout);
 
@@ -484,7 +496,7 @@ jarves.FieldTypes.PageContents = new Class({
     },
 
     getNodeId: function() {
-        return this.getEditor().options.node.id;
+        return this.getEditor() ? this.getEditor().options.node.id : null;
     },
 
     getDomainId: function() {

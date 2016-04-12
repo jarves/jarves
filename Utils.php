@@ -145,7 +145,10 @@ class Utils
         }
 
         $username = '[Unknown]';
+        $userId = 0;
         if ($this->pageStack->getClient() && $this->pageStack->getClient()->getUser()) {
+            $userId = $this->pageStack->getClient()->getUser()->getId();
+
             if ($this->pageStack->getClient()->getUser()->getFirstName() || $this->pageStack->getClient()->getUser()->getLastName()) {
                 $username = $this->pageStack->getClient()->getUser()->getFirstName();
                 if ($username) $username .= ' ';
@@ -157,6 +160,7 @@ class Utils
 
         $newsFeed = new \Jarves\Model\NewsFeed();
         $newsFeed->setUsername($username);
+        $newsFeed->setUserId($userId);
         $newsFeed->setVerb($verb);
 
         $newsFeed->setTargetObject($objectKey);

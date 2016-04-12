@@ -55,11 +55,33 @@ jarves.ObjectTable = new Class({
         var objectDefinition = jarves.getObjectDefinition(this.objectKey);
 
         if (!objectDefinition.browserColumns || Object.getLength(objectDefinition.browserColumns) == 0) {
-            new Element('div', {
-                text: tf('The object %s does not have any browser columns defined.', this.objectKey),
-                style: 'padding: 50px; color: gray; text-align: center;'
-            }).inject(this.subcontainer);
-            return false;
+            objectDefinition.browserColumns = {};
+
+            Object.each(objectDefinition.fields, function(field, fieldId) {
+                if (field.primaryKey) {
+                    objectDefinition.browserColumns[fieldId] = field;
+                }
+            });
+
+            var addedALabelField = false;
+
+            if (objectDefinition.labelField) {
+                objectDefinition.browserColumns[objectDefinition.labelField] = objectDefinition.fields[objectDefinition.labelField];
+                addedALabelField = true;
+            }
+
+            Object.each(objectDefinition.fields, function(field, fieldId) {
+                if (!field.primaryKey && !addedALabelField && field.type == 'text') {
+                    addedALabelField = true;
+                    objectDefinition.browserColumns[fieldId] = field;
+                }
+            });
+
+            // new Element('div', {
+            //     text: tf('The object %s does not have any browser columns defined.', this.objectKey),
+            //     'class': 'jarves-dialog-error-message'
+            // }).inject(this.subcontainer);
+            // return false;
         }
 
         Object.each(objectDefinition.browserColumns, function (column, key) {

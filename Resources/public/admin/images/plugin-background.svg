@@ -1,0 +1,21 @@
+<!--
+  ~ This file is part of Jarves.
+  ~
+  ~ (c) Marc J. Schmidt <marc@marcjschmidt.de>
+  ~
+  ~     J.A.R.V.E.S - Just A Rather Very Easy [content management] System.
+  ~
+  ~     http://jarves.io
+  ~
+  ~ To get the full copyright and license information, please view the
+  ~ LICENSE file, that was distributed with this source code.
+  -->
+
+<svg xmlns="http://www.w3.org/2000/svg" width="330px" height="330px">
+    <defs>
+        <style type="text/css">
+            @import url("../icons/style.css");
+        </style>
+    </defs>
+    <text x="25" y="240" style="font-family: icomoon;font-size: 150;fill: black;">&#xe271;</text>
+</svg>

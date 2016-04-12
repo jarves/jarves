@@ -82,22 +82,32 @@ class BackendController extends Controller
 
         $condition = new Condition();
 
-        foreach ($this->jarves->getConfigs()->getConfigs() as $bundleConfig) {
+        $configs = $this->jarves->getConfigs()->getConfigs();
+        $objects = [];
+        foreach ($configs as $bundleConfig) {
             if (!$bundleConfig->getObjects()) {
                 continue;
             }
 
             foreach ($bundleConfig->getObjects() as $object) {
-                /** @var AbstractStorage $storage */
-                $storage = $storageFactory->createStorage($object);
-
-                try {
-                    if ($searchResult = $storage->search($query, clone $condition)) {
-                        $result['items'][$object->getKey()] = $searchResult;
-                    };
-                } catch (\Exception $e) {
-                    $result['errors'][$object->getKey()] = get_class($e) . ': ' . $e->getMessage();
+                if ('jarves/file' !== $object->getKey()) {
+                    $objects[] = $object;
                 }
+            }
+        }
+
+        $objects[] = $this->jarves->getConfigs()->getObject('jarves/file');
+
+        foreach ($objects as $object) {
+            /** @var AbstractStorage $storage */
+            $storage = $storageFactory->createStorage($object);
+
+            try {
+                if ($searchResult = $storage->search($query, clone $condition)) {
+                    $result['items'][$object->getKey()] = $searchResult;
+                };
+            } catch (\Exception $e) {
+                $result['errors'][$object->getKey()] = get_class($e) . ': ' . $e->getMessage();
             }
         }
 
@@ -127,16 +137,21 @@ class BackendController extends Controller
         $localFilesystem->remove($kernel->getCacheDir());
         $localFilesystem->mkdir($kernel->getCacheDir());
 
+        $localFilesystem->remove('web/cache');
+        $localFilesystem->mkdir('web/cache');
+
         /** @var StorageFactory $storageFactory */
         $storageFactory = $this->get('jarves.storage_factory');
 
         foreach ($this->jarves->getConfigs()->getConfigs() as $bundleConfig) {
             $cacher->invalidateCache($bundleConfig->getName());
 
-            foreach ($bundleConfig->getObjects() as $object) {
-                /** @var AbstractStorage $storage */
-                $storage = $storageFactory->createStorage($object);
-                $storage->clearCache();
+            if ($bundleConfig->getObjects()) {
+                foreach ($bundleConfig->getObjects() as $object) {
+                    /** @var AbstractStorage $storage */
+                    $storage = $storageFactory->createStorage($object);
+                    $storage->clearCache();
+                }
             }
         }
 

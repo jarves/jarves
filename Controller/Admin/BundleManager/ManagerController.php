@@ -92,16 +92,72 @@ class ManagerController extends Controller
     public function deactivateAction($bundle)
     {
         Manager::prepareName($bundle);
+        $this->get('logger')->alert('DEACTIVATE BUNDLE ' . $bundle);
 
-        $bundle = $this->jarves->getBundle($bundle);
-
-        if ($bundle) {
-            $appModifier = new AppKernelModifier();
-            $appModifier->removeBundle(get_class($bundle));
-            return $appModifier->save();
+        if (0 === stripos($bundle, 'Jarves\\')) {
+            throw new \RuntimeException('Can not disabled Jarves bundle for security reasons.');
         }
 
-        return false;
+        $appKernelPath = new \ReflectionClass('AppKernel');
+        $file = $appKernelPath->getFileName();
+        $content = file_get_contents($file);
+
+        if (!class_exists($bundle)) {
+            throw new \RuntimeException('Bundle does not exist.');
+        }
+
+        if (false === stripos($content, 'new ' . $bundle) && false === stripos($content, 'new \\' . $bundle)) {
+            throw new \RuntimeException('Bundle not registered');
+        }
+
+        $searchBundle = 'new ' . $bundle . '()';
+        $content = preg_replace('/^[\s\t]*' .preg_quote($searchBundle) . '\s*\,?$/m', '', $content);
+
+        return !!file_put_contents($file, $content);
+    }
+
+    /**
+     * @ApiDoc(
+     *  section="Bundle/Package Manager",
+     *  description="Activates a bundle in the AppKernel"
+     * )
+     *
+     * @Rest\RequestParam(name="bundle", requirements=".+", strict=true, description="The bundle name")
+     *
+     * @Rest\Post("/admin/system/bundle/manager/activate")
+     *
+     * @param string $bundle
+     *
+     * @return boolean
+     */
+    public function activateAction($bundle)
+    {
+        Manager::prepareName($bundle);
+
+        $this->get('logger')->alert('ACTIVATE BUNDLE ' . $bundle);
+
+        $appKernelPath = new \ReflectionClass('AppKernel');
+        $file = $appKernelPath->getFileName();
+        $content = file_get_contents($file);
+
+        if (!class_exists($bundle)) {
+            throw new \RuntimeException('Bundle does not exist.');
+        }
+
+        if (false !== stripos($content, 'new ' . $bundle) || false !== stripos($content, 'new \\' . $bundle)) {
+            throw new \RuntimeException('Bundle already registered');
+        }
+
+        $newJarves = 'new Jarves\\JarvesBundle()';
+        $searchJarves = '/^(\s*)' . preg_quote($newJarves) . '/m';
+        $result = preg_match($searchJarves, $content);
+        if (!$result) {
+            throw new \RuntimeException('Jarves bundle not found in AppKernel.');
+        }
+
+        $content = preg_replace($searchJarves, "\$1new " . $bundle . "(),\n\$1" . $newJarves, $content);
+
+        return !!file_put_contents($file, $content);
     }
 
     /**
@@ -215,40 +271,10 @@ This is the bundle $bundleClassName.
     /**
      * @ApiDoc(
      *  section="Bundle/Package Manager",
-     *  description="Activates a bundle in the AppKernel"
-     * )
-     *
-     * @Rest\RequestParam(name="bundle", requirements=".+", strict=true, description="The bundle name")
-     *
-     * @Rest\Post("/admin/system/bundle/manager/activate")
-     *
-     * @param string $bundle
-     *
-     * @return boolean
-     */
-    public function activateAction($bundle)
-    {
-        Manager::prepareName($bundle);
-
-        $appModifier = new AppKernelModifier();
-        if (class_exists($bundle)) {
-            if ($appModifier->addBundle($bundle)) {
-                $appModifier->save();
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @ApiDoc(
-     *  section="Bundle/Package Manager",
      *  description="Returns composer information for given package"
      * )
      *
-     * @Rest\QueryParam(name="name", requirements="[a-zA-Z0-9/]", strict=true, description="The composer package name")
+     * @Rest\QueryParam(name="bundle", requirements="[a-zA-Z0-9/]+", strict=true, description="The composer package name")
      *
      * @Rest\Get("/admin/system/bundle/manager/info")
      *
@@ -256,7 +282,7 @@ This is the bundle $bundleClassName.
      *
      * @return array
      */
-    public function getInstalledInfoAction($name)
+    public function getInstalledInfoAction($bundle)
     {
         $fs = $this->localFilesystem;
         if ($fs->has('composer.lock')) {
@@ -265,7 +291,7 @@ This is the bundle $bundleClassName.
                 $composerLock = json_decode($composerLock, true);
 
                 foreach ($composerLock['packages'] as $package) {
-                    if (strtolower($package['name']) == strtolower($name)) {
+                    if (strtolower($package['name']) == strtolower($bundle)) {
                         return $package;
                     }
                 }
@@ -525,7 +551,7 @@ This is the bundle $bundleClassName.
             $interfaces = $reflection->getInterfaceNames();
             if (in_array('Symfony\Component\HttpKernel\Bundle\BundleInterface', $interfaces)) {
 
-                $composer = $this->utils->getComposerArray($bundleClass) ? : [];
+                $composer = $this->utils->getComposerArray($bundleClass) ?: [];
                 $composer['_path'] = $this->jarves->getBundleDir($bundleClass);
                 if (isset($composer['name'])) {
                     $composer['_installed'] = $this->getInstalledInfoAction($composer['name']);
@@ -556,7 +582,7 @@ This is the bundle $bundleClassName.
     {
         $res = [];
         foreach ($this->jarves->getBundles() as $bundleName => $bundle) {
-            $composer = $this->utils->getComposerArray($bundleName) ? : [];
+            $composer = $this->utils->getComposerArray($bundleName) ?: [];
             $version = @$composer['version'];
             if ($version && $version != '' && self::versionCompareToServer(
                     $version,
@@ -592,7 +618,7 @@ This is the bundle $bundleClassName.
      * @Rest\Post("/admin/system/bundle/manager/install")
      *
      * @param string $bundle
-     * @param bool   $ormUpdate
+     * @param bool $ormUpdate
      *
      * @return array
      */
@@ -635,8 +661,8 @@ This is the bundle $bundleClassName.
      * @Rest\Post("/admin/system/bundle/manager/install")
      *
      * @param string $bundle
-     * @param bool   $ormUpdate
-     * @param bool   $removeFiles
+     * @param bool $ormUpdate
+     * @param bool $removeFiles
      *
      * @throws BundleNotFoundException
      * @return bool
@@ -750,7 +776,8 @@ This is the bundle $bundleClassName.
         RepositoryInterface $repos,
         $name,
         $version = null
-    ) {
+    )
+    {
         $name = strtolower($name);
         $constraint = null;
         if ($version) {
@@ -827,7 +854,7 @@ This is the bundle $bundleClassName.
             array($installedRepo),
             $composer->getRepositoryManager()->getRepositories()
         ));
-        list($package, ) = $this->getPackage($installedRepo, $repos, $name, $version);
+        list($package,) = $this->getPackage($installedRepo, $repos, $name, $version);
 
         if (!$package) {
             throw new PackageNotFoundException(sprintf(

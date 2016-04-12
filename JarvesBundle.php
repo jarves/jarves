@@ -17,8 +17,8 @@ namespace Jarves;
 use Jarves\Cache\Cacher;
 use Jarves\Configuration\Connection;
 use Jarves\Configuration\Database;
+use Jarves\Configuration\EntryPoint;
 use Jarves\DependencyInjection\AssetCompilerCompilerPass;
-use Jarves\DependencyInjection\FieldTypesCompilerPass;
 use Jarves\DependencyInjection\ModelBuilderCompilerPass;
 use Propel\Runtime\Connection\ConnectionManagerMasterSlave;
 use Propel\Runtime\Connection\ConnectionManagerSingle;
@@ -114,8 +114,10 @@ class JarvesBundle extends Bundle
         $bootNeededCallback = $jarves->loadBundleConfigs($cacher);
         $this->registerContentTypes($jarves, $container);
         $this->registerFieldTypes($jarves, $container);
+
         if ($bootNeededCallback) {
             $jarves->getConfigs()->boot();
+            $this->setupObjects($jarves->getConfigs()->getConfigs());
             $bootNeededCallback();
         }
 
@@ -123,7 +125,97 @@ class JarvesBundle extends Bundle
         $this->loadPropelConfig($jarvesConfig->getSystemConfig()->getDatabase());
 
         $jarvesEventDispatcher->registerBundleEvents($jarves->getConfigs());
+    }
 
+    /**
+     * Setup AutoCrud
+     *
+     * @param \Jarves\Configuration\Bundle[] $bundleConfigs
+     */
+    protected function setupObjects(array $bundleConfigs) {
+
+        $objectsEntryPoint = $bundleConfigs['jarves']->getEntryPoint('object');
+
+        foreach ($bundleConfigs as $bundleConfig) {
+
+            /** @var EntryPoint[][] $objectEntryPoints */
+            $objectEntryPoints = [];
+            //read all entry points for each object
+            if ($bundleConfig->getEntryPoints()) {
+                foreach ($bundleConfig->getEntryPoints() as $entryPoint) {
+                    if ($entryPoint->getObject()) {
+                        $objectEntryPoints[$entryPoint->getObject()][$entryPoint->getType()] = $entryPoint;
+                    }
+                }
+            }
+
+            $entryPointsForThisBundle = [];
+            if ($bundleConfig->getObjects()) {
+                foreach ($bundleConfig->getObjects() as $object) {
+                    if (!isset($objectEntryPoints[$object->getKey()])) {
+                        //this object does not have any entry point to manage.
+
+                        if (!$object->getAutoCrud()) {
+                            //jarves should not autobuild entry points
+                            continue;
+                        }
+
+                        $entryPoint = new EntryPoint();
+                        $entryPoint->setPath(lcfirst($object->getId()));
+                        $entryPoint->setType('combine');
+                        $entryPoint->setObject($object->getKey());
+                        $entryPoint->setLink(true);
+                        $entryPoint->setIcon('#' . ($object->isNested() ? 'icon-list-nested' : 'icon-list'));
+                        $entryPoint->setLabel(($object->getLabel() ?: $object->getKey()));
+                        $entryPointsForThisBundle[] = $entryPoint;
+
+                        $objectEntryPoints[$entryPoint->getObject()][$entryPoint->getType()] = $entryPoint;
+                    }
+                }
+            }
+
+            if ($entryPointsForThisBundle) {
+                //we added some autoCrud entry points
+                $bundleObjectContainerEntryPoint = new EntryPoint();
+                $bundleObjectContainerEntryPoint->setPath($bundleConfig->getName());
+                $bundleObjectContainerEntryPoint->setLink(true);
+                $bundleObjectContainerEntryPoint->setLabel($bundleConfig->getLabel() ?: $bundleConfig->getBundleName());
+                $objectsEntryPoint->addChildren($bundleObjectContainerEntryPoint);
+
+                foreach ($entryPointsForThisBundle as $entryPoint) {
+                    $bundleObjectContainerEntryPoint->addChildren($entryPoint);
+                }
+            }
+
+            if ($bundleConfig->getObjects()) {
+                foreach ($bundleConfig->getObjects() as $object) {
+                    //setup addEntrypoint, editEntrypoint, listEntrypoint if not set already
+                    if (isset($objectEntryPoints[$object->getKey()]['combine'])) {
+
+                        if (!$object->getAddEntryPoint()) {
+                            $object->setAddEntryPoint($objectEntryPoints[$object->getKey()]['combine']->getFullPath());
+                        }
+                        if (!$object->getEditEntryPoint()) {
+                            $object->setEditEntryPoint($objectEntryPoints[$object->getKey()]['combine']->getFullPath());
+                        }
+                        if (!$object->getListEntryPoint()) {
+                            $object->setListEntryPoint($objectEntryPoints[$object->getKey()]['combine']->getFullPath());
+                        }
+                    }
+                    if ($object->getAddEntryPoint() && isset($objectEntryPoints[$object->getKey()]['add'])) {
+                        $object->setAddEntryPoint($objectEntryPoints[$object->getKey()]['add']->getFullPath());
+                    }
+
+                    if ($object->getEditEntryPoint() && isset($objectEntryPoints[$object->getKey()]['edit'])) {
+                        $object->setEditEntryPoint($objectEntryPoints[$object->getKey()]['edit']->getFullPath());
+                    }
+
+                    if ($object->getListEntryPoint() && isset($objectEntryPoints[$object->getKey()]['list'])) {
+                        $object->setListEntryPoint($objectEntryPoints[$object->getKey()]['list']->getFullPath());
+                    }
+                }
+            }
+        }
     }
 
     protected function registerFieldTypes(Jarves $jarves, ContainerInterface $container)

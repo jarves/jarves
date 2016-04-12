@@ -20,7 +20,8 @@ input.text {
     height: 28px;
 
     font-family: 'Open sans', Verdana;
-    font-weight: 300;
+    font-weight: 400;
+    color: #222;
 
     width: 100%;
 
@@ -92,7 +93,7 @@ input.text:focus {
 .jarves-Input-text-disabled:focus,
 .jarves-field-disabled:focus
 {
-    color: #a5a5a5;
+    color: #767676;
     -webkit-box-shadow: 0;
     -moz-box-shadow: 0;
     box-shadow: 0;

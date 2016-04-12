@@ -29,7 +29,7 @@ jarves.AdminInterface = new Class({
     /**
      * Builds the login etc.
      */
-    initialize: function(pOptions) {
+    initialize: function (pOptions) {
 
         this.setOptions(pOptions);
 
@@ -59,7 +59,7 @@ jarves.AdminInterface = new Class({
      *
      * @returns {jarves.FileUploader}
      */
-    getFileUploader: function() {
+    getFileUploader: function () {
         if (!this.kaFilesFileUploader) {
             this.kaFilesFileUploader = new jarves.FileUploader();
         }
@@ -69,18 +69,18 @@ jarves.AdminInterface = new Class({
 
     /**
      * Fires the objectChanged event.
-     * 
+     *
      * @param object
      */
-    objectChanged: function(object) {
+    objectChanged: function (object) {
         object = jarves.normalizeObjectKey(object);
 
-        Object.each(jarves.wm.getWindows(), function(window) {
+        Object.each(jarves.wm.getWindows(), function (window) {
             window.fireEvent('objectChanged', object);
         });
     },
 
-    hideAppContainer: function() {
+    hideAppContainer: function () {
         if (Modernizr.csstransforms && Modernizr.csstransitions) {
             jarves.adminInterface.getAppContainer().setStyle(Modernizr.prefixed('transform'), 'translate(0px, 100%)');
         } else {
@@ -88,18 +88,18 @@ jarves.AdminInterface = new Class({
                 jarves.adminInterface.getAppDialogAnimation().stop();
             }
 
-            jarves.adminInterface.getAppDialogAnimation().addEvent('complete', function(){
+            jarves.adminInterface.getAppDialogAnimation().addEvent('complete', function () {
                 jarves.adminInterface.getAppContainer().setStyle('display', 'none');
             });
 
             jarves.adminInterface.getAppDialogAnimation().start({
-                top: size.y+61,
-                bottom: (size.y+61)*-1
+                top: size.y + 61,
+                bottom: (size.y + 61) * -1
             });
         }
     },
 
-    showAppContainer: function() {
+    showAppContainer: function () {
         if (Modernizr.csstransforms && Modernizr.csstransitions) {
             jarves.adminInterface.getAppContainer().setStyle(Modernizr.prefixed('transform'), 'translate(0px, 0px)');
         } else {
@@ -113,7 +113,7 @@ jarves.AdminInterface = new Class({
         }
     },
 
-    getAppDialogAnimation: function() {
+    getAppDialogAnimation: function () {
         if (!this.appContainerAnimation) {
             this.appContainerAnimation = new Fx.Morph(jarves.adminInterface.getAppContainer(), {
                 duration: 500,
@@ -124,14 +124,14 @@ jarves.AdminInterface = new Class({
         return this.appContainerAnimation;
     },
 
-    openDashboard: function() {
+    openDashboard: function () {
         if (this.checkLastSystemDialog('dashboard')) return;
         this.lastSystemDialog = new jarves.SystemDialog(this.getDialogContainer(), {
             autoClose: true
         });
 
         this.btnOpenDashboard.addClass('jarves-main-menu-active');
-        this.lastSystemDialog.addEvent('close', function(){
+        this.lastSystemDialog.addEvent('close', function () {
             this.btnOpenDashboard.removeClass('jarves-main-menu-active');
         }.bind(this));
 
@@ -143,14 +143,14 @@ jarves.AdminInterface = new Class({
 
         var dashboardInstance = new jarves.Dashboard(this.lastSystemDialog.getContentContainer());
 
-        this.lastSystemDialog.addEvent('closed', function() {
+        this.lastSystemDialog.addEvent('closed', function () {
             dashboardInstance.destroy();
             this.clearLastSystemDialog();
         }.bind(this));
 
     },
 
-    getDialogContainer: function(){
+    getDialogContainer: function () {
         if (!this.dialogContainer) {
             this.dialogContainer = new Element('div', {
                 'class': 'jarves-admin jarves-main-dialog-container'
@@ -159,7 +159,7 @@ jarves.AdminInterface = new Class({
         return this.dialogContainer;
     },
 
-    checkLastSystemDialog: function(id) {
+    checkLastSystemDialog: function (id) {
         if (this.lastSystemDialog && this.lastSystemDialog.isOpen()) {
             if (id == this.lastSystemDialogId) {
                 delete this.lastSystemDialogId;
@@ -172,7 +172,7 @@ jarves.AdminInterface = new Class({
         return false;
     },
 
-    clearLastSystemDialog: function() {
+    clearLastSystemDialog: function () {
         delete this.lastSystemDialog;
         delete this.lastSystemDialogId;
     },
@@ -194,7 +194,7 @@ jarves.AdminInterface = new Class({
 //        this.lastSystemDialog.center();
 //    },
 
-    getMenuItems: function() {
+    getMenuItems: function () {
         return this.menuItems;
     },
 
@@ -222,7 +222,7 @@ jarves.AdminInterface = new Class({
 //        this.lastSystemDialog.center(true);
 //    },
 
-    createLayout: function() {
+    createLayout: function () {
         this.border = new Element('div', {
             'class': 'jarves-frame jarves-admin jarves-white'
         }).inject(document.body);
@@ -252,7 +252,6 @@ jarves.AdminInterface = new Class({
         }).inject(this.mainMenuUser);
 
 
-
         // actions
         this.mainMenuActions = new Element('div', {
             'class': 'jarves-main-menu-actions'
@@ -262,6 +261,7 @@ jarves.AdminInterface = new Class({
             'class': 'jarves-Input-text jarves-main-menu-actions-search-input'
         })
             .addEvent('keyup', this.searchKeyUp.bind(this))
+            .addEvent('click', this.searchClick.bind(this))
             .inject(this.mainMenuActions);
 
         this.mainMenuActionsLinks = new Element('div', {
@@ -271,6 +271,7 @@ jarves.AdminInterface = new Class({
         this.mainMenuActionsSearchBtn = new Element('a', {
             text: 'Search'
         })
+            .addEvent('click', this.searchClick.bind(this))
             .inject(this.mainMenuActionsLinks);
 
         this.mainMenuActionsCacheBtn = new Element('a', {
@@ -282,7 +283,9 @@ jarves.AdminInterface = new Class({
         this.mainMenuActionsLogoutBtn = new Element('a', {
             text: 'Logout'
         })
-            .addEvent('click', function(){this.logout()}.bind(this))
+            .addEvent('click', function () {
+                this.logout()
+            }.bind(this))
             .inject(this.mainMenuActionsLinks);
 
 
@@ -320,9 +323,9 @@ jarves.AdminInterface = new Class({
 //                }
 //            }.bind(this));
 //        } else {
-            this.desktopContainer = new Element('div', {
-                'class': 'jarves-desktop jarves-admin'
-            }).inject(this.appContainer);
+        this.desktopContainer = new Element('div', {
+            'class': 'jarves-desktop jarves-admin'
+        }).inject(this.appContainer);
 //        }
 
         this.wmTabContainer = new Element('div', {
@@ -332,33 +335,35 @@ jarves.AdminInterface = new Class({
         //this.setupMainLinksDragger();
     },
 
-    getAppContainer: function() {
+    getAppContainer: function () {
         return this.appContainer;
     },
 
-    getWMTabContainer: function() {
+    getWMTabContainer: function () {
         return this.wmTabContainer;
     },
 
-    isFrontPage: function() {
+    isFrontPage: function () {
         return this.options.frontPage;
     },
 
-    clearCache: function() {
+    clearCache: function () {
 
         if (!this.cacheToolTip) {
             this.cacheToolTip = new jarves.Tooltip(this.mainMenuActionsCacheBtn, t('Clearing cache ...'), 'top');
         }
         this.cacheToolTip.show();
 
-        new Request.JSON({url: _pathAdmin + 'admin/backend/cache', noCache: 1, onComplete: function(res) {
-            this.cacheToolTip.stop(t('Cache cleared'));
-        }.bind(this)}).requestDelete();
+        new Request.JSON({
+            url: _pathAdmin + 'admin/backend/cache', noCache: 1, onComplete: function (res) {
+                this.cacheToolTip.stop(t('Cache cleared'));
+            }.bind(this)
+        }).requestDelete();
     },
 
     lastSearchTimer: null,
 
-    searchKeyUp: function(event){
+    searchKeyUp: function (event) {
         if ('esc' === event.key) {
             clearTimeout(this.lastSearchTimer);
             this.closeSearch();
@@ -367,36 +372,157 @@ jarves.AdminInterface = new Class({
 
         var query = this.mainMenuSearchInput.value;
 
+        if (!query) {
+            this.closeSearch();
+            return;
+        }
+
         if (this.lastSearchTimer) {
             clearTimeout(this.lastSearchTimer);
         }
 
-        this.lastSearchTimer = setTimeout(function() {
+        this.lastSearchTimer = setTimeout(function () {
             this.lastSearchTimer = null;
             this.doSearch(query);
         }.bind(this), 100);
     },
 
-    doSearch: function(query) {
-        new Request.JSON({url: _pathAdmin + 'admin/backend/search', noCache: 1, onComplete: function(res) {
-            if (!res.data) return;
-
-            this.showSearch(res.data);
-        }.bind(this)}).get({query: query});
+    searchClick: function() {
+        if (this.lastSearchResults && this.mainMenuSearchInput.value) {
+            this.showSearch();
+        }
     },
 
-    showSearch: function(data){
+    lastSearchResults: null,
+    
+    showSearch: function() {
+        if (!this.searchResultContainer) {
+            this.searchResultContainer = new Element('div', {
+                'class': 'jarves-main-search-container'
+            }).inject(this.border);
 
+            this.searchResultCloserOverlay = new Element('div', {
+                'class': 'jarves-main-search-closer-overlay'
+            })
+                .addEvent('click', function () {
+                    this.closeSearch();
+                }.bind(this))
+                .inject(this.border);
+
+            this.lastSearchResultsPane = new jarves.SearchResultsPane({
+                el: this.searchResultContainer,
+                data: {
+                    result: this.lastSearchResults,
+                    loading: false
+                }
+            });
+        }
     },
 
-    closeSearch: function() {
-        this.searchResultContainer.addClass('close');
+    doSearch: function (query) {
+        this.showSearch();
+
+        this.lastSearchResultsPane.loading = true;
+        new Request.JSON({
+            url: _pathAdmin + 'admin/backend/search', noCache: 1, onComplete: function (res) {
+                if (!res.data) return;
+                this.lastSearchResultsPane.loading = false;
+                this.lastSearchResultsPane.result = res.data;
+                this.lastSearchResults = res.data;
+            }.bind(this)
+        }).get({query: query});
+    },
+
+    lastSearchResultsPane: null,
+
+    closeSearch: function () {
+        if (this.searchResultContainer) {
+            this.searchResultCloserOverlay.destroy();
+            this.searchResultContainer.destroy();
+        }
+
+        this.searchResultCloserOverlay = null;
+        this.searchResultContainer = null;
+    },
+
+    vue: null,
+    setupVue: function () {
+        defaultComponents = {};
+
+        //setup <object-key-search-results> elements
+        Object.each(jarves.getConfigs(), function (config, bundleName) {
+            if (config.objects) {
+                Object.each(config.objects, function (objectConfig) {
+                    var componentId = objectConfig.key.replace('/', '-') + '-search-results';
+
+                    if (Vue.options.components[componentId]) {
+                        return;
+                    }
+
+                    var component = Vue.extend({
+                        props: ['items', 'objectKey'],
+                        template: '<h4 v-on:click="openList(objectKey)">{{bundleName(objectKey)}} <div class="object-key">({{objectKey}})</div></h4>' +
+                        '<div class="jarves-search-results-items">' +
+                        '<div class="jarves-search-results-item" v-for="item in items"><a' +
+                        ' v-on:click="openItem(item, objectKey)">{{label(item, objectKey)}}</a></div>' +
+                        '</div>',
+                        methods: {
+                            openItem: function (item, objectKey) {
+                                jarves.openObjectDetailEntryPoint(objectKey, item);
+                                jarves.getAdminInterface().closeSearch();
+                            },
+                            openList: function(objectKey) {
+                                jarves.openObjectListEntryPoint(objectKey);
+                                jarves.getAdminInterface().closeSearch();
+                            },
+                            label: function (item, objectKey) {
+                                var config = jarves.getObjectDefinition(objectKey);
+
+                                if (item['_label']) {
+                                    return item['_label'];
+                                }
+
+                                if (config.labelField) {
+                                    return item[config.labelField];
+                                }
+                                if (config.treeLabel) {
+                                    return item[config.treeLabel];
+                                }
+
+                                var labelFound = null;
+                                var primaryKeys = jarves.getObjectPrimaryList(objectKey);
+                                Object.each(item, function (label, key) {
+                                    if (labelFound) {
+                                        return;
+                                    }
+
+                                    if (-1 !== primaryKeys.indexOf(key)) {
+                                        labelFound = label;
+                                    }
+                                });
+
+                                return labelFound;
+                            },
+                            bundleName: function (objectKey) {
+                                var config = jarves.getObjectDefinition(objectKey);
+                                return config.label || config.id;
+                            }
+                        }
+                    });
+                    Vue.component(componentId, component);
+                });
+            }
+        });
+
+        this.vue = Vue.extend({
+            components: defaultComponents
+        })
     },
 
     /*
      * Build the administration interface after login
      */
-    renderBackend: function() {
+    renderBackend: function () {
         if (this.options.frontPage) {
             return;
         }
@@ -483,7 +609,7 @@ jarves.AdminInterface = new Class({
 
         jarves.loadStream();
 
-        window.onbeforeunload = function(evt) {
+        window.onbeforeunload = function (evt) {
 
             if (jarves.wm.getWindowsCount() > 0) {
                 var message = _('There are open windows. Are you sure you want to leave the administration?');
@@ -523,11 +649,11 @@ jarves.AdminInterface = new Class({
      *
      * @returns {jarves.Helpsystem}
      */
-    getHelpSystem: function() {
+    getHelpSystem: function () {
         return this.helpsystem;
     },
 
-    doMiniSearch: function() {
+    doMiniSearch: function () {
 
         if (!this._miniSearchPane) {
 
@@ -559,22 +685,24 @@ jarves.AdminInterface = new Class({
 
     },
 
-    _miniSearch: function() {
+    _miniSearch: function () {
 
-        new Request.JSON({url: _pathAdmin + 'admin/backend/search', noCache: 1, onComplete: function(pResponse) {
-            this._miniSearchLoader.setStyle('display', 'none');
-            this._renderMiniSearchResults(pResponse.data);
-        }.bind(this)}).get({q: this.searchInput.getValue(), lang: window._session.lang});
+        new Request.JSON({
+            url: _pathAdmin + 'admin/backend/search', noCache: 1, onComplete: function (pResponse) {
+                this._miniSearchLoader.setStyle('display', 'none');
+                this._renderMiniSearchResults(pResponse.data);
+            }.bind(this)
+        }).get({q: this.searchInput.getValue(), lang: window._session.lang});
 
     },
 
-    _renderMiniSearchResults: function(pRes) {
+    _renderMiniSearchResults: function (pRes) {
 
         this._miniSearchResults.empty();
 
         if (typeOf(pRes) == 'object') {
 
-            Object.each(pRes, function(subresults, subtitle) {
+            Object.each(pRes, function (subresults, subtitle) {
                 var subBox = new Element('div').inject(this._miniSearchResults);
 
                 new Element('h3', {
@@ -582,58 +710,58 @@ jarves.AdminInterface = new Class({
                 }).inject(subBox);
 
                 var ol = new Element('ul').inject(subBox);
-                Array.each(subresults, function(subsubresults, index) {
+                Array.each(subresults, function (subsubresults, index) {
                     var li = new Element('li').inject(ol);
                     new Element('a', {
                         html: ' ' + subsubresults[0],
                         href: 'javascript: ;'
-                    }).addEvent('click', function() {
-                            jarves.wm.open(subsubresults[1], subsubresults[2]);
-                            this.hideMiniSearch();
-                        }.bind(this)).inject(li);
+                    }).addEvent('click', function () {
+                        jarves.wm.open(subsubresults[1], subsubresults[2]);
+                        this.hideMiniSearch();
+                    }.bind(this)).inject(li);
                 }.bind(this));
             }.bind(this));
         } else {
-            new Element('span', {html: '<br/>' + t('No results') }).inject(this._miniSearchResults);
+            new Element('span', {html: '<br/>' + t('No results')}).inject(this._miniSearchResults);
         }
 
     },
 
-    hideMiniSearch: function() {
+    hideMiniSearch: function () {
         if (this._miniSearchPane) {
             this._miniSearchPane.destroy();
             this._miniSearchPane = false;
         }
     },
 
-    prepareLoader: function() {
+    prepareLoader: function () {
         this._loader = new Element('div', {
             'class': 'jarves-ai-loader'
         }).setStyle('opacity', 0).set('tween', {duration: 400}).inject(document.body);
 
-        frames['content'].onload = function() {
+        frames['content'].onload = function () {
             this.endLoading();
         };
-        frames['content'].onunload = function() {
+        frames['content'].onunload = function () {
             this.startLoading();
         };
     },
 
-    endLoading: function() {
+    endLoading: function () {
         this._loader.tween('opacity', 0);
     },
 
-    getDesktop: function() {
+    getDesktop: function () {
         return this.desktopContainer;
     },
 
-    startLoading: function() {
+    startLoading: function () {
         var co = this.desktopContainer;
         this._loader.setStyles(co.getCoordinates());
         this._loader.tween('opacity', 1);
     },
 
-    renderLogin: function() {
+    renderLogin: function () {
         this.login = new Element('div', {
             'class': 'jarves-login jarves-admin'
         }).inject(document.body);
@@ -665,7 +793,7 @@ jarves.AdminInterface = new Class({
             action: './admin',
             method: 'post'
         }).addEvent('submit',
-            function(e) {
+            function (e) {
                 e.stop()
             }).inject(this.middle);
         this.loginForm = form;
@@ -676,7 +804,7 @@ jarves.AdminInterface = new Class({
             type: 'text',
             placeholder: t('Username')
         })
-            .addEvent('keyup', function(e) {
+            .addEvent('keyup', function (e) {
                 if (e.key == 'enter') {
                     this.doLogin();
                 }
@@ -687,21 +815,21 @@ jarves.AdminInterface = new Class({
             type: 'password',
             'class': 'jarves-Input-text',
             placeholder: t('Password')
-        }).addEvent('keyup', function(e) {
-                if (e.key == 'enter') {
-                    this.doLogin();
-                }
-            }.bind(this)).inject(form);
+        }).addEvent('keyup', function (e) {
+            if (e.key == 'enter') {
+                this.doLogin();
+            }
+        }.bind(this)).inject(form);
 
         this.loginLangSelection = new jarves.Select();
         this.loginLangSelection.inject(form);
 
-        this.loginLangSelection.addEvent('change',function() {
+        this.loginLangSelection.addEvent('change', function () {
             jarves.loadLanguage(this.loginLangSelection.getValue());
             this.reloadLogin();
         }.bind(this)).inject(form);
 
-        Object.each(jarves.possibleLangs, function(lang) {
+        Object.each(jarves.possibleLangs, function (lang) {
             this.loginLangSelection.add(lang.code, lang.title + ' (' + lang.langtitle + ')');
         }.bind(this));
 
@@ -717,7 +845,7 @@ jarves.AdminInterface = new Class({
 
         this.loginBtn = new jarves.Button(t('Login')).inject(form);
         this.loginBtn.setButtonStyle('blue');
-        this.loginBtn.addEvent('click', function() {
+        this.loginBtn.addEvent('click', function () {
             this.doLogin();
         }.bind(this));
 
@@ -738,7 +866,7 @@ jarves.AdminInterface = new Class({
             'class': 'jarves-login-loader-bottom'
         }).inject(form);
 
-        [this.loaderTop, this.loaderBottom].each(function(item) {
+        [this.loaderTop, this.loaderBottom].each(function (item) {
             item.set('morph', {duration: 300, transition: Fx.Transitions.Quart.easeInOut});
         });
 
@@ -815,15 +943,15 @@ jarves.AdminInterface = new Class({
         this.loginName.focus();
     },
 
-    reloadLogin: function() {
+    reloadLogin: function () {
         if (this.login) {
             this.login.destroy();
         }
         this.renderLogin();
     },
 
-    doLogin: function() {
-        (function() {
+    doLogin: function () {
+        (function () {
             document.activeElement.blur();
         }).delay(10, this);
         this.blockLoginForm();
@@ -833,22 +961,24 @@ jarves.AdminInterface = new Class({
             clearTimeout(this.loginFailedClearer);
         }
 
-        new Request.JSON({url: _pathAdmin + 'admin/login', noCache: 1,
-            onException: function(){
+        new Request.JSON({
+            url: _pathAdmin + 'admin/login', noCache: 1,
+            onException: function () {
                 this.loginFailed();
                 this.unblockLoginForm();
             }.bind(this),
-            onComplete: function(res) {
-            if (res.data) {
-                this.loginSuccess(res.data);
-            } else {
-                this.loginFailed();
-                this.unblockLoginForm();
-            }
-        }.bind(this)}).post({username: this.loginName.value, password: this.loginPw.value});
+            onComplete: function (res) {
+                if (res.data) {
+                    this.loginSuccess(res.data);
+                } else {
+                    this.loginFailed();
+                    this.unblockLoginForm();
+                }
+            }.bind(this)
+        }).post({username: this.loginName.value, password: this.loginPw.value});
     },
 
-    logout: function() {
+    logout: function () {
         if (this.loaderCon) {
             this.loaderCon.destroy();
         }
@@ -886,15 +1016,15 @@ jarves.AdminInterface = new Class({
                 opacity: 1
             }
 
-        }).chain(function() {
-                this.unblockLoginForm();
-                this.loginPw.focus();
+        }).chain(function () {
+            this.unblockLoginForm();
+            this.loginPw.focus();
 
-                this.middle.setStyle('height');
-            }.bind(this));
+            this.middle.setStyle('height');
+        }.bind(this));
 
         [this.loginMessage]
-            .each(function(i) {
+            .each(function (i) {
                 document.id(i).setStyle('display', 'block')
             });
 
@@ -902,8 +1032,8 @@ jarves.AdminInterface = new Class({
         window._session.userId = 0;
     },
 
-    loginSuccess: function(sessions, pAlready) {
-        (function() {
+    loginSuccess: function (sessions, pAlready) {
+        (function () {
             document.activeElement.blur();
         }).delay(10, this);
 
@@ -916,7 +1046,7 @@ jarves.AdminInterface = new Class({
         this.loginName.value = window._session.username;
 
         this.loginMessage.set('html', t('Please wait'));
-        if (!window._session.access){
+        if (!window._session.access) {
             this.loginMessage.set('html', t('Access denied.'));
             this.unblockLoginForm();
         } else {
@@ -924,15 +1054,15 @@ jarves.AdminInterface = new Class({
         }
     },
 
-    loginFailed: function() {
+    loginFailed: function () {
         this.loginPw.focus();
         this.loginMessage.set('html', '<span style="color: red">' + _('Login failed') + '.</span>');
-        this.loginFailedClearer = (function() {
+        this.loginFailedClearer = (function () {
             this.loginMessage.set('html', '');
         }).delay(3000, this);
     },
 
-    blockLoginForm: function(pAlready) {
+    blockLoginForm: function (pAlready) {
         if (pAlready) {
             this.loaderTop.setStyles({'height': 91, 'border-bottom': '1px solid #868686'});
             this.loaderBottom.setStyles({'height': 92, 'border-top': '1px solid #868686'});
@@ -942,67 +1072,71 @@ jarves.AdminInterface = new Class({
         }
     },
 
-    unblockLoginForm: function() {
+    unblockLoginForm: function () {
         this.loaderTop.morph({'height': 0, 'border-bottom': '0px solid #ddddd'});
         this.loaderBottom.morph({'height': 0, 'border-top': '0px solid #ddddd'});
-        (function(){
+        (function () {
             this.loginPw.focus();
         }.bind(this)).delay(200);
     },
 
-    loadSettings: function(keyLimitation, cb) {
+    loadSettings: function (keyLimitation, cb) {
         if (!jarves.settings) {
             jarves.settings = {};
         }
 
-        new Request.JSON({url: _pathAdmin +
-            'admin/backend/settings', noCache: 1, async: false, onComplete: function(res) {
-            if (res.error == 'access_denied') {
-                return;
-            }
+        new Request.JSON({
+            url: _pathAdmin +
+            'admin/backend/settings', noCache: 1, async: false, onComplete: function (res) {
+                if (res.error == 'access_denied') {
+                    return;
+                }
 
-            Object.each(res.data, function(val, key) {
-                jarves.settings[key] = val;
-            });
+                Object.each(res.data, function (val, key) {
+                    jarves.settings[key] = val;
+                });
 
-            jarves.settings['images'] = ['jpg', 'jpeg', 'bmp', 'png', 'gif', 'psd'];
+                jarves.settings['images'] = ['jpg', 'jpeg', 'bmp', 'png', 'gif', 'psd'];
 
-            if (!jarves.settings.user) {
-                jarves.settings.user = {};
-            }
+                if (!jarves.settings.user) {
+                    jarves.settings.user = {};
+                }
 
-            if (typeOf(jarves.settings.user) != 'object') {
-                jarves.settings.user = {};
-            }
+                if (typeOf(jarves.settings.user) != 'object') {
+                    jarves.settings.user = {};
+                }
 
-            if (!jarves.settings['user']['windows']) {
-                jarves.settings['user']['windows'] = {};
-            }
+                if (!jarves.settings['user']['windows']) {
+                    jarves.settings['user']['windows'] = {};
+                }
 
-            if (!this.options.frontPage && jarves.settings.system && jarves.settings.system.systemTitle) {
-                document.title = jarves.settings.system.systemTitle + t(' | Jarves Administration');
-            }
+                if (!this.options.frontPage && jarves.settings.system && jarves.settings.system.systemTitle) {
+                    document.title = jarves.settings.system.systemTitle + t(' | Jarves Administration');
+                }
 
-            jarves.settings.configsAlias = {};
-            Object.each(jarves.settings.configs, function(config, key){
-                jarves.settings.configsAlias[key.toLowerCase()] = jarves.settings.configs[key];
-                jarves.settings.configsAlias[key.toLowerCase().replace(/bundle$/, '')] = jarves.settings.configs[key];
-            });
+                jarves.settings.configsAlias = {};
+                Object.each(jarves.settings.configs, function (config, key) {
+                    jarves.settings.configsAlias[key.toLowerCase()] = jarves.settings.configs[key];
+                    jarves.settings.configsAlias[key.toLowerCase().replace(/bundle$/, '')] = jarves.settings.configs[key];
+                });
 
-            if (cb) {
-                cb(res.data);
-            }
-        }.bind(this)}).get({lang: window._session.lang, keys: keyLimitation});
+                if (cb) {
+                    cb(res.data);
+                }
+
+                this.setupVue();
+            }.bind(this)
+        }).get({lang: window._session.lang, keys: keyLimitation});
     },
 
-    loadBackend: function(pAlready) {
+    loadBackend: function (pAlready) {
         if (this.alreadyLoaded) {
             this.loadDone();
             return;
         }
 
         [this.loginMessage]
-            .each(function(i) {
+            .each(function (i) {
                 document.id(i).setStyle('display', 'none')
             });
 
@@ -1017,10 +1151,10 @@ jarves.AdminInterface = new Class({
         if (this.options.frontPage) {
             this.loadSettings();
         } else {
-            this.loadSettings(null, function() {
+            this.loadSettings(null, function () {
                 self.loaderTopLine.tween('width', 255);
 
-                self.loadMenu(function() {
+                self.loadMenu(function () {
                     self.loaderTopLine.set('tween', {duration: 200});
                     self.loaderTopLine.tween('width', 395);
                     self.loadDone.delay(200, self);
@@ -1030,7 +1164,7 @@ jarves.AdminInterface = new Class({
         }
     },
 
-    loadDone: function() {
+    loadDone: function () {
         this.check4Updates.delay(2000, this);
 
         this.allFilesLoaded = true;
@@ -1065,49 +1199,51 @@ jarves.AdminInterface = new Class({
                 opacity: 0
             }
 
-        }).chain(function() {
-                self.loginLoadingBarText.set('html');
+        }).chain(function () {
+            self.loginLoadingBarText.set('html');
 
-                //load settings, bg etc
-                self.renderBackend();
-                self.login.setStyle('display', 'none');
-                self.border.setStyle('display', 'block');
-                self.loaderTopLine.setStyle('display', 'block');
-                this.loginLoadingBarText.setStyle('display', 'block');
+            //load settings, bg etc
+            self.renderBackend();
+            self.login.setStyle('display', 'none');
+            self.border.setStyle('display', 'block');
+            self.loaderTopLine.setStyle('display', 'block');
+            this.loginLoadingBarText.setStyle('display', 'block');
 
-                self.loaderTopLine.setStyle('width', 0);
+            self.loaderTopLine.setStyle('width', 0);
 
-                var lastLogin = new Date();
-                if (window._session.lastlogin > 0) {
-                    lastLogin = new Date(window._session.lastlogin * 1000);
-                }
-                if (self.helpsystem) {
-                    self.helpsystem.newBubble(
-                        t('Welcome back, %s').replace('%s', window._session.username),
-                        t('Your last login was %s').replace('%s', lastLogin.format('%d. %b %I:%M')),
-                        3000);
-                }
+            var lastLogin = new Date();
+            if (window._session.lastlogin > 0) {
+                lastLogin = new Date(window._session.lastlogin * 1000);
+            }
+            if (self.helpsystem) {
+                self.helpsystem.newBubble(
+                    t('Welcome back, %s').replace('%s', window._session.username),
+                    t('Your last login was %s').replace('%s', lastLogin.format('%d. %b %I:%M')),
+                    3000);
+            }
 
-            }.bind(this));
+        }.bind(this));
         //});
     },
 
-    loadMenu: function(cb) {
+    loadMenu: function (cb) {
         if (this.lastLoadMenuReq) {
             this.lastLoadMenuReq.cancel();
         }
 
         this.lastLoadMenuReq =
-            new Request.JSON({url: _pathAdmin + 'admin/backend/menus', noCache: true, onComplete: function(res) {
-                this.menuItems = res.data;
-                this.renderMenu();
-                if (cb) {
-                    cb(res.data);
-                }
-            }.bind(this)}).get();
+            new Request.JSON({
+                url: _pathAdmin + 'admin/backend/menus', noCache: true, onComplete: function (res) {
+                    this.menuItems = res.data;
+                    this.renderMenu();
+                    if (cb) {
+                        cb(res.data);
+                    }
+                }.bind(this)
+            }).get();
     },
 
-    renderMenu: function() {
+    renderMenu: function () {
         if (!this.mainMenuContainer) return;
 
         this.mainMenuContainer.empty();
@@ -1120,7 +1256,7 @@ jarves.AdminInterface = new Class({
         this.mainMenu = new jarves.MainMenu(this.mainMenuContainer, this.getMenuItems());
     },
 
-    showDashboard: function(show) {
+    showDashboard: function (show) {
         if (this.dashboardVisible !== show) {
             if (show) {
                 this.dashboardInstance = new jarves.Dashboard(this.desktopContainer);
@@ -1138,7 +1274,7 @@ jarves.AdminInterface = new Class({
 
     },
 
-    displayNewUpdates: function(pModules) {
+    displayNewUpdates: function (pModules) {
         if (this.newUpdatesMenu) {
             this.newUpdatesMenu.destroy();
         }
@@ -1160,7 +1296,7 @@ jarves.AdminInterface = new Class({
          this.tween('height', 24 );
          })
          */.addEvent('click',
-            function() {
+            function () {
                 jarves.wm.open('jarvesbundle/system/module', {updates: 1});
             }).inject(this.border);
         this.newUpdatesMenu.tween('top', 48);
@@ -1191,17 +1327,19 @@ jarves.AdminInterface = new Class({
 //        }).inject(this.uploadMenu);
 //    },
 
-    check4Updates: function() {
+    check4Updates: function () {
         if (window._session.userId == 0) {
             return;
         }
-        new Request.JSON({url: _pathAdmin +
-            'admin/system/bundle/manager/check-updates', noCache: 1, onComplete: function(res) {
-            if (res && res.found) {
-                this.displayNewUpdates(res.modules);
-            }
-            this.check4Updates.delay(10 * (60 * 1000), this);
-        }.bind(this)}).get();
+        new Request.JSON({
+            url: _pathAdmin +
+            'admin/system/bundle/manager/check-updates', noCache: 1, onComplete: function (res) {
+                if (res && res.found) {
+                    this.displayNewUpdates(res.modules);
+                }
+                this.check4Updates.delay(10 * (60 * 1000), this);
+            }.bind(this)
+        }).get();
     }
 
 });

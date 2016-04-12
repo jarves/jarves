@@ -172,10 +172,12 @@ class TypeObject extends AbstractType
                 $crossObject = new Object(null, $objectDefinition->getJarves());
                 $crossObject->setId($possibleObjectName);
                 $crossObject->setSearchable(false);
+                $crossObject->setAutoCrud(false);
+                $crossObject->setExcludeFromREST(true);
+
                 $crossObject->setTable(
                     $objectDefinition->getTable() . '_' . Tools::camelcase2Underscore($foreignObjectDefinition->getId())
                 );
-                $crossObject->setExcludeFromREST(true);
                 $changed = true;
             }
         }

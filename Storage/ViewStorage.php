@@ -151,8 +151,10 @@ class ViewStorage extends AbstractStorage
             $depth = 1;
         }
 
-        $path = '@' . trim($path, '/@');
-        $path = str_replace(':', '/', $path);
+        if ($path) {
+            $path = '@' . trim($path, '/@');
+            $path = str_replace(':', '/', $path);
+        }
 
         $c = 0;
         $offset = $options['offset'];
@@ -163,23 +165,35 @@ class ViewStorage extends AbstractStorage
 
             $result = array();
             $bundles = array_keys($this->jarves->getBundles());
+
             foreach ($bundles as $bundleName) {
+
                 $directory = $this->jarves->resolvePath('@' . $bundleName, 'Resources/views', true);
-                $file = $this->localFilesystem->getFile($directory);
-                if (!$file) {
+
+                if (!$this->localFilesystem->has($directory)) {
                     continue;
                 }
+
+                $file = $this->localFilesystem->getFile($directory);
+                if (!$file) {
+                    $result[] = $directory;
+                    continue;
+                }
+
                 $file = $file->toArray();
 
                 $file['name'] = $bundleName;
                 $file['path'] = $bundleName;
+
                 if ($offset && $offset > $c) {
                     continue;
                 }
                 if ($limit && $limit < $c) {
                     continue;
                 }
-                if ($condition && !$this->conditionOperator->satisfy($condition, $file)) {
+
+                if ($condition && $condition->hasRules() && !$this->conditionOperator->satisfy($condition, $file)) {
+                    $result[] = $directory;
                     continue;
                 }
                 $c++;
@@ -194,7 +208,11 @@ class ViewStorage extends AbstractStorage
             }
         } else {
 
+            if (!($bundleName = $this->jarves->getBundleFromPath($path))) {
+                return [];
+            }
             $directory = $this->jarves->resolvePath($path, 'Resources/views', true) . '/';
+            
             if (!$this->localFilesystem->has($directory)) {
                 return [];
             }

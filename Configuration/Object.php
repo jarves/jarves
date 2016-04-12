@@ -74,6 +74,9 @@ class Object extends Model
      * Schema (default):
      *   Jarves\Objects -> crudService (ObjectCrud) -> storageService (propel)
      *
+     * The information stored in this object is also used by apiControllerService and extracts its propertyies to the
+     * crud framework in the administration interface.
+     *
      * @var string
      */
     protected $crudService = 'jarves.crud.object_crud';
@@ -379,6 +382,23 @@ class Object extends Model
     private $primaryKeys;
 
     /**
+     * Whether Jarves should not build crud views and menu links in the administration for this object automatically.
+     *
+     * If you disable this and have custom entry points defined, you should adjust 'editEntrypoint', 'addEntrypoint', 'listEntryPoint'
+     * pointing to your custom entry point, so the system knows what entry point to open when someone wants to edit/add/list
+     * you object items.
+     *
+     * @var bool
+     */
+    protected $autoCrud = true;
+
+    /**
+     * Whether Jarves should not include this object in the object REST API (jarves/object/<objectKey>).
+     * When false: you can only manage and see objects of this type using a custom rest api.
+     *
+     * Note: When disabled crud windows won't work. If you want to adjust the REST API behavior
+     * of this object, you should overwrite the 'apiControllerService' property instead.
+     *
      * @var bool
      */
     protected $excludeFromREST = false;
@@ -441,11 +461,31 @@ class Object extends Model
     }
 
     /**
-     * @param boolean $excludeFromREST
+     * {@inheritdoc}
      */
-    public function setExcludeFromREST($excludeFromREST)
+    public function toArray($printDefaults = false)
     {
-        $this->excludeFromREST = $excludeFromREST;
+        $array = parent::toArray($printDefaults);
+        $array['key'] = $this->getKey();
+
+        return $array;
+    }
+
+
+    /**
+     * @param boolean $autoCrud
+     */
+    public function setAutoCrud($autoCrud)
+    {
+        $this->autoCrud = $this->bool($autoCrud);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getAutoCrud()
+    {
+        return $this->autoCrud;
     }
 
     /**
@@ -454,6 +494,22 @@ class Object extends Model
     public function getExcludeFromREST()
     {
         return $this->excludeFromREST;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isExcludeFromREST()
+    {
+        return $this->excludeFromREST;
+    }
+
+    /**
+     * @param boolean $excludeFromREST
+     */
+    public function setExcludeFromREST($excludeFromREST)
+    {
+        $this->excludeFromREST = $this->bool($excludeFromREST);
     }
 
     /**

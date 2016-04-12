@@ -128,6 +128,15 @@ class EntryPoint extends Model
     }
 
     /**
+     * @param EntryPoint $entryPoint
+     */
+    public function addChildren(EntryPoint $entryPoint)
+    {
+        $this->children[] = $entryPoint;
+        $entryPoint->setParentInstance($this);
+    }
+
+    /**
      * @return EntryPoint[]
      */
     public function getChildren()

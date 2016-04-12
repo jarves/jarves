@@ -2,6 +2,7 @@
   <table name="system_news_feed" phpName="NewsFeed" isCrossRef="true">
     <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true"/>
     <column name="username" type="VARCHAR" size="255"/>
+    <column name="user_id" type="INTEGER"/>
     <column name="verb" type="VARCHAR" size="255"/>
     <column name="target_object" type="VARCHAR" size="255"/>
     <column name="target_pk" type="VARCHAR" size="255"/>

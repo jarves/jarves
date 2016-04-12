@@ -26,14 +26,13 @@
     }
 }
 
-
 .jarves-main-menu {
     position: absolute;
     top: 230px;
     left: 0;
     bottom: 50px;
     right: 0;
-    text-align: center;
+    text-align: left;
 }
 
 .jarves-main-menu-bottom {
@@ -190,6 +189,17 @@ a.jarves-mainMenu-link:before {
     margin-bottom: 10px;
     position: relative;
     @include line-top-right-dark;
+}
+
+.jarves-mainMenu-cat-level-0 > h2 {
+    font-weight: 400;
+    padding: 3px 0;
+}
+
+@for $i from 1 through 4 {
+    .jarves-mainMenu-cat-level-#{$i} {
+        padding-left: 13px * ($i - 1);
+    }
 }
 
 .jarves-mainMenu-cat h2 {

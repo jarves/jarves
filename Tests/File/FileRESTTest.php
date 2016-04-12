@@ -38,7 +38,7 @@ class FileRESTTest extends KernelAwareTestCase
         $this->assertNotNull($bundle);
         $this->assertGreaterThan(0, $bundle['id']);
         $this->assertEquals('/bundles', $bundle['path']);
-        $this->assertEquals('bundles', $bundle['name']);
+        $this->assertEquals('bundles/', $bundle['name']);
         $this->assertEquals('/', $bundle['dir']);
         $this->assertEquals(true, $bundle['writeAccess']);
         $this->assertEquals('dir', $bundle['type']);
@@ -66,7 +66,7 @@ class FileRESTTest extends KernelAwareTestCase
         $this->assertNotNull($file);
         $this->assertGreaterThan(0, $file['id']);
         $this->assertEquals('/bundles', $file['path']);
-        $this->assertEquals('bundles', $file['name']);
+        $this->assertEquals('bundles/', $file['name']);
         $this->assertEquals('/', $file['dir']);
         $this->assertEquals(true, $file['writeAccess']);
         $this->assertEquals('dir', $file['type']);
@@ -84,7 +84,7 @@ class FileRESTTest extends KernelAwareTestCase
         $this->assertNotNull($admin);
         $this->assertGreaterThan(0, $admin['id']);
         $this->assertEquals('/bundles/jarves', $admin['path']);
-        $this->assertEquals('jarves', $admin['name']);
+        $this->assertEquals('jarves/', $admin['name']);
         $this->assertEquals('/bundles', $admin['dir']);
         $this->assertEquals(true, $admin['writeAccess']);
         $this->assertEquals('dir', $admin['type']);
@@ -105,7 +105,7 @@ class FileRESTTest extends KernelAwareTestCase
         $this->assertNotNull($file);
         $this->assertGreaterThan(0, $file['id']);
         $this->assertEquals($testPath, $file['path']);
-        $this->assertEquals(basename($testPath), $file['name']);
+        $this->assertEquals(basename($testPath).'/', $file['name']);
         $this->assertEquals(dirname($testPath), $file['dir']);
         $this->assertEquals(true, $file['writeAccess']);
         $this->assertEquals('dir', $file['type']);

@@ -114,7 +114,7 @@ var jarves_backend_chooser = new Class({
 
             document.id(this.sLanguage).setStyles({
                 'position': 'absolute',
-                'right': 1,
+                'left': 10,
                 'top': 0,
                 'width': 110
             });

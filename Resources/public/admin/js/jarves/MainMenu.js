@@ -22,13 +22,105 @@ jarves.MainMenu = new Class({
         this.createLayout();
     },
 
+    entryPoints: {},
+
+    setupEntryPoints: function(bundleConfig, key) {
+        if (bundleConfig.entryPoints) {
+            this.entryPoints[key] = Object.clone(bundleConfig.entryPoints);
+            this.clearEntryPoints(this.entryPoints[key]);
+        }
+    },
+
+    /**
+     * Clears entryPoints, so it only contains entry points that appear in this.menuItems
+     *
+     * @param entryPoints
+     */
+    clearEntryPoints: function(entryPoints) {
+        Object.each(entryPoints, function(entryPoint, key) {
+            if (entryPoint.children) {
+                this.clearEntryPoints(entryPoint.children);
+            }
+
+            if (entryPoint.children && Object.getLength(entryPoint.children) > 0) {
+                //we have valid children, so let it in, but dont show it later due to link=false
+            } else {
+                //no active children
+                if (!this.menuItems[entryPoint.fullPath]) {
+                    delete entryPoints[key];
+                }
+            }
+        }.bind(this));
+    },
+
     createLayout: function() {
-        this.addSection('JarvesBundle');
         Object.each(jarves.settings.configs, function(config, key) {
-            if ('JarvesBundle' !== key) {
-                this.addSection(key);
+            this.setupEntryPoints(config, key);
+        }.bind(this));
+
+        this.addBundleMenus('JarvesBundle');
+
+        Object.each(jarves.settings.configs, function(config, key) {
+            if ('JarvesBundle' !== key && this.entryPoints[key]) {
+                this.addBundleMenus(key);
             }
         }, this);
+    },
+
+    addBundleMenus: function(bundleName) {
+        if (!this.entryPoints[bundleName]) {
+            return;
+        }
+
+        var container = new Element('div', {
+            'class': 'jarves-mainMenu-cat jarves-mainMenu-cat-level-0'
+        }).inject(this.container);
+
+        var bundleConfig = jarves.getConfig(bundleName);
+
+        new Element('h2', {
+            text: bundleConfig.label || bundleConfig.name
+        }).inject(container);
+
+        this.prepareCat(container);
+
+        this.addMenus(this.entryPoints[bundleName], container);
+    },
+
+    addMenus: function(entryPoints, container) {
+        Object.each(entryPoints, function(entryPoint) {
+
+            var linkContainer = container;
+
+            if (entryPoint.link) {
+                if (entryPoint.type) {
+                    //render normal link
+                    this.addLink(entryPoint, container);
+
+                } else if (!entryPoint.type && entryPoint.children && Object.getLength(entryPoint.children)) {
+                    //it has children, but is hasn a type, so its a header
+                    linkContainer = new Element('div', {
+                        'class': 'jarves-mainMenu-cat jarves-mainMenu-cat-level-' + (entryPoint.fullPath.match(/\//g) || []).length
+                    }).inject(linkContainer);
+
+                    new Element('h2', {
+                        text: entryPoint.label || entryPoint.path
+                    }).inject(linkContainer);
+                    this.prepareCat(linkContainer);
+
+                    // this.addMenus(entryPoints.children, linkContainer);
+                }
+            }
+
+            // if (entryPoint.children){
+            //     console.log(Object.getLength(entryPoint.children));
+            // }
+            if (entryPoint.children && Object.getLength(entryPoint.children)) {
+                // console.log(entryPoint.fullPath, entryPoint.children, linkContainer);
+                this.addMenus(entryPoint.children, linkContainer);
+            }
+
+        }.bind(this));
     },
 
     addSection: function(bundleName) {
@@ -43,7 +135,6 @@ jarves.MainMenu = new Class({
                 container = new Element('div', {
                     'class': 'jarves-mainMenu-cat'
                 }).inject(this.container);
-
 
 //                if ('JarvesBundle' !== bundleName) {
                     new Element('h2', {
@@ -61,6 +152,7 @@ jarves.MainMenu = new Class({
                         new Element('h2', {
                             text: entryPoint.label
                         }).inject(subContainer);
+
                         this.prepareCat(subContainer);
 
                         Object.each(entryPoint.children, function(subEntryPoint) {
@@ -75,7 +167,7 @@ jarves.MainMenu = new Class({
         }
     },
 
-    prepareCat: function(cat, bundleName) {
+    prepareCat: function(cat) {
 
         var toggle = new Element('span', {
             'class': 'jarves-mainMenu-cat-toggle icon-arrow-down-3',
@@ -99,7 +191,7 @@ jarves.MainMenu = new Class({
 
     },
 
-    addLink: function(bundleName, entryPoint, container) {
+    addLink: function(entryPoint, container) {
         var fullPath = entryPoint.fullPath;
         if (this.items[fullPath]) {
             this.items[fullPath].destroy();
@@ -134,15 +226,13 @@ jarves.MainMenu = new Class({
         var result = {};
 
         Object.each(entryPoints, function(entryPoint, key) {
+
             if (entryPoint.children) {
                 result = Object.merge(result, this.collectEntryPoints(entryPoint.children));
             }
-
             if (!entryPoint.link) return;
 
-//            if (entryPoint.system) {
-                result[key] = entryPoint;
-//            }
+            result[key] = entryPoint;
 
         }, this);
 

@@ -70,6 +70,13 @@
         color: white;
         background-color: lighten($blackMainColor, 10%);
     }
+
+    .jarves-Select-arrow {
+        background-color: #0F3740;
+        &:before {
+            color: #A0A0A0;
+        }
+    }
 }
 
 .jarves-login-barrierTape {

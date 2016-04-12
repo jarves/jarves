@@ -86,7 +86,7 @@ jarves.Content = new Class({
 
     renderLayout: function(container) {
         this.main = new Element('div', {
-            'class': 'jarves-content '
+            'class': 'jarves-content'
         }).inject(container);
 
         this.main.addListener('dragstart', function(e) {
@@ -514,6 +514,12 @@ jarves.Content = new Class({
     setValue: function(value) {
         value.type = value.type || 'text';
         this.value = value;
+
+        if (this.currentType) {
+            this.main.removeClass('jarves-content-type-' + this.currentType);
+        }
+
+        this.main.addClass('jarves-content-type-' + value.type.lcfirst());
 
         if (!this.currentType || !this.contentObject || value.type != this.currentType || !this.currentTemplate || this.currentTemplate != value.template) {
 

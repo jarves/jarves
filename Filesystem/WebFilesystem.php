@@ -148,6 +148,8 @@ class WebFilesystem extends Filesystem
 
     /**
      * {@inheritdoc}
+     *
+     * @return FileInfoInterface|FileInfoInterface[]|File
      */
     public function getFile($path)
     {

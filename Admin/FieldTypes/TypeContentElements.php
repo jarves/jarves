@@ -48,6 +48,10 @@ class TypeContentElements extends AbstractType
             $contentsObject->setId($contentsObjectName);
             $contentsObject->setWorkspace(true);
 
+            $contentsObject->setAutoCrud(false);
+            $contentsObject->setSearchable(false);
+            $contentsObject->setExcludeFromREST(true);
+
             $contentsObject->setNested(true);
             $contentsObject->setNestedRootAsObject(true);
             $contentsObject->setNestedRootObject($object->getKey());

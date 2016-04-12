@@ -49,6 +49,10 @@ class AppKernelModifier
         preg_match('/\$bundles = array\((.*)\);/mis', $this->script, $match);
 
         if (!isset($match[0])) {
+            preg_match('/\$bundles = \[(.*)\);/mis', $this->script, $match);
+        }
+
+        if (!isset($match[0])) {
             throw new \LogicException('In `registerBundles` of AppKernel class there is no $bundles = array(...) assignment.');
         }
 
@@ -145,6 +149,8 @@ class AppKernelModifier
         $inBlockComment = false;
         $inComment = false;
 
+        $bundleShortArrayVersion = false;
+
         $bundles = $this->bundles;
         foreach ($this->addBundles as $bundle) {
             $bundles[] = $bundle;
@@ -171,10 +177,12 @@ class AppKernelModifier
                 //search for comment starts
                 if (!$inBlockComment && $this->expect('//')) {
                     $inComment = true;
+                    continue;
                 }
 
                 if (!$inComment && $this->expect('/*')) {
                     $inBlockComment = true;
+                    continue;
                 }
             }
 
@@ -184,8 +192,12 @@ class AppKernelModifier
                         $inRegisterBundles = true;
                     }
                 } else {
-                    if ($this->expect('$bundles')) {
+                    if ($this->expect('$bundles = array(')) {
                         $inBundles = true;
+                    }
+                    if ($this->expect('$bundles = [')) {
+                        $inBundles = true;
+                        $bundleShortArrayVersion = true;
                     }
                 }
 
@@ -193,7 +205,7 @@ class AppKernelModifier
 
             if ($inBundles) {
 
-                if ($this->expect(');')) {
+                if (($bundleShortArrayVersion && $this->expect('];')) || (!$bundleShortArrayVersion && $this->expect(');'))) {
                     $this->remove(2);
 
                     $code = "\$bundles = array(\n";

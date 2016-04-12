@@ -3,11 +3,11 @@
     <objects>
       <object id="File" crossRef="false">
         <label>File</label>
-        <table>system_file</table>
         <storageService>jarves.storage.file</storageService>
         <labelField>name</labelField>
         <dataModel>custom</dataModel>
         <fieldLabel>path</fieldLabel>
+        <autoCrud>false</autoCrud>
         <nested>true</nested>
         <treeLabel>name</treeLabel>
         <treeIcon>type</treeIcon>
@@ -19,6 +19,9 @@
         <treeDefaultIcon>#icon-paper</treeDefaultIcon>
         <browserInterfaceClass>jarves.Files</browserInterfaceClass>
         <browserInterface>custom</browserInterface>
+        <listEntryPoint>jarves/files</listEntryPoint>
+        <editEntryPoint>jarves/files</editEntryPoint>
+        <addEntryPoint>jarves/files</addEntryPoint>
         <browserOptions>
           <field id="onlyUserDefined" type="checkbox">
             <label>Only user defined files</label>
@@ -45,10 +48,7 @@
           </field>
         </browserOptions>
         <fields>
-          <field id="id" type="number" primaryKey="true" autoIncrement="true">
-            <label>ID</label>
-          </field>
-          <field id="path" type="text">
+          <field id="path" type="text" primaryKey="true">
             <label>Path</label>
           </field>
           <field id="name" type="text">
@@ -77,6 +77,10 @@
         <labelField>title</labelField>
         <defaultSelection>type, title, alternativeTitle, urn, layout, visible, target</defaultSelection>
         <nested>true</nested>
+        <autoCrud>false</autoCrud>
+        <listEntryPoint>jarves/nodes</listEntryPoint>
+        <editEntryPoint>jarves/nodes</editEntryPoint>
+        <addEntryPoint>jarves/nodes</addEntryPoint>
         <nestedRootAsObject>true</nestedRootAsObject>
         <nestedRootObject>jarves/domain</nestedRootObject>
         <nestedRootObjectField>domainId</nestedRootObjectField>
@@ -148,10 +152,15 @@
         <label>Domain</label>
         <apiControllerDefinition>@JarvesBundle/Resources/config/crud/domain.yml</apiControllerDefinition>
         <table>system_domain</table>
+        <autoCrud>false</autoCrud>
         <labelField>domain</labelField>
         <labelTemplate>[{{lang}}] {{domain}}</labelTemplate>
         <defaultSelection>domain, lang</defaultSelection>
         <multiLanguage>true</multiLanguage>
+        <listEntryPoint>jarves/nodes</listEntryPoint>
+        <editEntryPoint>jarves/nodes</editEntryPoint>
+        <addEntryPoint>jarves/nodes</addEntryPoint>
+        <autoCrud>false</autoCrud>
         <fields>
           <field id="id" type="number" primaryKey="true" autoIncrement="true">
             <label>ID</label>
@@ -214,6 +223,7 @@
       <object id="Language">
         <label>Language</label>
         <table>system_langs</table>
+        <autoCrud>false</autoCrud>
         <searchable>false</searchable>
         <storageService>jarves.storage.language</storageService>
         <labelField>title</labelField>
@@ -230,6 +240,7 @@
       </object>
       <object id="Workspace">
         <label>Workspace</label>
+        <autoCrud>false</autoCrud>
         <table>system_workspace</table>
         <searchable>false</searchable>
         <fields>
@@ -247,6 +258,7 @@
       </object>
       <object id="EntryPoint" crossRef="false">
         <label>EntryPoint</label>
+        <autoCrud>false</autoCrud>
         <storageService>jarves.storage.entrypoint</storageService>
         <labelField>title</labelField>
         <dataModel>custom</dataModel>
@@ -259,8 +271,10 @@
       </object>
       <object id="Content">
         <label>Contents</label>
+        <autoCrud>false</autoCrud>
         <table>system_content</table>
         <labelField>id</labelField>
+        <searchable>false</searchable>
         <defaultSelection>node,boxId,template,type,content</defaultSelection>
         <fields>
           <field id="id" type="number" primaryKey="true" autoIncrement="true">
@@ -288,9 +302,9 @@
       <object id="View">
         <label>Template View</label>
         <desc>Template views</desc>
+        <autoCrud>false</autoCrud>
         <storageService>jarves.storage.view</storageService>
         <labelField>name</labelField>
-        <dataModel>custom</dataModel>
         <nested>true</nested>
         <fields>
           <field id="path" type="text" primaryKey="true">
@@ -305,6 +319,10 @@
         <label>Users</label>
         <table>system_user</table>
         <labelField>username</labelField>
+        <autoCrud>false</autoCrud>
+        <listEntryPoint>jarves/user/users</listEntryPoint>
+        <editEntryPoint>jarves/user/users</editEntryPoint>
+        <addEntryPoint>jarves/user/users</addEntryPoint>
         <apiControllerDefinition>@JarvesBundle/Resources/config/crud/user.yml</apiControllerDefinition>
         <blacklistSelection>passwd, passwdSalt</blacklistSelection>
         <fields>
@@ -352,7 +370,11 @@
       <object id="Group">
         <label>Groups</label>
         <table>system_group</table>
+        <autoCrud>false</autoCrud>
         <labelField>name</labelField>
+        <listEntryPoint>jarves/user/groups</listEntryPoint>
+        <editEntryPoint>jarves/user/groups</editEntryPoint>
+        <addEntryPoint>jarves/user/groups</addEntryPoint>
         <apiControllerDefinition>@JarvesBundle/Resources/config/crud/group.yml</apiControllerDefinition>
         <defaultSelection>name, description</defaultSelection>
         <fields>
@@ -375,6 +397,7 @@
       </object>
       <object id="NewsFeed">
         <label>News Feed</label>
+        <autoCrud>false</autoCrud>
         <table>system_news_feed</table>
         <labelField>title</labelField>
         <searchable>false</searchable>

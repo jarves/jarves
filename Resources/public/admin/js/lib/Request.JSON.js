@@ -130,13 +130,30 @@ Request.JSON = new Class({
             return false;
         }
 
-        jarves.lastRequestBubble = jarves.adminInterface.getHelpSystem().newBubble(
-            t('Response error'),
-            t('Server\'s response is not valid JSON. Looks like the server has serious troubles. :-(') +
-                "<br/>" + 'URI: %s'.replace('%s', this.options.url) +
-                '<br/><a class="jarves-Button" href="javascript:;">Details</a>',
-            15000);
+        var message = t('Server\'s response is not valid JSON. Looks like the server has serious troubles. :-(') +
+            "<br/>" + 'URI: %s'.replace('%s', this.options.url);
+
+        if (this.getDetailsLink()) {
+            message += '<br/><a class="jarves-Button" target="_blank" href="' + this.getDetailsLink() +'">Details</a>';
+        }
+
+        jarves.lastRequestBubble = jarves.adminInterface.getHelpSystem().newBubble(t('Response error'), message,15000);
+
         throw 'Response Error %s'.replace('%s', this.options.url);
+    },
+
+    /**
+     * Returns the symfony profiler link.
+     *
+     * @returns {string|null}
+     */
+    getDetailsLink: function(){
+        var token = this.xhr.getResponseHeader('X-Debug-Token');
+        if (token) {
+            return window._path + '_profiler/' + token;
+        }
+
+        return null;
     },
 
     checkError: function (response) {
@@ -162,23 +179,36 @@ Request.JSON = new Class({
                 return false;
             }
 
+            var detailsLink = this.getDetailsLink();
             if ('AccessDeniedException' === response.error) {
+
+                var message = t('You started a secured action or requested a secured information.') +
+                    "<br/>" + 'URI: %s'.replace('%s', this.options.url);
+
+                if (this.getDetailsLink()) {
+                    message += '<br/><a class="jarves-Button" target="_blank" href="' + this.getDetailsLink() +'">Details</a>';
+                }
+
                 jarves.lastRequestBubble = jarves.adminInterface.getHelpSystem().newBubble(
                     t('Access denied'),
-                    t('You started a secured action or requested a secured information.') +
-                        "<br/>" + 'URI: %s'.replace('%s', this.options.url) +
-                        '<br/><a class="jarves-Button" onclick="jarves.open(\'admin/system/rest-logger\')">Details</a>',
+                    message,
                     15000
                 );
                 throw 'Access Denied %s'.replace('%s', this.options.url);
             } else {
+
+                var message = t('There has been a error occured during the last request. It looks like the server has currently some troubles. Please try it again.') +
+                    "<br/><br/>" + t('Error code: %s').replace('%s', response.error) +
+                    "<br/>" + t('Error message: %s').replace('%s', response.message) +
+                    "<br/>" + 'URI: %s'.replace('%s', this.options.url);
+
+                if (this.getDetailsLink()) {
+                    message += '<br/><a class="jarves-Button" target="_blank" href="' + this.getDetailsLink() +'">Details</a>';
+                }
+
                 jarves.lastRequestBubble = jarves.adminInterface.getHelpSystem().newBubble(
                     t('Request error'),
-                    t('There has been a error occured during the last request. It looks like the server has currently some troubles. Please try it again.') +
-                        "<br/><br/>" + t('Error code: %s').replace('%s', response.error) +
-                        "<br/>" + t('Error message: %s').replace('%s', response.message) +
-                        "<br/>" + 'URI: %s'.replace('%s', this.options.url) +
-                        '<br/><a class="jarves-Button" onclick="jarves.wm.open(\'admin/system/rest-logger\')">Details</a>',
+                    message,
                     15000
                 );
             }

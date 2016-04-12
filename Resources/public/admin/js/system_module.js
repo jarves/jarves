@@ -566,37 +566,50 @@ var jarves_system_module = new Class({
                     var deactivate = new jarves.Button(_('Deactivate'))
 
                     deactivate.addEvent('click', function () {
-                        deactivate.startLoading(t('Deactivating ...'));
-                        new Request.JSON({url: _pathAdmin +
-                            'admin/system/bundle/manager/deactivate', noCache: 1,
-                            onComplete: function (response) {
-                                if (response.error) {
-                                deactivate.failedLoading(t('Failed'));
-                                } else {
-                                    deactivate.doneLoading(t('Deactivated'));
-                                }
-                                this.loadLocal();
-                                jarves.loadSettings();
-                                jarves.loadMenu();
-                        }.bind(this)}).post({bundle: key});
+                        this.win.confirm(
+                            t('Really deactivate the bundle?\nPLEASE NOTE: THIS CAN CRASH YOUR SYSTEM!'),
+                            function(answer) {
+                                if (!answer) return;
+
+                                deactivate.startLoading(t('Deactivating ...'));
+                                new Request.JSON({url: _pathAdmin +
+                                'admin/system/bundle/manager/deactivate', noCache: 1,
+                                    onComplete: function (response) {
+                                        if (response.error) {
+                                            deactivate.failedLoading(t('Failed'));
+                                        } else {
+                                            deactivate.doneLoading(t('Deactivated'));
+                                        }
+                                        this.loadLocal();
+                                        jarves.loadSettings();
+                                        jarves.loadMenu();
+                                    }.bind(this)}).post({bundle: key});
+                            });
+
                     }.bind(this)).inject(bActions)
                 } else {
-                    var activate =  new jarves.Button(_('Activate'))
+                    var activate =  new jarves.Button(_('Activate'));
 
                     activate.addEvent('click', function () {
-                        activate.startLoading(t('Activating ...'));
-                        new Request.JSON({url: _pathAdmin +
-                            'admin/system/bundle/manager/activate', noCache: 1,
-                            onComplete: function (response) {
-                                if (response.error) {
-                                    activate.failedLoading(t('Failed'));
-                                } else {
-                                    activate.doneLoading(t('Activated'));
-                                }
-                                this.loadLocal();
-                                jarves.loadSettings();
-                                jarves.loadMenu();
-                        }.bind(this)}).post({bundle: key});
+                        this.win.confirm(
+                            t('Really activate the bundle?\nPLEASE NOTE: THIS CAN CRASH YOUR SYSTEM!'),
+                            function(answer) {
+                                if (!answer) return;
+
+                                activate.startLoading(t('Activating ...'));
+                                new Request.JSON({url: _pathAdmin +
+                                'admin/system/bundle/manager/activate', noCache: 1,
+                                    onComplete: function (response) {
+                                        if (response.error) {
+                                            activate.failedLoading(t('Failed'));
+                                        } else {
+                                            activate.doneLoading(t('Activated'));
+                                        }
+                                        this.loadLocal();
+                                        jarves.loadSettings();
+                                        jarves.loadMenu();
+                                    }.bind(this)}).post({bundle: key});
+                            });
                     }.bind(this)).inject(bActions);
                 }
             }

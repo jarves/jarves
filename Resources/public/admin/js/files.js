@@ -13,12 +13,27 @@
 
 var jarves_files = new Class({
 
+    /**
+     *
+     * @param {jarves.Window} pWindow
+     */
     initialize: function (pWindow) {
         this.win = pWindow;
-        this.kaFiles = new jarves.Files(this.win.content, {
+
+        this.files = new jarves.Files(this.win.content, {
             withSidebar: false,
             selection: false,
+            standalone: true,
             useWindowHeader: true
         }, this.win);
+
+        if (pWindow.getParameter('selected')) {
+            var path = jarves.getObjectIdFromUrl(pWindow.getParameter('selected'));
+            console.log('files', pWindow.getParameter('selected'), path);
+
+            this.files.load(path);
+        } else {
+            this.files.loadRoot();
+        }
     }
 });

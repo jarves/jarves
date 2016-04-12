@@ -55,11 +55,14 @@
     top: 0;
 }
 
-.jarves-Table > thead > tr > th,
-.jarves-Table-head th,
 .jarves-Table > tbody > tr > td,
 .jarves-Table-body td {
     border-bottom: 1px solid darken($mainColor, 5%);
+}
+
+.jarves-Table > thead > tr > th,
+.jarves-Table-head th {
+    border-bottom: 1px solid #B7B7B7;
 }
 
 .jarves-Table > thead > tr > th,

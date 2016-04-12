@@ -272,7 +272,7 @@ class ObjectCrud implements ObjectCrudInterface
      *
      * @var boolean
      */
-    protected $add = false;
+    protected $add = true;
     protected $newLabel = '[[New]]';
     protected $addMultiple = false;
     protected $addMultipleFieldContainerWidth = '70%';
@@ -289,13 +289,13 @@ class ObjectCrud implements ObjectCrudInterface
      *
      * @var boolean
      */
-    protected $remove = false;
+    protected $remove = true;
     /**
      * Defines whether the edit button should be displayed
      *
      * @var boolean
      */
-    protected $edit = false;
+    protected $edit = true;
 
     protected $nestedMoveable = true;
 
@@ -513,7 +513,6 @@ class ObjectCrud implements ObjectCrudInterface
         }
 
         if ($this->objectDefinition) {
-
             if ($apiControllerDefinition = $this->objectDefinition->getApiControllerDefinition()) {
                 $path = $this->jarves->resolvePath($apiControllerDefinition);
                 $definitionContent = file_get_contents($path);
@@ -537,12 +536,37 @@ class ObjectCrud implements ObjectCrudInterface
             }
 
             if (!$this->fields) {
-                $this->fields = $this->objectDefinition->getFields();
+                $this->fields = [];
+                foreach ($this->objectDefinition->getFields() as $field) {
+                    if (!$field->isAutoIncrement()) {
+                        $this->fields[] = $field;
+                    }
+                }
+            }
+
+            if (!$this->columns) {
+                foreach ($this->fields as $field) {
+                    if ($field->isPrimaryKey() || $field->isAutoIncrement()) {
+                        continue;
+                    }
+
+                    if ('object' !== $field->getType()) {
+                        $this->columns[$field->getId()] = $field;
+                    }
+                }
+
+                if ($labelField = $this->objectDefinition->getLabelField()) {
+                    $field = $this->objectDefinition->getField($labelField);
+                    $this->columns[$field->getId()] = $field;
+                }
             }
 
             //we need to call it, no matter if it's already defined, because of multiLanguage field.
             $this->prepareFieldItem($this->fields);
             $this->translateFields($this->fields);
+
+            $this->prepareFieldItem($this->columns);
+            $this->translateFields($this->columns);
 
             if (!isset($this->titleField)) {
                 $this->titleField = $this->objectDefinition->getLabel();
@@ -563,6 +587,8 @@ class ObjectCrud implements ObjectCrudInterface
             }
         }
 
+        $this->fields = $this->toIdIndex($this->fields);
+        $this->columns = $this->toIdIndex($this->columns);
 
         if ($this->addMultipleFields) {
             $this->prepareFieldDefinition($this->addMultipleFields);
@@ -590,7 +616,10 @@ class ObjectCrud implements ObjectCrudInterface
 
         if ((!$this->order || count($this->order) == 0) && $this->columns) {
             reset($this->columns);
-            $this->order[key($this->columns)] = 'asc';
+            $field = current($this->columns);
+            if ($field instanceof Field) {
+                $this->order[$field->getId()] = 'asc';
+            }
         }
 
         //normalize order array
@@ -632,6 +661,21 @@ class ObjectCrud implements ObjectCrudInterface
 
         $this->translate($this->nestedRootAddLabel);
         $this->translate($this->newLabel);
+    }
+
+    /**
+     * @param Field[] $fieldArray
+     */
+    public function toIdIndex($fieldArray) {
+        if (!is_array($fieldArray)) {
+            return;
+        }
+        $result = [];
+        foreach ($fieldArray as $field) {
+            $result[$field->getId()] = $field;
+        }
+
+        return $result;
     }
 
     /**
@@ -1121,6 +1165,10 @@ class ObjectCrud implements ObjectCrudInterface
         $options['fields'] = $this->getItemsSelection($fields);
         $options['permissionCheck'] = $this->getPermissionCheck();
 
+        if ($this->getPermissionCheck() && !$this->acl->checkList($this->getObject())) {
+            return null;
+        }
+
         if ($limit = $this->getObjectDefinition()->getLimitDataSets()) {
             $condition->mergeAnd($limit);
         }
@@ -1223,7 +1271,10 @@ class ObjectCrud implements ObjectCrudInterface
         $fields = Tools::listToArray($fields);
 
         if (!$fields && $this->getColumns()) {
-            $fields = array_keys($this->getColumns());
+            $fields = [];
+            foreach($this->getColumns() as $field) {
+                $fields[] = $field->getId();
+            }
         }
 
         if (!$fields) {

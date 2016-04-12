@@ -14,6 +14,7 @@
 
 namespace Jarves\Model;
 
+use Jarves\File\FileInfo;
 use Jarves\File\FileInfoTrait;
 use Jarves\Model\Base\File as BaseFile;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -44,7 +45,7 @@ class File extends BaseFile implements FileInfoInterface
             $includeLazyLoadColumns,
             $alreadyDumpedObjects
         );
-        $item['name'] = $this->getName();
+        $item['name'] = $this->getName() . ($this->getName() !== '/' && $this->getType() == FileInfo::DIR ? '/': '');
         $item['dir'] = $this->getDir();
         $item['icon'] = $this->getIcon();
         $item['extension'] = $this->getExtension();

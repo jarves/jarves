@@ -518,6 +518,48 @@ jarves.mediaPath = function(path) {
 };
 
 /**
+ * Opens object.editEntryPoint or object.listEntryPoint for given objectKey and item.
+ *
+ * @param {string} objectKey
+ * @param {Object} item
+ */
+jarves.openObjectDetailEntryPoint = function(objectKey, item) {
+    var url = jarves.normalizeObjectKey(objectKey) + '/' + jarves.getObjectUrlId(objectKey, item);
+    jarves.openObjectDetailEntryPointForUrl(url);
+};
+
+/**
+ * Opens object.editEntryPoint or object.listEntryPoint with given objectUrl.
+ *
+ * @param {string} objectUrl
+ */
+jarves.openObjectDetailEntryPointForUrl = function(objectUrl) {
+
+    var config = jarves.getObjectDefinition(objectUrl);
+
+    if (config.editEntryPoint || config.listEntryPoint) {
+        jarves.wm.open(config.editEntryPoint || config.listEntryPoint, {
+            type: 'edit',
+            selected: objectUrl
+        }, null);
+    }
+};
+
+/**
+ * Opens object.listEntryPoint for given objectKey.
+ *
+ * @param {string} objectKey
+ */
+jarves.openObjectListEntryPoint = function(objectKey) {
+
+    var config = jarves.getObjectDefinition(objectKey);
+
+    if (config.listEntryPoint) {
+        jarves.wm.open(config.editEntryPoint || config.listEntryPoint, {}, null);
+    }
+};
+
+/**
  * Returns a list of the primary keys.
  *
  * @param {String} objectKey
@@ -595,6 +637,36 @@ jarves.getObjectPkFromUrlId = function(objectKey, urlId) {
 };
 
 /**
+ *
+ * Return the id or array of internal url id.
+ *
+ * Example:
+ *
+ *    3 => {'id': 3}
+ *    %252Fadmin%252Fimages%252Fhi.jpg => {path: '/admin/images/hi.jpg'}
+ *    idValue1/idValue2 => {id1: idValue1, id2: idValue2}
+ *
+ * @param {String} objectKey
+ * @param {String} urlId
+ * @returns {Object}
+ */
+jarves.getObjectItemFromUrlId = function(objectKey, urlId) {
+    var pks = jarves.getObjectPrimaryList(objectKey);
+
+    var values = jarves.urlDecode(urlId.split('/'));
+    var result = {};
+    Array.each(pks, function(pk, idx) {
+        if ('number' === pk.type) {
+            result[pk] = parseInt(values[idx]);
+        } else {
+            result[pk] = values[idx];
+        }
+    });
+
+    return result;
+};
+
+/**
  * Return the internal representation (id) of object primary keys.
  *
  * @param {String} objectKey
@@ -635,12 +707,15 @@ jarves.getObjectId = function(objectKey, item) {
 };
 
 /**
- * Returns the correct escaped id part of the object url (object://<objectName>/<id>).
+ * Returns the correct escaped id part of the object url (object://<objectName>/<id>)
  *
  * @param {String} objectKey
  * @param {String} id String from jarves.getObjectUrlId or jarves.getObjectIdFromUrl e.g.
+ *
+ * @return {String}
  */
 jarves.getObjectUrlIdFromId = function(objectKey, id) {
+    //todo, it does not handle compositePk
     return jarves.hasCompositePk(objectKey) ? id : jarves.urlEncode(id);
 };
 
@@ -1097,6 +1172,15 @@ jarves.getConfig = function(bundleName) {
 
     bundleName = bundleName.split('/')[0];
     return jarves.settings.configs[bundleName] || jarves.settings.configs[bundleName.toLowerCase()] || jarves.settings.configsAlias[bundleName] || jarves.settings.configsAlias[bundleName.toLowerCase()];
+};
+
+/**
+ * Returns all bundle configurations
+ *
+ * @returns {Object}
+ */
+jarves.getConfigs = function() {
+    return jarves.settings.configs;
 };
 
 /**

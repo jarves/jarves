@@ -35,7 +35,7 @@
     max-height: 99%;
     max-width: 99%;
 
-    overflow: visible;
+    overflow: auto;
     padding: 5px 10px;
 }
 
@@ -108,4 +108,10 @@
     -o-transition: all 0.2s ease-out;
     transition: all 0.2s ease-out;
     opacity: 0;
+}
+
+.jarves-dialog-error-message {
+    padding: 50px;
+    color: #8E0909;
+    text-align: center;
 }

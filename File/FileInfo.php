@@ -62,7 +62,7 @@ class FileInfo implements FileInfoInterface
     public function toArray()
     {
         return [
-            'name' => $this->getName(),
+            'name' => $this->getName() . ($this->getName() !== '/' && $this->getType() == FileInfo::DIR ? '/': ''),
             'path' => $this->getPath(),
             'type' => $this->getType(),
             'size' => $this->getSize(),
