@@ -5,7 +5,7 @@
             <asset src="@JarvesBundle/admin/mootools-more.js" />
             <assets src="@JarvesBundle/admin/js/mootools-extras/*.js" />
             <asset src="@JarvesBundle/admin/js/lib/nunjucks.min.js" />
-            <asset src="@JarvesBundle/admin/js/lib/vue.min.js" />
+            <asset priority="4000" compression="false" src="@JarvesBundle/admin/js/lib/vue.min.js" />
 
             <asset src="@JarvesBundle/admin/js/jarves.js" />
             <asset src="@JarvesBundle/admin/js/jarves/AdminInterface.js" />

@@ -19,6 +19,7 @@ use Jarves\Cache\Cacher;
 use Jarves\Client\ClientAbstract;
 use Jarves\Configuration\Bundle;
 use Jarves\Configuration\Client;
+use Jarves\Configuration\Configs;
 use Jarves\Configuration\Event;
 use Jarves\Configuration\Model;
 use Jarves\Configuration\SystemConfig;
@@ -270,6 +271,31 @@ class Jarves
         }
 
         return null;
+    }
+
+    /**
+     * Returns a real Bundle config object, which is being read from the configurations
+     * files without bootstrap. So this configuration does not contain any changes from
+     * autoCrud, object-attributes, field modifications and other configuration manipulations from the bootstrap.
+     *
+     * When no configurations are found, it returns a completely new Jarves\Configuration\Bundle object.
+     *
+     * @param string $bundleName
+     * @return Bundle
+     */
+    public function getRealConfig($bundleName)
+    {
+        $configs = new Configs($this);
+        $configs->loadBundles([$bundleName]);
+
+        $config = $configs->getConfig($bundleName);
+
+        if (!$config) {
+            $bundle = $this->getBundle($bundleName);
+            return new Bundle($bundle, $this, null);
+        }
+
+        return $config;
     }
 
     /**

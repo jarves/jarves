@@ -148,7 +148,7 @@ class EditorController extends Controller
      */
     public function getBasicAction($bundle)
     {
-        $config = $this->jarves->getConfig($bundle);
+        $config = $this->jarves->getRealConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -201,7 +201,7 @@ class EditorController extends Controller
         $adminAssets = $paramFetcher->get('adminAssets') ?: null;
         $falDrivers = $paramFetcher->get('falDrivers') ?: null;
 
-        $config = $this->jarves->getOrCreateConfig($bundle);
+        $config = $this->jarves->getRealConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -317,7 +317,7 @@ class EditorController extends Controller
     public function getPluginsAction(ParamFetcher $paramFetcher)
     {
         $bundle = $paramFetcher->get('bundle');
-        $config = $this->jarves->getConfig($bundle);
+        $config = $this->jarves->getRealConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -344,7 +344,7 @@ class EditorController extends Controller
         $bundle = $paramFetcher->get('bundle');
         $plugins = $paramFetcher->get('plugins') ?: null;
 
-        $config = $this->jarves->getOrCreateConfig($bundle);
+        $config = $this->jarves->getRealConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -378,7 +378,7 @@ class EditorController extends Controller
     {
         $bundle = $paramFetcher->get('bundle');
 
-        $config = $this->jarves->getConfig($bundle);
+        $config = $this->jarves->getRealConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -406,7 +406,7 @@ class EditorController extends Controller
         $bundle = $paramFetcher->get('bundle');
         $themes = $paramFetcher->get('themes') ?: null;
 
-        $config = $this->jarves->getOrCreateConfig($bundle);
+        $config = $this->jarves->getRealConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -489,7 +489,7 @@ class EditorController extends Controller
      */
     public function getObjectsAction($bundle)
     {
-        $config = $this->jarves->getConfig($bundle);
+        $config = $this->jarves->getRealConfig($bundle);
         if (!$config) {
             throw new BundleNotFoundException(sprintf('Bundle `%s` not found', $bundle));
         }
@@ -520,7 +520,7 @@ class EditorController extends Controller
      */
     public function setObjectsAction($bundle, $objects = null, $objectAttributes = null)
     {
-        $config = $this->jarves->getOrCreateConfig($bundle);
+        $config = $this->jarves->getRealConfig($bundle);
         if (!$config) {
             throw new BundleNotFoundException(sprintf('Bundle `%s` not found', $bundle));
         }
@@ -638,7 +638,7 @@ class EditorController extends Controller
     public function getEntryPointsAction(ParamFetcher $paramFetcher)
     {
         $bundle = $paramFetcher->get('bundle');
-        $config = $this->jarves->getConfig($bundle);
+        $config = $this->jarves->getRealConfig($bundle);
         if (!$config) {
             return null;
         }
@@ -667,7 +667,7 @@ class EditorController extends Controller
         $bundle = $paramFetcher->get('bundle');
         $entryPoints = $paramFetcher->get('entryPoints') ?: null;
 
-        $config = $this->jarves->getOrCreateConfig($bundle);
+        $config = $this->jarves->getRealConfig($bundle);
         if (!$config) {
             return null;
         }

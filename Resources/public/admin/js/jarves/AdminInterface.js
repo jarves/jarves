@@ -409,7 +409,8 @@ jarves.AdminInterface = new Class({
                 }.bind(this))
                 .inject(this.border);
 
-            this.lastSearchResultsPane = new jarves.SearchResultsPane({
+            var pane = Vue.extend(jarves.SearchResultsPane);
+            this.lastSearchResultsPane = new pane({
                 el: this.searchResultContainer,
                 data: {
                     result: this.lastSearchResults,
@@ -447,7 +448,7 @@ jarves.AdminInterface = new Class({
 
     vue: null,
     setupVue: function () {
-        defaultComponents = {};
+        var defaultComponents = {};
 
         //setup <object-key-search-results> elements
         Object.each(jarves.getConfigs(), function (config, bundleName) {
@@ -461,11 +462,12 @@ jarves.AdminInterface = new Class({
 
                     var component = Vue.extend({
                         props: ['items', 'objectKey'],
-                        template: '<h4 v-on:click="openList(objectKey)">{{bundleName(objectKey)}} <div class="object-key">({{objectKey}})</div></h4>' +
+                        template: '<div>' +
+                        '<h4 v-on:click="openList(objectKey)">{{bundleName(objectKey)}} <div class="object-key">({{objectKey}})</div></h4>' +
                         '<div class="jarves-search-results-items">' +
                         '<div class="jarves-search-results-item" v-for="item in items"><a' +
                         ' v-on:click="openItem(item, objectKey)">{{label(item, objectKey)}}</a></div>' +
-                        '</div>',
+                        '</div></div>',
                         methods: {
                             openItem: function (item, objectKey) {
                                 jarves.openObjectDetailEntryPoint(objectKey, item);
@@ -509,14 +511,11 @@ jarves.AdminInterface = new Class({
                             }
                         }
                     });
+                    defaultComponents[componentId] = component;
                     Vue.component(componentId, component);
                 });
             }
         });
-
-        this.vue = Vue.extend({
-            components: defaultComponents
-        })
     },
 
     /*

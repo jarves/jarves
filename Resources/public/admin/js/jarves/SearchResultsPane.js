@@ -11,8 +11,9 @@
  * LICENSE file, that was distributed with this source code.
  */
 
-jarves.SearchResultsPane = Vue.extend({
-    template: '<h3>Search</h3>' +
+jarves.SearchResultsPane = {
+    template: '<div>' +
+    '<h3>Search</h3>' +
     '<div v-on:click="closeSearch()" class="jarves-search-closer icon-cancel-8"></div>' +
     '<div class="description">Tip: Use a star (*) at the end to find more. Example: keyword*</div>' +
     '<div v-if="loading" class="jarves-search-loading">' +
@@ -22,6 +23,7 @@ jarves.SearchResultsPane = Vue.extend({
     '  <div class="jarves-search-result-object">' +
     '    <div :is="componentName(key)" :items="result" :object-key="key" v-for="(key, result) in result.items"></div>' +
     '  </div>' +
+    '</div>' +
     '</div>',
     replace: false,
     methods: {
@@ -32,4 +34,4 @@ jarves.SearchResultsPane = Vue.extend({
             jarves.getAdminInterface().closeSearch();
         }
     }
-});
+};

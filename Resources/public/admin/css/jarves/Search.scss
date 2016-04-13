@@ -36,7 +36,7 @@
 .jarves-search-results {
   position: absolute;
   left: 0;
-  top: 70px;
+  top: 83px;
   right: 0;
   padding-left: 15px;
   bottom: 15px;
@@ -56,7 +56,7 @@
   }
 }
 
-.jarves-search-result-object > h4 {
+.jarves-search-result-object > div > h4 {
   border-bottom: 1px dashed silver;
   padding: 3px;
   cursor: pointer;

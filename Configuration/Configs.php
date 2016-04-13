@@ -47,6 +47,9 @@ class Configs implements \IteratorAggregate
         }
     }
 
+    /**
+     * @param array $bundles
+     */
     public function loadBundles(array $bundles)
     {
         foreach ($bundles as $bundleName) {
@@ -253,6 +256,7 @@ class Configs implements \IteratorAggregate
     public function getConfig($bundleName)
     {
         $bundleName = $this->normalizeBundleName($bundleName);
+
         if (!isset($this->configElements[$bundleName]) && isset($this->configElements[$bundleName . 'bundle'])) {
             $bundleName .= 'bundle';
         }

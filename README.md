@@ -73,12 +73,12 @@ Features
 Screenshot
 ----------
 
-![Administration Login](http://jarves.io/bundles/app/images/screenhots/admin-login.png)
+![Administration Login](http://jarves.io/bundles/app/images/screenshots/admin-login.png)
 
 ### Frontend inline editing
 
-![Administration Frontend Edit](http://jarves.io/bundles/app/images/screenhots/admin-frontend-edit.png)
-![Administration Frontend Edit 2](http://jarves.io/bundles/app/images/screenhots/admin-frontend-edit-content-elements.png)
+![Administration Frontend Edit](http://jarves.io/bundles/app/images/screenshots/admin-frontend-edit.png)
+![Administration Frontend Edit 2](http://jarves.io/bundles/app/images/screenshots/admin-frontend-edit-content-elements.png)
 
 ### File manager
 
@@ -87,15 +87,26 @@ Screenshot
 3. File editing (rename, delete)
 4. Image editing (crop/resize)
 5. File Abstraction Layer (for AWS S3 inside Jarves for example)
+6. Async file uploaded
 
 ![Administration File manager](Resources/doc/images/admin-files-context-image.png)
 ![Administration File manager Images](Resources/doc/images/admin-files-context-image2.png)
+![Administration File manager Crop](http://jarves.io/bundles/app/images/screenshots/admin-files-image-crop.png)
+![Administration File manager Editor](http://jarves.io/bundles/app/images/screenshots/admin-file-codemirror.png)
 
 ### CRUD Framework
-![Administration CRUD Framework Window List](Resources/doc/images/admin-list.png)
-![Administration CRUD Framework Window](Resources/doc/images/admin-users.png)
+![Administration CRUD List](Resources/doc/images/screenshots/admin-crud-list.png)
+![Administration CRUD Form](Resources/doc/images/screenshots/admin-crud-form.png)
+![Administration CRUD Objects](Resources/doc/images/screenshots/admin-extensioneditor-objects.png)
 
-[More Screenshots](Resources/doc/screenshots.markdown)
+### Permission System
+
+Very detailed permission system.
+
+![Permission System Entry Points](Resources/doc/images/screenshots/admin-permission-management1.png)
+![Permission System Objects](Resources/doc/images/screenshots/admin-permission-management2.png)
+
+[More Screenshots](http://jarves.io/documentation/quick-start/screenshots)
 
 More information:
 http://jarves.io
