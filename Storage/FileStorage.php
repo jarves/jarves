@@ -382,7 +382,7 @@ class FileStorage extends AbstractStorage
             }
         }
 
-        if ($file && !$this->acl->checkUpdate('Core\\File', array('id' => $file->getId()))) {
+        if ($file && !$this->acl->isUpdatable('jarves/file', array('path' => $path))) {
             throw new AccessDeniedException(sprintf('No access to file `%s`', $path));
         }
     }
@@ -428,7 +428,7 @@ class FileStorage extends AbstractStorage
                 continue;
             }
 
-            $file['writeAccess'] = $this->acl->checkUpdate('Core\\File', array('id' => $file['id']));
+            $file['writeAccess'] = $this->acl->isUpdatable('jarves/file', array('path' => $file['path']));
 
             $c++;
 //            if ($offset && $offset >= $c) {
