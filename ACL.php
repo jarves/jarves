@@ -533,6 +533,8 @@ class ACL
         $pk = $aclRequest->getPrimaryKey();
         $field = $aclRequest->getField();
 
+        $pk = $this->objects->normalizePkString($objectKey, $pk);
+
         if (ACL::TARGET_TYPE_USER === $targetType && null === $targetId) {
             //0 means guest
             $targetId = $this->pageStack->getUser() ? $this->pageStack->getUser()->getId() : 0;
@@ -601,7 +603,10 @@ class ACL
         $originObjectItemPk = $currentObjectPk;
 
         while ($not_found) {
-            $currentObjectPkString = $this->objects->getObjectUrlId($objectKey, $currentObjectPk);
+            $currentObjectPkString = null;
+            if ($currentObjectPk) {
+                $currentObjectPkString = $this->objects->getObjectUrlId($objectKey, $currentObjectPk);
+            }
             $depth++;
 
             if ($depth > 50) {

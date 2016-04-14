@@ -81,7 +81,7 @@ class AdminAssets
             $session['lang'] = $this->pageStack->getSession()->get('admin_language');
         }
 
-        $session['access'] = $this->acl->check(ACLRequest::create('jarves/entryPoint', '/admin'));
+        $session['access'] = $this->acl->check(ACLRequest::create('jarves/entryPoint', ['path' => '/admin']));
 
         if ($this->pageStack->isLoggedIn()) {
             $user = $this->pageStack->getUser();

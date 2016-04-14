@@ -55,7 +55,7 @@ class AuthTest extends AuthTestCase
                 'mode' => 0,
                 'access' => true,
                 'constraintType' => 1,
-                'constraintCode' => $this->getObjects()->getObjectUrlId('jarves/entryPoint', '/admin'),
+                'constraintCode' => $this->getObjects()->getObjectUrlId('jarves/entryPoint', ['path' => '/admin']),
             ],
             TableMap::TYPE_CAMELNAME
         );

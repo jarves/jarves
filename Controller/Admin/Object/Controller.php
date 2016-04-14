@@ -134,7 +134,7 @@ class Controller extends SymfonyController
                 foreach ($requestedIds as $id) {
                     $pk = $this->getObjects()->parsePk($objectKey, $id);
                     if ($pk) {
-                        $map[$this->getObjects()->getObjectUrlId($objectKey, $pk[0]) . ''] = $id;
+                        $map[$this->getObjects()->getObjectUrlId($objectKey, $pk) . ''] = $id;
                     }
                 }
 

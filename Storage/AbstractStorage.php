@@ -542,16 +542,12 @@ abstract class AbstractStorage
             return null;
         }
 
-        if (count($this->primaryKeys) == 1) {
-            return $object[current($this->primaryKeys)];
-        } else {
-            $result = array();
-            foreach ($this->primaryKeys as $key) {
-                $result[] = $object[$key];
-            }
-
-            return $result;
+        $result = array();
+        foreach ($this->primaryKeys as $key) {
+            $result[] = $object[$key];
         }
+
+        return $result;
     }
 
 }

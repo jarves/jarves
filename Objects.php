@@ -347,7 +347,7 @@ class Objects
      * @param  string $objectKey
      * @param  string $primaryKey
      *
-     * @return array|mixed
+     * @return array
      */
     public function parsePk($objectKey, $primaryKey)
     {
@@ -440,7 +440,7 @@ class Objects
      * @return string
      * @throws \InvalidArgumentException
      */
-    public function getObjectUrlId($objectKey, $pk)
+    public function getObjectUrlId($objectKey, array $pk)
     {
         $pk = $this->normalizePk($objectKey, $pk);
         $pks = $this->getPrimaryList($objectKey);
@@ -1137,10 +1137,10 @@ class Objects
      *  idFoo/Bar => array(array(id => idFoo), array(id2 => "Bar"))
      *  1,45/2,45 => array(array(id => 1, pid = 45), array(id => 2, pid=>45))
      *
-     * @param $objectKey
-     * @param $pkString
+     * @param string $objectKey
+     * @param string $pkString
      *
-     * @return array Example array('id' => 4)
+     * @return array|null Example array('id' => 4)
      */
     public function normalizePkString($objectKey, $pkString)
     {
@@ -1151,7 +1151,7 @@ class Objects
         $obj = $this->getStorageController($objectKey);
         $objectIds = $obj->primaryStringToArray($pkString);
 
-        return @$objectIds[0];
+        return $objectIds ? $objectIds[0] : null;
     }
 
     /**

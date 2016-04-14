@@ -281,7 +281,7 @@ class AdminController extends Controller
             'userId' => $user->getId(),
             'username' => $user->getUsername(),
             'lastLogin' => $user->getLastLogin(),
-            'access' => $this->acl->check(ACLRequest::create('jarves/entryPoint', '/admin')),
+            'access' => $this->acl->check(ACLRequest::create('jarves/entryPoint', ['path' => '/admin'])),
             'firstName' => $user->getFirstName(),
             'lastName' => $user->getLastName(),
             'imagePath' => $user->getImagePath()
