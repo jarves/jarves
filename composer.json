@@ -40,7 +40,7 @@
         "sybio/image-workshop": ">=2",
         "michelf/php-markdown": "^1.6",
         "composer\/composer": "1.0.0",
-        "friendsofsymfony/rest-bundle": "^2.0.0-BETA2",
+        "friendsofsymfony/rest-bundle": "2.0.0-BETA2",
         "nelmio/api-doc-bundle": "~2.5",
         "icap/html-diff": ">=1.0.1"
     },
