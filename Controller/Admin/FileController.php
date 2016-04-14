@@ -4,6 +4,7 @@ namespace Jarves\Controller\Admin;
 
 use FOS\RestBundle\Request\ParamFetcher;
 use Jarves\ACL;
+use Jarves\ACLRequest;
 use Jarves\Filesystem\WebFilesystem;
 use Jarves\Jarves;
 use Jarves\Objects;
@@ -87,6 +88,8 @@ class FileController extends Controller
     public function deleteFileAction($path)
     {
         $this->checkAccess($path);
+        $this->checkAccess($path, ACL::MODE_DELETE);
+
         if (!$file = $this->webFilesystem->getFile($path)) {
             return false;
         }
@@ -119,7 +122,22 @@ class FileController extends Controller
     {
         $path = $paramFetcher->get('path');
         $content = $paramFetcher->get('content');
-        $this->checkAccess($path);
+
+        $pseudoItem = [
+            'path' => $path,
+            'type' => FileInfo::FILE
+        ];
+
+        //are we allowed to create this type of file?
+        $aclRequest = ACLRequest::create('jarves/file', $pseudoItem)
+            ->onlyAddMode()
+            ->setPrimaryObjectItem($pseudoItem);
+        $this->checkOrThrow($aclRequest);
+
+        //are we allowed to update the target folder?
+        $aclRequest = ACLRequest::create('jarves/file', ['path' => dirname($path)])
+            ->onlyUpdateMode();
+        $this->checkOrThrow($aclRequest);
 
         if ($this->webFilesystem->has($path)) {
             return ['targetExists' => true];
@@ -131,6 +149,17 @@ class FileController extends Controller
         }
 
         return $result;
+    }
+
+    /**
+     * @param ACLRequest $aclRequest
+     * @throws AccessDeniedException
+     */
+    protected function checkOrThrow(ACLRequest $aclRequest)
+    {
+        if (!$this->acl->check($aclRequest)) {
+            throw new AccessDeniedException('Access denied');
+        }
     }
 
     /**
@@ -151,16 +180,26 @@ class FileController extends Controller
      */
     public function moveFileAction(ParamFetcher $paramFetcher)
     {
-        $path = $paramFetcher->get('path');
-        $target = $paramFetcher->get('target');
+        $path = trim($paramFetcher->get('path'));
+        $target = trim($paramFetcher->get('target'));
         $overwrite = filter_var($paramFetcher->get('overwrite'), FILTER_VALIDATE_BOOLEAN);
 
         if (!$overwrite && $this->webFilesystem->has($target)) {
             return ['targetExists' => true];
         }
 
-        $this->checkAccess($path);
-        $this->checkAccess($target);
+        //are we allowed to update the old file?
+        $aclRequest = ACLRequest::create('jarves/file', ['path' => $path])
+            ->onlyAddMode();
+        $this->checkOrThrow($aclRequest);
+
+        //are we allowed to create this type of file?
+        $newFile = $this->webFilesystem->getFile($path)->toArray();
+        $newFile['path'] = $target;
+        $aclRequest = ACLRequest::create('jarves/file', $newFile)
+            ->setPrimaryObjectItem($newFile)
+            ->onlyAddMode();
+        $this->checkOrThrow($aclRequest);
 
         $this->newFeed($path, 'moved', sprintf('from %s to %s', $path, $target));
         $result = $this->webFilesystem->move($path, $target);
@@ -224,7 +263,22 @@ class FileController extends Controller
     public function createFolderAction(ParamFetcher $paramFetcher)
     {
         $path = $paramFetcher->get('path');
-        $this->checkAccess(dirname($path));
+
+        $pseudoItem = [
+            'path' => $path,
+            'type' => FileInfo::DIR
+        ];
+
+        //are we allowed to create this type of dir?
+        $aclRequest = ACLRequest::create('jarves/file', $pseudoItem)
+            ->onlyAddMode()
+            ->setPrimaryObjectItem($pseudoItem);
+        $this->checkOrThrow($aclRequest);
+
+        //are we allowed to update the target folder?
+        $aclRequest = ACLRequest::create('jarves/file', ['path' => dirname($path)])
+            ->onlyUpdateMode();
+        $this->checkOrThrow($aclRequest);
 
         if ($result = $this->webFilesystem->mkdir($path)) {
             $this->newFeed($path, 'created', $path);
@@ -240,13 +294,10 @@ class FileController extends Controller
      * )
      *
      * @param string $path
-     * @param array $fields
-     * @param string $method if falsy then 'checkUpdateExact'
-     *
-     * @throws FileNotFoundException
+     * @param int $mode
      * @throws AccessDeniedException
      */
-    protected function checkAccess($path, $fields = null, $method = null)
+    protected function checkAccess($path, $mode = ACL::MODE_UPDATE)
     {
         $file = null;
 
@@ -254,28 +305,12 @@ class FileController extends Controller
             $path = '/' . $path;
         }
 
-        try {
-            $file = $this->webFilesystem->getFile($path);
-        } catch (FileNotFoundException $e) {
-            while ('/' !== $path) {
-                try {
-                    $path = dirname($path);
-                    $file = $this->webFilesystem->getFile($path);
-                } catch (FileNotFoundException $e) {
-                }
-            }
-        }
+        $file = $this->webFilesystem->getFile($path);
 
-        $method = $method ? 'check' . ucfirst($method) . 'Exact' : 'checkUpdateExact';
+        $aclRequest = ACLRequest::create('jarves/file', $file->toArray())
+            ->setMode($mode);
 
-        if ($file && !$this->acl->$method(
-                'jarves/file',
-                array('id' => $file->getId()),
-                $fields
-            )
-        ) {
-            throw new AccessDeniedException(sprintf('No access to file `%s`', $path));
-        }
+        $this->checkOrThrow($aclRequest);
     }
 
     /**
@@ -424,11 +459,13 @@ class FileController extends Controller
 //            }
         }
 
-        $jarvesFile = $this->webFilesystem->getFile(dirname($path));
-        if ($jarvesFile && !$this->acl->checkUpdate(
-                'jarves/file',
-                array('id' => $jarvesFile->getId())
-            )
+        $fileToAdd = ['path' => $path];
+
+        $aclRequest = ACLRequest::create('jarves/file')
+            ->setPrimaryObjectItem($fileToAdd)
+            ->onlyUpdateMode();
+
+        if (!$this->acl->check($aclRequest)
         ) {
             throw new AccessDeniedException(sprintf('No access to file `%s`', $path));
         }
@@ -531,9 +568,9 @@ class FileController extends Controller
 
         foreach ($files as $key => $file) {
             $file = $file->toArray();
-            if (!$this->acl->checkListExact(
-                'jarves/file',
-                array('id' => $file['id']))
+
+            $aclRequest = ACLRequest::create('jarves/file', ['path' => $file['path']])->onlyListingMode();
+            if (!$this->acl->check($aclRequest)
             ) {
                 continue;
             }
@@ -541,10 +578,8 @@ class FileController extends Controller
             if (isset($blacklistedFiles[$file['path']]) | (!$showHiddenFiles && substr($file['name'], 0, 1) == '.')) {
                 continue;
             } else {
-                $file['writeAccess'] = $this->acl->checkUpdateExact(
-                    'jarves/file',
-                    array('id' => $file['id'])
-                );
+                $aclRequest = ACLRequest::create('jarves/file', ['path' => $file['path']])->onlyUpdateMode();
+                $file['writeAccess'] = $this->acl->check($aclRequest);
                 $this->appendImageInformation($file);
             }
             $result[] = $file;
@@ -633,12 +668,16 @@ class FileController extends Controller
     protected function getFile($path)
     {
         $file = $this->webFilesystem->getFile($path);
-        if (!$file || !$this->acl->checkListExact('jarves/file', array('id' => $file->getId()))) {
+        $file = $file->toArray();
+
+        $aclRequest = ACLRequest::create('jarves/file', $file)
+            ->onlyListingMode();
+
+        if (!$file || !$this->acl->check($aclRequest)) {
             return null;
         }
 
-        $file = $file->toArray();
-        $file['writeAccess'] = $this->acl->checkUpdateExact('jarves/file', $file['id']);
+        $file['writeAccess'] = $this->acl->check($aclRequest->onlyUpdateMode());
 
         $this->appendImageInformation($file);
 
@@ -677,7 +716,8 @@ class FileController extends Controller
             $path = $this->webFilesystem->getPath($path);
         }
 
-        $this->checkAccess($path, null, 'view');
+        $this->checkAccess($path, ACL::MODE_VIEW);
+
         $file = $this->webFilesystem->getFile($path);
         if ($file->isDir()) {
             return;
@@ -738,7 +778,7 @@ class FileController extends Controller
         if (is_numeric($path)) {
             $path = $this->webFilesystem->getPath($path);
         }
-        $this->checkAccess($path, null, 'view');
+        $this->checkAccess($path, ACL::MODE_VIEW);
 
         $file = $this->webFilesystem->getFile($path);
         if ($file->isDir()) {
@@ -824,7 +864,7 @@ class FileController extends Controller
             $path = $this->webFilesystem->getPath($path);
         }
 
-        $this->checkAccess($path, null, 'view');
+        $this->checkAccess($path, ACL::MODE_VIEW);
         $file = $this->webFilesystem->getFile($path);
         if ($file->isDir()) {
             return;

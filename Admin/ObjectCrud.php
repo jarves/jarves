@@ -15,6 +15,7 @@
 namespace Jarves\Admin;
 
 use Jarves\ACL;
+use Jarves\ACLRequest;
 use Jarves\Admin\Form\Form;
 use Jarves\ConditionOperator;
 use Jarves\Configuration\Condition;
@@ -1070,7 +1071,10 @@ class ObjectCrud implements ObjectCrudInterface
 
         $this->primaryKey = $pk;
 
-        if ($this->getPermissionCheck() && !$this->acl->checkViewExact($this->getObject(), $pk)) {
+        $aclRequest = ACLRequest::create($this->getObject(), $pk)
+            ->onlyViewMode();
+
+        if ($this->getPermissionCheck() && !$this->acl->check($aclRequest)) {
             return null;
         }
 
@@ -1107,7 +1111,12 @@ class ObjectCrud implements ObjectCrudInterface
         $def = $this->getObjectDefinition();
         $acl = [];
         foreach ($def->getFields() as $field) {
-            if (!$this->acl->checkUpdateExact($this->getObject(), $item, [$field->getId()])) {
+
+            $aclRequest = ACLRequest::create($this->getObject(), $item)
+                ->onlyUpdateMode()
+                ->setField([$field->getId()]);
+
+            if (!$this->acl->check($aclRequest)) {
                 $acl[] = $field->getId();
             }
         }
@@ -1165,7 +1174,9 @@ class ObjectCrud implements ObjectCrudInterface
         $options['fields'] = $this->getItemsSelection($fields);
         $options['permissionCheck'] = $this->getPermissionCheck();
 
-        if ($this->getPermissionCheck() && !$this->acl->checkList($this->getObject())) {
+        $aclRequest = ACLRequest::create($this->getObject())
+            ->onlyListingMode();
+        if ($this->getPermissionCheck() && !$this->acl->check($aclRequest)) {
             return null;
         }
 
@@ -1623,7 +1634,10 @@ class ObjectCrud implements ObjectCrudInterface
         $options['fields'] = $this->getItemSelection($fields);
         $options['permissionCheck'] = $this->getPermissionCheck();
 
-        if ($this->getPermissionCheck() && !$this->acl->checkViewExact($this->getObject(), $pk)) {
+        $aclRequest = ACLRequest::create($this->getObject(), $pk)
+            ->onlyViewMode();
+
+        if ($this->getPermissionCheck() && !$this->acl->check($aclRequest)) {
             return null;
         }
 
@@ -1866,7 +1880,11 @@ class ObjectCrud implements ObjectCrudInterface
             foreach ($values as $fieldName => $value) {
                 //todo, what if $targetObjectKey differs from $objectKey
 
-                if (!$this->acl->checkAdd($this->getObject(), $pk, $fieldName)) {
+                $aclRequest = ACLRequest::create($this->getObject(), $pk)
+                    ->setField($fieldName)
+                    ->onlyAddMode();
+
+                if (!$this->acl->check($aclRequest)) {
                     unset($values[$fieldName]);
                 }
             }
@@ -1987,12 +2005,12 @@ class ObjectCrud implements ObjectCrudInterface
                 return null;
             }
 
-            if (!$this->acl->checkUpdateExact($this->getObject(), $pk)) {
+            if (!$this->acl->check(ACLRequest::create($this->getObject(), $pk)->onlyUpdateMode())) {
                 return null;
             }
 
             foreach ($values as $fieldName => $value) {
-                if (!$this->acl->checkUpdateExact($this->getObject(), $pk, [$fieldName => $value])) {
+                if (!$this->acl->check(ACLRequest::create($this->getObject(), $pk)->onlyUpdateMode()->setField([$fieldName => $value]))) {
                     unset($values[$fieldName]);
                 }
             }
@@ -2058,12 +2076,17 @@ class ObjectCrud implements ObjectCrudInterface
                 return null;
             }
 
-            if (!$this->acl->checkUpdateExact($this->getObject(), $pk)) {
+            if (!$this->acl->check(ACLRequest::create($this->getObject(), $pk)->onlyUpdateMode())) {
                 return null;
             }
 
             foreach ($values as $fieldName => $value) {
-                if (!$this->acl->checkUpdateExact($this->getObject(), $pk, [$fieldName => $value])) {
+                $aclRequest = ACLRequest::create($this->getObject(), $pk)
+                    ->setField([$fieldName => $value])
+                    ->onlyUpdateMode()
+                ;
+
+                if (!$this->acl->check($aclRequest)) {
                     throw new AccessDeniedException(sprintf('Not allowed to change `%s`', $fieldName));
                 }
             }

@@ -207,7 +207,7 @@ abstract class AbstractStorage
 
         if (count($this->primaryKeys) > count($result)) {
             foreach ($this->primaryKeys as $pk2) {
-                if (!@$result[$pk2]) {
+                if (!isset($result[$pk2])) {
                     $result[$pk2] = null;
                 }
             }

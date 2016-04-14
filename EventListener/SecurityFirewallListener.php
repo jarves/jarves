@@ -3,6 +3,7 @@
 namespace Jarves\EventListener;
 
 use Jarves\ACL;
+use Jarves\ACLRequest;
 use Jarves\PageStack;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,7 +48,7 @@ class SecurityFirewallListener
                 return;
             }
 
-            if (!$pageStack->getUser() || !$acl->check('JarvesBundle:EntryPoint', $url)) {
+            if (!$pageStack->getUser() || !$acl->check(ACLRequest::create('jarves/entryPoint', $url))) {
                 $response = new Response(json_encode(
                     [
                         'status' => 403,

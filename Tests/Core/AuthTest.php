@@ -49,7 +49,7 @@ class AuthTest extends AuthTestCase
         $acl->fromArray(
             [
                 'object' => 'jarves/entryPoint',
-                'targetType' => \Jarves\ACL::GROUP,
+                'targetType' => \Jarves\ACL::TARGET_TYPE_GROUP,
                 'targetId' => $this->testGroupPk['id'],
                 'sub' => true,
                 'mode' => 0,

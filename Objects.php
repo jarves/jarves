@@ -1108,6 +1108,10 @@ class Objects
         return $obj->normalizePrimaryKey($pk);
     }
 
+    /**
+     * @param string $key
+     * @return string
+     */
     public static function normalizeObjectKey($key)
     {
         $key = str_replace(['\\', ':', '.'], '/', $key);

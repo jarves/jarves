@@ -14,6 +14,7 @@ namespace Jarves\Controller\Admin;
 
 use FOS\RestBundle\Request\ParamFetcher;
 use Jarves\ACL;
+use Jarves\ACLRequest;
 use Jarves\Client\UserProvider;
 use Jarves\Configuration\Stream;
 use Jarves\ContentRender;
@@ -256,7 +257,6 @@ class AdminController extends Controller
         $user = $this->userProvider->loadUserByUsername($username);
 
         if (!$user) {
-            var_dump('not found');
             $this->logger->warning(sprintf('Login failed for "%s". User not found', $username));
             sleep(1);
             return false;
@@ -281,7 +281,7 @@ class AdminController extends Controller
             'userId' => $user->getId(),
             'username' => $user->getUsername(),
             'lastLogin' => $user->getLastLogin(),
-            'access' => $this->acl->check('JarvesBundle:entryPoint', '/admin'),
+            'access' => $this->acl->check(ACLRequest::create('jarves/entryPoint', '/admin')),
             'firstName' => $user->getFirstName(),
             'lastName' => $user->getLastName(),
             'imagePath' => $user->getImagePath()

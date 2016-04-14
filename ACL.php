@@ -16,7 +16,6 @@ use Jarves\Configuration\Condition;
 use Jarves\Model\Acl as AclObject;
 use Jarves\Model\AclQuery;
 use Jarves\Model\Base\UserQuery;
-use Jarves\Model\User;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 
@@ -26,18 +25,18 @@ class ACL
     /**
      * targetType
      */
-    const USER = 0;
-    const GROUP = 1;
+    const TARGET_TYPE_USER = 0;
+    const TARGET_TYPE_GROUP = 1;
 
     /**
      * mode
      */
-    const ALL = 0;
-    const LISTING = 1;
-    const VIEW = 2;
-    const ADD = 3;
-    const UPDATE = 4;
-    const DELETE = 5;
+    const MODE_ALL = 0;
+    const MODE_LISTING = 1;
+    const MODE_VIEW = 2;
+    const MODE_ADD = 3;
+    const MODE_UPDATE = 4;
+    const MODE_DELETE = 5;
 
     /**
      * constraintType
@@ -106,22 +105,6 @@ class ACL
     }
 
     /**
-     * @param Objects $objects
-     */
-    public function setObjects($objects)
-    {
-        $this->objects = $objects;
-    }
-
-    /**
-     * @return Objects
-     */
-    public function getObjects()
-    {
-        return $this->objects;
-    }
-
-    /**
      * Activates or disables the caching mechanism.
      *
      * @param $caching
@@ -162,15 +145,15 @@ class ACL
      *
      * @return mixed
      */
-    public function getRules($objectKey, $mode = 1, $targetType = ACL::USER, $targetId = null)
+    public function getRules($objectKey, $mode = 1, $targetType = ACL::TARGET_TYPE_USER, $targetId = null)
     {
         $objectKey = Objects::normalizeObjectKey($objectKey);
 
         //normalize input. default is user
-        $targetType = ACL::GROUP === $targetType ? ACL::GROUP : ACL::USER;
+        $targetType = ACL::TARGET_TYPE_GROUP === $targetType ? ACL::TARGET_TYPE_GROUP : ACL::TARGET_TYPE_USER;
 
         $user = null;
-        if ($targetType === ACL::USER) {
+        if ($targetType === ACL::TARGET_TYPE_USER) {
             if (!$targetId) {
                 $user = $this->pageStack->getUser();
             } else {
@@ -178,7 +161,7 @@ class ACL
             }
         }
 
-        if (ACL::USER === $targetType) {
+        if (ACL::TARGET_TYPE_USER === $targetType) {
             if ($user) {
                 $targetId = $user->getId();
                 $inGroups = $user->getGroupIdsArray();
@@ -210,7 +193,7 @@ class ACL
         $targets[] = "( target_type = 1 AND target_id IN (?))";
         $data[] = implode(', ', $inGroups);
 
-        if (ACL::USER === $targetType) {
+        if (ACL::TARGET_TYPE_USER === $targetType) {
             //if user type, we include additionally all user rules
             $targets[] = "( target_type = 0 AND target_id = ?)";
             if ($user) {
@@ -243,12 +226,19 @@ class ACL
         $rules = array();
 
         while ($rule = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            if ($rule['fields'] && substr($rule['fields'], 0, 1) == '{') {
+            $rule['mode'] = (int)$rule['mode'];
+            $rule['access'] = (int)$rule['access'];
+            $rule['sub'] = (boolean)$rule['sub'];
+            $rule['constraint_type'] = (int)$rule['constraint_type'];
+
+            if ($rule['fields'] && substr($rule['fields'], 0, 1) === '{') {
                 $rule['fields'] = json_decode($rule['fields'], true);
             }
-            if ($rule['constraint_type'] == 2 && substr($rule['constraint_code'], 0, 1) == '[') {
+
+            if ($rule['constraint_type'] === ACL::CONSTRAINT_CONDITION && substr($rule['constraint_code'], 0, 1) === '[') {
                 $rule['constraint_code'] = json_decode($rule['constraint_code'], true);
             }
+
             $rules[] = $rule;
         }
 
@@ -273,17 +263,16 @@ class ACL
      * Get a condition object for item listings.
      *
      * @param  string $objectKey
-     * @param  string $table
      *
      * @return Condition
      */
-    public function getListingCondition($objectKey, $table = '')
+    public function getListingCondition($objectKey)
     {
         $objectKey = Objects::normalizeObjectKey($objectKey);
-        $obj = $this->getObjects()->getStorageController($objectKey);
-        $rules = self::getRules($objectKey, static::LISTING);
+        $obj = $this->objects->getStorageController($objectKey);
+        $rules = self::getRules($objectKey, static::MODE_LISTING);
 
-        if (count($rules) == 0) {
+        if (count($rules) === 0) {
             return null;
         }
 
@@ -297,7 +286,7 @@ class ACL
 
         $condition = '';
 
-        $primaryList = $this->getObjects()->getPrimaryList($objectKey);
+        $primaryList = $this->objects->getPrimaryList($objectKey);
         $primaryKey = current($primaryList);
 
         $denyList = array();
@@ -306,17 +295,17 @@ class ACL
 
         foreach ($rules as $rule) {
 
-            if ($rule['constraint_type'] == '1') {
+            if ($rule['constraint_type'] === ACL::CONSTRAINT_EXACT) {
                 //todo $rule['constraint_code'] can be a (urlencoded) composite pk
                 //todo constraint_code is always urlencoded;
                 $condition = Condition::create(array($primaryKey, '=', Tools::urlDecode($rule['constraint_code'])), $this->jarves);
             }
 
-            if ($rule['constraint_type'] == '2') {
+            if ($rule['constraint_type'] === ACL::CONSTRAINT_CONDITION) {
                 $condition = Condition::create($rule['constraint_code'], $this->jarves);
             }
 
-            if ($rule['constraint_type'] == '0') {
+            if ($rule['constraint_type'] === ACL::CONSTRAINT_ALL) {
                 $condition = array('1', '=', '1');
             } elseif ($rule['sub']) {
                 $subCondition = $obj->getNestedSubCondition($condition);
@@ -325,7 +314,7 @@ class ACL
                 }
             }
 
-            if ($rule['access'] == 1) {
+            if ($rule['access'] === 1) {
 
                 if ($denyList) {
                     $condition = array($condition, 'AND NOT', $denyList);
@@ -336,7 +325,7 @@ class ACL
                 }
             }
 
-            if ($rule['access'] != 1) {
+            if ($rule['access'] !== 1) {
                 if ($denyList) {
                     $denyList[] = 'AND NOT';
                 }
@@ -357,96 +346,6 @@ class ACL
         return $conditionObject;
     }
 
-    public function checkList(
-        $objectKey,
-        $targetType = null,
-        $targetId = null,
-        $rootHasAccess = false
-    )
-    {
-        return self::check($objectKey, null, null, self::LISTING, $targetType, $targetId, $rootHasAccess);
-    }
-
-    public function checkListExact(
-        $objectKey,
-        $objectId,
-        $targetType = null,
-        $targetId = null,
-        $rootHasAccess = false
-    )
-    {
-        return self::check($objectKey, $objectId, null, self::LISTING, $targetType, $targetId, $rootHasAccess);
-    }
-
-    public function checkUpdate(
-        $objectKey,
-        $fields = null,
-        $targetType = null,
-        $targetId = null,
-        $rootHasAccess = false
-    )
-    {
-        return self::check($objectKey, null, $fields, self::UPDATE, $targetType, $targetId, $rootHasAccess);
-    }
-
-    public function checkView(
-        $objectKey,
-        $fields = null,
-        $targetType = null,
-        $targetId = null,
-        $rootHasAccess = false
-    )
-    {
-        return self::check($objectKey, null, $fields, self::VIEW, $targetType, $targetId, $rootHasAccess);
-    }
-
-    public function checkDelete(
-        $objectKey,
-        $fields = null,
-        $targetType = null,
-        $targetId = null,
-        $rootHasAccess = false
-    )
-    {
-        return self::check($objectKey, null, $fields, self::DELETE, $targetType, $targetId, $rootHasAccess);
-    }
-
-    public function checkUpdateExact(
-        $objectKey,
-        $objectId,
-        $fields = null,
-        $targetType = null,
-        $targetId = null,
-        $rootHasAccess = false
-    )
-    {
-        return self::check($objectKey, $objectId, $fields, self::UPDATE, $targetType, $targetId, $rootHasAccess);
-    }
-
-    public function checkViewExact(
-        $objectKey,
-        $objectId,
-        $fields = null,
-        $targetType = null,
-        $targetId = null,
-        $rootHasAccess = false
-    )
-    {
-        return self::check($objectKey, $objectId, $fields, self::VIEW, $targetType, $targetId, $rootHasAccess);
-    }
-
-    public function checkDeleteExact(
-        $objectKey,
-        $objectId,
-        $fields = null,
-        $targetType = null,
-        $targetId = null,
-        $rootHasAccess = false
-    )
-    {
-        return self::check($objectKey, $objectId, $fields, self::DELETE, $targetType, $targetId, $rootHasAccess);
-    }
-
     /**
      * @param string $objectKey
      * @param array $objectId
@@ -455,11 +354,7 @@ class ACL
      */
     public function isUpdatable($objectKey, $objectId = null)
     {
-        if (null !== $objectId) {
-            return $this->checkUpdateExact($objectKey, $objectId);
-        } else {
-            return $this->checkUpdate($objectKey);
-        }
+        return $this->check(ACLRequest::create($objectKey, $objectId)->onlyUpdateMode());
     }
 
     /**
@@ -470,23 +365,7 @@ class ACL
      */
     public function isDeletable($objectKey, $objectId = null)
     {
-        if (null !== $objectId) {
-            return $this->checkDeleteExact($objectKey, $objectId);
-        } else {
-            return $this->checkDelete($objectKey);
-        }
-    }
-
-    public function checkAdd(
-        $objectKey,
-        $objectId,
-        $fields = null,
-        $targetType = null,
-        $targetId = null,
-        $rootHasAccess = false
-    )
-    {
-        return self::check($objectKey, $objectId, $fields, self::ADD, $targetType, $targetId, $rootHasAccess);
+        return $this->check(ACLRequest::create($objectKey, $objectId)->onlyDeleteMode());
     }
 
     /*
@@ -516,7 +395,7 @@ class ACL
     )
     {
         return self::setObject(
-            self::LISTING,
+            self::MODE_LISTING,
             $objectKey,
             self::CONSTRAINT_ALL,
             null,
@@ -539,7 +418,7 @@ class ACL
     )
     {
         return self::setObject(
-            self::LISTING,
+            self::MODE_LISTING,
             $objectKey,
             self::CONSTRAINT_EXACT,
             $objectPk,
@@ -562,7 +441,7 @@ class ACL
     )
     {
         return self::setObject(
-            self::LISTING,
+            self::MODE_LISTING,
             $objectKey,
             self::CONSTRAINT_CONDITION,
             $condition,
@@ -584,7 +463,7 @@ class ACL
     )
     {
         return self::setObject(
-            self::UPDATE,
+            self::MODE_UPDATE,
             $objectKey,
             self::CONSTRAINT_ALL,
             null,
@@ -642,33 +521,19 @@ class ACL
     }
 
     /**
-     * @param       $objectKey
-     * @param $pk
-     * @param  bool $field
-     * @param  int $mode
-     * @param null $targetType 0: user, 1: group
-     * @param null $targetId
-     * @param  bool $rootHasAccess
-     * @param  bool $asParent
+     * @param ACLRequest $aclRequest
+     *
      * @return bool
-     * @internal param $pObjectId
      */
-    public function check(
-        $objectKey,
-        $pk,
-        $field = false,
-        $mode = ACL::CONSTRAINT_ALL,
-        $targetType = null,
-        $targetId = null,
-        $rootHasAccess = false,
-        $asParent = false
-    )
+    public function check(ACLRequest $aclRequest)
     {
-        $objectKey = Objects::normalizeObjectKey($objectKey);
+        $objectKey = Objects::normalizeObjectKey($aclRequest->getObjectKey());
+        $targetType = $aclRequest->getTargetType();
+        $targetId = $aclRequest->getTargetId();
+        $pk = $aclRequest->getPrimaryKey();
+        $field = $aclRequest->getField();
 
-        if (null === $targetType) {
-            //it wasn't request any particular user or group, so get information from session
-            $targetType = ACL::USER;
+        if (ACL::TARGET_TYPE_USER === $targetType && null === $targetId) {
             //0 means guest
             $targetId = $this->pageStack->getUser() ? $this->pageStack->getUser()->getId() : 0;
         }
@@ -682,23 +547,23 @@ class ACL
             }
         }
 
-        if (ACL::GROUP === $targetId || null === $targetId) {
+        if (ACL::TARGET_TYPE_GROUP === $targetId || null === $targetId) {
             //
             return true;
         }
 
         $cacheKey = null;
         if ($pk && $this->getCaching()) {
-            $pkString = $this->getObjects()->getObjectUrlId($objectKey, $pk);
+            $pkString = $this->objects->getObjectUrlId($objectKey, $pk);
             $cacheKey = md5($targetType . '.' . $targetId . '.' . $objectKey . '/' . $pkString . '/' . json_encode($field));
             $cached = $this->cacher->getDistributedCache('core/acl/' . $cacheKey);
-            if (null !== $cached) {
+            if (false && null !== $cached) {
                 return $cached;
             }
         }
 
-        $rules = self::getRules($objectKey, $mode, $targetType, $targetId);
-        if (count($rules) == 0) {
+        $rules = self::getRules($objectKey, $aclRequest->getMode(), $targetType, $targetId);
+        if (count($rules) === 0) {
             return false;
         }
 
@@ -706,10 +571,12 @@ class ACL
 
         $currentObjectPk = $pk;
 
-        $definition = $this->getObjects()->getDefinition($objectKey);
+        $definition = $this->objects->getDefinition($objectKey);
 
         $not_found = true;
-        $parent_acl = $asParent;
+
+        //starts directly as if we were in the parent checking.
+        $parent_acl = $aclRequest->isAsParent();
 
         $fCount = null;
         $fKey = null;
@@ -731,8 +598,10 @@ class ACL
         $depth = 0;
         $match = false;
 
+        $originObjectItemPk = $currentObjectPk;
+
         while ($not_found) {
-            $currentObjectPkString = $this->getObjects()->getObjectUrlId($objectKey, $currentObjectPk);
+            $currentObjectPkString = $this->objects->getObjectUrlId($objectKey, $currentObjectPk);
             $depth++;
 
             if ($depth > 50) {
@@ -740,9 +609,11 @@ class ACL
                 break;
             }
 
-            foreach ($rules as $acl) {
+            foreach ($rules as $aclRule) {
 
-                if ($parent_acl && $acl['sub'] == 0) {
+                if ($parent_acl && !$aclRule['sub']) {
+                    //as soon we enter the parent_acl mode we only take acl rules into consideration
+                    //that are also valid for children (sub=true)
                     continue;
                 }
 
@@ -751,17 +622,23 @@ class ACL
                 /*
                  * CUSTOM CONSTRAINT
                  */
-                if ($acl['constraint_type'] == 2) {
-                    $objectItem = $this->getObjects()->get($objectKey, $currentObjectPk);
+                if ($aclRule['constraint_type'] === ACL::CONSTRAINT_CONDITION) {
+                    $objectItem = null;
 
-                    if ($objectItem && $this->conditionOperator->satisfy($acl['constraint_code'], $objectItem, $objectKey)) {
+                    if ($originObjectItemPk === $currentObjectPk && null !== $aclRequest->getPrimaryObjectItem()) {
+                        $objectItem = $aclRequest->getPrimaryObjectItem();
+                    } else if ($originObjectItemPk) {
+                        $objectItem = $this->objects->get($objectKey, $currentObjectPk);
+                    }
+
+                    if ($objectItem && $this->conditionOperator->satisfy($aclRule['constraint_code'], $objectItem, $objectKey)) {
                         $match = true;
                     }
                     /*
                      * EXACT
                      */
-                } else if ($acl['constraint_type'] == 1) {
-                    if ($currentObjectPk && $acl['constraint_code'] == $currentObjectPkString) {
+                } else if ($aclRule['constraint_type'] === ACL::CONSTRAINT_EXACT) {
+                    if ($currentObjectPk && $aclRule['constraint_code'] === $currentObjectPkString) {
                         $match = true;
                     }
                     /**
@@ -771,17 +648,18 @@ class ACL
                     $match = true;
                 }
 
-                if (!$match && $acl['sub']) {
+                if (!$match && $aclRule['sub'] && $currentObjectPk) {
                     // we need to check if a parent matches this $acl as we have sub=true
-                    $parentItem = $this->getObjects()->get($objectKey, $currentObjectPk);
-                    $parentCondition = Condition::create($acl['constraint_code']);
+                    $parentItem = $this->objects->normalizePkString($objectKey, $currentObjectPk);
+
+                    $parentCondition = Condition::create($aclRule['constraint_code']);
                     $parentOptions['fields'] = $this->conditionOperator->extractFields($parentCondition);
 
-                    while ($parentItem = $this->getObjects()->getParent($objectKey, $this->getObjects()->getObjectPk($objectKey, $parentItem), $parentOptions)) {
-                        if ($acl['constraint_type'] == 2 && $this->conditionOperator->satisfy($parentCondition, $parentItem)) {
+                    while ($parentItem = $this->objects->getParent($objectKey, $this->objects->getObjectPk($objectKey, $parentItem), $parentOptions)) {
+                        if ($aclRule['constraint_type'] === ACL::CONSTRAINT_CONDITION && $this->conditionOperator->satisfy($parentCondition, $parentItem)) {
                             $match = true;
                             break;
-                        } else if ($acl['constraint_type'] == 1 && $acl['constraint_code'] == $this->getObjects()->getObjectUrlId($objectKey, $parentItem)) {
+                        } else if ($aclRule['constraint_type'] === ACL::CONSTRAINT_EXACT && $aclRule['constraint_code'] === $this->objects->getObjectUrlId($objectKey, $parentItem)) {
                             $match = true;
                             break;
                         }
@@ -789,20 +667,21 @@ class ACL
                 }
 
                 if ($match) {
+                    //match, check all $field
 
                     $field2Key = $field;
 
                     if ($field) {
-                        if ($fIsArray && $fCount == 1) {
-                            if (is_string($fKey) && is_array($acl['fields'][$fKey])) {
+                        if ($fIsArray && $fCount === 1) {
+                            if (is_string($fKey) && is_array($aclRule['fields'][$fKey])) {
                                 //this field has limits
-                                if (($field2Acl = $acl['fields'][$fKey]) !== null) {
+                                if (($field2Acl = $aclRule['fields'][$fKey]) !== null) {
                                     if (is_array($field2Acl[0])) {
                                         //complex field rule, $field2Acl = ([{access: no, condition: [['id', '>', 2], ..]}, {}, ..])
                                         foreach ($field2Acl as $fRule) {
 
                                             $satisfy = false;
-                                            if (($f = $definition->getField($fKey)) && $f->getType() == 'object') {
+                                            if (($f = $definition->getField($fKey)) && $f->getType() === 'object') {
                                                 $uri = $f->getObject() . '/' . $fValue;
 
                                                 $uriObject = $this->objects->getFromUrl($uri);
@@ -811,27 +690,27 @@ class ACL
                                                 $satisfy = $this->conditionOperator->satisfy($fRule['condition'], $field);
                                             }
                                             if ($satisfy) {
-                                                return ($fRule['access'] == 1) ? true : false;
+                                                return ($fRule['access'] === 1) ? true : false;
                                             }
 
                                         }
 
                                         //if no field rules fits, we consider the whole rule
-                                        if ($acl['access'] != 2) {
-                                            return ($acl['access'] == 1) ? true : false;
+                                        if ($aclRule['access'] !== 2) {
+                                            return ($aclRule['access'] === 1) ? true : false;
                                         }
 
                                     } else {
                                         //simple field rule $field2Acl = ({"value1": yes, "value2": no}
                                         if ($field2Acl[$fKey] !== null) {
-                                            return ($field2Acl[$fKey] == 1) ? true : false;
+                                            return ($field2Acl[$fKey] === 1) ? true : false;
                                         } else {
                                             //current($field) is not exactly defined in $field2Acl, so we set $access to $acl['access']
                                             //
                                             //if access = 2 then wo do not know it, cause 2 means 'inherited', so maybe
                                             //a other rule has more detailed rule
-                                            if ($acl['access'] != 2) {
-                                                $access == ($acl['access'] == 1) ? true : false;
+                                            if ($aclRule['access'] !== 2) {
+                                                $access = ($aclRule['access'] === 1) ? true : false;
                                                 break;
                                             }
                                         }
@@ -844,32 +723,35 @@ class ACL
                         }
 
                         if (!is_array($field2Key)) {
-                            if ($acl['fields'] && ($field2Acl = $acl['fields'][$field2Key]) !== null && !is_array(
-                                    $acl['fields'][$field2Key]
+                            if ($aclRule['fields'] && ($field2Acl = $aclRule['fields'][$field2Key]) !== null && !is_array(
+                                    $aclRule['fields'][$field2Key]
                                 )
                             ) {
-                                $access = ($field2Acl == 1) ? true : false;
+                                $access = ($field2Acl === 1) ? true : false;
                                 break;
                             } else {
                                 //$field is not exactly defined, so we set $access to $acl['access']
                                 //and maybe a rule with the same code has the field defined
                                 // if access = 2 then this rule is only for exactly define fields
-                                if ($acl['access'] != 2) {
-                                    $access = ($acl['access'] == 1) ? true : false;
+                                if ($aclRule['access'] !== 2) {
+                                    $access = ($aclRule['access'] === 1) ? true : false;
                                     break;
                                 }
                             }
                         }
                     } else {
-                        $access = ($acl['access'] == 1) ? true : false;
+                        $access = ($aclRule['access'] === 1) ? true : false;
                         break;
                     }
                 }
             } //foreach
 
             if (null === $access && $definition->isNested() && $pk) {
-                if (null === ($currentObjectPk = $this->getObjects()->getParentPk($objectKey, $currentObjectPk))) {
-                    $access = $rootHasAccess ? true : $access;
+                //$access has not defined yet (no rule matched yet). Check if nested and $pk is given
+                //load its root and check again
+
+                if (null === ($currentObjectPk = $this->objects->getParentPk($objectKey, $currentObjectPk))) {
+                    $access = $aclRequest->isRootHasAccess() ? true : $access;
                     break;
                 }
 
@@ -879,7 +761,7 @@ class ACL
             }
         }
 
-        $access = !!$access;
+        $access = (boolean)$access;
 
         if ($pk && $this->getCaching()) {
             $this->cacher->setDistributedCache('core/acl/' . $cacheKey, $access);
@@ -909,7 +791,7 @@ class ACL
             $t = explode('[', $code2);
             $code2 = $t[0];
             self::normalizeCode($code2);
-            if ($code2 == $code) {
+            if ($code2 === $code) {
                 return $item;
             }
         }
@@ -969,11 +851,11 @@ class ACL
     {
         $code = str_replace('//', '/', $code);
 
-        if (substr($code, 0, 1) != '/') {
+        if (substr($code, 0, 1) !== '/') {
             $code = '/' . $code;
         }
 
-        if (substr($code, -1) == '/') {
+        if (substr($code, -1) === '/') {
             $code = substr($code, 0, -1);
         }
 

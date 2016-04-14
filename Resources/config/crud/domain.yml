@@ -20,6 +20,14 @@ fields:
            - email
            - alias
            - redirect
+columns:
+  - domain
+  - path
+  - titleFormat
+  - lang
+  - master
+  - startnode
+  - theme
 add: false
 edit: false
 remove: false

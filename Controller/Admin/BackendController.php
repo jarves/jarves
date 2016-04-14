@@ -4,6 +4,7 @@ namespace Jarves\Controller\Admin;
 
 use FOS\RestBundle\Request\ParamFetcher;
 use Jarves\ACL;
+use Jarves\ACLRequest;
 use Jarves\Admin\Utils;
 use Jarves\Cache\Cacher;
 use Jarves\Configuration\Condition;
@@ -613,7 +614,7 @@ class BackendController extends Controller
 
                 if (substr_count($path, '/') <= 3) {
                     if ($subEntryPoint->isLink()) {
-                        if ($this->acl->check('jarvesbundle:entryPoint', '/' . $path)) {
+                        if ($this->acl->check(ACLRequest::create('jarvesbundle:entryPoint', '/' . $path))) {
                             $entryPoints[$path] = array(
                                 'label' => $subEntryPoint->getLabel(),
                                 'icon' => $subEntryPoint->getIcon(),

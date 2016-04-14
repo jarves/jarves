@@ -16,6 +16,7 @@ namespace Jarves\Admin;
 
 
 use Jarves\ACL;
+use Jarves\ACLRequest;
 use Jarves\Jarves;
 use Jarves\Model\DomainQuery;
 use Jarves\PageStack;
@@ -80,7 +81,7 @@ class AdminAssets
             $session['lang'] = $this->pageStack->getSession()->get('admin_language');
         }
 
-        $session['access'] = $this->acl->check('JarvesBundle:EntryPoint', '/admin');
+        $session['access'] = $this->acl->check(ACLRequest::create('jarves/entryPoint', '/admin'));
 
         if ($this->pageStack->isLoggedIn()) {
             $user = $this->pageStack->getUser();
