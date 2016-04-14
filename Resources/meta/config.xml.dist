@@ -13,6 +13,25 @@
   <!--This is a key generated through the installation process. You should not change it!
     The system needs this key to decrypt the passwords in the users database.-->
   <passwordHashKey></passwordHashKey>
+  <database>
+    <connections>
+      <!--
+        type: mysql|pgsql|sqlite (the pdo driver name)
+        persistent: true|false (if the connection should be persistent)
+        slave: true|false (if the connection is a slave or not (readonly or not))
+        charset: 'utf8'
+      -->
+      <connection type="mysql" persistent="false" charset="utf8" slave="false">
+        <!--Can be a IP or a hostname. For SQLite enter here the path to the file.-->
+        <server>127.0.0.1</server>
+        <port></port>
+        <!--The schema/database name-->
+        <name>test</name>
+        <username>root</username>
+        <password></password>
+      </connection>
+    </connections>
+  </database>
   <!--
   The cache layer we use for the distributed caching.
   (The `fast caching` is auto determined (Order: APC, XCache, Files))
@@ -41,7 +60,7 @@
     <!--
         A class that handles the actual data storage.
     -->
-    <sessionStorage service="jarves.client.store.database>
+    <sessionStorage service="jarves.client.store.database">
       <options></options>
     </sessionStorage>
   </client>
