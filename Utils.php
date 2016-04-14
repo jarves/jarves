@@ -83,7 +83,7 @@ class Utils
         $changes = [];
         foreach ($definition->getFields() as $field) {
             if ($field->hasFieldType() && !$field->getFieldType()->isDiffAllowed()) {
-                //todo, made $field->isDiffAllowed() as well
+                //todo, check $field->isDiffAllowed() as well
                 continue;
             }
 
@@ -146,15 +146,15 @@ class Utils
 
         $username = '[Unknown]';
         $userId = 0;
-        if ($this->pageStack->getClient() && $this->pageStack->getClient()->getUser()) {
-            $userId = $this->pageStack->getClient()->getUser()->getId();
+        if ($user = $this->pageStack->getUser()) {
+            $userId = $user->getId();
 
-            if ($this->pageStack->getClient()->getUser()->getFirstName() || $this->pageStack->getClient()->getUser()->getLastName()) {
-                $username = $this->pageStack->getClient()->getUser()->getFirstName();
+            if ($user->getFirstName() || $user->getLastName()) {
+                $username = $user->getFirstName();
                 if ($username) $username .= ' ';
-                $username .= $this->pageStack->getClient()->getUser()->getLastName();
+                $username .= $user->getLastName();
             } else {
-                $username = $this->pageStack->getClient()->getUser()->getUsername();
+                $username = $user->getUsername();
             }
         }
 

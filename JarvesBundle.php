@@ -46,6 +46,11 @@ class JarvesBundle extends Bundle
             'serializer' => ['enabled' => true]
         ]);
 
+        $container->loadFromExtension('security', [
+            'encoders' => ['Jarves\Model\User' => 'bcrypt'],
+            'providers' => ['jarves' => ['id' => 'jarves.user_provider']]
+        ]);
+
         if ($container->hasParameter('jarves_admin_prefix')) {
             $container->setParameter('jarves_admin_prefix', 'jarves/');
         }

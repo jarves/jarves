@@ -156,6 +156,10 @@ class FrontendRouteListener extends RouterListener
                 if ($request->attributes->has('_route')) {
                     $name = $request->attributes->get('_route');
                     $route = $this->routes->get($name);
+                    if (!$route) {
+                        //no our front end route hit
+                        return;
+                    }
                     $nodeId = $route->getDefault('nodeId');
 
                     $node = $this->pageStack->getPage($nodeId);

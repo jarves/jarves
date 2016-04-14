@@ -40,12 +40,6 @@ services:
          tags:
             - { name: twig.extension }
 
-     jarves.twig.extension.globals:
-         class: Jarves\Twig\GlobalsExtension
-         arguments: ["@jarves"]
-         tags:
-            - { name: twig.extension }
-
      jarves.twig.extension.unsearchable:
          class: Jarves\Twig\UnsearchableExtension
          tags:

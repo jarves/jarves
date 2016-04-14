@@ -178,10 +178,10 @@ class BackendController extends Controller
 
         $properties = new Properties($settings);
 
-        if ($this->pageStack->getAdminClient()->getUser()->getId() > 0) {
-            $this->pageStack->getAdminClient()->getUser()->setSettings($properties);
+        if ($user = $this->pageStack->getUser()) {
+            $user->setSettings($properties);
 
-            return $this->pageStack->getAdminClient()->getUser()->save();
+            return $user->save();
         }
 
         return false;
@@ -304,7 +304,8 @@ class BackendController extends Controller
         }
 
         if ($loadKeys == false || in_array('user', $loadKeys)) {
-            if ($settings = $this->pageStack->getAdminClient()->getUser()->getSettings()) {
+            $user = $this->pageStack->getUser();
+            if ($settings = $user->getSettings()) {
                 if ($settings instanceof Properties) {
                     $res['user'] = $settings->toArray();
                 }

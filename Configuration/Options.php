@@ -158,6 +158,6 @@ class Options extends Model
      */
     public function getOption($key)
     {
-        return $this->options[$key];
+        return isset($this->options[$key]) ? $this->options[$key] : null;
     }
 }

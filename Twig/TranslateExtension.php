@@ -36,8 +36,8 @@ class TranslateExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            't' => new \Twig_Function_Method($this, 't'),
-            'tc' => new \Twig_Function_Method($this, 'tc')
+            new \Twig_SimpleFunction('t', [$this, 't']),
+            new \Twig_SimpleFunction('tc', [$this, 'tc'])
         );
     }
 

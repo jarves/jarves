@@ -88,7 +88,7 @@ class LatencyMonitorSubscriber implements EventSubscriberInterface
         $max = 20;
         $change = false;
         foreach (array('frontend', 'backend', 'cache', 'session') as $key) {
-            if (!@$this->latency[$key]) {
+            if (!isset($this->latency[$key]) || !$this->latency[$key]) {
                 continue;
             }
 

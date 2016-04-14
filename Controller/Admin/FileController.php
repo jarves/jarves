@@ -350,7 +350,7 @@ class FileController extends Controller
 
         $this->webFilesystem->write(
             $newPath,
-            "file-is-being-uploaded-by-" . hash('sha512', $this->pageStack->getAdminClient()->getTokenId())
+            "file-is-being-uploaded-by-" . hash('sha512', $this->pageStack->getSession()->getId())
         );
         $res['ready'] = true;
 
@@ -411,7 +411,7 @@ class FileController extends Controller
                 if ($this->webFilesystem->has($newPath)) {
                     $content = $this->webFilesystem->read($newPath);
 
-                    $check = "file-is-being-uploaded-by-" . hash('sha512', $this->pageStack->getAdminClient()->getTokenId());
+                    $check = "file-is-being-uploaded-by-" . hash('sha512', $this->pageStack->getSession()->getId());
                     if ($content != $check) {
                         //not our file, so cancel
                         throw new FileUploadException(sprintf(

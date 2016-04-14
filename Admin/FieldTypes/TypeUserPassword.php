@@ -18,22 +18,25 @@ use Jarves\Client\ClientAbstract;
 use Jarves\Configuration\Configs;
 use Jarves\Configuration\Object;
 use Jarves\JarvesConfig;
+use Jarves\Model\User;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
-class TypeUserPassword extends AbstractType
+class TypeUserPassword extends AbstractSingleColumnType
 {
     protected $name = 'UserPassword';
 
-    /**
-     * @var JarvesConfig
-     */
-    private $jarvesConfig;
+    protected $phpDataType = 'string';
+
+    protected $sqlDataType = 'VARCHAR(255)';
 
     /**
-     * @param JarvesConfig $jarvesConfig
+     * @var EncoderFactoryInterface
      */
-    public function __construct(JarvesConfig $jarvesConfig)
+    private $encoderFactory;
+
+    public function __construct(EncoderFactoryInterface $encoderFactory)
     {
-        $this->jarvesConfig = $jarvesConfig;
+        $this->encoderFactory = $encoderFactory;
     }
 
     public function isDiffAllowed()
@@ -41,46 +44,15 @@ class TypeUserPassword extends AbstractType
         return false;
     }
 
-
-
-    public function getColumns()
+    public function getValue()
     {
-        $actualColumn = new ColumnDefinition();
-        $actualColumn->setName($this->getFieldDefinition()->getId());
-        $actualColumn->setPhpDataType('string');
-        $actualColumn->setSqlDataType('varchar(512)');
+        if (!parent::getValue()) {
+            return null;
+        }
 
-        $saltColumn = new ColumnDefinition();
-        $saltColumn->setName($this->getFieldDefinition()->getId() . 'Salt');
-        $saltColumn->setPhpDataType('string');
-        $saltColumn->setSqlDataType('varchar(64)');
+        $userClass = $this->getFieldDefinition()->getOption('userClass') ?: User::class;
 
-        return [
-            $actualColumn,
-            $saltColumn
-        ];
+        $encoder = $this->encoderFactory->getEncoder($userClass);
+        return $encoder->encodePassword(parent::getValue(), null);
     }
-
-    public function getSelection()
-    {
-        return [$this->getFieldDefinition()->getId(), $this->getFieldDefinition()->getId() . 'Salt'];
-    }
-
-    public function mapValues(array &$data)
-    {
-        $salt = ClientAbstract::getSalt();
-        $data[$this->getFieldDefinition()->getId().'Salt'] = $salt;
-
-        $passwordHashKey = $this->jarvesConfig->getSystemConfig()->getPasswordHashKey();
-        $data[$this->getFieldDefinition()->getId()] = ClientAbstract::getHashedPassword($this->getValue(), $salt, $passwordHashKey);
-    }
-
-    /**
-     * {@inheritDocs}
-     */
-    public function bootRunTime(Object $object, Configs $configs)
-    {
-    }
-
-
 }

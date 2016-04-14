@@ -41,8 +41,8 @@ class LoadAssetExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'loadAsset' => new \Twig_Function_Method($this, 'loadAsset'),
-            'loadAssetAtBottom' => new \Twig_Function_Method($this, 'loadAssetAtBottom')
+            new \Twig_SimpleFunction('loadAsset', [$this, 'loadAsset']),
+            new \Twig_SimpleFunction('loadAssetAtBottom', [$this, 'loadAssetAtBottom'])
         );
     }
 

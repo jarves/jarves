@@ -19,6 +19,7 @@ use Jarves\Model\Log;
 use Jarves\Model\LogRequest;
 use Jarves\PageStack;
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Logger;
 
 class JarvesHandler extends AbstractProcessingHandler
 {
@@ -49,6 +50,7 @@ class JarvesHandler extends AbstractProcessingHandler
     public function __construct(PageStack $pageStack)
     {
         $this->pageStack = $pageStack;
+        parent::__construct($level = Logger::DEBUG, $bubble = true);
     }
 
     /**
@@ -100,7 +102,7 @@ class JarvesHandler extends AbstractProcessingHandler
             $this->counts[$record['level']] = 0;
         }
 
-        $this->counts[$record['level']+0]++;
+        $this->counts[$record['level'] + 0]++;
 
         if ($record['level'] < 300) {
             return;
@@ -141,7 +143,8 @@ class JarvesHandler extends AbstractProcessingHandler
 //
         try {
             $log->save();
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         $this->inSaving = false;
     }
 
@@ -170,9 +173,8 @@ class JarvesHandler extends AbstractProcessingHandler
             $this->logRequest->setIp($this->pageStack->getRequest()->getClientIp());
             $this->logRequest->setPath(substr($this->pageStack->getRequest()->getPathInfo(), 0, 254));
             $this->logRequest->setUsername(
-                $this->pageStack->getClient() && $this->pageStack->getClient()->hasSession()
-                && $this->pageStack->getClient()->getUser()
-                    ? $this->pageStack->getClient()->getUser()->getUsername()
+                $this->pageStack->getUser()
+                    ? $this->pageStack->getUser()->getUsername()
                     : 'Guest'
             );
 
@@ -188,7 +190,8 @@ class JarvesHandler extends AbstractProcessingHandler
     /**
      * Resets the current LogRequest. Needed after each request.
      */
-    public function resetLogRequest() {
+    public function resetLogRequest()
+    {
         $this->logRequest = null;
     }
 }

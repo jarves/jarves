@@ -448,9 +448,9 @@ class PackageManager implements ContainerAwareInterface
         $admin->setEmail('admin@localhost');
         $admin->setActivate(1);
 
-        /** @var JarvesConfig $jarvesConfig */
-        $jarvesConfig = $this->container->get('jarves.config');
-        $admin->hashPassword('admin', $jarvesConfig->getSystemConfig()->getPasswordHashKey());
+        $encoderFactory = $this->container->get('security.encoder_factory');
+        $encoder = $encoderFactory->getEncoder($admin);
+        $admin->setPassword($encoder->encodePassword('admin', null));
 
         $liveWorkspace = WorkspaceQuery::create()->findOneById(1);
         $admin->addWorkspace($liveWorkspace);

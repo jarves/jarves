@@ -166,11 +166,11 @@ class Container
         $extension = array_pop($exploded);
         $extensionLong = array_pop($exploded) . '.' . $extension;
 
-        if ($serviceId = @$this->loaderByExtension[strtolower($extensionLong)]) {
-            return $this->container->get($serviceId);
+        if (isset($this->loaderByExtension[strtolower($extensionLong)])) {
+            return $this->container->get($this->loaderByExtension[strtolower($extensionLong)]);
         }
-        if ($serviceId = @$this->loaderByExtension[strtolower($extension)]) {
-            return $this->container->get($serviceId);
+        if (isset($this->loaderByExtension[strtolower($extension)])) {
+            return $this->container->get($this->loaderByExtension[strtolower($extension)]);
         }
     }
 

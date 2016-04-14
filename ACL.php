@@ -26,8 +26,8 @@ class ACL
     /**
      * targetType
      */
-    const GROUP = 1;
     const USER = 0;
+    const GROUP = 1;
 
     /**
      * mode
@@ -155,68 +155,76 @@ class ACL
      * @static
      *
      * @param        $objectKey
-     * @param  int   $mode
+     * @param  int $mode
+     *
+     * @param integer|null $targetType
+     * @param integer|null $targetId
      *
      * @return mixed
-     *
      */
-    public function getRules($objectKey, $mode = 1, $targetType = null, $targetId = null)
+    public function getRules($objectKey, $mode = 1, $targetType = ACL::USER, $targetId = null)
     {
         $objectKey = Objects::normalizeObjectKey($objectKey);
 
-        $user = false;
-        if ($targetType === null && $this->pageStack->getClient() && $this->pageStack->getClient()->hasSession()) {
-            $user = $this->pageStack->getClient()->getUser();
-            $targetType = ACL::USER;
+        //normalize input. default is user
+        $targetType = ACL::GROUP === $targetType ? ACL::GROUP : ACL::USER;
+
+        $user = null;
+        if ($targetType === ACL::USER) {
+            if (!$targetId) {
+                $user = $this->pageStack->getUser();
+            } else {
+                $user = UserQuery::create()->findPk($targetId);
+            }
         }
 
-        if ($targetType === ACL::USER && (($user && $targetId && $user->getId() != $targetId) || !$user)) {
-            $user = UserQuery::create()->findPk($targetId);
-        }
-
-        if ($targetType != ACL::USER) {
-            $targetType = ACL::GROUP;
-        }
-
-        $inGroups = '';
-        $userId = '';
-        if ($user) {
-            $targetId = $userId = $user->getId();
-            $inGroups = $user->getGroupIds();
+        if (ACL::USER === $targetType) {
+            if ($user) {
+                $targetId = $user->getId();
+                $inGroups = $user->getGroupIdsArray();
+            } else {
+                //no user found, so we check against guest
+                $targetId = 0;
+                $inGroups = [0];
+            }
+        } else {
+            $inGroups = [(string)$targetId];
         }
 
         $cacheKey = '';
         if ($this->getCaching()) {
-            $cacheKey = md5($targetType.'.'.$targetId.'.'.$inGroups.'.'.$objectKey . '.' . $mode);
+            $cacheKey = md5($targetType . '.' . $targetId . '.' . implode(',', $inGroups) . '.' . $objectKey . '.' . $mode);
             $cached = $this->cacher->getDistributedCache('core/acl/rules/' . $cacheKey);
             if (null !== $cached) {
                 return $cached;
             }
         }
 
-        if ($targetType == ACL::GROUP) {
-            $inGroups = $targetId + 0;
-        }
-
-        if (!$inGroups) {
-            $inGroups = '0';
-        }
-
         $mode += 0;
 
         $data = array($objectKey, $mode);
-
         $targets = array();
 
-        $targets[] = "( target_type = 1 AND target_id IN (?))";
-        $data[] = $inGroups;
 
-        if ($targetType === null || $targetType == ACL::USER) {
+        //group is always checked. If no user found, $inGroups is 0, which means it checks against Guest group.
+        $targets[] = "( target_type = 1 AND target_id IN (?))";
+        $data[] = implode(', ', $inGroups);
+
+        if (ACL::USER === $targetType) {
+            //if user type, we include additionally all user rules
             $targets[] = "( target_type = 0 AND target_id = ?)";
-            $data[] = $userId;
+            if ($user) {
+                $data[] = $user->getId();
+            } else {
+                //no user found, so we check against guest
+                $data[] = 0;
+            }
         }
 
+        //now it gets dirty. A bit more complicated query, so we do it directly with PDO.
         $con = Propel::getReadConnection('default');
+
+        $targets = implode(' OR ', $targets);
 
         $query = "
                 SELECT constraint_type, constraint_code, mode, access, sub, fields
@@ -225,7 +233,7 @@ class ACL
                 object = ? AND
                 (mode = ? OR mode = 0) AND
                 (
-                    " . implode(' OR ', $targets) . "
+                    $targets
                 )
                 ORDER BY prio ASC
         ";
@@ -337,7 +345,7 @@ class ACL
             }
         }
 
-        if (!$conditionObject->hasRules()){
+        if (!$conditionObject->hasRules()) {
             $conditionObject->addAnd(array('1', '!=', '1'));
         }
 
@@ -354,7 +362,8 @@ class ACL
         $targetType = null,
         $targetId = null,
         $rootHasAccess = false
-    ) {
+    )
+    {
         return self::check($objectKey, null, null, self::LISTING, $targetType, $targetId, $rootHasAccess);
     }
 
@@ -364,7 +373,8 @@ class ACL
         $targetType = null,
         $targetId = null,
         $rootHasAccess = false
-    ) {
+    )
+    {
         return self::check($objectKey, $objectId, null, self::LISTING, $targetType, $targetId, $rootHasAccess);
     }
 
@@ -374,7 +384,8 @@ class ACL
         $targetType = null,
         $targetId = null,
         $rootHasAccess = false
-    ) {
+    )
+    {
         return self::check($objectKey, null, $fields, self::UPDATE, $targetType, $targetId, $rootHasAccess);
     }
 
@@ -384,7 +395,8 @@ class ACL
         $targetType = null,
         $targetId = null,
         $rootHasAccess = false
-    ) {
+    )
+    {
         return self::check($objectKey, null, $fields, self::VIEW, $targetType, $targetId, $rootHasAccess);
     }
 
@@ -394,7 +406,8 @@ class ACL
         $targetType = null,
         $targetId = null,
         $rootHasAccess = false
-    ) {
+    )
+    {
         return self::check($objectKey, null, $fields, self::DELETE, $targetType, $targetId, $rootHasAccess);
     }
 
@@ -405,7 +418,8 @@ class ACL
         $targetType = null,
         $targetId = null,
         $rootHasAccess = false
-    ) {
+    )
+    {
         return self::check($objectKey, $objectId, $fields, self::UPDATE, $targetType, $targetId, $rootHasAccess);
     }
 
@@ -416,7 +430,8 @@ class ACL
         $targetType = null,
         $targetId = null,
         $rootHasAccess = false
-    ) {
+    )
+    {
         return self::check($objectKey, $objectId, $fields, self::VIEW, $targetType, $targetId, $rootHasAccess);
     }
 
@@ -427,7 +442,8 @@ class ACL
         $targetType = null,
         $targetId = null,
         $rootHasAccess = false
-    ) {
+    )
+    {
         return self::check($objectKey, $objectId, $fields, self::DELETE, $targetType, $targetId, $rootHasAccess);
     }
 
@@ -468,7 +484,8 @@ class ACL
         $targetType = null,
         $targetId = null,
         $rootHasAccess = false
-    ) {
+    )
+    {
         return self::check($objectKey, $objectId, $fields, self::ADD, $targetType, $targetId, $rootHasAccess);
     }
 
@@ -496,7 +513,8 @@ class ACL
         $access,
         $fields = null,
         $withSub = false
-    ) {
+    )
+    {
         return self::setObject(
             self::LISTING,
             $objectKey,
@@ -518,7 +536,8 @@ class ACL
         $access,
         $fields = null,
         $withSub = false
-    ) {
+    )
+    {
         return self::setObject(
             self::LISTING,
             $objectKey,
@@ -540,7 +559,8 @@ class ACL
         $access,
         $fields = null,
         $withSub = false
-    ) {
+    )
+    {
         return self::setObject(
             self::LISTING,
             $objectKey,
@@ -561,7 +581,8 @@ class ACL
         $access,
         $fields = null,
         $withSub = false
-    ) {
+    )
+    {
         return self::setObject(
             self::UPDATE,
             $objectKey,
@@ -585,7 +606,8 @@ class ACL
         $targetId,
         $access,
         $fields = null
-    ) {
+    )
+    {
 
         $objectKey = Objects::normalizeObjectKey($objectKey);
         $acl = new AclObject();
@@ -621,56 +643,55 @@ class ACL
 
     /**
      * @param       $objectKey
-     * @param       $pObjectId
+     * @param $pk
      * @param  bool $field
-     * @param  int  $mode
+     * @param  int $mode
+     * @param null $targetType 0: user, 1: group
+     * @param null $targetId
      * @param  bool $rootHasAccess
      * @param  bool $asParent
-     *
      * @return bool
+     * @internal param $pObjectId
      */
     public function check(
         $objectKey,
         $pk,
         $field = false,
-        $mode = 1,
+        $mode = ACL::CONSTRAINT_ALL,
         $targetType = null,
         $targetId = null,
         $rootHasAccess = false,
         $asParent = false
-    ) {
-
+    )
+    {
         $objectKey = Objects::normalizeObjectKey($objectKey);
-        if (($targetId === null && $targetType === null) && $this->pageStack->isAdmin() && $this->pageStack->getAdminClient()->hasSession()) {
-            $targetId = $this->pageStack->getAdminClient()->getUserId();
-            $targetType = ACL::USER;
 
-        } elseif (($targetId === null && $targetType === null) && $this->pageStack->getClient() && $this->pageStack->getClient()->hasSession()) {
-            $targetId = $this->pageStack->getClient()->getUserId();
+        if (null === $targetType) {
+            //it wasn't request any particular user or group, so get information from session
             $targetType = ACL::USER;
+            //0 means guest
+            $targetId = $this->pageStack->getUser() ? $this->pageStack->getUser()->getId() : 0;
         }
 
-        if ($targetType === null) {
-            $targetType = ACL::USER;
-        }
-
-        $user = $this->pageStack->getClient()->getUser();
+        $user = $this->pageStack->getUser();
         if ($user) {
             $groupIds = $user->getGroupIds();
-            if (false !== strpos(','.$groupIds.',', ',1,')) {
+            if (false !== strpos(',' . $groupIds . ',', ',1,')) {
+                //user is in the admin group, so he has always access.
                 return true;
             }
         }
 
-        if (1 === $targetId || null === $targetId) {
+        if (ACL::GROUP === $targetId || null === $targetId) {
+            //
             return true;
         }
 
         $cacheKey = null;
         if ($pk && $this->getCaching()) {
             $pkString = $this->getObjects()->getObjectUrlId($objectKey, $pk);
-            $cacheKey = md5($targetType.'.'.$targetId . '.'.$objectKey . '/' . $pkString . '/' . json_encode($field));
-            $cached = $this->cacher->getDistributedCache('core/acl/'.$cacheKey);
+            $cacheKey = md5($targetType . '.' . $targetId . '.' . $objectKey . '/' . $pkString . '/' . json_encode($field));
+            $cached = $this->cacher->getDistributedCache('core/acl/' . $cacheKey);
             if (null !== $cached) {
                 return $cached;
             }
@@ -736,16 +757,16 @@ class ACL
                     if ($objectItem && $this->conditionOperator->satisfy($acl['constraint_code'], $objectItem, $objectKey)) {
                         $match = true;
                     }
-                /*
-                 * EXACT
-                 */
-                } else if ($acl['constraint_type'] == 1){
+                    /*
+                     * EXACT
+                     */
+                } else if ($acl['constraint_type'] == 1) {
                     if ($currentObjectPk && $acl['constraint_code'] == $currentObjectPkString) {
                         $match = true;
                     }
-                /**
-                 * ALL
-                 */
+                    /**
+                     * ALL
+                     */
                 } else {
                     $match = true;
                 }
@@ -786,7 +807,7 @@ class ACL
 
                                                 $uriObject = $this->objects->getFromUrl($uri);
                                                 $satisfy = $this->conditionOperator->satisfy($fRule['condition'], $uriObject);
-                                            } else if (null !== $fValue){
+                                            } else if (null !== $fValue) {
                                                 $satisfy = $this->conditionOperator->satisfy($fRule['condition'], $field);
                                             }
                                             if ($satisfy) {
@@ -824,8 +845,8 @@ class ACL
 
                         if (!is_array($field2Key)) {
                             if ($acl['fields'] && ($field2Acl = $acl['fields'][$field2Key]) !== null && !is_array(
-                                $acl['fields'][$field2Key]
-                            )
+                                    $acl['fields'][$field2Key]
+                                )
                             ) {
                                 $access = ($field2Acl == 1) ? true : false;
                                 break;
@@ -861,7 +882,7 @@ class ACL
         $access = !!$access;
 
         if ($pk && $this->getCaching()) {
-            $this->cacher->setDistributedCache('core/acl/'.$cacheKey, $access);
+            $this->cacher->setDistributedCache('core/acl/' . $cacheKey, $access);
         }
 
         return $access;
@@ -871,7 +892,7 @@ class ACL
      *
      * Returns the acl infos for the specified id
      *
-     * @param string  $object
+     * @param string $object
      * @param integer $code
      *
      * @return array

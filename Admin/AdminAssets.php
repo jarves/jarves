@@ -71,28 +71,31 @@ class AdminAssets
     {
         $response = $this->pageStack->getPageResponse();
 
-        $client = $this->pageStack->getAdminClient();
-        if (!$client) {
-            $client = $this->pageStack->getClient();
-        }
 
         $session = array();
-        $session['userId'] = $client->getUserId();
-        $session['sessionid'] = $client->getToken();
-        $session['tokenid'] = $client->getTokenId();
-        $session['lang'] = $client->getSession()->getLanguage();
-        $session['access'] = $this->acl->check('JarvesBundle:EntryPoint', '/admin');
-        if ($client->getUserId()) {
-            $session['username'] = $client->getUser()->getUsername();
-            $session['lastLogin'] = $client->getUser()->getLastLogin();
-            $session['firstName'] = $client->getUser()->getFirstName();
-            $session['lastName'] = $client->getUser()->getLastName();
+        $session['userId'] = null;
+        $session['lang'] = 'en';
 
-            $email = $client->getUser()->getEmail();
-            $session['emailMd5'] = $email ? md5(strtolower(trim($email))) : null;
-            $session['imagePath'] = $client->getUser()->getImagePath();
+        if ($this->pageStack->getSession() && $this->pageStack->getSession()->has('admin_language')) {
+            $session['lang'] = $this->pageStack->getSession()->get('admin_language');
         }
 
+        $session['access'] = $this->acl->check('JarvesBundle:EntryPoint', '/admin');
+
+        if ($this->pageStack->isLoggedIn()) {
+            $user = $this->pageStack->getUser();
+            $session['userId'] = $user->getId();
+            $session['username'] = $user->getUsername();
+            $session['lastLogin'] = $user->getLastLogin();
+            $session['firstName'] = $user->getFirstName();
+            $session['lastName'] = $user->getLastName();
+
+//            $email = $user->getEmail();
+//            $session['emailMd5'] = $email ? md5(strtolower(trim($email))) : null;
+            $session['imagePath'] = $user->getImagePath();
+        }
+
+        $session['token'] = get_class($this->pageStack->getToken());
         $css = 'window._session = ' . json_encode($session) . ';';
         $response->addJs($css);
     }

@@ -20,5 +20,5 @@ class TypeDatetime extends AbstractSingleColumnType
 
     protected $phpDataType = 'integer';
 
-    protected $sqlDataType = 'bigint';
+    protected $sqlDataType = 'TIMESTAMP';
 }

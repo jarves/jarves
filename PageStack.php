@@ -21,8 +21,11 @@ use Jarves\Configuration\Client;
 use Jarves\Model\Domain;
 use Jarves\Model\Node;
 use Jarves\Model\NodeQuery;
+use Jarves\Model\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Contains current requested node and current domain, and the current PageResponse.
@@ -51,11 +54,6 @@ class PageStack
     protected $adminPrefix;
 
     /**
-     * @var JarvesConfig
-     */
-    private $jarvesConfig;
-
-    /**
      * Client instance in administration area.
      *
      * @var ClientAbstract
@@ -68,6 +66,7 @@ class PageStack
      * @var ClientAbstract
      */
     protected $client;
+
     /**
      * @var RequestStack
      */
@@ -79,27 +78,27 @@ class PageStack
     private $lastRequest;
 
     /**
-     * @var ClientFactory
-     */
-    private $clientFactory;
-
-    /**
      * @var Cacher
      */
     private $cacher;
 
     /**
+     * @var TokenStorageInterface
+     */
+    private $tokenStorage;
+
+    /**
      * @param string $adminPrefix
      * @param RequestStack $requestStack
-     * @param ClientFactory $clientFactory
      * @param Cacher $cacher
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct($adminPrefix, RequestStack $requestStack, ClientFactory $clientFactory, Cacher $cacher)
+    public function __construct($adminPrefix, RequestStack $requestStack, Cacher $cacher, TokenStorageInterface $tokenStorage)
     {
         $this->adminPrefix = $adminPrefix;
         $this->requestStack = $requestStack;
-        $this->clientFactory = $clientFactory;
         $this->cacher = $cacher;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -184,45 +183,88 @@ class PageStack
     }
 
     /**
-     * Returns the current session client instance for administration.
-     * If not exists, we create it and start the session process.
+     * Returns the current logged in User if available. Null if not or another token than Jarves' is active.
      *
-     * Note that this method creates a new AbstractClient instance and starts
-     * the whole session process mechanism (with sending sessions ids etc)
-     * if the adminClient does not exists already.
-     *
-     * @return ClientAbstract
+     * @return User|null
      */
-    public function getAdminClient()
+    public function getUser()
     {
-        if (null === $this->adminClient) {
-            $this->adminClient = $this->clientFactory->create();
-            $this->adminClient->start();
+        $token = $this->tokenStorage->getToken();
+        if ($token && !($token instanceof AnonymousToken)) {
+            return $token->getUser();
         }
 
-        return $this->adminClient;
+        return null;
     }
 
     /**
-     * Returns the current session client for front end.
-     *
-     * If not exists, we create it and start the session process.
-     *
-     * Note that this method creates a new AbstractClient instance and starts
-     * the whole session process mechanism (with sending sessions ids etc)
-     * if the adminClient does not exists already.
-     *
-     * @return ClientAbstract
-     *
+     * @return null|\Symfony\Component\Security\Core\Authentication\Token\TokenInterface
      */
+    public function getToken()
+    {
+        return $this->tokenStorage->getToken();
+    }
+
+    /**
+     * Returns true when a non AnonymousToken is set (which primarily means a real User is logged in)
+     *
+     * @return boolean
+     */
+    public function isLoggedIn()
+    {
+        return !($this->tokenStorage->getToken() instanceof AnonymousToken);
+    }
+
+    /**
+     * Returns the current session. if available.
+     *
+     * @return null|\Symfony\Component\HttpFoundation\Session\SessionInterface
+     */
+    public function getSession()
+    {
+        return $this->getRequest()->getSession();
+    }
+
+//    /**
+//     * Returns the current session client instance for administration.
+//     * If not exists, we create it and start the session process.
+//     *
+//     * Note that this method creates a new AbstractClient instance and starts
+//     * the whole session process mechanism (with sending sessions ids etc)
+//     * if the adminClient does not exists already.
+//     *
+//     * @return ClientAbstract
+//     */
+    public function getAdminClient()
+    {
+//        if (null === $this->adminClient) {
+//            $this->adminClient = $this->clientFactory->create();
+//            $this->adminClient->start();
+//        }
+//
+//        return $this->adminClient;
+    }
+//
+//    /**
+//     * Returns the current session client for front end.
+//     *
+//     * If not exists, we create it and start the session process.
+//     *
+//     * Note that this method creates a new AbstractClient instance and starts
+//     * the whole session process mechanism (with sending sessions ids etc)
+//     * if the adminClient does not exists already.
+//     *
+//     * @return ClientAbstract
+//     *
+//     */
     public function getClient()
     {
-        if (null === $this->client) {
-            $config = $this->getCurrentDomain() ? $this->getCurrentDomain()->getSessionProperties() : null;
-            $this->client = $this->clientFactory->create($config);
-        }
-
-        return $this->client;
+//        if (null === $this->client) {
+//            $config = $this->getCurrentDomain() ? $this->getCurrentDomain()->getSessionProperties() : null;
+//            $this->client = $this->clientFactory->create($config);
+//        }
+//
+//        return $this->client;
     }
 
     /**
@@ -302,11 +344,10 @@ class PageStack
      * @param        $nodeOrId
      * @param bool $fullUrl with http://
      * @param bool $suppressStartNodeCheck
-     * @param Domain $domain
      *
      * @return string
      */
-    public function getNodeUrl($nodeOrId, $fullUrl = false, $suppressStartNodeCheck = false, Domain $domain = null)
+    public function getNodeUrl($nodeOrId, $fullUrl = false, $suppressStartNodeCheck = false)
     {
         $id = $nodeOrId;
 
@@ -345,16 +386,11 @@ class PageStack
             $url = substr($prefix, 1) . $url;
         }
 
+        $domainName = $domain->getRealDomain();
+
         //crop first /
         if (substr($url, 0, 1) == '/') {
             $url = substr($url, 1);
-        }
-
-        $domainName = $domain->getRealDomain();
-        if ($domain->getMaster() != 1) {
-            $url = $domain->getPath() . $domain->getLang() . '/' . $url;
-        } else {
-            $url = $domain->getPath() . $url;
         }
 
         if ($fullUrl) {
@@ -366,6 +402,51 @@ class PageStack
         //crop last /
         if (substr($url, -1) == '/') {
             $url = substr($url, 0, -1);
+        }
+
+        return $url;
+    }
+
+    /**
+     * @param Node|integer $nodeOrId
+     * @param bool $suppressStartNodeCheck
+     * @return string
+     */
+    public function getRouteUrl($nodeOrId, $suppressStartNodeCheck = false)
+    {
+        $id = $nodeOrId;
+
+        if (!$nodeOrId) {
+            $nodeOrId = $this->getCurrentPage();
+        }
+
+        if ($nodeOrId instanceof Node) {
+            $id = $nodeOrId->getId();
+        }
+
+        $domainId = $nodeOrId instanceof Node ? $nodeOrId->getDomainId() : $this->getDomainOfPage($id);
+        $domain = $this->getCurrentDomain();
+
+        if (!$domain || $domainId !== $domain->getId()) {
+            $domain = $this->getDomain($domainId);
+        }
+
+        if (!$suppressStartNodeCheck && $domain->getStartnodeId() === $id) {
+            $url = '/';
+        } else {
+            $urls = $this->getCachedPageToUrl($domainId);
+            $url = isset($urls[$id]) ? $urls[$id] : '';
+        }
+
+        //crop first /
+        if (substr($url, 0, 1) == '/') {
+            $url = substr($url, 1);
+        }
+
+        if ($domain->getMaster() != 1) {
+            $url = $domain->getPath() . $domain->getLang() . '/' . $url;
+        } else {
+            $url = $domain->getPath() . $url;
         }
 
         return $url;

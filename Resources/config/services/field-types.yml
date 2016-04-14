@@ -117,7 +117,7 @@ services:
 
      jarves.field.types.userPassword:
          class: "%jarves.field.types.userPassword.class%"
-         arguments: ["@jarves.config"]
+         arguments: ["@security.encoder_factory"]
          shared: false
 
      jarves.field.types.contentElements:

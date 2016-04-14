@@ -40,7 +40,6 @@ class AuthTest extends AuthTestCase
         $this->assertInternalType('array', $response['data']);
         $this->assertEquals($this->userPk['id'], $response['data']['userId']);
         $this->assertEquals(false, $response['data']['access']);
-        $this->assertEquals(32, strlen($response['data']['token']));
     }
 
     public function testNewValidUserLogin()
@@ -68,7 +67,6 @@ class AuthTest extends AuthTestCase
         $this->assertInternalType('array', $response['data']);
         $this->assertEquals($this->userPk['id'], $response['data']['userId']);
         $this->assertEquals(true, $response['data']['access']);
-        $this->assertEquals(32, strlen($response['data']['token']));
     }
 
 }

@@ -18,6 +18,7 @@ use Jarves\Cache\Cacher;
 use Jarves\Jarves;
 use Jarves\JarvesEventDispatcher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 trait ContainerHelperTrait
 {
@@ -193,6 +194,14 @@ trait ContainerHelperTrait
     public function getACL()
     {
         return $this->container->get('jarves.acl');
+    }
+
+    /**
+     * @return TokenStorageInterface
+     */
+    public function getTokenStorage()
+    {
+        return $this->container->get('security.token_storage');
     }
 
     /**

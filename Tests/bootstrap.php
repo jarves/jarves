@@ -26,3 +26,5 @@ AnnotationRegistry::registerLoader(array($autoload, 'loadClass'));
 
 $autoload->set('', realpath(__DIR__ . '/../../../'));
 $autoload->set('', realpath(__DIR__ . '/Integration/skeletion/src/'));
+
+Propel\Runtime\Propel::disableInstancePooling();

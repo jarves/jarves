@@ -184,6 +184,7 @@ class FrontendRouter
 
             $cgroups = null;
             if ($page['access_need_via'] == 0) {
+                //we need to move this to a extra listener
 //                $cgroups =& $this->getJarves()->getClient()->getUser()->getGroups();
             } else {
 //                $htuser = $this->getJarves()->getClient()->login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
@@ -203,13 +204,13 @@ class FrontendRouter
 
             if (!$access) {
                 //maybe we have access through the backend auth?
-                if ($this->pageStack->getAdminClient()->hasSession()) {
-//                    foreach ($this->getJarves()->getAdminClient()->getUser()->getGroups() as $group) {
-//                        if (strpos($groups, "," . $group . ",") !== false) {
-//                            $access = true;
-//                            break;
-//                        }
-//                    }
+                if ($this->pageStack->isLoggedIn()) {
+                    foreach ($this->pageStack->getUser()->getGroupIdsArray() as $groupId) {
+                        if (false !== strpos($groups, "," . $groupId . ",")) {
+                            $access = true;
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -247,14 +248,14 @@ class FrontendRouter
         $clazz = 'jarves.page_controller';
         $domainUrl = $domain->getMaster() ? '' : '/' . $domain->getLang();
 
-        $url = $this->pageStack->getNodeUrl($page->getId(), null, null, $domain);
+        $url = $this->pageStack->getRouteUrl($page->getId());
 
         $controller = $clazz . ':handleAction';
 
         if ('' !== $url && '/' !== $url && $domain && $domain->getStartnodeId() == $page->getId()) {
             //This is the start page, so add a redirect controller
             $this->routes->add(
-                'jarves_page_redirect_to_startpage_' . $domain->getId(),
+                'jarves_frontend_page_redirect_to_startpage_' . $domain->getId(),
                 new SyRoute(
                     $url,
                     array(
@@ -269,7 +270,7 @@ class FrontendRouter
         }
 
         $this->routes->add(
-            'jarves_page_' . $page->getId() . '-' . preg_replace('/\W/', '_', $page->getUrn()),
+            'jarves_frontend_page_' . $page->getId() . '-' . preg_replace('/\W/', '_', $page->getUrn()),
             new SyRoute(
                 $url,
                 array('_controller' => $controller, 'jarvesFrontend' => true, 'nodeId' => $page->getId())
@@ -365,10 +366,10 @@ class FrontendRouter
                         $defaults = array_merge($defaults, $route->getArrayDefaults());
                     }
 
-                    $url = $this->pageStack->getNodeUrl($page->getId(), null, null, $domain);
+                    $url = $this->pageStack->getRouteUrl($page->getId());
 
                     $this->routes->add(
-                        'jarves_plugin_' . ($route->getId() ?: $plugin->getId()) . '_' . $idx,
+                        'jarves_frontend_plugin_' . ($route->getId() ?: $plugin->getId()) . '_' . $idx,
                         new SyRoute(
                             $url . '/' . $route->getPattern(),
                             $defaults,

@@ -44,7 +44,7 @@ class ResizeImageExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'resizeImage' => new \Twig_Function_Method($this, 'resizeImage')
+            new \Twig_SimpleFunction('resizeImage', [$this, 'resizeImage'])
         );
     }
 

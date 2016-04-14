@@ -240,7 +240,7 @@ class ContentRender
                 $access = false;
                 $groups = ',' . $content->getAccessFromGroups() . ',';
 
-                $userGroups = $this->pageStack->getClient()->getUser()->getUserGroups();
+                $userGroups = $this->pageStack->getUser()->getUserGroups();
 
                 foreach ($userGroups as $group) {
                     if (strpos($groups, ',' . $group->getGroupId() . ',') !== false) {
@@ -250,7 +250,7 @@ class ContentRender
                 }
 
                 if (!$access) {
-                    $adminGroups = $this->pageStack->getClient()->getUser()->getUserGroups();
+                    $adminGroups = $this->pageStack->getUser()->getUserGroups();
                     foreach ($adminGroups as $group) {
                         if (strpos($groups, ',' . $group->getGroupId() . ',') !== false) {
                             $access = true;

@@ -141,8 +141,7 @@ class UITranslationsController extends Controller
             $lang = 'en';
         }
 
-        $this->pageStack->getAdminClient()->getSession()->setLanguage($lang);
-        $this->pageStack->getAdminClient()->syncStore();
+        $this->pageStack->getSession()->set('admin_language', $lang);
 
         $messages = $this->translator->loadMessages($lang);
 

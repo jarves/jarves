@@ -324,7 +324,7 @@
         <editEntryPoint>jarves/user/users</editEntryPoint>
         <addEntryPoint>jarves/user/users</addEntryPoint>
         <apiControllerDefinition>@JarvesBundle/Resources/config/crud/user.yml</apiControllerDefinition>
-        <blacklistSelection>passwd, passwdSalt</blacklistSelection>
+        <blacklistSelection>password</blacklistSelection>
         <fields>
           <field id="id" type="number" primaryKey="true" autoIncrement="true">
             <label>ID</label>
@@ -335,7 +335,7 @@
           <field id="authClass" type="text">
             <label>Auth class</label>
           </field>
-          <field id="password" type="userPassword">
+          <field id="password" type="password">
             <label>Password</label>
           </field>
           <field id="activationKey" type="text"/>

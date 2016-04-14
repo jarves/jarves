@@ -20,25 +20,7 @@ use Jarves\Model\Base\User as BaseUser;
 
 class User extends BaseUser
 {
-
     protected $cachedGroupIds;
-
-    /**
-     * Converts $password in a hash and set it.
-     * If the salt is not already set, this generates one.
-     *
-     * @param string $password plain password
-     * @param string $passwordHashKey from the system configuration
-     *
-     */
-    public function hashPassword($password, $passwordHashKey)
-    {
-        $this->setPasswordSalt(ClientAbstract::getSalt());
-
-        $password = ClientAbstract::getHashedPassword($password, $this->getPasswordSalt(), $passwordHashKey);
-
-        $this->setPassword($password);
-    }
 
     /**
      * @return string comma separated list of ids
@@ -60,5 +42,36 @@ class User extends BaseUser
         }
 
         return $this->cachedGroupIds;
+    }
+    
+    public function getGroupIdsArray()
+    {
+        return explode(',', $this->getGroupIds());
+    }
+
+    public function __toString()
+    {
+        return $this->getUsername();
+    }
+
+    /**
+     * Return all groups, converted it names to role names.
+     *
+     * @return string[]
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function getGroupRoles()
+    {
+        $names = GroupQuery::create()
+            ->select('Name')
+            ->filterByUser($this)
+            ->find();
+
+        $result = [];
+        foreach ($names as $name) {
+            $result[] = preg_replace('/[^a-zA-Z0-9]+/', '_', strtoupper($name));
+        }
+
+        return $result;
     }
 }

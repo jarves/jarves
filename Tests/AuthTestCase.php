@@ -16,6 +16,7 @@ namespace Jarves\Tests;
 
 use Jarves\Model\GroupQuery;
 use Jarves\Model\UserQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class AuthTestCase extends KernelAwareTestCase
@@ -27,8 +28,8 @@ class AuthTestCase extends KernelAwareTestCase
     {
         parent::setUp();
 
-        UserQuery::create()->filterByUsername('test')->delete();
-        GroupQuery::create()->filterByName('TestGroup')->delete();
+        UserQuery::create()->filterById(1, Criteria::GREATER_THAN)->delete();
+        GroupQuery::create()->filterById(1, Criteria::GREATER_THAN)->delete();
 
         if ($this->testGroupPk) {
             return;
@@ -46,6 +47,7 @@ class AuthTestCase extends KernelAwareTestCase
             [
                 'username' => 'test',
                 'password' => 'test',
+                'activate' => true,
                 'email' => 'test@localhost',
                 'groups' => [$this->testGroupPk['id']]
             ]
@@ -55,16 +57,5 @@ class AuthTestCase extends KernelAwareTestCase
 
         $this->assertEquals(1, count($user['groups']));
         $this->assertEquals($this->testGroupPk['id'], $user['groups'][0]['id']);
-    }
-
-    public function tearDown()
-    {
-        if (!$this->testGroupPk) {
-            return;
-        }
-        $this->getObjects()->remove('jarves/group', $this->testGroupPk);
-        $this->getObjects()->remove('jarves/user', $this->userPk);
-
-        parent::tearDown();
     }
 }

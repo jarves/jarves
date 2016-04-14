@@ -337,7 +337,7 @@ jarves.FileUploader = new Class({
 
             this.uploadStart(file);
 
-            file.post[window._session.tokenid] = window._session.sessionid;
+            // file.post[window._session.tokenid] = window._session.sessionid;
             var url = _pathAdmin + "admin/file/upload";
             xhr.open('POST', url, true);
 

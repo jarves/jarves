@@ -16,6 +16,7 @@ namespace Jarves\Tests\Service\ACL;
 
 use Jarves\Configuration\Condition;
 use Jarves\Model\Acl;
+use Jarves\Model\Base\UserQuery;
 use Jarves\Model\DomainQuery;
 use Jarves\Model\Group;
 use Jarves\Model\Node;
@@ -23,6 +24,7 @@ use Jarves\Model\NodeQuery;
 use Jarves\Model\User;
 use Jarves\Tests\AuthTestCase;
 use Jarves\Tests\KernelAwareTestCase;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Test\Model\Item;
 use Test\Model\ItemCategory;
 use Test\Model\ItemCategoryQuery;
@@ -70,8 +72,14 @@ class ObjectTest extends AuthTestCase
         $this->getACL()->setCaching(false);
         $this->getACL()->removeObjectRules('jarves/node');
 
-        $this->getPageStack()->getClient()->login('test', 'test');
-        $user = $this->getPageStack()->getClient()->getUser();
+        $tokenStorage = $this->getTokenStorage();
+
+        $token = new UsernamePasswordToken(UserQuery::create()->findOneByUsername('test'), null, "main");
+        $tokenStorage->setToken($token);
+
+        $user = $this->getPageStack()->getUser();
+
+        $this->assertEquals('test', $user->getUsername());
 
         $domain = DomainQuery::create()->findOne();
         $root = NodeQuery::create()->findRoot($domain->getId());

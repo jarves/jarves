@@ -14,15 +14,24 @@ namespace Jarves\Controller\Admin;
 
 use FOS\RestBundle\Request\ParamFetcher;
 use Jarves\ACL;
+use Jarves\Client\UserProvider;
 use Jarves\Configuration\Stream;
 use Jarves\ContentRender;
 use Jarves\Jarves;
 use Jarves\Model\Content;
+use Jarves\Model\User;
+use Jarves\Model\UserQuery;
 use Jarves\PageStack;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
 class AdminController extends Controller
 {
@@ -46,6 +55,26 @@ class AdminController extends Controller
      */
     protected $acl;
 
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * @var EncoderFactoryInterface
+     */
+    protected $encoderFactory;
+
+    /**
+     * @var TokenStorageInterface
+     */
+    protected $tokenStorage;
+
+    /**
+     * @var UserProvider
+     */
+    protected $userProvider;
+
     public function setContainer(ContainerInterface $container = null)
     {
         parent::setContainer($container);
@@ -54,6 +83,10 @@ class AdminController extends Controller
         $this->acl = $this->get('jarves.acl');
         $this->pageStack = $this->get('jarves.page_stack');
         $this->contentRender = $this->get('jarves.content.render');
+        $this->logger = $this->get('logger');
+        $this->encoderFactory = $this->get('security.encoder_factory');
+        $this->tokenStorage = $this->get('security.token_storage');
+        $this->userProvider = $this->get('jarves.user_provider');
     }
 
     /**
@@ -215,34 +248,49 @@ class AdminController extends Controller
      *
      * @return array|bool Returns false on failure or a array if successful.
      */
-    public function loginUserAction(ParamFetcher $paramFetcher)
+    public function loginUserAction(ParamFetcher $paramFetcher, Request $request)
     {
         $username = $paramFetcher->get('username');
         $password = $paramFetcher->get('password');
-        $status = $this->pageStack->getAdminClient()->login($username, $password);
 
-        if ($this->pageStack->getAdminClient()->getUser()) {
-            $lastLogin = $this->pageStack->getAdminClient()->getUser()->getLastLogin();
-            if ($status) {
-                $this->pageStack->getAdminClient()->getUser()->setLastLogin(time());
+        $user = $this->userProvider->loadUserByUsername($username);
 
-                $email = $this->pageStack->getAdminClient()->getUser()->getEmail();
-
-                return array(
-                    'token' => $this->pageStack->getAdminClient()->getToken(),
-                    'userId' => $this->pageStack->getAdminClient()->getUserId(),
-                    'username' => $this->pageStack->getAdminClient()->getUser()->getUsername(),
-                    'lastLogin' => $lastLogin,
-                    'access' => $this->acl->check('JarvesBundle:entryPoint', '/admin'),
-                    'firstName' => $this->pageStack->getAdminClient()->getUser()->getFirstName(),
-                    'lastName' => $this->pageStack->getAdminClient()->getUser()->getLastName(),
-                    'emailMd5' => $email ? md5(strtolower(trim($email))) : null,
-                    'imagePath' => $this->pageStack->getAdminClient()->getUser()->getImagePath()
-                );
-            }
+        if (!$user) {
+            var_dump('not found');
+            $this->logger->warning(sprintf('Login failed for "%s". User not found', $username));
+            sleep(1);
+            return false;
         }
 
-        return false;
+        $encoder = $this->encoderFactory->getEncoder($user);
+
+        if (!$encoder->isPasswordValid($user->getPassword(), $password, null)) {
+            $this->logger->warning(sprintf('Login failed for "%s". Password missmatch ', $username));
+            sleep(1);
+            return false;
+        }
+
+        $token = new UsernamePasswordToken($user, null, "main", $user->getGroupRoles());
+        $this->tokenStorage->setToken($token);
+
+        //now dispatch the login event
+        $event = new InteractiveLoginEvent($request, $token);
+        $this->get("event_dispatcher")->dispatch("security.interactive_login", $event);
+
+        return array(
+            'userId' => $user->getId(),
+            'username' => $user->getUsername(),
+            'lastLogin' => $user->getLastLogin(),
+            'access' => $this->acl->check('JarvesBundle:entryPoint', '/admin'),
+            'firstName' => $user->getFirstName(),
+            'lastName' => $user->getLastName(),
+            'imagePath' => $user->getImagePath()
+        );
+    }
+
+    protected function loginFailed($username)
+    {
+        $this->logger->warning(sprintf('Login failed for "%s"', $username));
     }
 
     /**
@@ -257,11 +305,7 @@ class AdminController extends Controller
      */
     public function logoutUserAction()
     {
-        if ($this->pageStack->getAdminClient()->hasSession() && $this->pageStack->getAdminClient()->getUser()) {
-            $this->pageStack->getAdminClient()->logout();
-
-            return true;
-        }
+        $this->tokenStorage->setToken(null);
 
         return false;
     }
@@ -278,7 +322,7 @@ class AdminController extends Controller
      */
     public function loggedInAction()
     {
-        return $this->pageStack->getAdminClient()->getUserId() > 0;
+        return !!$this->tokenStorage->getToken();
     }
 
     /**

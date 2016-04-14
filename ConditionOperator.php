@@ -560,13 +560,13 @@ class ConditionOperator
 
             case '= CURRENT_USER':
             case 'EQUAL CURRENT_USER':
-                return $this->pageStack->getClient()
-                && $ovalue == $this->pageStack->getClient()->getUserId();
+                return $this->pageStack->isLoggedIn()
+                && $ovalue == $this->pageStack->getUser()->getId();
 
             case '!= CURRENT_USER':
             case 'NOT EQUAL CURRENT_USER':
-                return $this->pageStack->getClient()
-                && $ovalue != $this->pageStack->getClient()->getUserId();
+                return $this->pageStack->isLoggedIn()
+                && $ovalue != $this->pageStack->getUser()->getId();
 
             case '=':
             case 'EQUAL':

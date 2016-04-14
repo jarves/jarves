@@ -47,12 +47,12 @@ class SecurityFirewallListener
                 return;
             }
 
-            if (!$pageStack->getAdminClient()->getUser() || !$acl->check('JarvesBundle:EntryPoint', $url)) {
+            if (!$pageStack->getUser() || !$acl->check('JarvesBundle:EntryPoint', $url)) {
                 $response = new Response(json_encode(
                     [
                         'status' => 403,
                         'error' => 'AccessDeniedException',
-                        'message' => 'Access denied.' . (!$pageStack->getAdminClient()->getUser() ? ' Not logged in.' : ''),
+                        'message' => 'Access denied.' . (!$pageStack->getUser() ? ' Not logged in.' : ''),
                     ],
                     JSON_PRETTY_PRINT
                 ), 403);

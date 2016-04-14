@@ -66,8 +66,7 @@ jarves.field_multiUpload = new Class({
 
         jarves.uploads[this.win.id] = new SWFUpload({
 
-            upload_url: _path + this.options.uploadpath + "?" + window._session.tokenid + "=" +
-                window._session.sessionid,
+            upload_url: _path + this.options.uploadpath + "?" + window._session.tokenid + "=" + window._session.sessionid,
 
             file_post_name: "file",
             flash_url: _path + "admin/swfupload.swf",

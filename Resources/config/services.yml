@@ -46,9 +46,6 @@ parameters:
      jarves.asset_handler.js.class: Jarves\AssetHandler\JsHandler
      jarves.asset_handler.container.class: Jarves\AssetHandler\Container
 
-     database_table_prefix: jarves_
-     jarves_admin_prefix: /jarves
-
 services:
      jarves:
          class: "%jarves.core.class%"
@@ -62,13 +59,16 @@ services:
          class: "%jarves.objects.class%"
          arguments: ["@jarves", "@service_container"]
 
+     jarves.user_provider:
+         class: Jarves\Client\UserProvider
+
      jarves.event_dispatcher:
          class: Jarves\JarvesEventDispatcher
          arguments: ["@event_dispatcher", "@service_container", "@jarves.condition_operator", "@jarves.cache.cacher"]
 
      jarves.page_stack:
          class: Jarves\PageStack
-         arguments: ["%jarves_admin_prefix%", "@request_stack", "@jarves.client.factory", "@jarves.cache.cacher"]
+         arguments: ["%jarves_admin_prefix%", "@request_stack", "@jarves.cache.cacher", "@security.token_storage"]
 
      jarves.utils:
          class: Jarves\Utils
@@ -185,13 +185,15 @@ services:
         class: "%jarves.frontendRoutes.listener.class%"
         arguments: ["@jarves", "@jarves.page_stack", "@jarves.editmode", "@jarves.frontend_router", "@jarves.page_response.factory"]
         tags:
-            - { name: kernel.event_listener, event: kernel.request, priority: 64 }
+              # Symfony\Component\HttpKernel\EventListener\RouterListener has priority of 32, we need to call ours before
+            - { name: kernel.event_listener, event: kernel.request, priority: 33 }
 
      jarves.securityFirewall.listener:
         class: "%jarves.securityFirewall.listener.class%"
         arguments: ["@service_container"]
         tags:
-            - { name: kernel.event_listener, event: kernel.request, priority: 21 }
+              #Symfony\Component\Security\Http\Firewall has priority of 8, so we need to call our listener after it
+            - { name: kernel.event_listener, event: kernel.request, priority: 7 }
 
      jarves.termination.listener:
         class: "%jarves.termination.listener.class%"

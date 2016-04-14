@@ -41,11 +41,11 @@ class NavigationExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'navigationLevel' => new \Twig_Function_Method($this, 'navigationLevel', [
+            new \Twig_SimpleFunction('navigationLevel', [$this, 'navigationLevel'], [
                     'is_safe' => ['html'],
                     'needs_environment' => true
                 ]),
-            'navigationNode' => new \Twig_Function_Method($this, 'navigationNode', [
+            new \Twig_SimpleFunction('navigationNode', [$this, 'navigationNode'], [
                     'is_safe' => ['html'],
                     'needs_environment' => true
                 ])
