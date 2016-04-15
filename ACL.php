@@ -549,9 +549,13 @@ class ACL
             }
         }
 
-        if (ACL::TARGET_TYPE_GROUP === $targetId || null === $targetId) {
-            //
-            return true;
+        if (0 === $targetId) {
+            //guests do always have no access
+            return false;
+        }
+
+        if (ACL::TARGET_TYPE_GROUP === $targetType || !$targetId) {
+            throw new \InvalidArgumentException('For type TARGET_TYPE_GROUP a targetId is required.');
         }
 
         $cacheKey = null;
@@ -559,13 +563,14 @@ class ACL
             $pkString = $this->objects->getObjectUrlId($objectKey, $pk);
             $cacheKey = md5($targetType . '.' . $targetId . '.' . $objectKey . '/' . $pkString . '/' . json_encode($field));
             $cached = $this->cacher->getDistributedCache('core/acl/' . $cacheKey);
-            if (false && null !== $cached) {
+            if (null !== $cached) {
                 return $cached;
             }
         }
 
         $rules = self::getRules($objectKey, $aclRequest->getMode(), $targetType, $targetId);
         if (count($rules) === 0) {
+            //no rules found, so we have no access
             return false;
         }
 

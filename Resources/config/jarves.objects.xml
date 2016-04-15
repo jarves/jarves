@@ -40,11 +40,11 @@
           </field>
           <field id="onlyLocal" type="checkbox">
             <label>Only local files</label>
-            <desc>Exclude all external files in magic folders</desc>
+            <description>Exclude all external files in magic folders</description>
           </field>
           <field id="returnPath" type="checkbox">
             <label>Return path</label>
-            <desc>Instead of returning the object id</desc>
+            <description>Instead of returning the object id</description>
           </field>
         </browserOptions>
         <fields>
@@ -59,7 +59,7 @@
           </field>
           <field id="size" type="number">
             <label>Size</label>
-            <desc>In bytes</desc>
+            <description>In bytes</description>
           </field>
           <field id="ctime" type="datetime">
             <label>Created</label>
@@ -72,7 +72,7 @@
       <object id="Node">
         <label>Node</label>
         <apiControllerDefinition>@JarvesBundle/Resources/config/crud/node.yml</apiControllerDefinition>
-        <desc>Pages, Links, Trays and Navigation folder</desc>
+        <description>Pages, Links, Trays and Navigation folder</description>
         <table>system_node</table>
         <labelField>title</labelField>
         <defaultSelection>type, title, alternativeTitle, urn, layout, visible, target</defaultSelection>
@@ -127,7 +127,7 @@
           </field>
           <field id="accessDenied" type="checkbox">
             <label>Access denied</label>
-            <desc>For everyone. This removes the page from the navigation.</desc>
+            <description>For everyone. This removes the page from the navigation.</description>
           </field>
           <field id="meta" type="text">
             <label>Meta tags</label>
@@ -176,11 +176,11 @@
           </field>
           <field id="alias" type="text">
             <label>Domain Aliases</label>
-            <desc>A comma separated list of domain names.</desc>
+            <description>A comma separated list of domain names.</description>
           </field>
           <field id="redirect" type="text">
             <label>Domain Redirects</label>
-            <desc>A comma separated list of domain redirections.</desc>
+            <description>A comma separated list of domain redirections.</description>
           </field>
           <field id="startnode" type="object">
             <label>Startpage</label>
@@ -190,20 +190,20 @@
           </field>
           <field id="resourceCompression" type="checkbox">
             <label>Resource compression</label>
-            <desc>JS and CSS compression.</desc>
+            <description>JS and CSS compression.</description>
           </field>
           <field id="path" type="text" required="true">
             <label>Path</label>
-            <desc>If your installation does not point to a domain name directly but is in a subfolder, then this is the name of this folder. Default /.</desc>
+            <description>If your installation does not point to a domain name directly but is in a subfolder, then this is the name of this folder. Default /.</description>
             <default>/</default>
           </field>
           <field id="email" type="text">
             <label>Email</label>
-            <desc>If errors/exceptions appear the system prints this email to the user.</desc>
+            <description>If errors/exceptions appear the system prints this email to the user.</description>
           </field>
           <field id="robots" type="textarea">
             <label>robots.txt</label>
-            <desc>The content of the robots.txt file for this domain.</desc>
+            <description>The content of the robots.txt file for this domain.</description>
           </field>
           <field id="favicon" type="file">
             <label>Favicon path.</label>
@@ -214,9 +214,12 @@
           <field id="theme" type="theme">
             <label>Theme</label>
           </field>
+          <field id="themeOptions" type="themeOptions">
+            <label>Theme Options</label>
+          </field>
           <field id="titleFormat" type="text">
             <label>Title Format</label>
-            <desc>Available placeholder: %title%</desc>
+            <description>Available placeholder: %title%</description>
           </field>
         </fields>
       </object>
@@ -301,7 +304,7 @@
       </object>
       <object id="View">
         <label>Template View</label>
-        <desc>Template views</desc>
+        <description>Template views</description>
         <autoCrud>false</autoCrud>
         <storageService>jarves.storage.view</storageService>
         <labelField>name</labelField>

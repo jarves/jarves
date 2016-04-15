@@ -1184,6 +1184,31 @@ jarves.getConfigs = function() {
 };
 
 /**
+ * Returns the theme configuration.
+ * 
+ * @param {string} themeId
+ * @returns {*}
+ */
+jarves.getTheme = function(themeId) {
+    var themeFound = null;
+
+    Object.each(jarves.getConfigs(), function(config, key) {
+        if (themeFound) return false;
+        if (config.themes) {
+            Object.each(config.themes, function(theme) {
+                if (themeFound) return false;
+                if (themeId === theme.id) {
+                    themeFound = theme;
+                    return false;
+                }
+            });
+        }
+    }.bind(this));
+
+    return themeFound;
+};
+
+/**
  * Returns the short bundleName.
  *
  * @param {String} bundleName

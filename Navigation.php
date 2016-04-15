@@ -72,9 +72,8 @@ class Navigation
             $mtime = filemtime($viewPath);
         }
 
-        $themeProperties = $this->pageStack->getCurrentDomain()->getThemeProperties();
 
-        if (!$options['noCache'] && $themeProperties && $themeProperties->getByPath('core/cacheNavigations') !== 0) {
+        if (!$options['noCache']) {
 
             $cache = $this->cacher->getDistributedCache($cacheKey);
             if ($cache && isset($cache['html']) && $cache['html'] !== null && $cache['mtime'] == $mtime) {
@@ -96,7 +95,7 @@ class Navigation
         if ($navigation !== false) {
             $html = $twig->render($view, $data);
 
-            if (!$options['noCache'] && $themeProperties && $themeProperties->getByPath('core/cacheNavigations') !== 0) {
+            if (!$options['noCache']) {
                 $this->cacher->setDistributedCache($cacheKey, array('mtime' => $mtime, 'html' => $html));
             } elseif (!$fromCache) {
                 $this->cacher->setDistributedCache($cacheKey, array('mtime' => $mtime, 'object' => serialize($navigation)));

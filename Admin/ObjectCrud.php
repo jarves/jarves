@@ -776,13 +776,16 @@ class ObjectCrud implements ObjectCrudInterface
             $field = $fields[$key];
             if (is_numeric($key) && !$field instanceof Field) {
 
+                if (!$this->objectDefinition->getField($field)) {
+                    throw new \InvalidArgumentException(sprintf('Field %s not found', $field));
+                }
                 $newItem = clone $this->objectDefinition->getField($field);
                 if ($newItem) {
                     $newItem = $newItem->toArray();
                 } else {
                     continue;
                 }
-                if (!$newItem['label']) {
+                if (!isset($newItem['label'])) {
                     $newItem['label'] = $field;
                 }
 

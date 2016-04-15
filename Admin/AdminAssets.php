@@ -185,7 +185,6 @@ class AdminAssets
 
         $response = $this->pageStack->getPageResponse();
 
-        // TODO, remove mootools dependency. WE NEED MOOTOOLS PRIME FOR THAT!
         $response->addJsFile('@JarvesBundle/admin/mootools-core-1.4.5-fixed-memory-leak.js');
         $response->addJsFile('@JarvesBundle/admin/mootools-more.js');
 
@@ -207,7 +206,7 @@ class AdminAssets
         $domainArray['domain'] = $domain->getDomain();
         $domainArray['path'] = $domain->getPath();
         $domainArray['theme'] = $domain->getTheme();
-        $domainArray['themeProperties'] = $domain->getThemeProperties();
+        $domainArray['themeOptions'] = $domain->getThemeOptions();
 
         $options = [
             'id' => $request->query->get('_jarves_editor_id'),

@@ -34,6 +34,10 @@ services:
          class: "%jarves.field.types.text.class%"
          shared: false
 
+     jarves.field.types.themeOptions:
+         class: Jarves\Admin\FieldTypes\TypeThemeOptions
+         shared: false
+
      jarves.field.types.theme:
          class: "%jarves.field.types.theme.class%"
          shared: false

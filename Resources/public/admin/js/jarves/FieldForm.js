@@ -33,6 +33,9 @@ jarves.FieldForm = new Class({
     fieldDefinitions: {},
     forcedVisibility: {},
 
+    //when this form is a subform from other form
+    form: null,
+
     options: {
         allTableItems: false,
         allSmall: false,
@@ -88,6 +91,14 @@ jarves.FieldForm = new Class({
         }.bind(this));
 
         return res;
+    },
+
+    setForm: function(form){
+        this.form = form;
+    },
+
+    getForm: function() {
+        return this.form;
     },
 
     /**
@@ -330,6 +341,8 @@ jarves.FieldForm = new Class({
         obj.addEvent('change', this.fireChange);
 
         if (instanceOf(obj, jarves.FieldForm)) {
+            console.log('isForm', obj, id);
+            obj.setForm(this);
         } else {
             obj.setForm(this);
 

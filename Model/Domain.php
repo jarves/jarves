@@ -43,6 +43,20 @@ class Domain extends BaseDomain
         return $this->realDomain;
     }
 
+    public function setThemeOptions($v)
+    {
+        return parent::setThemeOptions(json_encode($v));
+    }
+
+    public function getThemeOptions()
+    {
+        if ($v = parent::getThemeOptions()) {
+            return json_decode($v, true);
+        }
+
+        return null;
+    }
+
     /**
      * Returns the full url, with http/s, hostname and language prefix.
      *

@@ -560,6 +560,8 @@ class PageResponse extends Response
         $data = [
             'pageResponse' => $this,
             'body' => $body,
+            'page' => $this->pageStack->getCurrentPage(),
+            'domain' => $this->pageStack->getCurrentDomain(),
             'additionalHeaderTags' => $this->getAdditionalHeaderTags()
         ];
         $data = array_merge($data, $this->getAssetTags());
@@ -656,8 +658,10 @@ class PageResponse extends Response
             $html = $this->templating->render(
                 $layoutPath,
                 array(
+                    'page' => $this->pageStack->getCurrentPage(),
+                    'domain' => $this->pageStack->getCurrentDomain(),
                     'baseUrl' => $this->getBaseHref(),
-                    'themeProperties' => [] //Jarves::$themeProperties
+                    'themeOptions' => $this->pageStack->getCurrentDomain()->getThemeOptions()
                 )
             );
         } catch (\Exception $e) {

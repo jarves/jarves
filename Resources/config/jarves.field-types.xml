@@ -49,6 +49,10 @@ Use case: `urlField:url` (when the current field is a title for example)
       <field-type id="theme" service="jarves.field.types.theme">
         <label>Theme</label>
       </field-type>
+      <field-type id="themeOptions" service="jarves.field.types.themeOptions">
+        <label>Theme Options</label>
+        <description>A Form of all available options.</description>
+      </field-type>
       <field-type id="number" service="jarves.field.types.number">
         <label>Number</label>
       </field-type>

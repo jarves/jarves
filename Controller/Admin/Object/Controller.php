@@ -131,8 +131,9 @@ class Controller extends SymfonyController
                 //map requested id to real ids
                 $requestedIds = explode('/', $this->getObjects()->getCroppedObjectId($url));
                 $map = array();
+
                 foreach ($requestedIds as $id) {
-                    $pk = $this->getObjects()->parsePk($objectKey, $id);
+                    $pk = $this->getObjects()->normalizePkString($objectKey, $id);
                     if ($pk) {
                         $map[$this->getObjects()->getObjectUrlId($objectKey, $pk) . ''] = $id;
                     }

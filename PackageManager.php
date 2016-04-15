@@ -401,12 +401,15 @@ class PackageManager implements ContainerAwareInterface
             ->filterByCode('en')
             ->update(array('Visible' => 1));
 
-//search footer id
+        //search footer id
         $footerNavi = NodeQuery::create()->findOneByTitle('Footer Navigation');
         $footerText = NodeQuery::create()->findOneByTitle('Footer text');
 
-        $domainThemeProperties = new \Jarves\Properties('{"@JarvesDemoThemeBundle":{"jarvesDemoTheme":{"logo":"@JarvesDemoThemeBundle/images/logo.png","title":"BUSINESSNAME","slogan":"Business Slogan comes here!","footer_deposit":"' . $footerText->getId() . '","search_Node":"12","footer_navi":"' . $footerNavi->getId() . '"}}}');
-        $domain->setThemeProperties($domainThemeProperties);
+        $domainThemeProperties = [
+            'footerNavigation' => $footerNavi->getId(),
+            'footerTray' => $footerText->getId(),
+        ];
+        $domain->setThemeOptions($domainThemeProperties);
         $domain->save();
 
 

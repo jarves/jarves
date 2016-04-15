@@ -48,7 +48,10 @@ class SecurityFirewallListener
                 return;
             }
 
-            if (!$pageStack->getUser() || !$acl->check(ACLRequest::create('jarves/entryPoint', ['path' => $url]))) {
+            $hasUser = (boolean)$pageStack->getUser();
+            $hasAccess = $acl->check(ACLRequest::create('jarves/entryPoint', ['path' => $url]));
+
+            if (!$hasUser || !$hasAccess) {
                 $response = new Response(json_encode(
                     [
                         'status' => 403,

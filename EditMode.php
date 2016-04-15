@@ -56,13 +56,14 @@ class EditMode
         $hasRequest = !!$request;
 
         if ($nodeId) {
-            return $hasRequest && 1 == $request->get('_jarves_editor')
-            && $this->acl->isUpdatable('jarves/node', $nodeId);
+            return $hasRequest
+            && 1 == $request->get('_jarves_editor')
+            && $this->acl->isUpdatable('jarves/node', ['id' => $nodeId]);
         }
 
         return $hasRequest && 1 == $request->get('_jarves_editor')
         && $this->pageStack->getCurrentPage()
-        && $this->acl->isUpdatable('jarves/node', $this->pageStack->getCurrentPage()->getId());
+        && $this->acl->isUpdatable('jarves/node', ['id' => $this->pageStack->getCurrentPage()->getId()]);
     }
 
 }

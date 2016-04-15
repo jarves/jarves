@@ -5,10 +5,13 @@ namespace Jarves\Controller;
 use Jarves\ACL;
 use Jarves\Admin\AdminAssets;
 use Jarves\EditMode;
+use Jarves\Exceptions\AccessDeniedException;
 use Jarves\Jarves;
+use Jarves\Model\NodeQuery;
 use Jarves\PageStack;
 use Jarves\Utils;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -50,14 +53,17 @@ class PageController
         $this->acl = $acl;
     }
 
-
     /**
      * Build the page and return the Response of Core\Jarves::getResponse().
-     * @return Response
      *
+     * @param Request $request
+     * @param integer $nodeId
+     *
+     * @return Response
+     * @throws AccessDeniedException
      * @throws \Exception
      */
-    public function handleAction()
+    public function handleAction(Request $request, $nodeId)
     {
         $page = $this->pageStack->getCurrentPage();
 
@@ -76,6 +82,19 @@ class PageController
                 return new RedirectResponse($to, 301);
             }
         }
+
+        if ($editorNodeId = (int)$this->pageStack->getRequest()->get('_jarves_editor_node')) {
+            if ($this->editMode->isEditMode($editorNodeId)) {
+                $nodeId = $editorNodeId;
+            } else {
+                throw new AccessDeniedException('Access denied.');
+            }
+        }
+
+        $node = $this->pageStack->getPage($nodeId);
+        $this->pageStack->setCurrentPage($node);
+        $this->pageStack->setCurrentDomain($this->pageStack->getDomain($node->getDomainId()));
+
 
         if ($this->editMode->isEditMode()) {
             $this->newAdminAssets()->handleKEditor();

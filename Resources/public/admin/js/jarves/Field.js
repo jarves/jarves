@@ -237,10 +237,10 @@ jarves.Field = new Class({
                     }.bind(this)).inject(this.titleText);
             }
 
-            if (this.options.desc) {
+            if (this.options.description) {
                 this.descText = new Element('div', {
                     'class': 'desc',
-                    html: this.options.desc
+                    html: this.options.description
                 }).inject(this.title);
             }
 

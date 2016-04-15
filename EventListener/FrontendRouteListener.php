@@ -135,38 +135,8 @@ class FrontendRouteListener extends RouterListener
         }
 
         try {
-            if ($nodeId = (int)$this->pageStack->getRequest()->get('_jarves_editor_node')) {
-                if ($this->editMode->isEditMode($nodeId)) {
-                    $node = NodeQuery::create()->joinWithDomain()->findPk($nodeId);
-                    if ($node) {
-                        $this->pageStack->setCurrentPage($node);
-                        $this->pageStack->setCurrentDomain($node->getDomain());
-
-                        if (!$request->attributes->has('_controller')) {
-                            $request->attributes->set('_controller', 'jarves.page_controller:handleAction');
-                        }
-                    }
-                } else {
-                    throw new AccessDeniedException('Access denied.');
-                }
-            } else {
-                //check routes in $this->route
-                parent::onKernelRequest($event);
-
-                if ($request->attributes->has('_route')) {
-                    $name = $request->attributes->get('_route');
-                    $route = $this->routes->get($name);
-                    if (!$route) {
-                        //no our front end route hit
-                        return;
-                    }
-                    $nodeId = $route->getDefault('nodeId');
-
-                    $node = $this->pageStack->getPage($nodeId);
-                    $this->pageStack->setCurrentPage($node);
-                    $this->pageStack->setCurrentDomain($this->pageStack->getDomain($node->getDomainId()));
-                }
-            }
+            //check routes in $this->route
+            parent::onKernelRequest($event);
         } catch (MethodNotAllowedException $e) {
         } catch (NotFoundHttpException $e) {
         }

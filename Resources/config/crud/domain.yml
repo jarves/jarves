@@ -9,7 +9,6 @@ fields:
             - lang
             - master
             - startnode
-            - theme
     __Extra__:
         label: Extra
         type: tab
@@ -20,6 +19,12 @@ fields:
            - email
            - alias
            - redirect
+    __Theme__:
+        label: Theme
+        type: tab
+        children:
+            - theme
+            - themeOptions
 columns:
   - domain
   - path
