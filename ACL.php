@@ -549,6 +549,16 @@ class ACL
             }
         }
 
+        if (ACL::TARGET_TYPE_USER === $targetType && 1 === $targetId) {
+            //user admin has always access
+            return true;
+        }
+
+        if (ACL::TARGET_TYPE_GROUP === $targetType && 1 === $targetId) {
+            //group admin has always access
+            return true;
+        }
+
         if (0 === $targetId) {
             //guests do always have no access
             return false;
