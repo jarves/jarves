@@ -554,7 +554,7 @@ class ACL
             return false;
         }
 
-        if (ACL::TARGET_TYPE_GROUP === $targetType || !$targetId) {
+        if (ACL::TARGET_TYPE_GROUP === $targetType && !$targetId) {
             throw new \InvalidArgumentException('For type TARGET_TYPE_GROUP a targetId is required.');
         }
 
