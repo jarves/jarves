@@ -114,9 +114,11 @@ class ObjectTest extends AuthTestCase
         $rule2->setConstraintCode(json_encode([
             'title', '=', 'TestNode tree'
         ]));
-        $rule2->setPrio(1);
+        $rule2->setPrio(3);
         $rule2->setSub(true);
         $rule2->save();
+
+        $this->getCacher()->invalidateCache('core');
 
         $node1RequestListing = ACLRequest::create('jarves/node', $subNode->getId())->onlyListingMode();
         $node2RequestListing = ACLRequest::create('jarves/node', $subNode2->getId())->onlyListingMode();
@@ -227,7 +229,7 @@ class ObjectTest extends AuthTestCase
         $rule->setConstraintCode(json_encode([
             ['title', 'LIKE', '%test']
         ]));
-        $rule->setPrio(1);
+        $rule->setPrio(3);
         $rule->save();
 
         $item1ListingRequest = ACLRequest::create('test/item', $item1->getId())
@@ -405,9 +407,7 @@ class ObjectTest extends AuthTestCase
             'testGroup got list access to all test/item objects.'
         );
 
-        $this->getACL()->removeObjectRules('test/item');
         $this->getACL()->setObjectListExact('test/item', $item1->getId(), \Jarves\ACL::TARGET_TYPE_GROUP, $group->getId(), false);
-        $this->getACL()->setObjectList('test/item', \Jarves\ACL::TARGET_TYPE_GROUP, $group->getId(), true);
         $this->assertFalse(
             $this->getACL()->check($aclRequestItem1OnlyListing->targetGroup($group->getId())),
             'testGroup got list access-denied to item 1.'
@@ -421,21 +421,17 @@ class ObjectTest extends AuthTestCase
             'testGroup still have access to item2.'
         );
 
-        $this->getACL()->removeObjectRules('test/item');
         $this->getACL()->setObjectListExact('test/item', $item2->getId(), \Jarves\ACL::TARGET_TYPE_GROUP, $group->getId(), false);
-        $this->getACL()->setObjectList('test/item', \Jarves\ACL::TARGET_TYPE_GROUP, $group->getId(), true);
 
         $this->assertFalse(
             $this->getACL()->check($aclRequestItem2OnlyListing->targetGroup($group->getId())),
             'testGroup does not have access to item2 anymore.'
         );
 
-        $this->getACL()->removeObjectRules('test/item');
         $acl = $this->getACL()->setObjectListExact('test/item', $item2->getId(), \Jarves\ACL::TARGET_TYPE_USER, $user->getId(), true);
-        $this->getACL()->setObjectList('test/item', \Jarves\ACL::TARGET_TYPE_GROUP, $group->getId(), true);
 
         $this->assertTrue(
-            $this->getACL()->check($aclRequestItem2OnlyListing->targetGroup($group->getId())),
+            $this->getACL()->check($aclRequestItem2OnlyListing->targetUser($user->getId())),
             'testUser got access through a rule for only him.'
         );
 
@@ -447,11 +443,8 @@ class ObjectTest extends AuthTestCase
             'testUser got no-access through a rule for only him.'
         );
 
-        $this->getACL()->removeObjectRules('test/item');
         //access to every item
         $acl = $this->getACL()->setObjectList('test/item', \Jarves\ACL::TARGET_TYPE_GROUP, $group->getId(), true);
-        $acl->setPrio(-1);
-        $acl->save();
 
         $this->assertTrue(
             $this->getACL()->check($aclRequestItem2OnlyListing->targetUser($user->getId())),
@@ -501,8 +494,7 @@ class ObjectTest extends AuthTestCase
         );
 
         //revoke anything to object 'test\item'
-        $acl = $this->getACL()->setObjectList('test/item', \Jarves\ACL::TARGET_TYPE_GROUP, $group->getId(), false);
-        $acl->setPrio(-1)->save();
+        $this->getACL()->setObjectList('test/item', \Jarves\ACL::TARGET_TYPE_GROUP, $group->getId(), false);
 
         $this->assertFalse(
             $this->getACL()->check($aclRequestItem2OnlyListing->targetGroup($group->getId())),
@@ -512,15 +504,13 @@ class ObjectTest extends AuthTestCase
         //check against object test
         $aclRequestTest1OnlyListing = ACLRequest::create('test/test', $test1->getId())
             ->onlyListingMode();
-        $acl = $this->getACL()->setObjectListExact('test/test', $test1->getId(), \Jarves\ACL::TARGET_TYPE_GROUP, $group->getId(), true);
-        $acl->setPrio(-2)->save();
+        $this->getACL()->setObjectListExact('test/test', $test1->getId(), \Jarves\ACL::TARGET_TYPE_GROUP, $group->getId(), true);
         $this->assertTrue(
             $this->getACL()->check($aclRequestTest1OnlyListing->targetGroup($group->getId())),
             'testGroup has access test1.'
         );
 
-        $acl = $this->getACL()->setObjectList('test/test', \Jarves\ACL::TARGET_TYPE_GROUP, $group->getId(), false);
-        $acl->setPrio(-3)->save();
+        $this->getACL()->setObjectList('test/test', \Jarves\ACL::TARGET_TYPE_GROUP, $group->getId(), false);
         $this->assertFalse(
             $this->getACL()->check($aclRequestTest1OnlyListing->targetGroup($group->getId())),
             'testGroup has no access test1.'
