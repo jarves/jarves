@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "506f5a351d51c2a42093d524d9933866",
-    "content-hash": "7076ae151bd197347dda107bd9e85bcc",
+    "hash": "6ddfda278aecdbd9b059accba3aed817",
+    "content-hash": "fe8dcfa6cdc241679859eef7c8a75720",
     "packages": [
         {
             "name": "composer/composer",
@@ -853,35 +853,36 @@
             "time": "2016-01-25 15:43:01"
         },
         {
-            "name": "leafo/scssphp",
-            "version": "v0.6.3",
+            "name": "kadet/keylighter",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/leafo/scssphp.git",
-                "reference": "a27edad3d16635a222d7204706572e24c338aa17"
+                "url": "https://github.com/kadet1090/KeyLighter.git",
+                "reference": "54eb3fa9704beb18ac9880170339bed7fe81ac63"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/leafo/scssphp/zipball/a27edad3d16635a222d7204706572e24c338aa17",
-                "reference": "a27edad3d16635a222d7204706572e24c338aa17",
+                "url": "https://api.github.com/repos/kadet1090/KeyLighter/zipball/54eb3fa9704beb18ac9880170339bed7fe81ac63",
+                "reference": "54eb3fa9704beb18ac9880170339bed7fe81ac63",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0"
+                "php": ">=5.5.0"
             },
             "require-dev": {
-                "kherge/box": "~2.5",
-                "phpunit/phpunit": "~3.7",
-                "squizlabs/php_codesniffer": "~2.5"
+                "phpunit/phpunit": "4.8.*"
             },
             "bin": [
-                "bin/pscss"
+                "bin/keylighter"
             ],
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Leafo\\ScssPhp\\": "src/"
-                }
+                    "Kadet\\Highlighter\\": "."
+                },
+                "files": [
+                    "./functions.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -889,21 +890,12 @@
             ],
             "authors": [
                 {
-                    "name": "Leaf Corcoran",
-                    "email": "leafot@gmail.com",
-                    "homepage": "http://leafo.net"
+                    "name": "Kacper Donat",
+                    "email": "contact@kadet.net"
                 }
             ],
-            "description": "scssphp is a compiler for SCSS written in PHP.",
-            "homepage": "http://leafo.github.io/scssphp/",
-            "keywords": [
-                "css",
-                "less",
-                "sass",
-                "scss",
-                "stylesheet"
-            ],
-            "time": "2016-01-15 02:50:06"
+            "description": "Yet another syntax highlighter for PHP",
+            "time": "2016-04-15 22:04:59"
         },
         {
             "name": "michelf/php-markdown",
@@ -958,16 +950,16 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "1.18.2",
+            "version": "1.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "064b38c16790249488e7a8b987acf1c9d7383c09"
+                "reference": "5f56ed5212dc509c8dc8caeba2715732abb32dbf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/064b38c16790249488e7a8b987acf1c9d7383c09",
-                "reference": "064b38c16790249488e7a8b987acf1c9d7383c09",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/5f56ed5212dc509c8dc8caeba2715732abb32dbf",
+                "reference": "5f56ed5212dc509c8dc8caeba2715732abb32dbf",
                 "shasum": ""
             },
             "require": {
@@ -1032,7 +1024,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2016-04-02 13:12:58"
+            "time": "2016-04-12 18:29:35"
         },
         {
             "name": "nelmio/api-doc-bundle",
@@ -1173,12 +1165,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/propelorm/Propel2.git",
-                "reference": "14377a8c468dd8a5ca01064f140ab36f6cb117df"
+                "reference": "c0a0d21a0bbbfcf52b4e5f601494182ea22d8894"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/14377a8c468dd8a5ca01064f140ab36f6cb117df",
-                "reference": "14377a8c468dd8a5ca01064f140ab36f6cb117df",
+                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/c0a0d21a0bbbfcf52b4e5f601494182ea22d8894",
+                "reference": "c0a0d21a0bbbfcf52b4e5f601494182ea22d8894",
                 "shasum": ""
             },
             "require": {
@@ -1230,24 +1222,25 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2016-04-04 10:03:45"
+            "time": "2016-04-13 14:55:57"
         },
         {
             "name": "propel/propel-bundle",
-            "version": "2.0.x-dev",
+            "version": "3.0.x-dev",
             "source": {
                 "type": "git",
-                "url": "https://github.com/marcj/PropelBundle.git",
-                "reference": "07dd412e0684632a24938c57da7995ab0f369594"
+                "url": "https://github.com/propelorm/PropelBundle.git",
+                "reference": "5fd4b68de2c1881ef815dd100f2948a5cf0829be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcj/PropelBundle/zipball/07dd412e0684632a24938c57da7995ab0f369594",
-                "reference": "07dd412e0684632a24938c57da7995ab0f369594",
+                "url": "https://api.github.com/repos/propelorm/PropelBundle/zipball/5fd4b68de2c1881ef815dd100f2948a5cf0829be",
+                "reference": "5fd4b68de2c1881ef815dd100f2948a5cf0829be",
                 "shasum": ""
             },
             "require": {
                 "propel/propel": "dev-master",
+                "symfony/security-acl": "^2.8|^3.0",
                 "symfony/symfony": "^2.8|^3.0"
             },
             "require-dev": {
@@ -1264,6 +1257,7 @@
                     "Tests/"
                 ]
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -1279,10 +1273,7 @@
                 "persistence",
                 "propel"
             ],
-            "support": {
-                "source": "https://github.com/marcj/PropelBundle/tree/2.0"
-            },
-            "time": "2016-03-27 01:16:43"
+            "time": "2016-04-14 10:10:14"
         },
         {
             "name": "psr/log",
@@ -1678,20 +1669,20 @@
         },
         {
             "name": "symfony/monolog-bundle",
-            "version": "v2.10.0",
+            "version": "2.11.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/monolog-bundle.git",
-                "reference": "82fd8f36e2cccbe94faf237403c48052d4d4b77e"
+                "reference": "e7caf4936c7be82bc6d68df87f1d23a0d5bf6e00"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/monolog-bundle/zipball/82fd8f36e2cccbe94faf237403c48052d4d4b77e",
-                "reference": "82fd8f36e2cccbe94faf237403c48052d4d4b77e",
+                "url": "https://api.github.com/repos/symfony/monolog-bundle/zipball/e7caf4936c7be82bc6d68df87f1d23a0d5bf6e00",
+                "reference": "e7caf4936c7be82bc6d68df87f1d23a0d5bf6e00",
                 "shasum": ""
             },
             "require": {
-                "monolog/monolog": "~1.12",
+                "monolog/monolog": "~1.18",
                 "php": ">=5.3.2",
                 "symfony/config": "~2.3|~3.0",
                 "symfony/dependency-injection": "~2.3|~3.0",
@@ -1706,7 +1697,7 @@
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.9.x-dev"
+                    "dev-master": "2.x-dev"
                 }
             },
             "autoload": {
@@ -1734,7 +1725,7 @@
                 "log",
                 "logging"
             ],
-            "time": "2016-03-13 15:55:56"
+            "time": "2016-04-13 16:21:01"
         },
         {
             "name": "symfony/polyfill-intl-icu",
@@ -2019,6 +2010,67 @@
                 "shim"
             ],
             "time": "2016-01-20 09:13:37"
+        },
+        {
+            "name": "symfony/security-acl",
+            "version": "v3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/security-acl.git",
+                "reference": "053b49bf4aa333a392c83296855989bcf88ddad1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/security-acl/zipball/053b49bf4aa333a392c83296855989bcf88ddad1",
+                "reference": "053b49bf4aa333a392c83296855989bcf88ddad1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.9",
+                "symfony/security-core": "~2.8|~3.0"
+            },
+            "require-dev": {
+                "doctrine/common": "~2.2",
+                "doctrine/dbal": "~2.2",
+                "psr/log": "~1.0",
+                "symfony/phpunit-bridge": "~2.8|~3.0"
+            },
+            "suggest": {
+                "doctrine/dbal": "For using the built-in ACL implementation",
+                "symfony/class-loader": "For using the ACL generateSql script",
+                "symfony/finder": "For using the ACL generateSql script"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Security\\Acl\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Security Component - ACL (Access Control List)",
+            "homepage": "https://symfony.com",
+            "time": "2015-12-28 09:39:46"
         },
         {
             "name": "symfony/symfony",
@@ -2402,12 +2454,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jarves/jarves-demotheme.git",
-                "reference": "4d547afc42e18f368b5f44d295eea5ee94c3716f"
+                "reference": "fe5cd80535724b951062de2a8652ffc91f24ff84"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jarves/jarves-demotheme/zipball/4d547afc42e18f368b5f44d295eea5ee94c3716f",
-                "reference": "4d547afc42e18f368b5f44d295eea5ee94c3716f",
+                "url": "https://api.github.com/repos/jarves/jarves-demotheme/zipball/fe5cd80535724b951062de2a8652ffc91f24ff84",
+                "reference": "fe5cd80535724b951062de2a8652ffc91f24ff84",
                 "shasum": ""
             },
             "type": "library",
@@ -2434,7 +2486,7 @@
                 "Jarves",
                 "theme"
             ],
-            "time": "2016-03-26 23:09:21"
+            "time": "2016-04-15 00:47:19"
         },
         {
             "name": "jarves/publication-bundle",
@@ -2443,12 +2495,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jarves/jarves-publication.git",
-                "reference": "2af692f00c959422ba8c365474f9e7a1cb021c48"
+                "reference": "eda26a57f2d6482bf4c27c0de964177205026d37"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jarves/jarves-publication/zipball/2af692f00c959422ba8c365474f9e7a1cb021c48",
-                "reference": "2af692f00c959422ba8c365474f9e7a1cb021c48",
+                "url": "https://api.github.com/repos/jarves/jarves-publication/zipball/eda26a57f2d6482bf4c27c0de964177205026d37",
+                "reference": "eda26a57f2d6482bf4c27c0de964177205026d37",
                 "shasum": ""
             },
             "type": "library",
@@ -2475,7 +2527,7 @@
                 "blog",
                 "news"
             ],
-            "time": "2016-04-07 11:40:50"
+            "time": "2016-04-07 19:29:17"
         },
         {
             "name": "mockery/mockery",
@@ -2912,6 +2964,7 @@
         "propel/propel-bundle": 20,
         "propel/propel": 20,
         "friendsofsymfony/rest-bundle": 10,
+        "kadet/keylighter": 20,
         "mockery/mockery": 0,
         "jarves/demotheme-bundle": 20,
         "jarves/publication-bundle": 20
@@ -2919,7 +2972,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.4"
+        "php": ">=5.6"
     },
     "platform-dev": []
 }
