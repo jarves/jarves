@@ -72,6 +72,7 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
                 ->setInput(file_get_contents($localPath))
                 ->add('sass')
                 ->add('--scss')
+                ->add('--no-cache')
                 ->add('--unix-newlines')
                 ->add('--load-path')
                 ->add(dirname($localPath))
