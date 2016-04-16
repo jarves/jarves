@@ -284,7 +284,7 @@ class Propel extends AbstractStorage
         } else {
             if (is_array($fields)) {
 
-                $fields = $this->extractSelection($fields);
+                $fields = array_unique($this->extractSelection($fields));
 
                 foreach ($fields as $field) {
 
@@ -293,7 +293,6 @@ class Propel extends AbstractStorage
                     if (($pos = strpos($field, '.')) !== false) {
                         $relationName = ucfirst(substr($field, 0, $pos));
                         $relationFieldSelection = explode(',', str_replace(' ', '', ucfirst(substr($field, $pos + 1))));
-
                     } else {
                         $relationName = ucfirst($field);
                     }
@@ -320,7 +319,7 @@ class Propel extends AbstractStorage
                         } else {
                             foreach ($relationFieldSelection as $relationField) {
                                 //check if $relationField exists in the foreign table
-                                if (!$relation->getRightTable()->hasColumnByPhpName($relationField)) {
+                                if (!$relation->getRightTable()->hasColumn($relationField)) {
                                     continue;
                                 }
                                 $relationFields[ucfirst($originalRelationName)][] = $relationField;

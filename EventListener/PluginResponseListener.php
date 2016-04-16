@@ -2,6 +2,7 @@
 
 namespace Jarves\EventListener;
 
+use Jarves\EditMode;
 use Jarves\Jarves;
 use Jarves\Model\Content;
 use Jarves\PageResponseFactory;
@@ -22,7 +23,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class PluginResponseListener
 {
-
     /**
      * @var Jarves
      */
@@ -48,37 +48,47 @@ class PluginResponseListener
      */
     private $pageResponseFactory;
 
-    /**
-     * PluginResponseListener constructor.
-     * @param Jarves $jarves
-     * @param PageStack $pageStack
-     * @param FrontendRouteListener $frontendRouteListener
-     * @param KernelInterface $kernel
-     * @param PageResponseFactory $pageResponseFactory
-     */
     function __construct(Jarves $jarves, PageStack $pageStack, FrontendRouteListener $frontendRouteListener,
-                         KernelInterface $kernel, PageResponseFactory $pageResponseFactory)
+                         KernelInterface $kernel, PageResponseFactory $pageResponseFactory, EditMode $editMode)
     {
         $this->jarves = $jarves;
         $this->pageStack = $pageStack;
         $this->frontendRouteListener = $frontendRouteListener;
         $this->kernel = $kernel;
         $this->pageResponseFactory = $pageResponseFactory;
+        $this->editMode = $editMode;
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
         $response = $event->getResponse();
         if (null !== $response && $response instanceof PluginResponseInterface) {
-//            $response->setControllerRequest($event->getRequest());
+
+            //when a route from a plugin is hit
+            if (!$event->getRequest()->attributes->get('_jarves_is_plugin')) {
+                //we accept only plugin routes.
+                return;
+            }
+
             $pageResponse = $this->pageStack->getPageResponse();
 
             /** @var $content Content */
             $content = $event->getRequest()->attributes->get('_content');
+
+            //this is later used in ContentTypes\TypePlugin, so it won't execute
+            //the same plugin again.
             $pageResponse->setPluginResponse($content->getId(), $response);
 
-            //when a route from a plugin is hit
             if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
+                //when this was a master request, we need to render the actual content of the page,
+                //so HttpKernel can return a valid ready rendered response
+
+                //if a plugin route has been successfully requested
+                //we need to handle also the Jarves editor
+                if ($this->editMode->isEditMode()) {
+                    $this->editMode->registerEditor();
+                }
+
                 $pageResponse->setRenderFrontPage(true);
                 $pageResponse->renderContent();
             }
@@ -92,7 +102,9 @@ class PluginResponseListener
     {
         $data = $event->getControllerResult();
         $request = $event->getRequest();
-        if (!$request->attributes->has('_content')) {
+
+        if (!$event->getRequest()->attributes->get('_jarves_is_plugin')) {
+            //we accept only plugin responses.
             return;
         }
 
@@ -104,8 +116,22 @@ class PluginResponseListener
             } else {
                 $response = $this->pageResponseFactory->createPluginResponse($data);
             }
+
+            //it's required to place a PluginResponseInterface as response, so
+            //PluginResponseListener::onKernelResponse can correctly identify it
+            //and set it as response for this plugin content, so ContentTypes\TypePlugin
+            //can place the correct response at the correct position, without executing
+            //the plugin twice.
             $event->setResponse($response);
         } else {
+
+            //we hit a plugin route, but it has responsed with NULL
+            //this means it is not responsible for this route/slug.
+            //we need now to remove this plugin route from the route collection
+            //and fire again a sub request until all plugins on this page
+            //are handled. If no plugin is responsible for this url pattern
+            //and the main page route is also not responsible
+            //no response is set in the $event and a 404 is thrown by the HttpKernel.
             $foundRoute = false;
 
             $routes = $this->frontendRouteListener->getRoutes();
@@ -113,13 +139,15 @@ class PluginResponseListener
             foreach ($routes as $idx => $route) {
                 /** @var \Symfony\Component\Routing\Route $route */
                 if ($content === $route->getDefault('_content')) {
+                    //remove exactly only the current plugin that was hit in this sub request
                     $routes->remove($idx);
                     $foundRoute = true;
                     break;
                 }
             }
+
             if ($foundRoute) {
-                //we've remove the route and fire now again a sub request
+                //we've removed the route and fire now again a sub request
                 $request = clone $this->pageStack->getRequest();
                 $request->attributes = new ParameterBag();
                 $response = $this->kernel->handle(
@@ -127,9 +155,10 @@ class PluginResponseListener
                     HttpKernelInterface::SUB_REQUEST
                 );
                 $event->setResponse($response);
-
-                return;
             }
+
+            //we do not need to restore routes in the frontendRouteListener, because
+            //it reload all routes on every master request
         }
     }
 }

@@ -43,7 +43,7 @@ class AclController extends Controller
      * @Rest\QueryParam(name="type", requirements=".+", strict=true, description="Target type")
      * @Rest\QueryParam(name="id", requirements=".+", strict=true, description="Target id")
      *
-     * @Rest\Get("/admin/acl")
+     * @Rest\Get("/user/acl")
      *
      * @param  int $type
      * @param  int $id
@@ -72,7 +72,7 @@ class AclController extends Controller
      * @Rest\RequestParam(name="targetType", requirements=".+", strict=true, description="Target type")
      * @Rest\RequestParam(name="rules", strict=false, description="ACL rules array")
      *
-     * @Rest\Post("/admin/acl")
+     * @Rest\Post("/user/acl")
      *
      * @param  int $targetId
      * @param  int $targetType
@@ -152,7 +152,7 @@ class AclController extends Controller
      *
      * @Rest\QueryParam(name="q", requirements=".*", description="Search query")
      *
-     * @Rest\Get("/admin/acl/search")
+     * @Rest\Get("/user/acl/search")
      *
      * @param string $q
      *

@@ -94,7 +94,7 @@ jarves.DashboardWidgets.NewsFeed = new Class({
             text: item.targetLabel
         })
             .addEvent('click', function() {
-                jarves.openObjectDetailEntryPoint(item.targetObject, jarves.getObjectItemFromUrlId(item.targetObject, item.targetPk));
+                jarves.openObjectDetailEntryPoint(item.targetObject, jarves.getObjectPkFromUrlId(item.targetObject, item.targetPk));
             })
             .inject(div);
 

@@ -53,12 +53,41 @@ class Navigation
         return $array[$level - 1];
     }
 
+    /**
+     * 
+     * Options:
+     * 
+     *  //whether the template cache is deactivated. Navigation object is still cached
+     *  boolean noCache = false
+     *
+     *  //whether the pathInfo is used in the cacheKey instead of the currentUrl.
+     *  //Useful when you have in your navigation controller calls that are based on pathInfo like
+     *  //pageStack->getCurrentUrlAffix()
+     *  boolean pathInfoCache = false
+     * 
+     * Example:
+     *   getRendered(['noCache' => true]);
+     * 
+     * @param array $options
+     * @param \Twig_Environment $twig
+     * @return string
+     * @throws \Exception
+     */
     public function getRendered($options, \Twig_Environment $twig)
     {
-        $options['noCache'] = isset($options['noCache']) ? $options['noCache'] : false;
+        $options['noCache'] = isset($options['noCache']) ? (boolean)$options['noCache'] : false;
+        $options['pathInfoCache'] = isset($options['pathInfoCache']) ? (boolean)$options['pathInfoCache'] : false;
+
         $view = $options['template'] ?: $options['view'];
-        $cacheKey = 'core/navigation/' . $this->pageStack->getCurrentPage()->getDomainId()
-            . '.' . $this->pageStack->getCurrentPage()->getId() . '_' . md5(json_encode($options));
+        $cacheKey =
+            'core/navigation/'
+            . $this->pageStack->getCurrentPage()->getDomainId()
+            . '.'
+            . $this->pageStack->getCurrentPage()->getId()
+            . ($options['pathInfoCache'] ? '_' . md5($this->pageStack->getRequest()->getPathInfo()) : '')
+            . '_'
+            . md5(json_encode($options));
+
         $fromCache = false;
 
         $viewPath = $this->jarves->resolvePath($view, 'Resources/views/');
@@ -72,9 +101,7 @@ class Navigation
             $mtime = filemtime($viewPath);
         }
 
-
         if (!$options['noCache']) {
-
             $cache = $this->cacher->getDistributedCache($cacheKey);
             if ($cache && isset($cache['html']) && $cache['html'] !== null && $cache['mtime'] == $mtime) {
                 return $cache['html'];

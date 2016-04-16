@@ -614,44 +614,18 @@ jarves.getObjectPk = function(objectKey, item) {
  *
  * Example:
  *
- *    3 => 3
- *    %252Fadmin%252Fimages%252Fhi.jpg => /admin/images/hi.jpg
+ *    3 => {id: 3}
+ *    %252Fadmin%252Fimages%252Fhi.jpg => {path: /admin/images/hi.jpg}
  *    idValue1/idValue2 => {id1: idValue1, id2: idValue2}
  *
  * @param {String} objectKey
  * @param {String} urlId
- * @returns {String|Object}
+ * @returns {Object} always a object
  */
 jarves.getObjectPkFromUrlId = function(objectKey, urlId) {
     var pks = jarves.getObjectPrimaryList(objectKey);
 
-    if (1 < pks.length) {
-        var values = jarves.urlDecode(urlId.split('/'));
-        var result = {};
-        Array.each(pks, function(pk, idx) {
-           result[pk] = values[idx];
-        });
-    }
-
-    return jarves.urlDecode(urlId);
-};
-
-/**
- *
- * Return the id or array of internal url id.
- *
- * Example:
- *
- *    3 => {'id': 3}
- *    %252Fadmin%252Fimages%252Fhi.jpg => {path: '/admin/images/hi.jpg'}
- *    idValue1/idValue2 => {id1: idValue1, id2: idValue2}
- *
- * @param {String} objectKey
- * @param {String} urlId
- * @returns {Object}
- */
-jarves.getObjectItemFromUrlId = function(objectKey, urlId) {
-    var pks = jarves.getObjectPrimaryList(objectKey);
+    urlId = jarves.getCroppedObjectId(urlId);
 
     var values = jarves.urlDecode(urlId.split('/'));
     var result = {};
@@ -745,12 +719,19 @@ jarves.getObjectUrl = function(objectKey, id) {
 /**
  * This just cuts off object://<objectName>/ and returns the raw primary key part.
  *
+ * Use getObjectItemFromUrlId to get the item
+ *
  * @param {String} url
  *
  * @return {String}
  */
 jarves.getCroppedObjectId = function(url) {
     if ('string' !== typeOf(url)) {
+        return url;
+    }
+
+    if (-1 === url.indexOf('/')) {
+        //object url have only in the object://jarves/node/ slashes, never in the id part because they are urlEncoded
         return url;
     }
 
@@ -811,7 +792,7 @@ jarves.getCroppedObjectKey = function(url) {
  *
  * @param {String} url
  *
- * @return {String} encoded id
+ * @return {String} decoded id
  */
 jarves.getObjectIdFromUrl = function(url) {
     var pks = jarves.getObjectPrimaryList(jarves.getCroppedObjectKey(url));

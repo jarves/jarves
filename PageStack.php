@@ -54,20 +54,6 @@ class PageStack
     protected $adminPrefix;
 
     /**
-     * Client instance in administration area.
-     *
-     * @var ClientAbstract
-     */
-    protected $adminClient;
-
-    /**
-     * Frontend client instance.
-     *
-     * @var ClientAbstract
-     */
-    protected $client;
-
-    /**
      * @var RequestStack
      */
     private $requestStack;
@@ -114,6 +100,14 @@ class PageStack
 
 
         return $this->lastRequest;
+    }
+
+    /**
+     * @return RequestStack
+     */
+    public function getRequestStack()
+    {
+        return $this->requestStack;
     }
 
     public function reset()
@@ -225,49 +219,9 @@ class PageStack
         return $this->getRequest()->getSession();
     }
 
-//    /**
-//     * Returns the current session client instance for administration.
-//     * If not exists, we create it and start the session process.
-//     *
-//     * Note that this method creates a new AbstractClient instance and starts
-//     * the whole session process mechanism (with sending sessions ids etc)
-//     * if the adminClient does not exists already.
-//     *
-//     * @return ClientAbstract
-//     */
-    public function getAdminClient()
-    {
-//        if (null === $this->adminClient) {
-//            $this->adminClient = $this->clientFactory->create();
-//            $this->adminClient->start();
-//        }
-//
-//        return $this->adminClient;
-    }
-//
-//    /**
-//     * Returns the current session client for front end.
-//     *
-//     * If not exists, we create it and start the session process.
-//     *
-//     * Note that this method creates a new AbstractClient instance and starts
-//     * the whole session process mechanism (with sending sessions ids etc)
-//     * if the adminClient does not exists already.
-//     *
-//     * @return ClientAbstract
-//     *
-//     */
-    public function getClient()
-    {
-//        if (null === $this->client) {
-//            $config = $this->getCurrentDomain() ? $this->getCurrentDomain()->getSessionProperties() : null;
-//            $this->client = $this->clientFactory->create($config);
-//        }
-//
-//        return $this->client;
-    }
-
     /**
+     * When a route is loading within /jarves
+     *
      * @return bool
      */
     public function isAdmin()
@@ -283,7 +237,6 @@ class PageStack
 
         return (0 === strpos($this->getRequest()->getPathInfo(), $adminPrefix));
     }
-
 
     /**
      * Returns Domain object. This tries to cache the domain, so its a faster access method than using
@@ -337,7 +290,10 @@ class PageStack
      */
     public function getCurrentUrlAffix()
     {
-       return substr($this->getRequest()->getPathInfo(), strlen($this->getCurrentUrl()));
+        $pathInfo = $this->getRequest()->getPathInfo(); //with leading /
+        $currentUrl = $this->getCurrentUrl(); //without leading /
+
+       return substr(ltrim($pathInfo, '/'), strlen($currentUrl));
     }
 
     /**

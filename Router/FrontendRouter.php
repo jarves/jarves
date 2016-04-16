@@ -140,10 +140,11 @@ class FrontendRouter
      * Check for redirects/access requirements
      *
      * @param RouteCollection $routes
+     * @param Node $page
      *
      * @return null|RedirectResponse|Response
      */
-    public function loadRoutes(RouteCollection $routes)
+    public function loadRoutes(RouteCollection $routes, Node $page)
     {
         $this->routes = $routes;
 
@@ -152,12 +153,10 @@ class FrontendRouter
                 return null;
             }
 
-            if ($this->searchDomain() && $page = $this->searchPage()) {
-                $this->registerMainPage($page);
-                $this->registerPluginRoutes($page);
-                if ($response = $this->checkPageAccess($page)) {
-                    return $response;
-                }
+            $this->registerMainPage($page);
+            $this->registerPluginRoutes($page);
+            if ($response = $this->checkPageAccess($page)) {
+                return $response;
             }
         }
 
@@ -226,19 +225,12 @@ class FrontendRouter
 
             return new RedirectResponse($to);
         }
-
-        if (!$page && $oriPage->getAccessNeedVia() == 1) {
-            $response = new Response();
-
-            return $response;
-            //create
-//            container(
-//                'WWW-Authenticate: Basic realm="' .
-//                ('Access denied. Maybe you are not logged in or have no access.') . '"'
-//            );
-//            container('HTTP/1.0 401 Unauthorized');
-
-        }
+//
+//        if (!$page && $oriPage->getAccessNeedVia() == 1) {
+//            $response = new Response('', 404);
+//
+//            return $response;
+//        }
     }
 
     public function registerMainPage(Node $page)
@@ -355,6 +347,7 @@ class FrontendRouter
 
                     $defaults = array(
                         '_controller' => $route->getController() ?: $controller,
+                        '_jarves_is_plugin' => true,
                         '_content' => $plugin,
                         '_title' => sprintf('%s: %s', $bundleName, $pluginDefinition->getLabel()),
                         'options' => isset($data['options']) && is_array($data['options']) ? $data['options'] : [],
@@ -527,9 +520,7 @@ class FrontendRouter
             return null;
         }
 
-        $this->pageStack->setCurrentDomain($foundDomain);
         $foundDomain->setRealDomain($hostname);
-
         $this->stopwatch->stop($title);
 
         return $foundDomain;
@@ -537,10 +528,10 @@ class FrontendRouter
 
     /**
      * Returns the id of given path-info. Null if not existent.
-     *
+     * 
      * @return Node|null
      */
-    protected function searchPage()
+    public function searchPage()
     {
         $url = $this->getRequest()->getPathInfo();
 
@@ -589,7 +580,6 @@ class FrontendRouter
             $page = $this->pageStack->getPage($pageId);
         }
 
-        $this->pageStack->setCurrentPage($page);
         $this->stopwatch->stop($title);
 
         return $page;

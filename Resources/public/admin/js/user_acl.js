@@ -935,7 +935,7 @@ var jarves_user_acl = new Class({
 
         new Element('div', {
             'class': 'jarves-List-split',
-            text: t('Rules (priority order: top is more important)')
+            text: t('Rules (bottom has higher priority)')
         }).inject(this.objectRulesFilter);
 
         this.objectRulesInfo = new Element('div', {
@@ -1391,7 +1391,7 @@ var jarves_user_acl = new Class({
             this.lastRq.cancel();
         }
 
-        this.lastRq = new Request.JSON({url: _pathAdmin + 'admin/acl/search', noCache: 1,
+        this.lastRq = new Request.JSON({url: _pathAdmin + 'user/acl/search', noCache: 1,
             onComplete: this.renderList.bind(this)
         }).get(req);
 
@@ -1435,7 +1435,7 @@ var jarves_user_acl = new Class({
 
                     new Element('span', {
                         text: ' (' + item.ruleCount + ')',
-                        style: 'color: gray; font-size: 12px; font-weight: normal;'
+                        'class': 'sub'
                     }).inject(h2);
 
                     var subline = new Element('div', {
@@ -1497,7 +1497,7 @@ var jarves_user_acl = new Class({
 
                     new Element('span', {
                         text: ' (' + item.ruleCount + ')',
-                        style: 'color: gray; font-size: 12px; font-weight: normal;'
+                        'class': 'sub'
                     }).inject(h2);
 
                 }.bind(this));
@@ -1571,7 +1571,7 @@ var jarves_user_acl = new Class({
         this.currentTargetRsn = pId;
 
         this.lrAcls = new Request.JSON({
-            url: _pathAdmin + 'admin/acl',
+            url: _pathAdmin + 'user/acl',
             noCache: true,
             onComplete: this.setAcls.bind(this)
         }).get({type: pType, id: pId});
@@ -1815,7 +1815,7 @@ var jarves_user_acl = new Class({
             rules: this.currentAcls
         };
 
-        this.lastSaveRq = new Request.JSON({url: _pathAdmin + 'admin/acl',
+        this.lastSaveRq = new Request.JSON({url: _pathAdmin + 'user/acl',
             progressButton: this.btnSave,
             onFailure: function() {
                 this.btnSave.failedLoading(t('Failed'));

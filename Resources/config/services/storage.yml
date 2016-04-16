@@ -8,6 +8,12 @@ services:
     shared: false
     arguments: ["@jarves", "@jarves.objects", "@jarves.acl", "@jarves.condition_operator"]
 
+  jarves.storage.node:
+    class: Jarves\Storage\NodeStorage
+    parent: jarves.storage.propel
+    calls:
+      - ['setPageStack', ['@jarves.page_stack']]
+
   jarves.storage.entrypoint:
     class: Jarves\Storage\EntryPointStorage
     arguments: ["@jarves"]

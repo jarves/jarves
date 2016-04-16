@@ -75,7 +75,7 @@
         <description>Pages, Links, Trays and Navigation folder</description>
         <table>system_node</table>
         <labelField>title</labelField>
-        <defaultSelection>type, title, alternativeTitle, urn, layout, visible, target</defaultSelection>
+        <defaultSelection>type, title, alternativeTitle, urn, layout, visible, target, domain.domain, url</defaultSelection>
         <nested>true</nested>
         <autoCrud>false</autoCrud>
         <listEntryPoint>jarves/nodes</listEntryPoint>
@@ -92,6 +92,7 @@
         <treeRootObjectIconPath>#world</treeRootObjectIconPath>
         <treeRootObjectFixedIcon>true</treeRootObjectFixedIcon>
         <treeRootFieldTemplate>{{domain}}</treeRootFieldTemplate>
+        <storageService>jarves.storage.node</storageService>
         <fields>
           <field id="id" type="number" primaryKey="true" autoIncrement="true">
             <label>ID</label>

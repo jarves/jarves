@@ -171,7 +171,9 @@ jarves.FieldTypes.PageContents = new Class({
             this.domainSelection = new jarves.Select(this.headerLayout.getCell(1, 1), {
                 object: 'jarves/domain',
                 onChange: function(item) {
-                    this.loadEditor(this.domainSelection.getValue(), this.currentNode, this.currentContents);
+                    this.currentNode = null;
+                    this.loadEditor(this.domainSelection.getValue());
+                    this.loadTreeForDomain(this.domainSelection.getValue());
                 }.bind(this)
             });
         }
@@ -264,6 +266,12 @@ jarves.FieldTypes.PageContents = new Class({
      * @param {Number} domainId
      */
     loadTreeForDomain: function(domainId) {
+        if (!this.treeContainer) {
+            return;
+        }
+
+        this.treeContainer.empty();
+
         this.treeField = new jarves.Field({
             type: 'tree',
             object: 'jarves/node',
@@ -274,11 +282,32 @@ jarves.FieldTypes.PageContents = new Class({
         }, this.treeContainer);
 
         this.treeField.addEvent('change', function(value){
-            if (this.currentNode && this.currentNode === value.id) {
+
+            /** @var {jarves.FieldTypes.Tree} treeField */
+            var treeField = this.treeField.getFieldObject();
+
+            /** @var {jarves.ObjectTree} objectTree */
+            var objectTree = treeField.getSelectedTree();
+
+            var objectUrl = objectTree.getSelectedUrl();
+
+            var objectKey = jarves.getCroppedObjectKey(objectUrl);
+            var pk = jarves.getObjectPkFromUrlId(objectKey, objectUrl);
+
+            if ('jarves/node' === objectKey && this.currentNode && this.currentNode === pk.id) {
+                //node already selected
                 return;
             }
 
-            this.loadStandaloneEditor(domainId, value.id);
+            if ('jarves/domain' === objectKey) {
+                //clicked on the domain, we reload complete editor
+                this.currentNode = null;
+                this.loadStandaloneEditor(domainId);
+            } else {
+                //click on the node, so pk.id == node.id
+                this.loadStandaloneEditor(domainId, pk.id);
+            }
+
         }.bind(this));
 
         if (this.getEditor()) {

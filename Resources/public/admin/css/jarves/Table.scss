@@ -102,17 +102,18 @@
     line-height: 18px;
 }
 
-.jarves-Table tr.active > td,
-.jarves-Table tr.active:hover > td,
-.jarves-Table-body tr.active > td,
-.jarves-Table-body tr.active:hover > td {
-    background-color: darken($mainColor, 12%);
-}
-
 .jarves-Table tr.active > td a,
 .jarves-Table-body tr.active a:link {
 }
 
 .jarves-Table-hover tr:hover > td {
     background-color: darken($mainColor, 3%);
+}
+
+.jarves-Table tr.active > td,
+.jarves-Table tr.active:hover > td,
+.jarves-Table-body tr.active > td,
+.jarves-Table-body tr.active:hover > td {
+    background-color: #457488;
+    color: white;
 }

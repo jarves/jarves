@@ -1263,9 +1263,7 @@ class ObjectCrud implements ObjectCrudInterface
             }
         }
 
-        if (!$fields) {
-            $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getDefaultSelection()));
-        }
+        $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getDefaultSelection()));
 
         $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getSingleItemLabelField()));
         $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getSingleItemSelection()));
@@ -1291,9 +1289,7 @@ class ObjectCrud implements ObjectCrudInterface
             }
         }
 
-        if (!$fields) {
-            $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getDefaultSelection()));
-        }
+        $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getDefaultSelection()));
 
         return $this->applyDefaultSelection($fields);
     }
@@ -1315,8 +1311,9 @@ class ObjectCrud implements ObjectCrudInterface
         $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getTreeLabel()));
         $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getTreeFields()));
         $fields = array_merge($fields, Tools::listToArray($this->getObjectDefinition()->getTreeIcon()));
+        $fields = $this->applyDefaultSelection($fields);
 
-        return $this->applyDefaultSelection($fields);
+        return $fields;
     }
 
     /**

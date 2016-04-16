@@ -97,7 +97,9 @@ class ResponseCacher
      *     return array('items' => heavyDbQuery());
      * });
      *
-     * Note: The $data callable is only called if the cache needs to regenerate.
+     * Note: The $data callable is only called if the cache needs to regenerate (when it has been
+     * invalidated or empty, or the view file changed).
+     *
      * If the callable $data returns NULL, then this will return NULL, too.
      *
      * @param string $cacheKey
@@ -145,10 +147,18 @@ class ResponseCacher
      *     return array('items' => heavyDbQuery());
      * });
      *
-     * Note: The $data callable is only called if the cache needs to regenerate.
+     * Note: The $data callable is only called if the cache needs to regenerate (when it has been
+     * invalidated or empty, or the view file changed).
      *
      * If the callable $data returns NULL, then this will return NULL, too, without entering
      * the actual rendering process.
+     *
+     * You should use this method in your plugins instead of writing your own cache mechanism,
+     * because this method handles PageResponse merging. Means: If templates used in this
+     * $view are changing somehow the PageResponse ({{loadAsset('style.css')}} calls) then
+     * this information (diff to current PageResponse) is stored and restored when we found
+     * a html cache. The diff is beside the actual rendered HTML also stored in the cache
+     * to keep this possible.
      *
      * @param string $cacheKey
      * @param string $view
@@ -158,7 +168,7 @@ class ResponseCacher
      *
      * @see method `render` to get more information.
      *
-     * @return PluginResponseInterface|null
+     * @return string
      */
     public function renderFullCached($cacheKey, $view, $data = null, $lifeTime = null, $force = false)
     {
@@ -168,7 +178,7 @@ class ResponseCacher
         if (!is_string($cache)) {
             $cache = null;
         } else {
-            $cache = unserialize($cache);
+            $cache = @unserialize($cache);
         }
 
         if ($force || !$cache || !$cache['content'] || !is_array($cache) || $mTime != $cache['fileMTime']) {

@@ -52,27 +52,35 @@ class NavigationExtension extends \Twig_Extension
         );
     }
 
-    public function navigationNode(\Twig_Environment $twig, $nodeOrId, $view = 'JarvesBundle:Default:navigation.html.twig')
+    public function navigationNode(
+        \Twig_Environment $twig,
+        $nodeOrId,
+        $view = 'JarvesBundle:Default:navigation.html.twig',
+        array $options = [])
     {
         $id = $nodeOrId;
         if ($id instanceof Node) {
             $id = $nodeOrId->getId();
         }
 
-        $options = [
+        $options = array_merge($options, [
             'id' => $id,
             'template' => $view
-        ];
+        ]);
 
         return $this->navigation->getRendered($options, $twig);
     }
 
-    public function navigationLevel(\Twig_Environment $twig, $level, $view = 'JarvesBundle:Default:navigation.html.twig')
+    public function navigationLevel(
+        \Twig_Environment $twig,
+        $level,
+        $view = 'JarvesBundle:Default:navigation.html.twig',
+        array $options = [])
     {
-        $options = [
+        $options = array_merge($options, [
             'level' => $level,
             'template' => $view
-        ];
+        ]);
 
         return $this->navigation->getRendered($options, $twig);
     }

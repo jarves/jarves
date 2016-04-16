@@ -177,7 +177,13 @@ class AdminAssets
         $response->setResourceCompression(false);
     }
 
-    public function handleKEditor()
+    /**
+     * Injects all necessary files to get the Jarves Content Editor working
+     * on the current page response.
+     *
+     * This register in `parent.jarves` a new jarves.Editor.
+     */
+    public function registerEditor()
     {
         $this->addMainResources(['noJs' => true]);
         $this->addSessionScripts();
@@ -187,8 +193,6 @@ class AdminAssets
 
         $response->addJsFile('@JarvesBundle/admin/mootools-core-1.4.5-fixed-memory-leak.js');
         $response->addJsFile('@JarvesBundle/admin/mootools-more.js');
-
-        //$response->addJs('jarves = parent.jarves;');
 
         $response->setResourceCompression(false);
         $response->setDomainHandling(false);

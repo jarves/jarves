@@ -20,11 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
 class PageController
 {
     /**
-     * @var Jarves
-     */
-    private $jarves;
-
-    /**
      * @var EditMode
      */
     private $editMode;
@@ -33,46 +28,35 @@ class PageController
      * @var PageStack
      */
     private $pageStack;
-
     /**
-     * @var ACL
-     */
-    private $acl;
-
-    /**
-     * @param Jarves $jarves
      * @param EditMode $editMode
      * @param PageStack $pageStack
-     * @param ACL $acl
      */
-    public function __construct(Jarves $jarves, EditMode $editMode, PageStack $pageStack, ACL $acl)
+    public function __construct(EditMode $editMode, PageStack $pageStack)
     {
-        $this->jarves = $jarves;
         $this->editMode = $editMode;
         $this->pageStack = $pageStack;
-        $this->acl = $acl;
     }
 
     /**
-     * Build the page and return the Response of Core\Jarves::getResponse().
+     * Build the page and return the PageResponse.
      *
-     * @param Request $request
-     * @param integer $nodeId
+     * Checks for links, mounts etc.
      *
      * @return Response
      * @throws AccessDeniedException
      * @throws \Exception
      */
-    public function handleAction(Request $request, $nodeId)
+    public function handleAction()
     {
-        $page = $this->pageStack->getCurrentPage();
+        $node = $this->pageStack->getCurrentPage();
 
         //is link
-        if ($page->getType() == 1) {
-            $to = $page->getLink();
+        if ($node->getType() == 1) {
+            $to = $node->getLink();
             if (!$to) {
                 throw new \Exception('Redirect failed: ' .
-                    sprintf('Current page with title %s has no target link.', $page->getTitle())
+                    sprintf('Current page with title %s has no target link.', $node->getTitle())
                 );
             }
 
@@ -83,21 +67,8 @@ class PageController
             }
         }
 
-        if ($editorNodeId = (int)$this->pageStack->getRequest()->get('_jarves_editor_node')) {
-            if ($this->editMode->isEditMode($editorNodeId)) {
-                $nodeId = $editorNodeId;
-            } else {
-                throw new AccessDeniedException('Access denied.');
-            }
-        }
-
-        $node = $this->pageStack->getPage($nodeId);
-        $this->pageStack->setCurrentPage($node);
-        $this->pageStack->setCurrentDomain($this->pageStack->getDomain($node->getDomainId()));
-
-
         if ($this->editMode->isEditMode()) {
-            $this->newAdminAssets()->handleKEditor();
+            $this->editMode->registerEditor();
         }
 
         $pageResponse = $this->pageStack->getPageResponse();
@@ -105,14 +76,6 @@ class PageController
         $pageResponse->renderContent();
 
         return $pageResponse; //new Response('<body>ho</body>');
-    }
-
-    /**
-     * @return AdminAssets
-     */
-    public function newAdminAssets()
-    {
-        return new AdminAssets($this->jarves, $this->pageStack, $this->acl);
     }
 
     /**

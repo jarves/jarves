@@ -1331,12 +1331,12 @@ jarves.ObjectTree = new Class({
         return this.firstLoadDone;
     },
 
-    hasChildren: function(pObject) {
-        if (this._objectsParent.get(pObject.id)) {
-            return true;
-        }
-        return false;
-    },
+    // hasChildren: function(pObject) {
+    //     if (this._objectsParent.get(pObject.id)) {
+    //         return true;
+    //     }
+    //     return false;
+    // },
 
     hasSelected: function() {
         var selected = this.main.getElement('.jarves-objectTree-item-selected');
@@ -1346,6 +1346,10 @@ jarves.ObjectTree = new Class({
     getSelected: function() {
         var selected = this.main.getElement('.jarves-objectTree-item-selected');
         return selected ? selected.objectEntry : false;
+    },
+
+    getSelectedUrl: function() {
+        return this.selected
     },
 
     getSelectedElement: function() {

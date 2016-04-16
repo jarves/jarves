@@ -54,6 +54,16 @@ class Node extends BaseNode
     }
 
     /**
+     * Whether this node is from type page or tray.
+     *
+     * @return bool
+     */
+    public function isRenderable()
+    {
+        return $this->getType() === 0 || $this->getType() === 3;
+    }
+
+    /**
      * Does the current node has (valid) sub links?
      *
      * @return bool

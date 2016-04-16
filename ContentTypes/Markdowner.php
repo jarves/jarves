@@ -27,12 +27,42 @@ class Markdowner
     {
         $parser = new MarkdownExtra;
 
-        if (false !== stripos($text, '```')) {
-            //add highlightjs to PageResponse
-            $this->pageStack->getPageResponse()->addJsFile('@Jarves/highlightjs/highlight.pack.js');
-            $this->pageStack->getPageResponse()->addJsAtBottom('hljs.initHighlightingOnLoad();');
-            $this->pageStack->getPageResponse()->addCssFile('@Jarves/highlightjs/styles/github.css');
-        }
+        $stylesAdded = false;
+
+        $classMap = [
+            'js' => 'JavaScript',
+            'javascript' => 'JavaScript',
+            'php' => 'Php',
+            'css' => 'css',
+            'scss' => 'css',
+            'less' => 'css',
+            'ini' => 'ini',
+            'latex' => 'latex',
+            'perl' => 'perl',
+            'powershell' => 'PowerShell',
+            'sql' => 'Sql',
+            'xml' => 'Xml',
+            'html' => 'Html',
+        ];
+        
+        $parser->code_block_content_func = function ($code, $language) use (&$stylesAdded, $classMap) {
+            if (!$stylesAdded ){
+                $this->pageStack->getPageResponse()->addCssFile('@Jarves/keylighter/default.scss');
+                $stylesAdded = true;
+            }
+
+            if (!isset($classMap[$language])) {
+                return htmlentities($code);
+            }
+
+            $class = '\\Kadet\\Highlighter\\Language\\' . $classMap[$language];
+
+            /** @var \Kadet\Highlighter\Language\Language $parser */
+            $parser = new $class();
+            $out = new \Kadet\Highlighter\Formatter\HtmlFormatter();
+
+            return $out->format($parser->parse($code));
+        };
 
         return $parser->transform($text);
     }

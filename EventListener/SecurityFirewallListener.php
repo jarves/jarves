@@ -4,6 +4,7 @@ namespace Jarves\EventListener;
 
 use Jarves\ACL;
 use Jarves\ACLRequest;
+use Jarves\Exceptions\AccessDeniedException;
 use Jarves\PageStack;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,6 +30,16 @@ class SecurityFirewallListener
         /** @var ACL $acl */
         $acl = $this->container->get('jarves.acl');
 
+        $editorNodeId = $pageStack->getRequest()->get('_jarves_editor_node');
+        $editorDomainId = $pageStack->getRequest()->get('_jarves_editor_domain');
+        
+        if (null !== $editorNodeId || null !== $editorDomainId) {
+            $pk = $editorNodeId ? ['id' => $editorNodeId] : null;
+            if (!$acl->isUpdatable('jarves/node', $pk)) {
+                throw new AccessDeniedException('Access denied');
+            }
+        }
+
         if ($pageStack->isAdmin()) {
             $whiteList = [
                 '',
@@ -49,7 +60,8 @@ class SecurityFirewallListener
             }
 
             $hasUser = (boolean)$pageStack->getUser();
-            $hasAccess = $acl->check(ACLRequest::create('jarves/entryPoint', ['path' => $url]));
+            $aclPath = '/jarves' . $url; //acl rules start always with /jarves
+            $hasAccess = $acl->check(ACLRequest::create('jarves/entryPoint', ['path' => $aclPath]));
 
             if (!$hasUser || !$hasAccess) {
                 $response = new Response(json_encode(

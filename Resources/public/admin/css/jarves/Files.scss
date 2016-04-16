@@ -342,20 +342,23 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
     font-size: 12px;
 }
 
-.jarves-Files-item-selected .jarves-Files-item-title-dimensions,
-.jarves-Files-item-drag-selected .jarves-Files-item-title-dimensions {
-    color: white;
-}
-
 .jarves-Files-item:hover div.jarves-Files-item-title,
 .jarves-Files-item-miniatur:hover .jarves-Files-item-miniatur-name {
-//    background-color: #eee;
-//    color: #333;
+    //    background-color: #eee;
+    //    color: #333;
 }
 
 .jarves-Files-item:hover {
-    background-color: darken($mainColor, 3%);
+    background-color: darken($mainColor, 5%);
 }
+
+.jarves-Files-item-selected,
+.jarves-Files-item-selected:hover,
+.jarves-Files-item-drag-selected {
+    background-color: #457488;
+    color: white;
+}
+
 
 .jarves-Files-item-title {
     position: relative;
@@ -370,30 +373,6 @@ div.jarves-Files-addressFaker + .jarves-buttonGroup-item {
     border: 1px solid #aaa;
     position: absolute;
     z-index: 150000;
-}
-//
-//.jarves-Files-item-drag-selected div.jarves-Files-item-title,
-//.jarves-Files-item-drag-selected:hover div.jarves-Files-item-title,
-//.jarves-Files-item-drag-selected:hover .jarves-Files-item-miniatur-name,
-//.jarves-Files-item-drag-selected .jarves-Files-item-miniatur-name,
-//.jarves-Files-item-selected div.jarves-Files-item-title,
-//.jarves-Files-item-selected:hover div.jarves-Files-item-title,
-//.jarves-Files-item-selected:hover .jarves-Files-item-miniatur-name,
-//.jarves-Files-item-selected .jarves-Files-item-miniatur-name,
-//{
-////    background-color: #22638E;
-//    color: white;
-//}
-
-.jarves-Files-item-selected,
-.jarves-Files-item-selected:hover,
-.jarves-Files-item-drag-selected {
-//    background-color: #ddd;
-//    -moz-border-radius: 5px;
-//    -webkit-border-radius: 5px;
-//    border-radius: 5px;
-//    outline: 1px dotted darken($mainColor, 15%);
-    background-color: #4F9EC1;
 }
 
 /* listType: miniatur */

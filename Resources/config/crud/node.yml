@@ -115,7 +115,6 @@ fields:
                 label: 'Search words'
                 type: textarea
                 desc: 'Additional keywords.'
-extraSelection: 'domain, domain.theme'
 columns:
     type:
         label: Type

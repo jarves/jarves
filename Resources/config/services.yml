@@ -76,7 +76,7 @@ services:
 
      jarves.page_controller:
          class: Jarves\Controller\PageController
-         arguments: ["@jarves", "@jarves.editmode", "@jarves.page_stack", "@jarves.acl"]
+         arguments: ["@jarves.editmode", "@jarves.page_stack"]
 
      jarves.configuration_operator:
          class: Jarves\Configuration\ConfigurationOperator
@@ -84,7 +84,7 @@ services:
 
      jarves.editmode:
          class: Jarves\EditMode
-         arguments: ["@jarves.page_stack", "@request_stack", "@jarves.acl"]
+         arguments: ["@jarves.page_stack", "@request_stack", "@jarves", "@jarves.acl"]
 
      jarves.page_response.factory:
          class: Jarves\PageResponseFactory
@@ -163,7 +163,7 @@ services:
 
      jarves.pluginResponse.listener:
         class: "%jarves.pluginResponse.listener.class%"
-        arguments: ["@jarves", "@jarves.page_stack", "@jarves.frontendRoutes.listener", "@kernel", "@jarves.page_response.factory"]
+        arguments: ["@jarves", "@jarves.page_stack", "@jarves.frontendRoutes.listener", "@kernel", "@jarves.page_response.factory", "@jarves.editmode"]
         tags:
             - { name: kernel.event_listener, event: kernel.response }
             - { name: kernel.event_listener, event: kernel.view, priority: 24 }
@@ -183,10 +183,10 @@ services:
 
      jarves.frontendRoutes.listener:
         class: "%jarves.frontendRoutes.listener.class%"
-        arguments: ["@jarves", "@jarves.page_stack", "@jarves.editmode", "@jarves.frontend_router", "@jarves.page_response.factory"]
+        arguments: ["@jarves", "@jarves.page_stack", "@jarves.editmode", "@jarves.frontend_router", "@jarves.page_response.factory", "@router.request_context", "@logger"]
         tags:
               # Symfony\Component\HttpKernel\EventListener\RouterListener has priority of 32, we need to call ours before
-            - { name: kernel.event_listener, event: kernel.request, priority: 33 }
+            - { name: kernel.event_listener, event: kernel.request, priority: 34 }
 
      jarves.securityFirewall.listener:
         class: "%jarves.securityFirewall.listener.class%"
@@ -285,27 +285,8 @@ services:
         tags:
             - { name: jarves.asset_handler.loader, contentType: 'text/javascript', extension: js }
 
-
      jarves.cache.backend.files:
         class: Jarves\Cache\Backend\Files
-        shared: false
-
-     jarves.client.factory:
-        class: Jarves\Client\ClientFactory
-        arguments: ["@service_container", "@jarves.config"]
-
-     jarves.client.abstract:
-        class: Jarves\Client\ClientAbstract
-        shared: false
-        arguments: ["@jarves.config", "@jarves.page_stack"]
-
-     jarves.client.jarves_users:
-        class: Jarves\Client\JarvesUsers
-        shared: false
-        parent: jarves.client.abstract
-
-     jarves.client.store.database:
-        class: Jarves\Client\StoreDatabase
         shared: false
 
      jarves.markdowner:

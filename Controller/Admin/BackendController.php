@@ -614,7 +614,7 @@ class BackendController extends Controller
 
                 if (substr_count($path, '/') <= 3) {
                     if ($subEntryPoint->isLink()) {
-                        if ($this->acl->check(ACLRequest::create('jarves/entryPoint', '/' . $path))) {
+                        if ($this->acl->check(ACLRequest::create('jarves/entryPoint', ['path' => '/' . $path]))) {
                             $entryPoints[$path] = array(
                                 'label' => $subEntryPoint->getLabel(),
                                 'icon' => $subEntryPoint->getIcon(),

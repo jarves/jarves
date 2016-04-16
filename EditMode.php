@@ -14,6 +14,7 @@
 
 namespace Jarves;
 
+use Jarves\Admin\AdminAssets;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class EditMode
@@ -32,17 +33,23 @@ class EditMode
      * @var PageStack
      */
     private $pageStack;
+    /**
+     * @var Jarves
+     */
+    private $jarves;
 
     /**
      * @param PageStack $pageStack
      * @param RequestStack $requestStack
+     * @param Jarves $jarves
      * @param ACL $acl
      */
-    function __construct(PageStack $pageStack, RequestStack $requestStack, ACL $acl)
+    function __construct(PageStack $pageStack, RequestStack $requestStack, Jarves $jarves, ACL $acl)
     {
         $this->requestStack = $requestStack;
         $this->acl = $acl;
         $this->pageStack = $pageStack;
+        $this->jarves = $jarves;
     }
 
     /**
@@ -57,13 +64,21 @@ class EditMode
 
         if ($nodeId) {
             return $hasRequest
-            && 1 == $request->get('_jarves_editor')
+            && 1 === (int)$request->get('_jarves_editor')
             && $this->acl->isUpdatable('jarves/node', ['id' => $nodeId]);
         }
 
-        return $hasRequest && 1 == $request->get('_jarves_editor')
+        return $hasRequest && 1 === (int)$request->get('_jarves_editor')
         && $this->pageStack->getCurrentPage()
         && $this->acl->isUpdatable('jarves/node', ['id' => $this->pageStack->getCurrentPage()->getId()]);
     }
 
+    /**
+     * @see AdminAssets::registerEditor
+     */
+    public function registerEditor()
+    {
+        $adminAssets = new AdminAssets($this->jarves, $this->pageStack, $this->acl);
+        $adminAssets->registerEditor();
+    }
 }

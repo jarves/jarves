@@ -159,6 +159,7 @@ class TypePlugin extends AbstractType
                     array(
                         '_controller' => $controller,
                         '_content' => $this->getContent(),
+                        '_jarves_is_plugin' => true,
                         'options' => isset($this->plugin['options']) ? $this->plugin['options'] : array()
                     )
                 );

@@ -218,7 +218,7 @@ class ACL
                 (
                     $targets
                 )
-                ORDER BY prio ASC
+                ORDER BY prio DESC
         ";
 
         $stmt = $con->prepare($query);
@@ -348,24 +348,24 @@ class ACL
 
     /**
      * @param string $objectKey
-     * @param array $objectId
+     * @param array $pk
      *
      * @return bool
      */
-    public function isUpdatable($objectKey, $objectId = null)
+    public function isUpdatable($objectKey, $pk = null)
     {
-        return $this->check(ACLRequest::create($objectKey, $objectId)->onlyUpdateMode());
+        return $this->check(ACLRequest::create($objectKey, $pk)->onlyUpdateMode());
     }
 
     /**
      * @param string $objectKey
-     * @param array $objectId
+     * @param array $pk
      *
      * @return bool
      */
-    public function isDeletable($objectKey, $objectId = null)
+    public function isDeletable($objectKey, $pk = null)
     {
-        return $this->check(ACLRequest::create($objectKey, $objectId)->onlyDeleteMode());
+        return $this->check(ACLRequest::create($objectKey, $pk)->onlyDeleteMode());
     }
 
     /*
@@ -573,7 +573,7 @@ class ACL
             $pkString = $this->objects->getObjectUrlId($objectKey, $pk);
             $cacheKey = md5($targetType . '.' . $targetId . '.' . $objectKey . '/' . $pkString . '/' . json_encode($field));
             $cached = $this->cacher->getDistributedCache('core/acl/' . $cacheKey);
-            if (null !== $cached) {
+            if (false && null !== $cached) {
                 return $cached;
             }
         }
