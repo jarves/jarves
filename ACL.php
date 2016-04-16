@@ -573,7 +573,7 @@ class ACL
             $pkString = $this->objects->getObjectUrlId($objectKey, $pk);
             $cacheKey = md5($targetType . '.' . $targetId . '.' . $objectKey . '/' . $pkString . '/' . json_encode($field));
             $cached = $this->cacher->getDistributedCache('core/acl/' . $cacheKey);
-            if (false && null !== $cached) {
+            if (null !== $cached) {
                 return $cached;
             }
         }

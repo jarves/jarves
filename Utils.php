@@ -272,7 +272,7 @@ class Utils
             }
         }
 
-        if (false && $fileUpToDate) {
+        if ($fileUpToDate) {
             return true;
         } else {
             if (!$debugMode) {
