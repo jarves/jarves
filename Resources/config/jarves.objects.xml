@@ -75,7 +75,7 @@
         <description>Pages, Links, Trays and Navigation folder</description>
         <table>system_node</table>
         <labelField>title</labelField>
-        <defaultSelection>type, title, alternativeTitle, urn, layout, visible, target, domain.domain, url</defaultSelection>
+        <defaultSelection>type, title, alternativeTitle, urn, layout, visible, target, domain.domain, domain.theme, url</defaultSelection>
         <nested>true</nested>
         <autoCrud>false</autoCrud>
         <listEntryPoint>jarves/nodes</listEntryPoint>
