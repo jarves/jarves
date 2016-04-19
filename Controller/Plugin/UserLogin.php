@@ -2,11 +2,10 @@
 
 namespace Jarves\Controller\Plugin;
 
-use Jarves\Jarves;
+use Jarves\Client\UserOperator;
 use Jarves\Model\User;
 use Jarves\PageStack;
 use Jarves\PluginController;
-use Jarves\PluginResponse;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -34,20 +33,27 @@ class UserLogin extends PluginController
     private $formFactory;
 
     /**
+     * @var UserOperator
+     */
+    private $userOperator;
+
+    /**
      * @param EngineInterface $templating
      * @param PageStack $pageStack
      * @param FormFactory $formFactory
+     * @param UserOperator $userOperator
      */
-    public function __construct(EngineInterface $templating, PageStack $pageStack, FormFactory $formFactory)
+    public function __construct(EngineInterface $templating, PageStack $pageStack, FormFactory $formFactory, UserOperator $userOperator)
     {
         $this->templating = $templating;
         $this->pageStack = $pageStack;
         $this->formFactory = $formFactory;
+        $this->userOperator = $userOperator;
     }
 
     public function loginForm()
     {
-        if ($this->pageStack->getClient()->isLoggedIn()) {
+        if ($this->pageStack->isLoggedIn()) {
             return $this->templating->renderResponse('JarvesBundle:User:logout.html.twig');
         }
 
@@ -56,7 +62,7 @@ class UserLogin extends PluginController
 
     public function registerForm(Request $request)
     {
-        if ($this->pageStack->getClient()->isLoggedIn()) {
+        if ($this->pageStack->isLoggedIn()) {
             return $this->templating->renderResponse('JarvesBundle:User:logout.html.twig');
         }
 
@@ -84,7 +90,7 @@ class UserLogin extends PluginController
      */
     public function doLogin(Request $request)
     {
-        $success = $this->pageStack->getClient()->login($request->request->get('email'), $request->request->get('password'));
+        $success = $this->userOperator->login($request->request->get('email'), $request->request->get('password'));
 
         return RedirectResponse::create($this->pageStack->getCurrentUrl() . '?success=' . ($success ? 1 : 0));
     }
@@ -94,7 +100,7 @@ class UserLogin extends PluginController
      */
     public function doLogout()
     {
-        $this->pageStack->getClient()->logout();
+        $this->userOperator->logout();
 
         return RedirectResponse::create($this->pageStack->getCurrentUrl());
     }

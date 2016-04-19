@@ -43,7 +43,7 @@ class User extends BaseUser
 
         return $this->cachedGroupIds;
     }
-    
+
     public function getGroupIdsArray()
     {
         return explode(',', $this->getGroupIds());

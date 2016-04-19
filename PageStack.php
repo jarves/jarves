@@ -15,17 +15,17 @@
 namespace Jarves;
 
 use Jarves\Cache\Cacher;
-use Jarves\Client\ClientAbstract;
-use Jarves\Client\ClientFactory;
-use Jarves\Configuration\Client;
 use Jarves\Model\Domain;
 use Jarves\Model\Node;
 use Jarves\Model\NodeQuery;
 use Jarves\Model\User;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
 /**
  * Contains current requested node and current domain, and the current PageResponse.
@@ -79,7 +79,8 @@ class PageStack
      * @param Cacher $cacher
      * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct($adminPrefix, RequestStack $requestStack, Cacher $cacher, TokenStorageInterface $tokenStorage)
+    public function __construct($adminPrefix, RequestStack $requestStack, Cacher $cacher,
+                                TokenStorageInterface $tokenStorage)
     {
         $this->adminPrefix = $adminPrefix;
         $this->requestStack = $requestStack;
@@ -115,8 +116,6 @@ class PageStack
         $this->pageResponse = null;
         $this->node = null;
         $this->domain = null;
-        $this->adminClient = null;
-        $this->client = null;
         $this->lastRequest = null;
     }
 
@@ -353,6 +352,11 @@ class PageStack
             $isSecure = $this->getRequest() ? $this->getRequest()->isSecure() : false;
 
             $url = 'http' . ($isSecure ? 's' : '') . '://' . $domainName . $url;
+        } else {
+            //check that we have first starting slash
+            if ('/' !== substr($url, 0, 1)) {
+                $url = '/' . $url;
+            }
         }
 
         //crop last /

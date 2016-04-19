@@ -569,7 +569,6 @@ class Propel extends AbstractStorage
         try {
             $stmt = $con->prepare($sql);
         } catch (\PDOException $e) {
-            echo $sql;
             throw $e;
         }
         $db->bindValues($stmt, $params, $dbMap);
