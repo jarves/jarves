@@ -76,7 +76,10 @@ jarves.LayoutVertical = new Class({
             this.layout = pContainer;
             this.layout.setVertical(this);
         } else {
-            this.layout = new jarves.Layout(pContainer, {fixed: this.options.fixed, gridLayout: this.options.gridLayout});
+            this.layout = new jarves.Layout(pContainer, {
+                fixed: this.options.fixed,
+                gridLayout: this.options.gridLayout
+            });
         }
 
         this.container = this.layout.getMain();
@@ -84,10 +87,12 @@ jarves.LayoutVertical = new Class({
         if (this.options.gridLayout) {
 
             //we use a table for main=tbody, rows will be TRs
-            if (this.container.get('tag') == 'table') {
+            if (this.container.hasClass('jarves-Layout-Table')) {
                 this.table = this.container;
             } else {
-                this.table = new Element('table', {cellpadding: 0}).inject(this.container);
+                this.table = new Element('div', {
+                    'class': 'jarves-Layout-Table'
+                }).inject(this.container);
                 //this.table.setStyle('table-layout', 'fixed');
             }
             this.table.setStyles({
@@ -95,8 +100,7 @@ jarves.LayoutVertical = new Class({
                 height: this.options.fixed ? '100%' : null
             });
 
-            this.container =
-                (this.container.get('tag') == 'tbody') ? pContainer : new Element('tbody').inject(this.table);
+            this.container = this.table;
         }
 
         this.renderLayout();
@@ -127,11 +131,12 @@ jarves.LayoutVertical = new Class({
     addRow: function (pHeight) {
         var row;
 
-        if (this.container.get('tag') == 'tbody') {
-            row = new Element('tr', {height: pHeight}).inject(this.container);
-        } else {
-            row = new Element('div', {styles: {height: pHeight}}).inject(this.container);
-        }
+        row = new Element('div', {
+            styles: {
+                height: pHeight
+            },
+            'class': 'jarves-Layout-row'
+        }).inject(this.container);
 
         this.rows.push(row);
 
@@ -151,20 +156,18 @@ jarves.LayoutVertical = new Class({
             throw 'Row not found %s'.replace('%s', pId);
         }
 
-        if (this.rows[pId - 1].get('tag') == 'tr') {
+        if (this.rows[pId - 1].hasClass('jarves-Layout-row')) {
             var children = this.rows[pId - 1].getChildren();
             if (children.length > 0) {
                 return children[0];
             }
             else {
-                var td = new Element('td', {
-                    valign: 'top',
-                    height: this.rows[pId - 1].get('height')
-                }).inject(this.rows[pId - 1]);
-
                 var div = new Element('div', {
+                    styles: {
+                        height: this.rows[pId - 1].get('height')
+                    },
                     'class': 'jarves-Layout-cell'
-                }).inject(td);
+                }).inject(this.rows[pId - 1]);
 
                 return div;
             }
