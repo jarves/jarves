@@ -101,12 +101,7 @@ class UserOperator
             return false;
         }
 
-        $token = new UsernamePasswordToken($user, null, "main", $user->getGroupRoles());
-        $this->tokenStorage->setToken($token);
-
-        //now dispatch the login event
-        $event = new InteractiveLoginEvent($this->requestStack->getMasterRequest(), $token);
-        $this->eventDispatcher->dispatch("security.interactive_login", $event);
+        $this->manualLogin($user);
 
         return true;
     }
@@ -147,5 +142,18 @@ class UserOperator
     public function isLoggedIn()
     {
         return !($this->tokenStorage->getToken() instanceof AnonymousToken);
+    }
+
+    /**
+     * @param User $user
+     */
+    public function manualLogin(User $user)
+    {
+        $token = new UsernamePasswordToken($user, null, "main", $user->getGroupRoles());
+        $this->tokenStorage->setToken($token);
+
+        //now dispatch the login event
+        $event = new InteractiveLoginEvent($this->requestStack->getMasterRequest(), $token);
+        $this->eventDispatcher->dispatch("security.interactive_login", $event);
     }
 }

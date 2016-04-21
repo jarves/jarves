@@ -74,4 +74,13 @@ class User extends BaseUser
 
         return $result;
     }
+
+    /**
+     * @param string $role
+     * @return boolean
+     */
+    public function hasRole($role)
+    {
+        return in_array($role, $this->getGroupRoles());
+    }
 }
