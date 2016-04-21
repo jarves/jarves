@@ -135,7 +135,6 @@ jarves.LayoutHorizontal = new Class({
             'class': 'jarves-Layout-cell'
         }).inject(this.getContainer());
 
-        console.log(div, div.style.width, pWidth);
         this.columns.push(div);
     }
 
