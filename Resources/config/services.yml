@@ -289,6 +289,10 @@ services:
         class: Jarves\Cache\Backend\Files
         shared: false
 
+     jarves.cache.backend.apc:
+        class: Jarves\Cache\Backend\Apc
+        shared: false
+
      jarves.markdowner:
         class: Jarves\ContentTypes\Markdowner
         arguments: ["@jarves.page_stack"]

@@ -33,10 +33,6 @@ class Factory
 
         if (function_exists('apc_store')) {
             $service .= 'apc';
-        } else if (function_exists('xcache_set')) {
-            $service .= 'xcache';
-        } else if (function_exists('wincache_ucache_get')) {
-            $service .= 'wincache';
         } else {
             $service .= 'files';
         }
