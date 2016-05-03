@@ -4,4 +4,4 @@ parameters:
 services:
   jarves.plugin.userlogin:
        class: "%jarves.plugin.userlogin.class%"
-       arguments: ["@templating", "@jarves.page_stack", "@form.factory"]
+       arguments: ["@templating", "@jarves.page_stack", "@form.factory", "@jarves.user_operator"]

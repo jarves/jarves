@@ -677,6 +677,10 @@ jarves.WindowList = new Class({
                     this.win.alert(tf('There was an error: %s: %s', res.error, res.message));
                 } else {
                     this.itemsCount = res.data;
+                    if (!this.itemsCount) {
+                        return;
+                    }
+
                     this.maxPages = Math.ceil(res.data / this.classProperties.itemsPerPage);
 
                     this.ctrlMax.set('text', '/ ' + this.maxPages);

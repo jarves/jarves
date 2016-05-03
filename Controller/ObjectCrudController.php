@@ -109,6 +109,27 @@ class ObjectCrudController extends ObjectCrud
 
     /**
      * @ApiDoc(
+     *    description="Returns %object% items count"
+     * )
+     *
+     * @Rest\QueryParam(name="filter", map=true, requirements=".*", description="Simple filtering per field")
+     * @Rest\QueryParam(name="q", requirements=".+", description="Search query")
+     *
+     * @Rest\View()
+     * @Rest\Get("/:count")
+     *
+     * @param array $filter
+     * @param string $q
+     *
+     * @return integer
+     */
+    public function getCountAction($filter = null, $q = null)
+    {
+        return $this->getCount($filter, $q);
+    }
+
+    /**
+     * @ApiDoc(
      *    description="Returns a single %object% item"
      * )
      *
@@ -206,27 +227,6 @@ class ObjectCrudController extends ObjectCrud
         $primaryKey = $this->extractPrimaryKey($request);
 
         return $this->patch($primaryKey, $request);
-    }
-
-    /**
-     * @ApiDoc(
-     *    description="Returns %object% items count"
-     * )
-     *
-     * @Rest\QueryParam(name="filter", map=true, requirements=".*", description="Simple filtering per field")
-     * @Rest\QueryParam(name="q", requirements=".+", description="Search query")
-     *
-     * @Rest\View()
-     * @Rest\Get("/:count")
-     *
-     * @param array $filter
-     * @param string $q
-     *
-     * @return integer
-     */
-    public function getCountAction($filter = null, $q = null)
-    {
-        return $this->getCount($filter, $q);
     }
 
     /**

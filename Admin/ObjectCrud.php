@@ -2099,6 +2099,9 @@ class ObjectCrud implements ObjectCrudInterface
         }
 
         $incomingFields = $requestOrData instanceof Request ? array_keys($requestOrData->request->all()) : array_keys($requestOrData);
+        if (!$incomingFields) {
+            return false;
+        }
         $changedData = $this->mapData($values, $incomingFields, $item);
 
         if ($this->getWithNewsFeed()) {

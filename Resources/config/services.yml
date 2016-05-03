@@ -66,6 +66,10 @@ services:
          class: Jarves\JarvesEventDispatcher
          arguments: ["@event_dispatcher", "@service_container", "@jarves.condition_operator", "@jarves.cache.cacher"]
 
+     jarves.user_operator:
+         class: Jarves\Client\UserOperator
+         arguments: ["@security.token_storage", "@jarves.user_provider", "@logger", "@security.encoder_factory", "@event_dispatcher" , "@request_stack"]
+
      jarves.page_stack:
          class: Jarves\PageStack
          arguments: ["%jarves_admin_prefix%", "@request_stack", "@jarves.cache.cacher", "@security.token_storage"]

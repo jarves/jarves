@@ -139,6 +139,6 @@ jarves.LayoutSplitter = new Class({
             }
         };
 
-        new Drag(this.cell.hasClass('jarves-Layout-cell') ? this.cell.getParent('td') : this.cell, options);
+        new Drag(this.cell, options);
     }
 });

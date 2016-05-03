@@ -1,3 +1,5 @@
+@charset "UTF-8";
+
 /*
  * This file is part of Jarves.
  *
@@ -19,9 +21,19 @@
     bottom: 0px;
 }
 
+div.jarves-Layout-Table {
+    display: table;
+}
+
+div.jarves-Layout-row {
+    display: table-row;
+    height: 100%;
+}
+
 div.jarves-Layout-cell {
     position: relative;
-    height: 100%;
+    display: table-cell;
+    vertical-align: top;
 }
 
 div.jarves-Layout-cell-scroll {

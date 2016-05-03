@@ -43,7 +43,7 @@ class User extends BaseUser
 
         return $this->cachedGroupIds;
     }
-    
+
     public function getGroupIdsArray()
     {
         return explode(',', $this->getGroupIds());
@@ -73,5 +73,14 @@ class User extends BaseUser
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $role
+     * @return boolean
+     */
+    public function hasRole($role)
+    {
+        return in_array($role, $this->getGroupRoles());
     }
 }

@@ -158,7 +158,7 @@ jarves.Field = new Class({
         } else {
             if (!this.options.tableItem && container && (container.get('tag') == 'table' || container.get('tag') == 'tbody')) {
 
-                //we should be appear as a non-table element but got a table element as contain.
+                //we should appear as a non-table element but got a table element as container.
                 //so create a tr>td[colspan=2] and set this.options.tableItem to true, that
                 //this.inject works correct.
 
@@ -278,11 +278,11 @@ jarves.Field = new Class({
         //            }
         //        }
 
-        if (null !== this.options.fieldWidth) {
+        if (!this.options.noWrapper && null !== this.options.fieldWidth) {
             this.main.setStyle('width', this.options.width);
         }
 
-        if (this.options.invisible == 1) {
+        if (!this.options.noWrapper && this.options.invisible == 1) {
             this.main.setStyle('display', 'none');
         }
 

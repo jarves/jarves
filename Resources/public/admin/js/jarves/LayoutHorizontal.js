@@ -82,7 +82,7 @@ jarves.LayoutHorizontal = new Class({
 
         this.container = this.vertical.addHorizontal(this, this.options.height);
 
-        if (this.container && this.container.get('tag') == 'div') {
+        if (this.container && !this.container.hasClass('jarves-Layout-row')) {
             //we have no gridLayout, so create a layout with one row and row flexible column.
             this.layout = new jarves.Layout(this.container, {gridLayout: true, layout: [
                 {columns: [null]}
@@ -102,7 +102,7 @@ jarves.LayoutHorizontal = new Class({
     },
 
     getTd: function (column) {
-        return this.tds[column - 1];
+        return this.columns[column - 1];
     },
 
     toElement: function () {
@@ -127,17 +127,14 @@ jarves.LayoutHorizontal = new Class({
     },
 
     addColumn: function (pWidth) {
-        var td = new Element('td', {
-            width: pWidth,
-            valign: 'top',
-            height: this.getContainer().get('height') || '100%'
+        var div = new Element('div', {
+            styles: {
+                height: this.getContainer().get('height'),
+                width: pWidth
+            },
+            'class': 'jarves-Layout-cell'
         }).inject(this.getContainer());
 
-        var div = new Element('div', {
-            'class': 'jarves-Layout-cell'
-        }).inject(td);
-
-        this.tds.push(td);
         this.columns.push(div);
     }
 
