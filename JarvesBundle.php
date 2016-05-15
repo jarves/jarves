@@ -51,7 +51,7 @@ class JarvesBundle extends Bundle
         ]);
 
         if (!$container->hasParameter('jarves_admin_prefix')) {
-            $container->setParameter('jarves_admin_prefix', 'jarves/');
+            $container->setParameter('jarves_admin_prefix', '/jarves');
         }
 
         if (!$container->hasParameter('database_driver')) {
