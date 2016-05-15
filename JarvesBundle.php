@@ -37,7 +37,6 @@ class JarvesBundle extends Bundle
 
     public function build(ContainerBuilder $container)
     {
-        parent::build($container);
         $container->addCompilerPass(new ModelBuilderCompilerPass());
         $container->addCompilerPass(new AssetCompilerCompilerPass());
 
@@ -51,9 +50,20 @@ class JarvesBundle extends Bundle
             'providers' => ['jarves' => ['id' => 'jarves.user_provider']]
         ]);
 
-        if ($container->hasParameter('jarves_admin_prefix')) {
+        if (!$container->hasParameter('jarves_admin_prefix')) {
             $container->setParameter('jarves_admin_prefix', 'jarves/');
         }
+
+        if (!$container->hasParameter('database_driver')) {
+            //newer Symfony versions do not have database_driver anymore. Especially from a fresh
+            //installation when `composer install` is used Symfony creates parameters.yml
+            //with database credentials. Propel needs however a database driver, so we make
+            //sure we have one. This is only being used when now <database> section in the
+            //config.jarves.xml is given.
+            $container->setParameter('database_driver', 'mysql');
+        }
+
+        parent::build($container);
     }
 
     public function boot()
@@ -127,7 +137,6 @@ class JarvesBundle extends Bundle
         }
 
         $jarves->prepareWebSymlinks();
-        $this->loadPropelConfig($jarvesConfig->getSystemConfig()->getDatabase());
 
         $jarvesEventDispatcher->registerBundleEvents($jarves->getConfigs());
     }
@@ -308,40 +317,6 @@ class JarvesBundle extends Bundle
                 }
             }
         }
-    }
-
-    /**
-     * @param Database $database
-     */
-    public function loadPropelConfig(Database $database)
-    {
-        /** @var StandardServiceContainer $serviceContainer */
-        $serviceContainer = Propel::getServiceContainer();
-
-        if ($database->hasSlaveConnection()) {
-            $manager = new ConnectionManagerMasterSlave();
-
-            $config = $this->getManagerConfig($database->getMainConnection());
-            $manager->setWriteConfiguration($config);
-
-            $slaves = [];
-            foreach ($database->getConnections() as $connection) {
-                if ($connection->isSlave()) {
-                    $slaves[] = $this->getManagerConfig($connection);
-                }
-            }
-            $manager->setReadConfiguration($slaves);
-        } else {
-            $manager = new ConnectionManagerSingle();
-            $config = $this->getManagerConfig($database->getMainConnection());
-            $manager->setConfiguration($config);
-        }
-
-        $manager->setName('default');
-
-        $serviceContainer->setAdapterClass('default', $database->getMainConnection()->getType());
-        $serviceContainer->setConnectionManager('default', $manager);
-        $serviceContainer->setDefaultDatasource('default');
     }
 
     public function getManagerConfig(Connection $connection)

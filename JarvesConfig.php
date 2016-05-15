@@ -16,6 +16,7 @@ namespace Jarves;
 
 use Jarves\Configuration\Model;
 use Jarves\Configuration\SystemConfig;
+use Propel\Generator\Exception\BuildException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class JarvesConfig
@@ -87,9 +88,13 @@ class JarvesConfig
                 file_put_contents($cacheFile, $systemConfigHash . "\n" . serialize($this->systemConfig));
             }
 
-            if (!$this->systemConfig->getDatabase()) {
+            if (!$this->systemConfig->getDatabase() || !$this->systemConfig->getDatabase()->isValid()) {
                 $database = $this->container->get('jarves.configuration.database');
                 $this->systemConfig->setDatabase($database);
+                if (!$database->isValid()) {
+                    throw new BuildException('Jarves uses the database credentials from parameters.yml. ' .
+                        'You did not configure all parameters.');
+                }
             }
         }
 

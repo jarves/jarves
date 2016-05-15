@@ -4,7 +4,6 @@
     <column name="username" type="VARCHAR" size="255"/>
     <column name="auth_class" type="VARCHAR" size="255"/>
     <column name="password" type="VARCHAR" size="512"/>
-    <column name="password_salt" type="VARCHAR" size="64"/>
     <column name="activation_key" type="VARCHAR" size="255"/>
     <column name="email" type="VARCHAR" size="255"/>
     <column name="settings" type="OBJECT"/>

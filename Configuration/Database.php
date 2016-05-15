@@ -47,6 +47,17 @@ class Database extends Model
     }
 
     /**
+     * Checks if a connection is configured and it contains valid values.
+     */
+    public function isValid()
+    {
+        return count($this->getConnections()) > 0
+        && $this->getMainConnection()
+        && !empty($this->getMainConnection()->getServer());
+
+    }
+
+    /**
      * @return Connection[]
      */
     public function getSlaveConnections()

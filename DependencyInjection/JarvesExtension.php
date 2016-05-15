@@ -2,6 +2,7 @@
 
 namespace Jarves\DependencyInjection;
 
+use Jarves\Configuration\Connection;
 use Jarves\Configuration\SystemConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
@@ -21,17 +22,6 @@ class JarvesExtension extends Extension implements PrependExtensionInterface
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-//        $configuration = new Configuration();
-//        $config = $this->processConfiguration($configuration, $configs);
-
-        if (!$container->hasParameter('database_driver')) {
-            $container->setParameter('database_driver', 'mysql');
-        }
-
-        if (!$container->hasParameter('jarves_admin_prefix')) {
-            $container->setParameter('jarves_admin_prefix', '/jarves');
-        }
-
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('services.plugin.yml');
@@ -41,41 +31,6 @@ class JarvesExtension extends Extension implements PrependExtensionInterface
         $loader->load('services/storage.yml');
         $loader->load('services/crud.yml');
     }
-
-//    public function prepend(ContainerBuilder $container)
-//    {
-//        $bundles = $container->getParameter('kernel.bundles');
-//
-//        if (!isset($bundles['PropelBundle'])) {
-//            // disable AcmeGoodbyeBundle in bundles
-//            $config = array('use_acme_goodbye' => false);
-//            foreach ($container->getExtensions() as $name => $extension) {
-//                switch ($name) {
-//                    case 'acme_something':
-//                    case 'acme_other':
-//                        // set use_acme_goodbye to false in the config of
-//                        // acme_something and acme_other note that if the user manually
-//                        // configured use_acme_goodbye to true in the app/config/config.yml
-//                        // then the setting would in the end be true and not false
-//                        $container->prependExtensionConfig($name, $config);
-//                        break;
-//                }
-//            }
-//        }
-//
-//        // process the configuration of AcmeHelloExtension
-//        $configs = $container->getExtensionConfig($this->getAlias());
-//        // use the Configuration class to generate a config array with
-//        // the settings "acme_hello"
-//        $config = $this->processConfiguration(new Configuration(), $configs);
-//
-//        // check if entity_manager_name is set in the "acme_hello" configuration
-//        if (isset($config['entity_manager_name'])) {
-//            // prepend the acme_something settings with the entity_manager_name
-//            $config = array('entity_manager_name' => $config['entity_manager_name']);
-//            $container->prependExtensionConfig('acme_something', $config);
-//        }
-//    }
 
     /**
      * @param ContainerBuilder $container
@@ -124,42 +79,56 @@ class JarvesExtension extends Extension implements PrependExtensionInterface
     {
         $systemConfig = $this->getSystemConfig($container);
 
-//        if (!$systemConfig->getDatabase()) {
-//            $database = $container->get('jarves.configuration.database');
-//            $systemConfig->setDatabase($database);
-//        } else {
+        $propelConfig = $container->getExtensionConfig('propel');
 
-        if ($systemConfig->getDatabase()) {
-            /*
-             *
-                propel:
-                    database:
-                        connections:
-                            default:
-                                adapter:    "%database_driver%"
-                                user:       "%database_user%"
-                                password:   "%database_password%"
-                                dsn:        "%database_driver%:host=%database_host%;dbname=%database_name%;charset=UTF8"
-             */
-            $database = $systemConfig->getDatabase();
-            $mainConnection = $database->getMainConnection();
-
-            $defaultValues = [
-                'adapter' => $mainConnection->getType(),
-                'user' => $mainConnection->getUsername(),
-                'password' => $mainConnection->getPassword(),
-                'dsn' => $mainConnection->getDsn(),
-            ];
-
-            $array = [
-                'database' => [
-                    'connections' => [
-                        'default' => $defaultValues
-                    ]
-                ]
-            ];
-
-            $container->prependExtensionConfig('propel', $array);
+        if (isset($propelConfig[0]['database'])) {
+           //propel is already configured, so we don't overwrite it
+            return;
         }
+
+        $database = $systemConfig->getDatabase();
+        $mainConnection = null;
+
+        if ($database) {
+            $mainConnection = $database->getMainConnection();
+        }
+
+        if (!$mainConnection) {
+            $mainConnection = new Connection();
+            $mainConnection->setType($container->getParameter('database_driver'));
+            $mainConnection->setServer($container->getParameter('database_host'));
+            $mainConnection->setPort($container->getParameter('database_port'));
+            $mainConnection->setName($container->getParameter('database_name'));
+            $mainConnection->setUsername($container->getParameter('database_user'));
+            $mainConnection->setPassword($container->getParameter('database_password'));
+        }
+
+        /*
+         *
+            propel:
+                database:
+                    connections:
+                        default:
+                            adapter:    "%database_driver%"
+                            user:       "%database_user%"
+                            password:   "%database_password%"
+                            dsn:        "%database_driver%:host=%database_host%;dbname=%database_name%;charset=UTF8"
+         */
+        $defaultValues = [
+            'adapter' => $mainConnection->getType(),
+            'user' => $mainConnection->getUsername(),
+            'password' => $mainConnection->getPassword(),
+            'dsn' => $mainConnection->getDsn(),
+        ];
+
+        $array = [
+            'database' => [
+                'connections' => [
+                    'default' => $defaultValues
+                ]
+            ]
+        ];
+
+        $container->prependExtensionConfig('propel', $array);
     }
 }
