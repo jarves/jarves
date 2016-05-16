@@ -10,6 +10,7 @@ env:
   - DB_TYPE=sqlite DB_NAME=test DB_SERVER=test.sq3
 
 before_script:
+  - gem install sass
   - composer install --prefer-dist
 
   # DB
