@@ -84,8 +84,19 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
             $process->start();
             while ($process->isRunning());
 
-            if (($error = $process->getErrorOutput()) && false !== strpos($error, 'Error:')) {
-                throw new \RuntimeException(sprintf("Error during scss compilation of %s:\n%s", $assetPath, $error));
+            if (127 === $process->getExitCode()) {
+                throw new \RuntimeException('sass binary not found. Please install sass first and make its in $PATH. '
+                    . $process->getExitCodeText());
+            }
+
+            if (0 !== $process->getExitCode()) {
+                throw new \RuntimeException(sprintf(
+                    "Error during scss compilation of %s:\n%s\n%s\n%s",
+                    $assetPath,
+                    $process->getExitCodeText(),
+                    $process->getErrorOutput(),
+                    $process->getOutput()
+                ));
             }
 
             $compiled = $process->getOutput();

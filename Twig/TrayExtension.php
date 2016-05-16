@@ -46,7 +46,7 @@ class TrayExtension extends \Twig_Extension
 
     public function tray($nodeId, $boxId = 1)
     {
-        return $this->container->get('jarves.content.render')->renderSlot($nodeId, $boxId);
+        return $this->container->get('jarves.content.render')->renderSlot($nodeId, $boxId, ['_disable_editor' => true]);
     }
 
 }

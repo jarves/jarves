@@ -90,6 +90,12 @@ var jarves_system_development_fields = new Class({
             .setButtonStyle('blue')
             .addEvent('click', function(){
                 var value = prompt('Value');
+                try {
+                    var valueJson = JSON.parse(value);
+                    if (typeof valueJson !== 'undefined') {
+                        value = valueJson;
+                    }
+                } catch(e){}
                 this.setValue(value);
             }.bind(this))
             .inject(this.bottom);

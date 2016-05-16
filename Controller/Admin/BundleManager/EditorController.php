@@ -104,7 +104,7 @@ class EditorController extends Controller
             return $config;
         }
 
-        return null;
+        return [];
     }
 
     /**
@@ -182,10 +182,10 @@ class EditorController extends Controller
      * )
      *
      * @Rest\QueryParam(name="bundle", requirements=".*", strict=true, description="The bundle name")
-     * @Rest\RequestParam(name="events", description="The `events` values array")
-     * @Rest\RequestParam(name="listeners", description="The `listeners` values array")
-     * @Rest\RequestParam(name="adminAssets", description="The `adminAssets` values array")
-     * @Rest\RequestParam(name="falDrivers", description="The `falDrivers` values array")
+     * @Rest\RequestParam(name="events", map=true, description="The `events` values array")
+     * @Rest\RequestParam(name="listeners", map=true, description="The `listeners` values array")
+     * @Rest\RequestParam(name="adminAssets", map=true, description="The `adminAssets` values array")
+     * @Rest\RequestParam(name="falDriver", map=true, description="The `falDriver` values array")
      *
      * @Rest\Post("/admin/system/bundle/editor/basic")
      *
@@ -199,7 +199,7 @@ class EditorController extends Controller
         $events = $paramFetcher->get('events') ?: null;
         $listeners = $paramFetcher->get('listeners') ?: null;
         $adminAssets = $paramFetcher->get('adminAssets') ?: null;
-        $falDrivers = $paramFetcher->get('falDrivers') ?: null;
+//        $falDriver = $paramFetcher->get('falDriver') ?: null;
 
         $config = $this->jarves->getRealConfig($bundle);
         if (!$config) {

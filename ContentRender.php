@@ -137,7 +137,9 @@ class ContentRender
     public function renderSlot($nodeId = null, $slotId = 1, $params = array())
     {
         $params['id'] = $slotId;
-        if ($this->editMode->isEditMode()) {
+        $disableEditor = isset($params['_disable_editor']) && $params['_disable_editor'] ? true : false;
+        
+        if ($this->editMode->isEditMode() && !$disableEditor) {
             return '<div class="jarves-slot" params="' . htmlspecialchars(json_encode($params)) . '"></div>';
         }
 
@@ -159,7 +161,9 @@ class ContentRender
     public function renderSingleSlot($nodeId = null, $slotId = 1, $params = array())
     {
         $params['id'] = $slotId;
-        if ($this->editMode->isEditMode()) {
+        $disableEditor = isset($params['_disable_editor']) && $params['_disable_editor'] ? true : false;
+
+        if ($this->editMode->isEditMode() && !$disableEditor) {
             return '<div class="jarves-slot jarves-single-slot" params="' . htmlspecialchars(json_encode($params)) . '"></div>';
         }
 

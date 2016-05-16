@@ -69,7 +69,12 @@ jarves.FieldTypes.View = new Class({
     },
 
     getValue: function () {
-        var value = this.parent() || '';
+        var value = this.parent();
+        if (value) {
+            value = value.path;
+        } else {
+            value = '';
+        }
         return this.options.fullPath ? value : value.substr(this.directory.length);
     },
 

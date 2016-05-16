@@ -1926,8 +1926,10 @@ jarves.Files = new Class({
         if (dragged) {
             //maybe internal drag'n'drop
             this.move(dragged, file.path + '/' + dragged.basename(), null, function() {
-                this.sideTree.getFieldObject().updateBranch(file);
-                this.sideTree.getFieldObject().updateBranch(this.currentFile);
+                if (this.sideTree) {
+                    this.sideTree.getFieldObject().updateBranch(file);
+                    this.sideTree.getFieldObject().updateBranch(this.currentFile);
+                }
             }.bind(this));
         } else if (files && 0 < files.length) {
             //external file drop
