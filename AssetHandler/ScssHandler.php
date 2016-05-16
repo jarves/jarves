@@ -66,7 +66,7 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
             }
         }
 
-        if (true || $needsCompilation) {
+        if ($needsCompilation) {
             $processBuilder = new ProcessBuilder();
             $processBuilder
                 ->setInput(file_get_contents($localPath))
