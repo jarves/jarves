@@ -24,7 +24,7 @@ jarves.DashboardWidgets.Latency = new Class({
 
         new Element('div', {
             style: 'padding: 5px; text-align: center;',
-            text: 'Frontend'
+            text: 'Website'
         }).inject(this.main);
 
         this.latency = new Element('div', {
@@ -34,7 +34,7 @@ jarves.DashboardWidgets.Latency = new Class({
 
         new Element('div', {
             style: 'padding: 5px; text-align: center;',
-            text: t('Backend / DB / Session / Cache')
+            text: t('Admin / DB / Session / Cache')
         }).inject(this.main);
 
         this.other = new Element('div', {
