@@ -422,7 +422,7 @@ jarves.urlEncode = function(value) {
         return result.substr(0, result.length - 1);
     } else if (typeOf(value) == 'object') {
         result = '';
-        Array.each(value, function(item, key) {
+        Object.each(value, function(item, key) {
             result += key + '=' + jarves.urlEncode(item) + ',';
         });
         return result.substr(0, result.length - 1);
@@ -439,14 +439,22 @@ jarves.urlEncode = function(value) {
  * @return {String}
  */
 jarves.urlDecode = function(value) {
-    if (typeOf(value) != 'string') {
-        return value;
-    }
+    var result;
 
-    try {
-        return decodeURIComponent(value.replace(/%252F/g, '%2F'));
-    } catch (e) {
-        return value;
+    if (typeOf(value) == 'string') {
+        return decodeURIComponent(value.replace(/%252F/g, '%2F')); //fix apache default setting
+    } else if (typeOf(value) == 'array') {
+        result = [];
+        Array.each(value, function(item) {
+            result.push(jarves.urlDecode(item));
+        });
+        return result;
+    } else if (typeOf(value) == 'object') {
+        result = {};
+        Object.each(value, function(item, key) {
+            result[key] = jarves.urlDecode(item);
+        });
+        return result;
     }
 };
 
