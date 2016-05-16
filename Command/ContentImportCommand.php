@@ -228,6 +228,9 @@ class ContentImportCommand extends AbstractCommand
 
         Propel::getWriteConnection('default')->commit();
 
+        $cacher = $this->getContainer()->get('jarves.cache.cacher');
+        $cacher->invalidateCache('core');
+
         $output->writeln("<info>Done.</info>");
     }
 }
