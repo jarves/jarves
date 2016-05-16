@@ -411,7 +411,7 @@ jarves.getClass = function(classPath) {
  * @return {String}
  */
 jarves.urlEncode = function(value) {
-	var result;
+    var result;
     if (typeOf(value) == 'string') {
         return encodeURIComponent(value).replace(/\%2F/g, '%252F'); //fix apache default setting
     } else if (typeOf(value) == 'array') {
@@ -632,6 +632,12 @@ jarves.getObjectPk = function(objectKey, item) {
  */
 jarves.getObjectPkFromUrlId = function(objectKey, urlId) {
     var pks = jarves.getObjectPrimaryList(objectKey);
+
+    if ('object' === typeOf(urlId)) {
+        return urlId;
+    }
+
+    urlId = String.from(urlId);
 
     urlId = jarves.getCroppedObjectId(urlId);
 
@@ -1174,7 +1180,7 @@ jarves.getConfigs = function() {
 
 /**
  * Returns the theme configuration.
- * 
+ *
  * @param {string} themeId
  * @returns {*}
  */
@@ -1217,8 +1223,8 @@ jarves.getShortBundleName = function(bundleName) {
  * @return {String} returns only the base bundle name
  */
 jarves.getBundleName = function(bundleClass) {
-	var split = bundleClass.split('\\');
-	return split[split.length -1];
+    var split = bundleClass.split('\\');
+    return split[split.length -1];
 };
 
 /**
@@ -1435,13 +1441,13 @@ jarves.openDialog = function(options) {
             opacity: 0.001
         }
     }).addEvent('click',function(e) {
-            jarves.closeDialog();
-            e.stopPropagation();
-            this.fireEvent('close');
-            if (options.onClose) {
-                options.onClose();
-            }
-        }).inject(target);
+        jarves.closeDialog();
+        e.stopPropagation();
+        this.fireEvent('close');
+        if (options.onClose) {
+            options.onClose();
+        }
+    }).inject(target);
 
     autoPositionLastOverlay.close = function() {
         if (autoPositionLastOverlay) {

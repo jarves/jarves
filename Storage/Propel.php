@@ -1256,17 +1256,18 @@ class Propel extends AbstractStorage
 
                 $propelRelation = $self->tableMap->getRelation(ucfirst($fieldName));
                 $localColumns = $propelRelation->getLocalColumns();
+                $firstColumn = current($localColumns);
+
                 if (is_array($fieldValue)) {
-                    foreach ($localColumns as $column) {
-                        $setter = 'set' . ucfirst($column->getPhpName());
-                        $key = lcfirst($column->getPhpName());
-                        $item->$setter($fieldValue[$key]);
-                    }
-                } else {
-                    $firstColumn = current($localColumns);
-                    $setter = 'set' . ucfirst($firstColumn->getPhpName());
-                    $item->$setter($fieldValue);
+                    $foreignColumns = $propelRelation->getForeignColumns();
+                    $firstForeignColumn = current($foreignColumns);
+
+                    $key = lcfirst($firstForeignColumn->getPhpName());
+                    $fieldValue = $fieldValue[$key];
                 }
+
+                $setter = 'set' . ucfirst($firstColumn->getPhpName());
+                $item->$setter($fieldValue);
             }
         };
 
