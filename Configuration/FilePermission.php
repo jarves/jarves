@@ -27,10 +27,6 @@ class FilePermission extends Model
     disableModeChange:  true|false (false)
     ';
 
-    protected $docBlocks = [
-        'groupOwner' => 'The group owner name'
-    ];
-
     protected $attributes = ['groupPermission', 'everyonePermission', 'disableModeChange'];
 
     /**
@@ -49,6 +45,8 @@ class FilePermission extends Model
     protected $disableModeChange = false;
 
     /**
+     * The group owner name. Let it empty to disable chrgrp() call.
+     *
      * @var string
      */
     protected $groupOwner;

@@ -105,8 +105,11 @@ class Local extends AbstractAdapter
             }
         }
 
-        if (is_dir($path)) {
+        if (!$this->changeMode) {
+            return true;
+        }
 
+        if (is_dir($path)) {
             if (!chmod($path, $this->dirMode)) {
                 throw new FileOperationDeniedException(sprintf(
                     'Operation to chmod the folder %s to %o is denied.',
@@ -114,15 +117,14 @@ class Local extends AbstractAdapter
                     $this->dirMode
                 ));
             }
-
-//            $sub = find($path . '/*', false);
-//            if (is_array($sub)) {
-//                foreach ($sub as $path) {
-//                    $this->setPermission(substr($path, 0, strlen($this->getRoot())));
-//                }
-//            }
         } elseif (is_file($path)) {
-            @chmod($path, $this->fileMode);
+            if (!chmod($path, $this->fileMode)) {
+                throw new FileOperationDeniedException(sprintf(
+                    'Operation to chmod the file %s to %o is denied.',
+                    $path,
+                    $this->fileMode
+                ));
+            }
         }
 
         return true;
@@ -208,9 +210,8 @@ class Local extends AbstractAdapter
             } else {
                 touch($path2);
             }
-            if ($this->changeMode) {
-                $this->setPermission($path);
-            }
+
+            $this->setPermission($path);
         }
 
         return file_exists($path2);
@@ -233,23 +234,7 @@ class Local extends AbstractAdapter
             }
         }
 
-        if ($this->groupName) {
-            if (!@chgrp($path, $this->groupName)) {
-                throw new FileOperationDeniedException(sprintf(
-                    'Operation to chgrp the folder %s to %s is denied.',
-                    $path,
-                    $this->groupName
-                ));
-            }
-        }
-
-        if (!chmod($path, $this->dirMode)) {
-            throw new FileOperationDeniedException(sprintf(
-                'Operation to chmod the folder %s to %o is denied.',
-                $path,
-                $this->dirMode
-            ));
-        }
+        $this->setPermission($path);
 
         return is_dir($path);
     }
