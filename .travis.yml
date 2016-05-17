@@ -12,6 +12,7 @@ env:
 before_script:
   - gem install sass
   - composer install --prefer-dist
+  - php bin/console install:assets
 
   # DB
   - sh -c "if [ '$DB_TYPE' = 'mysql' ]; then mysql -e 'DROP DATABASE IF EXISTS test; CREATE DATABASE test;'; fi"
