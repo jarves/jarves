@@ -133,7 +133,7 @@ class Jarves
     }
 
     /**
-     * Resets current Pasymlink geResponse;
+     * Resets current PageResponse;
      */
     public function reset()
     {
