@@ -33,7 +33,6 @@ try {
 
 /** @var $jarves \Jarves\Jarves */
 $jarves = $kernel->getContainer()->get('jarves');
-$jarves->prepareWebSymlinks();
 
 
 if (@$_REQUEST['step'] == 'checkConfig') {

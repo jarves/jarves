@@ -133,7 +133,7 @@ class Jarves
     }
 
     /**
-     * Resets current PageResponse;
+     * Resets current Pasymlink geResponse;
      */
     public function reset()
     {
@@ -146,35 +146,6 @@ class Jarves
     public function getFieldTypes()
     {
         return $this->fieldTypes;
-    }
-
-    /**
-     * Creates all symlink in /web/<bundleName> to <bundlePath>/Resources/public
-     * if not already.
-     */
-    public function prepareWebSymlinks()
-    {
-        chdir($this->rootDir . '/..');
-        $bundles = 'web/bundles/';
-        if (!is_dir($bundles)) {
-            if (!@mkdir($bundles)) {
-                throw new \Exception(
-                    sprintf('Can not create `%s` directory. Please check permissions.', getcwd() . '/' . $bundles)
-                );
-            }
-        }
-
-        foreach ($this->getBundles() as $bundle) {
-            if ($bundle) {
-                $public = $bundle->getPath() . '/Resources/public';
-                if (is_dir($public)) {
-                    $web = $bundles . $this->getShortBundleName($bundle->getName());
-                    if (!is_link($web)) {
-                        symlink(realpath($public), $web);
-                    }
-                }
-            }
-        }
     }
 
     /**
