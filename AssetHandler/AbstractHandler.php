@@ -49,14 +49,14 @@ abstract class AbstractHandler
     }
 
     /**
-     * Returns relative file path.
+     * Returns local full file path.
      *
      * @param string $path
      * @return string
      */
     protected function getAssetPath($path)
     {
-        return $this->getJarves()->resolveWebPath($path);
+        return realpath($this->getJarves()->getRootDir() . '/../') . '/' . $this->getJarves()->resolveWebPath($path);
     }
 
     /**

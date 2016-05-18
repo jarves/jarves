@@ -158,7 +158,7 @@ class Connection extends Model
      */
     public function getType()
     {
-        return $this->type == 'postgresql' ? 'pgsql' : $this->type;
+        return $this->type === 'postgresql' ? 'pgsql' : $this->type;
     }
 
     /**
