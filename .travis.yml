@@ -12,7 +12,6 @@ env:
 before_script:
   - gem install sass
   - composer install --prefer-dist
-  - php bin/console assets:install
 
   # DB
   - sh -c "if [ '$DB_TYPE' = 'mysql' ]; then mysql -e 'DROP DATABASE IF EXISTS test; CREATE DATABASE test;'; fi"
@@ -27,3 +26,4 @@ before_script:
   - Tests/Integration/skeletion/app/console propel:migration:diff
   - Tests/Integration/skeletion/app/console propel:migration:up
   - Tests/Integration/skeletion/app/console jarves:install:demo localhost /
+  - Tests/Integration/skeletion/app/console assets:install
