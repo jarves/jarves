@@ -150,7 +150,7 @@ EOF
             $content = '';
             foreach ($files as $assetPath) {
                 $content .= "\n/* $assetPath */\n\n";
-                $path = $this->getJarves()->resolveWebPath($assetPath);
+                $path = $this->getAssetPath($assetPath);
                 $content .= file_get_contents($path);
             }
 
