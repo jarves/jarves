@@ -136,8 +136,6 @@ class JarvesBundle extends Bundle
             $bootNeededCallback();
         }
 
-        $jarves->prepareWebSymlinks();
-
         $jarvesEventDispatcher->registerBundleEvents($jarves->getConfigs());
     }
 
