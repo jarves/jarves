@@ -214,7 +214,6 @@ class FrontendRouteListener extends RouterListener
                     parent::onKernelRequest($event);
                 } catch (MethodNotAllowedException $e) {
                 } catch (NotFoundHttpException $e) {
-                    $this->logger->debug(sprintf('No frontend route found for %s.', $event->getRequest()->getHost().'/'.$event->getRequest()->getPathInfo()));
                 }
             }
         }
