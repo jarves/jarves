@@ -296,7 +296,7 @@ class PageStack
     }
 
     /**
-     * @param        $nodeOrId
+     * @param Node|int|string   $nodeOrId
      * @param bool $fullUrl with http://
      * @param bool $suppressStartNodeCheck
      *
@@ -314,18 +314,25 @@ class PageStack
             $id = $nodeOrId->getId();
         }
 
-        $domainId = $nodeOrId instanceof Node ? $nodeOrId->getDomainId() : $this->getDomainOfPage($id);
         $domain = $this->getCurrentDomain();
+
+        if (!is_numeric($id)) {
+            //url given
+            $domainId = $domain->getId();
+            $url = $id;
+        } else {
+            $domainId = $nodeOrId instanceof Node ? $nodeOrId->getDomainId() : $this->getDomainOfPage($id);
+
+            if (!$suppressStartNodeCheck && $domain->getStartnodeId() === $id) {
+                $url = '/';
+            } else {
+                $urls = $this->getCachedPageToUrl($domainId);
+                $url = isset($urls[$id]) ? $urls[$id] : '';
+            }
+        }
 
         if (!$domain || $domainId !== $domain->getId()) {
             $domain = $this->getDomain($domainId);
-        }
-
-        if (!$suppressStartNodeCheck && $domain->getStartnodeId() === $id) {
-            $url = '/';
-        } else {
-            $urls = $this->getCachedPageToUrl($domainId);
-            $url = isset($urls[$id]) ? $urls[$id] : '';
         }
 
         //do we need to add app_dev.php/ or something?

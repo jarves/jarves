@@ -46,18 +46,23 @@ class NodeIsActiveExtension extends \Twig_Extension
         );
     }
 
-    public function isActive(Node $node, $exact = false)
+    /**
+     * @param Node|int|string $id Node, node id, or node url
+     * @param bool $exact whether it should also return true when a children is active
+     * @return bool
+     */
+    public function isActive($id, $exact = false)
     {
         $current = $this->pageStack->getCurrentPage();
 
-        if ($node->getId() == $current->getId()) {
+        $url = $this->pageStack->getNodeUrl($current, true, true);
+        $purl = $this->pageStack->getNodeUrl($id, true, true);
+        
+        if ($url === $purl) {
             return true;
         }
 
         if (!$exact) {
-            $url = $this->pageStack->getNodeUrl($current, true, true);
-            $purl = $this->pageStack->getNodeUrl($node, true, true);
-
             if ($url && $purl) {
                 $pos = strpos($url, $purl);
                 if ($url == '/' || $pos != 0 || $pos === false) {
