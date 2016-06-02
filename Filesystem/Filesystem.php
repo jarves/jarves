@@ -4,6 +4,7 @@ namespace Jarves\Filesystem;
 
 use Jarves\File\FileInfo;
 use Jarves\Filesystem\Adapter\AdapterInterface;
+use Jarves\Filesystem\Adapter\Local;
 use Jarves\Model\File;
 use Jarves\File\FileInfoInterface;
 use Jarves\Model\FileQuery;
@@ -202,6 +203,20 @@ class Filesystem implements FilesystemInterface
 
     /**
      * @param string $path
+     * @return resource
+     */
+    public function handle($path)
+    {
+        $fs = $this->getAdapter($path);
+        if ($fs instanceof Local) {
+            return $fs->handle($this->normalizePath($path));
+        }
+
+        throw new \InvalidArgumentException('File of given path does not live on a local filesystem, so no handle support is possible.');
+    }
+
+    /**
+     * @param string $path
      * @return boolean
      */
     public function remove($path)
@@ -224,6 +239,12 @@ class Filesystem implements FilesystemInterface
     {
         $fs = $this->getAdapter($path);
         return $fs->hash($this->normalizePath($path));
+    }
+
+    public function filemtime($path)
+    {
+        $fs = $this->getAdapter($path);
+        return $fs->filemtime($this->normalizePath($path));
     }
 
     public function mkdir($path)

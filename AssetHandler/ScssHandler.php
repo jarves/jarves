@@ -42,7 +42,7 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
     {
         $assetPath = $assetInfo->getPath();
         $localPath = $this->getAssetPath($assetPath);
-        if (!file_exists($localPath)){
+        if (!file_exists($localPath)) {
             return null;
         }
 
@@ -55,18 +55,52 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
 
         $needsCompilation = true;
         $sourceMTime = filemtime($localPath);
+        $dir = dirname($localPath);
 
-        if (file_exists('web/' . $targetPath)) {
-            $fh = fopen('web/' . $targetPath, 'r+');
+        if (file_exists($targetPath)) {
+            $fh = fopen($targetPath, 'r+');
             if ($fh) {
                 $firstLine = fgets($fh);
-                $lastSourceMTime = (int) substr($firstLine, strlen('/* compiled at '), -3);
+                $info = substr($firstLine, strlen('/* compiled at '), -3);
+                $spacePosition = strpos($info, ' ');
+                $lastSourceMTime = 0;
+                $dependencies = [];
+
+                if ($spacePosition > 0) {
+                    $lastSourceMTime = (int)substr($info, 0, $spacePosition);
+                    $dependencies = trim(substr($info, $spacePosition + 1));
+                    if ($dependencies) {
+                        $dependencies = explode(',', trim(substr($info, $spacePosition + 1)));
+                    } else {
+                        $dependencies = [];
+                    }
+                } else {
+                    //old format without dependencies
+                    $lastSourceMTime = (int)$info;
+                }
 
                 $needsCompilation = $lastSourceMTime !== $sourceMTime;
+
+                if (!$needsCompilation) {
+                    //check dependencies
+                    foreach ($dependencies as $dependency) {
+                        list($path, $depLastMTime) = explode(':', $dependency);
+                        $depLastMTime = (int)$depLastMTime;
+                        $depSourceMTime = filemtime($dir . '/' . $path);
+                        if ($depLastMTime !== $depSourceMTime) {
+                            $needsCompilation = true;
+                            break;
+                        }
+                    }
+                }
             }
         }
 
         if ($needsCompilation) {
+            //resolve all dependencies
+            $dependencies = [];
+            $this->resolveDependencies($localPath, $dependencies);
+
             $processBuilder = new ProcessBuilder();
             $processBuilder
                 ->setInput(file_get_contents($localPath))
@@ -77,12 +111,11 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
                 ->add('--load-path')
                 ->add(dirname($localPath))
                 ->add($localPath)
-                ->enableOutput()
-            ;
+                ->enableOutput();
 
             $process = $processBuilder->getProcess();
             $process->start();
-            while ($process->isRunning());
+            while ($process->isRunning()) ;
 
             if (127 === $process->getExitCode()) {
                 throw new \RuntimeException('sass binary not found. Please install sass first and make its in $PATH. '
@@ -101,7 +134,10 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
 
             $compiled = $process->getOutput();
             $compiled = $this->replaceRelativePaths($publicPath, $targetPath, $compiled);
-            $compiled = "/* compiled at $sourceMTime */\n".$compiled;
+
+            $dependencies = implode(',', $dependencies);
+            $info = "$sourceMTime $dependencies";
+            $compiled = "/* compiled at $info */\n" . $compiled;
             $this->webFilesystem->write($targetPath, $compiled);
         }
 
@@ -111,7 +147,37 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
         return $assetInfo;
     }
 
-    public function needsGrouping() {
+    public function resolveDependencies($localPath, array &$dependencies, &$seen = [])
+    {
+        $localPath = realpath($localPath);
+        $content = file_get_contents($localPath);
+        $found = [];
+
+        preg_match_all('/@import \'(?!.*:\/\/)([^\/].*)\'/', $content, $matches);
+        $found = array_merge($found, $matches[1]);
+        preg_match_all('/@import "(?!.*:\/\/)([^\/].*)"/', $content, $matches);
+        $found = array_merge($found, $matches[1]);
+
+        foreach ($found as $name) {
+            if ('.scss' !== substr($name, -5)) {
+                $name .= '.scss';
+            }
+            $path = dirname($localPath) . '/' . $name;
+            if (isset($seen[$path])) {
+                continue;
+            }
+            $seen[$path] = true;
+
+            if (file_exists($path)) {
+                $dependencies[] = Tools::getRelativePath($path, dirname($localPath)) . ':' . filemtime($path);
+
+                $this->resolveDependencies($path, $dependencies, $seen);
+            }
+        }
+    }
+
+    public function needsGrouping()
+    {
         return false;
     }
 

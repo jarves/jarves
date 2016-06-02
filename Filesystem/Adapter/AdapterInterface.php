@@ -14,6 +14,7 @@ interface AdapterInterface {
     public function delete($path);
     public function mkdir($path);
     public function hash($path);
+    public function filemtime($path);
     public function move($source, $target);
     public function copy($path, $newPath);
 

@@ -252,6 +252,18 @@ class Local extends AbstractAdapter
     }
 
     /**
+     * @param string $path
+     * @param string $mode
+     * @return resource
+     */
+    public function handle($path, $mode = 'r+')
+    {
+        $path = $this->getFullPath($path);
+
+        return fopen($path, $mode);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function write($path, $content = '')
@@ -468,11 +480,20 @@ class Local extends AbstractAdapter
      */
     public function hash($path)
     {
-        if (is_readable($this->getRoot() . $path)) {
-            return md5_file($this->getRoot() . $path);
+        $path = $this->getFullPath($path);
+        if (is_readable($path)) {
+            return md5_file($path);
         }
 
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function filemtime($path)
+    {
+        return filemtime($this->getFullPath($path));
     }
 
     /**
