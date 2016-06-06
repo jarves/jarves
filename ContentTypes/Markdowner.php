@@ -45,6 +45,7 @@ class Markdowner
             'mysql' => 'Sql\\MySQL',
             'xml' => 'Xml',
             'html' => 'Html',
+            'python' => 'Python',
         ];
         
         $parser->code_block_content_func = function ($code, $language) use (&$stylesAdded, $classMap) {
