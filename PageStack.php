@@ -318,10 +318,13 @@ class PageStack
 
         if (!is_numeric($id)) {
             //url given
-            $domainId = $domain->getId();
             $url = $id;
         } else {
             $domainId = $nodeOrId instanceof Node ? $nodeOrId->getDomainId() : $this->getDomainOfPage($id);
+
+            if (!$domain || $domainId !== $domain->getId()) {
+                $domain = $this->getDomain($domainId);
+            }
 
             if (!$suppressStartNodeCheck && $domain->getStartnodeId() === $id) {
                 $url = '/';
@@ -329,10 +332,6 @@ class PageStack
                 $urls = $this->getCachedPageToUrl($domainId);
                 $url = isset($urls[$id]) ? $urls[$id] : '';
             }
-        }
-
-        if (!$domain || $domainId !== $domain->getId()) {
-            $domain = $this->getDomain($domainId);
         }
 
         //do we need to add app_dev.php/ or something?
