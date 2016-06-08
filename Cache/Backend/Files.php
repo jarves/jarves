@@ -26,6 +26,15 @@ class Files extends AbstractCache
      * @var boolean
      */
     private $useJson = false;
+    /**
+     * @var
+     */
+    private $cacheDir;
+
+    public function __construct($cacheDir)
+    {
+        $this->cacheDir = $cacheDir;
+    }
 
     /**
      * {@inheritdoc}
@@ -33,7 +42,7 @@ class Files extends AbstractCache
     public function setup($config)
     {
         if (!isset($config['path'])) {
-            $config['path'] = $this->cacheConfig->getJarves()->getCacheDir() . '/object-cache/';
+            $config['path'] = $this->cacheDir . '/object-cache/';
         }
 
         $this->path = $config['path'];
@@ -66,7 +75,7 @@ class Files extends AbstractCache
     public function testConfig($config)
     {
         if (!isset($config['path'])) {
-            $config['path'] = $this->cacheConfig->getJarves()->getCacheDir() . '/object-cache/';
+            $config['path'] = $this->cacheDir . '/object-cache/';
         }
 
         if (!file_exists($config['path']) && !mkdir($config['path'])) {
