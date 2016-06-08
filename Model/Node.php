@@ -21,12 +21,47 @@ class Node extends BaseNode
 {
     protected $collNestedGetLinks;
 
-    protected $parents_cached;
+    protected $parentsCached;
+
+    const TYPE_PAGE = 0;
+    const TYPE_LINK = 1;
+    const TYPE_FOLDER = 2;
+    const TYPE_TRAY = 3;
 
     /**
      * @var string
      */
     protected $path;
+
+    /**
+     * @param string $title
+     * @param string $urn
+     * @param string|null $theme
+     * @param string|null $layout
+     * @return Node
+     */
+    public static function createPage($title, $urn, $theme = null, $layout = null)
+    {
+        $page = new self();
+        $page->setType(self::TYPE_PAGE);
+        $page->setTitle($title);
+        $page->setUrn($urn);
+        $page->setTheme($theme);
+        $page->setLayout($layout);
+
+        return $page;
+    }
+
+    /**
+     * @param array $overwrittenContents
+     * @return $this
+     */
+    public function setOverwrittenContents($overwrittenContents)
+    {
+        $this->overwrittenContents = $overwrittenContents;
+
+        return $this;
+    }
 
     /**
      * Same as getChildren but returns only visible pages and non-folder nodes
@@ -83,21 +118,21 @@ class Node extends BaseNode
      */
     public function getParents()
     {
-        if (!$this->parents_cached) {
+        if (!$this->parentsCached) {
 
-            $this->parents_cached = array();
+            $this->parentsCached = array();
 
             $ancestors = $this->getAncestors();
             foreach ($ancestors as $parent) {
 
                 if ($parent->getType() !== null && $parent->getType() < 2) { //exclude root node
-                    $this->parents_cached[] = $parent;
+                    $this->parentsCached[] = $parent;
                 }
 
             }
         }
 
-        return $this->parents_cached;
+        return $this->parentsCached;
     }
 
     /**

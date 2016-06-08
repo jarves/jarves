@@ -89,7 +89,6 @@ class PluginResponseListener
                     $this->editMode->registerEditor();
                 }
 
-                $pageResponse->setRenderFrontPage(true);
                 $pageResponse->renderContent();
             }
 

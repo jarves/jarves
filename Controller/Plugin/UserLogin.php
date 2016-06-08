@@ -14,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class UserLogin extends PluginController
 {
@@ -43,7 +44,8 @@ class UserLogin extends PluginController
      * @param FormFactory $formFactory
      * @param UserOperator $userOperator
      */
-    public function __construct(EngineInterface $templating, PageStack $pageStack, FormFactory $formFactory, UserOperator $userOperator)
+    public function __construct(EngineInterface $templating, PageStack $pageStack,
+                                FormFactory $formFactory, UserOperator $userOperator)
     {
         $this->templating = $templating;
         $this->pageStack = $pageStack;
@@ -91,8 +93,14 @@ class UserLogin extends PluginController
     public function doLogin(Request $request)
     {
         $success = $this->userOperator->login($request->request->get('email'), $request->request->get('password'));
+        $session = $request->getSession();
+        $session->start();
 
-        return RedirectResponse::create($this->pageStack->getCurrentUrl() . '?success=' . ($success ? 1 : 0));
+        if (!$success && $session instanceof Session) {
+            $session->getFlashBag()->add('error', 'LOGIN_FAILED');
+        }
+
+        return $this->loginForm();
     }
 
     /**

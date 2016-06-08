@@ -72,7 +72,6 @@ class PageController
         }
 
         $pageResponse = $this->pageStack->getPageResponse();
-        $pageResponse->setRenderFrontPage(true);
         $pageResponse->renderContent();
 
         return $pageResponse; //new Response('<body>ho</body>');

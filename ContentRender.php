@@ -182,6 +182,14 @@ class ContentRender
      */
     public function getSlotContents($nodeId, $slotId)
     {
+        if ($contents = $this->pageStack->getPageResponse()->getPageContent()) {
+            if (is_array($contents) && $contents[$slotId]) {
+                return $contents[$slotId];
+            } else if (is_string($contents)) {
+                return $contents;
+            }
+        }
+        
         $cacheKey = 'core/contents/' . $nodeId . '.' . $slotId;
         $cache = $this->cacher->getDistributedCache($cacheKey);
         $contents = null;
@@ -216,8 +224,14 @@ class ContentRender
      */
     public function renderContents(&$contents, $slotProperties)
     {
-        $title = sprintf('Slot %s [%d]', @$slotProperties['name'], @$slotProperties['id']);
+        $name = isset($slotProperties['name']) ? $slotProperties['name'] : '';
+
+        $title = sprintf('Slot %s [%d]', $name, $slotProperties['id']);
         $this->stopwatch->start($title, 'Jarves');
+
+        if (is_string($contents)) {
+            return $contents;
+        }
 
         $filteredContents = array();
         if (!($contents instanceof \Traversable)) {
@@ -227,6 +241,11 @@ class ContentRender
         /** @var $content Content */
         foreach ($contents as $content) {
             $access = true;
+
+            if (is_string($content)) {
+                $filteredContents[] = $content;
+                continue;
+            }
 
             if (
                 ($content->getAccessFrom() + 0 > 0 && $content->getAccessFrom() > time()) ||
@@ -289,6 +308,11 @@ class ContentRender
 
         if ($count > 0) {
             foreach ($filteredContents as $content) {
+
+                if (is_string($content)) {
+                    $html .= $content;
+                    continue;
+                }
 
                 if ('stopper' === $content->getType()) {
                     if ($html) {

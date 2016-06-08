@@ -103,12 +103,21 @@ class PageResponse extends Response
     /**
      * @var bool
      */
-    protected $renderFrontPage = false;
+    protected $renderFrontPage = true;
 
     /**
      * @var bool
      */
     protected $domainHandling = true;
+
+    /**
+     * Overwrites the page content from the database fo the current page.
+     *
+     * Contains a array map with contentId => Content[], or string
+     *
+     * @var null|array|string
+     */
+    protected $pageContent = null;
 
     /**
      * @var string
@@ -203,6 +212,22 @@ class PageResponse extends Response
         }
         
         return $this->favicon;
+    }
+
+    /**
+     * @return array|null|string
+     */
+    public function getPageContent()
+    {
+        return $this->pageContent;
+    }
+
+    /**
+     * @param array|null|string $pageContent
+     */
+    public function setPageContent($pageContent)
+    {
+        $this->pageContent = $pageContent;
     }
 
     /**
@@ -503,9 +528,6 @@ class PageResponse extends Response
         $this->header[] = $content;
     }
 
-    /**
-     *
-     */
     public function renderContent()
     {
         $this->stopwatch->start("Render PageResponse");
@@ -517,6 +539,7 @@ class PageResponse extends Response
     public function prepare(Request $request)
     {
         parent::prepare($request);
+
         if (!$this->getContent()) {
             $this->renderContent();
         }

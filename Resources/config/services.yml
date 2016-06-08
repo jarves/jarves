@@ -12,6 +12,8 @@ parameters:
      jarves.stopwatch.class: Jarves\StopwatchHelper
      jarves.translator.class: Jarves\Translation\Translator
 
+     jarves.user_provider.class: Jarves\Client\UserProvider
+
      jarves.pluginResponse.listener.class: Jarves\EventListener\PluginResponseListener
      jarves.paramFetcher.listener.class: Jarves\EventListener\ParamFetcherListener
      jarves.securityFirewall.listener.class: Jarves\EventListener\SecurityFirewallListener
@@ -60,7 +62,7 @@ services:
          arguments: ["@jarves", "@service_container"]
 
      jarves.user_provider:
-         class: Jarves\Client\UserProvider
+         class: "%jarves.user_provider.class%"
 
      jarves.event_dispatcher:
          class: Jarves\JarvesEventDispatcher
@@ -292,6 +294,7 @@ services:
      jarves.cache.backend.files:
         class: Jarves\Cache\Backend\Files
         shared: false
+        arguments: ["%kernel.cache_dir%"]
 
      jarves.cache.backend.apc:
         class: Jarves\Cache\Backend\Apc

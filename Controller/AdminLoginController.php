@@ -54,6 +54,7 @@ class AdminLoginController extends PluginController
 
         $response->setResourceCompression(false);
         $response->setDomainHandling(false);
+        $response->setRenderFrontPage(false);
 
         $response->setTitle($jarvesConfig->getSystemConfig()->getSystemTitle() . ' | Jarves Administration');
         $response->prepare($request);

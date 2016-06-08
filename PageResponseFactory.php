@@ -16,6 +16,7 @@ namespace Jarves;
 
 
 use Jarves\AssetHandler\Container;
+use Jarves\Model\Node;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Templating\EngineInterface;
 
@@ -85,6 +86,34 @@ class PageResponseFactory
             $data, 200, [],
             $this->pageStack, $this->jarves, $this->stopwatch, $this->assetCompilerContainer, $this->eventDispatcher, $this->templating, $this->editMode
         );
+    }
+
+    /**
+     * @param Node|string|int $page Node model, url or node id. Use Jarves\Model\Node::createPage()
+     * @param string|array|null $contents
+     *
+     * @return PageResponse
+     */
+    public function createWithPage($page, $contents = null)
+    {
+        $page = $this->pageStack->getPage($page);
+
+        if (!$page) {
+            throw new \InvalidArgumentException('Can not find page.');
+        }
+        $this->pageStack->setCurrentPage($page);
+        if (null !== $contents) {
+            $page->setOverwrittenContents($contents);
+        }
+
+        $pageResponse = new PageResponse(
+            '', 200, [],
+            $this->pageStack, $this->jarves, $this->stopwatch, $this->assetCompilerContainer, $this->eventDispatcher, $this->templating, $this->editMode
+        );
+
+        $this->pageStack->setPageResponse($pageResponse);
+
+        return $pageResponse;
     }
 
     /**

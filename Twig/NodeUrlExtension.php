@@ -50,8 +50,30 @@ class NodeUrlExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'currentUrl' => new \Twig_SimpleFunction('currentUrl', [$this, 'getUrl'])
+            'currentUrl' => new \Twig_SimpleFunction('currentUrl', [$this, 'getUrl']),
+            'class_when_uri' => new \Twig_SimpleFunction('class_when_uri', [$this, 'classWhenUri']),
+            'is_uri' => new \Twig_SimpleFunction('is_uri', [$this, 'isUri'])
         );
+    }
+
+    public function isUri($index, $expected = null)
+    {
+        $url = trim($this->pageStack->getRequest()->getPathInfo(), '/');
+        $uris = explode('/', $url);
+
+        $uri = isset($uris[$index]) ? $uris[$index] : null;
+
+        return $uri === $expected;
+    }
+
+    public function classWhenUri($className, $index, $expected = null)
+    {
+        $url = trim($this->pageStack->getRequest()->getPathInfo(), '/');
+        $uris = explode('/', $url);
+
+        $uri = isset($uris[$index]) ? $uris[$index] : null;
+
+        return $uri === $expected ? $className : '';
     }
 
     public function getUrl($nodeOrId = false)

@@ -423,14 +423,25 @@ class PageStack
     /**
      * Returns a super fast cached Page object.
      *
-     * @param  int $pageId If not defined, it returns the current page.
+     * @param Node|string|int $node Node model, url or node id
      *
-     * @return Node
+     * @return Node|null
      */
-    public function getPage($pageId = null)
+    public function getPage($node)
     {
-        if (!$pageId) {
-            return $this->getCurrentPage();
+        $pageId = $node;
+
+        if ($node instanceof Node) {
+            return $node;
+        }
+
+        if (!is_numeric($node)) {
+            $urlsToPage = $this->getCachedUrlToPage($this->getCurrentDomain()->getId());
+            if (isset($urlsToPage[$node])) {
+                $pageId = $urlsToPage[$node];
+            } else {
+                return null;
+            }
         }
 
         $data = $this->cacher->getDistributedCache('core/object/node/' . $pageId);
@@ -442,7 +453,7 @@ class PageStack
             $page = unserialize($data);
         }
 
-        return $page ?: false;
+        return $page ?: null;
     }
 
     /**
