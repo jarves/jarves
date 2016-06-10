@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6ddfda278aecdbd9b059accba3aed817",
+    "hash": "6096312012988abe53f32392e4365cc9",
     "content-hash": "fe8dcfa6cdc241679859eef7c8a75720",
     "packages": [
         {
@@ -858,12 +858,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kadet1090/KeyLighter.git",
-                "reference": "54eb3fa9704beb18ac9880170339bed7fe81ac63"
+                "reference": "56e355258dc23a68f98ec95b348d6afecd51a00b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kadet1090/KeyLighter/zipball/54eb3fa9704beb18ac9880170339bed7fe81ac63",
-                "reference": "54eb3fa9704beb18ac9880170339bed7fe81ac63",
+                "url": "https://api.github.com/repos/kadet1090/KeyLighter/zipball/56e355258dc23a68f98ec95b348d6afecd51a00b",
+                "reference": "56e355258dc23a68f98ec95b348d6afecd51a00b",
                 "shasum": ""
             },
             "require": {
@@ -895,7 +895,7 @@
                 }
             ],
             "description": "Yet another syntax highlighter for PHP",
-            "time": "2016-04-15 22:04:59"
+            "time": "2016-06-06 14:32:01"
         },
         {
             "name": "michelf/php-markdown",

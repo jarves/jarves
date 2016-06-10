@@ -5,6 +5,8 @@ namespace Jarves\ContentTypes;
 use Jarves\PageStack;
 use Michelf\Markdown;
 use Michelf\MarkdownExtra;
+use Kadet\Highlighter;
+use Kadet\Highlighter\Language\Language;
 
 /**
  * Extends Michelfs\Markdown with code syntax highglighting
@@ -26,45 +28,15 @@ class Markdowner
     public function transform($text)
     {
         $parser = new MarkdownExtra;
-
         $stylesAdded = false;
 
-        $classMap = [
-            'js' => 'JavaScript',
-            'javascript' => 'JavaScript',
-            'php' => 'Php',
-            'css' => 'css',
-            'scss' => 'Css\\Scss',
-            'less' => 'Css\\Less',
-            'sass' => 'Css\\Sass',
-            'ini' => 'ini',
-            'latex' => 'latex',
-            'perl' => 'perl',
-            'powershell' => 'PowerShell',
-            'sql' => 'Sql',
-            'mysql' => 'Sql\\MySQL',
-            'xml' => 'Xml',
-            'html' => 'Html',
-            'python' => 'Python',
-        ];
-        
-        $parser->code_block_content_func = function ($code, $language) use (&$stylesAdded, $classMap) {
-            if (!$stylesAdded ){
+        $parser->code_block_content_func = function ($code, $language) use (&$stylesAdded) {
+            if (!$stylesAdded){
                 $this->pageStack->getPageResponse()->addCssFile('@Jarves/keylighter/default.scss');
                 $stylesAdded = true;
             }
 
-            if (!isset($classMap[$language])) {
-                return htmlentities($code);
-            }
-
-            $class = '\\Kadet\\Highlighter\\Language\\' . $classMap[$language];
-
-            /** @var \Kadet\Highlighter\Language\Language $parser */
-            $parser = new $class();
-            $out = new \Kadet\Highlighter\Formatter\HtmlFormatter();
-
-            return $out->format($parser->parse($code));
+            return Highlighter\highlight($code, Language::byName($language));
         };
 
         return $parser->transform($text);
