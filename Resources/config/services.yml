@@ -271,7 +271,7 @@ services:
 
      jarves.asset_handler.scss:
         class: "%jarves.asset_handler.scss.class%"
-        arguments: ["@jarves", "@jarves.filesystem.web"]
+        arguments: ["@jarves", "@jarves.filesystem.local"]
         tags:
             - { name: jarves.asset_handler.compiler, extension: scss }
 

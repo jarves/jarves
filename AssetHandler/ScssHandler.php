@@ -25,17 +25,17 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
     /**
      * @var Filesystem
      */
-    protected $webFilesystem;
+    protected $filesystem;
 
     /**
      * CssHandler constructor.
      * @param Jarves $jarves
-     * @param Filesystem $webFilesystem
+     * @param Filesystem $filesystem
      */
-    public function __construct(Jarves $jarves, Filesystem $webFilesystem)
+    public function __construct(Jarves $jarves, Filesystem $filesystem)
     {
         parent::__construct($jarves);
-        $this->webFilesystem = $webFilesystem;
+        $this->filesystem = $filesystem;
     }
 
     public function compileFile(AssetInfo $assetInfo)
@@ -57,8 +57,8 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
         $sourceMTime = filemtime($localPath);
         $dir = dirname($localPath);
 
-        if (file_exists($targetPath)) {
-            $fh = fopen($targetPath, 'r+');
+        if ($this->filesystem->has('web/' . $targetPath)) {
+            $fh = $this->filesystem->handle('web/' . $targetPath);
             if ($fh) {
                 $firstLine = fgets($fh);
                 $info = substr($firstLine, strlen('/* compiled at '), -3);
@@ -138,7 +138,7 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
             $dependencies = implode(',', $dependencies);
             $info = "$sourceMTime $dependencies";
             $compiled = "/* compiled at $info */\n" . $compiled;
-            $this->webFilesystem->write($targetPath, $compiled);
+            $this->filesystem->write('web/' . $targetPath, $compiled);
         }
 
         $assetInfo = new AssetInfo();
