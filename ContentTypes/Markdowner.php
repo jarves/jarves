@@ -3,7 +3,6 @@
 namespace Jarves\ContentTypes;
 
 use Jarves\PageStack;
-use Michelf\Markdown;
 use Michelf\MarkdownExtra;
 use Kadet\Highlighter;
 use Kadet\Highlighter\Language\Language;
@@ -30,14 +29,16 @@ class Markdowner
         $parser = new MarkdownExtra;
         $stylesAdded = false;
 
-        $parser->code_block_content_func = function ($code, $language) use (&$stylesAdded) {
-            if (!$stylesAdded){
-                $this->pageStack->getPageResponse()->addCssFile('@Jarves/keylighter/default.scss');
-                $stylesAdded = true;
-            }
+        if (class_exists('Kadet\Highlighter\Language\Language')) {
+            $parser->code_block_content_func = function ($code, $language) use (&$stylesAdded) {
+                if (!$stylesAdded) {
+                    $this->pageStack->getPageResponse()->addCssFile('@Jarves/keylighter/default.scss');
+                    $stylesAdded = true;
+                }
 
-            return Highlighter\highlight($code, Language::byName($language));
-        };
+                return Highlighter\highlight($code, Language::byName($language));
+            };
+        }
 
         return $parser->transform($text);
     }
