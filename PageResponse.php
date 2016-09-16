@@ -1033,8 +1033,6 @@ class PageResponse extends Response
     {
         $assetHandlerContainer = $this->assetCompilerContainer;
 
-//        /** @var $assets \Jarves\AssetHandler\AssetInfo[] */
-
         // sort by priority, highest => lowest
         krsort($this->assetsInfo);
         krsort($this->assetsInfoBottom);

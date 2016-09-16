@@ -20,15 +20,9 @@
             "Jarves\\": ""
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/marcj/PropelBundle"
-        }
-    ],
     "require": {
         "php": ">=5.6",
-        "symfony/symfony": "^3.0",
+        "symfony/symfony": "^2.8|^3.0",
         "twig/extensions": ">=1.0",
         "symfony/monolog-bundle": ">=2.8",
         "sensio/distribution-bundle": ">=2.3",
@@ -40,7 +34,7 @@
         "sybio/image-workshop": ">=2",
         "michelf/php-markdown": "^1.6",
         "composer\/composer": "1.0.0",
-        "friendsofsymfony/rest-bundle": "2.0.0-BETA2",
+        "friendsofsymfony/rest-bundle": "2.1.0",
         "nelmio/api-doc-bundle": "~2.5",
         "icap/html-diff": ">=1.0.1",
         "kadet/keylighter": "dev-master"

@@ -86,13 +86,22 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
                     foreach ($dependencies as $dependency) {
                         list($path, $depLastMTime) = explode(':', $dependency);
                         $depLastMTime = (int)$depLastMTime;
+
+                        if (!file_exists($dir . '/' . $path)) {
+                            //depended file does not exist anymore, so we need to recompile
+                            $needsCompilation = true;
+                            break;
+                        }
+
                         $depSourceMTime = filemtime($dir . '/' . $path);
+
                         if ($depLastMTime !== $depSourceMTime) {
                             $needsCompilation = true;
                             break;
                         }
                     }
                 }
+
             }
         }
 
@@ -147,7 +156,7 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
         return $assetInfo;
     }
 
-    public function resolveDependencies($localPath, array &$dependencies, &$seen = [])
+    public function resolveDependencies($localPath, array &$dependencies, &$seen = [], $relativeTo = null)
     {
         $localPath = realpath($localPath);
         $content = file_get_contents($localPath);
@@ -169,9 +178,9 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
             $seen[$path] = true;
 
             if (file_exists($path)) {
-                $dependencies[] = Tools::getRelativePath($path, dirname($localPath)) . ':' . filemtime($path);
+                $dependencies[] = Tools::getRelativePath($path, dirname($relativeTo ?: $localPath)) . ':' . filemtime($path);
 
-                $this->resolveDependencies($path, $dependencies, $seen);
+                $this->resolveDependencies($path, $dependencies, $seen, $localPath);
             }
         }
     }
