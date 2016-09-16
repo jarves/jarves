@@ -40,7 +40,7 @@ class Domain extends BaseDomain
      */
     public function getRealDomain()
     {
-        return $this->realDomain;
+        return $this->realDomain ?: $this->getDomain();
     }
 
     public function setThemeOptions($v)

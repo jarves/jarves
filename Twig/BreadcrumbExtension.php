@@ -69,7 +69,7 @@ class BreadcrumbExtension extends \Twig_Extension
         $breadcrumbs = [];
         $page = $this->pageStack->getCurrentPage();
 
-        $cacheKey = 'core/breadcrumbs/' . $page->getId();
+        $cacheKey = 'core/breadcrumbs/' . $page->getCacheKey();
         if ($cache = $this->cacher->getDistributedCache($cacheKey)) {
             if (is_string($cache)) {
                 return $cache;

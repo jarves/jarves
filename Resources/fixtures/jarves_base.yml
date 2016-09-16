@@ -1,0 +1,11 @@
+Jarves\Model\User:
+  user_admin: {id: 1, username: "admin", activate: true, email: 'admin@localhost', password: "$2y$13$ZwUmzpVBBwcfjpFBvRgNrOAMqYxslB/TvhrEnZa.jocVISQz9jsUa"}
+
+Jarves\Model\Group:
+  group_admin: {id: 1, name: "admin"}
+
+Jarves\Model\UserGroup:
+  - {user_id: user_admin, groups_id: group_admin}
+
+Jarves\Model\Language:
+  - {code: "en", title: "English", langtitle: "English"}

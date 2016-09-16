@@ -21,6 +21,7 @@ use Jarves\AssetHandler\JsHandler;
 use Jarves\Configuration\ThemeLayout;
 use Jarves\Model\Content;
 use Jarves\Model\ContentInterface;
+use Jarves\Model\Domain;
 use Jarves\Model\Node;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -536,8 +537,21 @@ class PageResponse extends Response
         $this->stopwatch->stop("Render PageResponse");
     }
 
+    /**
+     * Makes sure we have domain object.
+     *
+     * @param Request $request
+     */
     public function prepare(Request $request)
     {
+        if (!$this->pageStack->getCurrentDomain()) {
+            $domain = new Domain();
+            $domain->setDomain($this->pageStack->getRequest()->getHost());
+            $domain->setPath($this->pageStack->getRequest()->getBasePath());
+            $domain->setMaster(true);
+            $this->pageStack->setCurrentDomain($domain);
+        }
+
         parent::prepare($request);
 
         if (!$this->getContent()) {
@@ -654,7 +668,16 @@ class PageResponse extends Response
             return '';
         }
 
-        $themeId = $page->getTheme() ?: $this->pageStack->getCurrentDomain()->getTheme();
+        $themeId = $page->getTheme();
+
+        if (!$themeId && $this->pageStack->getCurrentDomain()) {
+            $themeId = $this->pageStack->getCurrentDomain()->getTheme();
+        }
+
+        if (!$themeId) {
+            throw new \LogicException('PageResponse class was not able to find a theme to use for rendering the body. Define one at the currentPage or currentDomain of PageStack.');
+        }
+
         if (!$theme = $this->jarves->getConfigs()->getTheme($themeId)) {
             $this->stopwatch->stop('Build PageBody');
             throw new \LogicException(sprintf('Theme `%s` not found.', $themeId));
@@ -684,7 +707,7 @@ class PageResponse extends Response
                     'page' => $this->pageStack->getCurrentPage(),
                     'domain' => $this->pageStack->getCurrentDomain(),
                     'baseUrl' => $this->getBaseHref(),
-                    'themeOptions' => $this->pageStack->getCurrentDomain()->getThemeOptions()
+                    'themeOptions' => $this->pageStack->getCurrentDomain() ? $this->pageStack->getCurrentDomain()->getThemeOptions() : []
                 )
             );
         } catch (\Exception $e) {
@@ -857,7 +880,7 @@ class PageResponse extends Response
         }
 
         if ($this->getDomainHandling() && $this->pageStack->getCurrentDomain()) {
-            $title = $this->pageStack->getCurrentDomain()->getTitleFormat();
+            $title = $this->pageStack->getCurrentDomain()->getTitleFormat() ?: '%title%';
 
             if ($page = $this->pageStack->getCurrentPage()) {
                 return str_replace(
@@ -871,8 +894,8 @@ class PageResponse extends Response
                     $title
                 );
             }
-        } else {
-            return $this->title;
+        } else if ($this->pageStack->getCurrentPage()) {
+            return $this->pageStack->getCurrentPage()->getTitle();
         }
     }
 

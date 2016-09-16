@@ -18,6 +18,7 @@ namespace Jarves;
 use Jarves\AssetHandler\Container;
 use Jarves\Model\Node;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Router;
 use Symfony\Component\Templating\EngineInterface;
 
 class PageResponseFactory
@@ -54,6 +55,10 @@ class PageResponseFactory
      * @var PageStack
      */
     private $pageStack;
+    /**
+     * @var Router
+     */
+    private $router;
 
     /**
      * @param Jarves $jarves
@@ -66,7 +71,7 @@ class PageResponseFactory
      */
     public function __construct(Jarves $jarves, PageStack $pageStack, StopwatchHelper $stopwatch, Container $assetCompilerContainer,
                                 EventDispatcherInterface $eventDispatcher, EngineInterface $templating,
-                                EditMode $editMode)
+                                EditMode $editMode, Router $router)
     {
         $this->jarves = $jarves;
         $this->stopwatch = $stopwatch;
@@ -75,6 +80,7 @@ class PageResponseFactory
         $this->templating = $templating;
         $this->editMode = $editMode;
         $this->pageStack = $pageStack;
+        $this->router = $router;
     }
 
     /**
@@ -86,6 +92,35 @@ class PageResponseFactory
             $data, 200, [],
             $this->pageStack, $this->jarves, $this->stopwatch, $this->assetCompilerContainer, $this->eventDispatcher, $this->templating, $this->editMode
         );
+    }
+
+    /**
+     * Creates a new PageResponse object based on the current found route (using Symfony's router) or using $routeName.
+     * You need to define at your routes additional options: title, theme, layout.
+     *
+     * @param null $routeName Per default current route name, if available
+     * @param string|array|null $contents
+     *
+     * @return PageResponse
+     */
+    public function createFromRoute($routeName = null, $contents = null)
+    {
+        if (!$routeName) {
+            $routeName = $this->pageStack->getRequest()->attributes->get('_route');
+            if (!$routeName) {
+                throw new \RuntimeException('Could not detect route name');
+            }
+        }
+
+        $route = $this->router->getRouteCollection()->get($routeName);
+
+        if (!$route) {
+            throw new \RuntimeException("Route with name `$routeName` does not exist");
+        }
+
+        $page = Node::createPage($route->getOption('title'), $route->getPath(), $route->getOption('theme'), $route->getOption('layout'));
+
+        return $this->createWithPage($page, $contents);
     }
 
     /**
@@ -102,9 +137,6 @@ class PageResponseFactory
             throw new \InvalidArgumentException('Can not find page.');
         }
         $this->pageStack->setCurrentPage($page);
-        if (null !== $contents) {
-            $page->setOverwrittenContents($contents);
-        }
 
         $pageResponse = new PageResponse(
             '', 200, [],
@@ -112,6 +144,10 @@ class PageResponseFactory
         );
 
         $this->pageStack->setPageResponse($pageResponse);
+
+        if (null !== $contents) {
+            $pageResponse->setPageContent($contents);
+        }
 
         return $pageResponse;
     }

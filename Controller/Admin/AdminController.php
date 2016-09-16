@@ -99,41 +99,6 @@ class AdminController extends Controller
     }
 
     /**
-     * @Rest\Get("/test")
-     *
-     * @param ParamFetcher $paramFetcher
-     *
-     * @return array
-     */
-    public function getTest(ParamFetcher $paramFetcher)
-    {
-        $config = $this->getJarves()->getConfig('jarves')->getEntryPoint('nodes')->getBundle();
-        var_dump($config);
-        exit;
-    }
-
-
-//    /**
-//     * @ApiDoc(
-//     *  section="Administration",
-//     *  description="Returns a layout template/view with placeholder for Jarves page editor."
-//     * )
-//     *
-//     * @Rest\QueryParam(name="template", requirements=".+", strict=true, description="The template/view to be used for this content")
-//     * @Rest\QueryParam(name="type", requirements=".+", strict=true, description="The content type")
-//     *
-//     * @Rest\Get("/admin/content/template")
-//     *
-//     * @param ParamFetcher $paramFetcher
-//     *
-//     * @return array
-//     */
-//    public function getInlineEditorAction()
-//    {
-//
-//    }
-
-    /**
      * @ApiDoc(
      *  section="Administration",
      *  description="Returns a content template/view with placeholder for Jarves page editor."

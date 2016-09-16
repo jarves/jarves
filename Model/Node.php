@@ -34,10 +34,11 @@ class Node extends BaseNode
     protected $path;
 
     /**
-     * @param string $title
-     * @param string $urn
+     * @param string      $title
+     * @param string      $urn
      * @param string|null $theme
      * @param string|null $layout
+     *
      * @return Node
      */
     public static function createPage($title, $urn, $theme = null, $layout = null)
@@ -53,20 +54,21 @@ class Node extends BaseNode
     }
 
     /**
-     * @param array $overwrittenContents
-     * @return $this
+     * @return string
      */
-    public function setOverwrittenContents($overwrittenContents)
+    public function getCacheKey()
     {
-        $this->overwrittenContents = $overwrittenContents;
+        if (null !== $this->getId()){
+            return (string)$this->getId();
+        }
 
-        return $this;
+        return $this->getUrn();
     }
 
     /**
      * Same as getChildren but returns only visible pages and non-folder nodes
      *
-     * @param  boolean                 $pWithFolders
+     * @param  boolean $pWithFolders
      *
      * @return ObjectCollection
      */
@@ -108,7 +110,6 @@ class Node extends BaseNode
         $links = $this->getLinks();
 
         return count($links) !== 0;
-
     }
 
     /**
@@ -122,13 +123,16 @@ class Node extends BaseNode
 
             $this->parentsCached = array();
 
+            if ($this->isNew()) {
+                return $this->parentsCached ?: [];
+            }
+
             $ancestors = $this->getAncestors();
             foreach ($ancestors as $parent) {
 
                 if ($parent->getType() !== null && $parent->getType() < 2) { //exclude root node
                     $this->parentsCached[] = $parent;
                 }
-
             }
         }
 
