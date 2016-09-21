@@ -65,7 +65,7 @@ class FileStorage extends AbstractStorage
         $result = [];
 
         $finder = Finder::create()
-            ->in('web')
+            ->in($webRoot = sprintf('%s/../web', $this->jarves->getRootDir()))
             ->followLinks()
             ->exclude('cache')
             ->exclude('bundles/jarves')
@@ -83,7 +83,7 @@ class FileStorage extends AbstractStorage
 
         /** @var SplFileInfo $file */
         foreach ($finder as $file) {
-            $path = substr($file->getPath() . '/'. $file->getFilename(), 4);
+            $path = substr($file->getPath() . '/'. $file->getFilename(), strlen($webRoot));
 
             if ($regexSearch) {
                 if (!preg_match($regex, $file->getFilename())) {
@@ -363,7 +363,7 @@ class FileStorage extends AbstractStorage
      * Checks the file access.
      *
      * @param $path
-     * 
+     *
      * @throws AccessDeniedException
      */
     public function checkAccess($path)
