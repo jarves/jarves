@@ -16,6 +16,7 @@ namespace Jarves;
 
 
 use Jarves\AssetHandler\Container;
+use Jarves\Cache\Cacher;
 use Jarves\Model\Node;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Router;
@@ -59,6 +60,10 @@ class PageResponseFactory
      * @var Router
      */
     private $router;
+    /**
+     * @var Cacher
+     */
+    private $cacher;
 
     /**
      * @param Jarves $jarves
@@ -71,7 +76,7 @@ class PageResponseFactory
      */
     public function __construct(Jarves $jarves, PageStack $pageStack, StopwatchHelper $stopwatch, Container $assetCompilerContainer,
                                 EventDispatcherInterface $eventDispatcher, EngineInterface $templating,
-                                EditMode $editMode, Router $router)
+                                EditMode $editMode, Router $router, Cacher $cacher)
     {
         $this->jarves = $jarves;
         $this->stopwatch = $stopwatch;
@@ -81,6 +86,7 @@ class PageResponseFactory
         $this->editMode = $editMode;
         $this->pageStack = $pageStack;
         $this->router = $router;
+        $this->cacher = $cacher;
     }
 
     /**
@@ -112,12 +118,33 @@ class PageResponseFactory
             }
         }
 
-        $route = $this->router->getRouteCollection()->get($routeName);
+        $reflection = new \ReflectionClass($this->router->getGenerator());
+        $key = 'jarves_routes';
 
-        if (!$route) {
+        $cache = $this->cacher->getFastCache($key);
+        $validCache = false;
+        $routes = [];
+
+        if ($cache) {
+            $validCache = $cache['time'] === filemtime($reflection->getFileName()) && isset($cache['routes']) && is_string($cache['routes']);
+            if ($validCache) {
+                $routes = unserialize($cache['routes']);
+            }
+        }
+
+        if (!$validCache) {
+            $routes = $this->router->getRouteCollection()->all();
+            $this->cacher->setFastCache($key, [
+                'time' => filemtime($reflection->getFileName()),
+                'routes' => serialize($routes)
+            ]);
+        }
+
+        if (!isset($routes[$routeName])) {
             throw new \RuntimeException("Route with name `$routeName` does not exist");
         }
 
+        $route = $routes[$routeName];
         $page = Node::createPage($route->getOption('title'), $route->getPath(), $route->getOption('theme'), $route->getOption('layout'));
 
         return $this->createWithPage($page, $contents);

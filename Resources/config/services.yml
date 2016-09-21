@@ -94,7 +94,7 @@ services:
 
      jarves.page_response.factory:
          class: Jarves\PageResponseFactory
-         arguments: ["@jarves", "@jarves.page_stack", "@jarves.stopwatch", "@jarves.asset_handler.container", "@event_dispatcher", "@templating", "@jarves.editmode", "@router"]
+         arguments: ["@jarves", "@jarves.page_stack", "@jarves.stopwatch", "@jarves.asset_handler.container", "@event_dispatcher", "@templating", "@jarves.editmode", "@router", "@jarves.cache.cacher"]
 
      jarves.cache.fast:
          class: "%jarves.cache.fast.class%"
