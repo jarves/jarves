@@ -582,12 +582,12 @@ jarves.WindowCombine = new Class({
 
     },
 
-    checkScrollPosition: function(pRecheck, pAndScrollToSelect) {
+     checkScrollPosition: function(pRecheck, pAndScrollToSelect) {
         if (this.loadingNewItems) {
             return;
         }
 
-        if (this.mainLeftItems.getScroll().y - (this.mainLeftItems.getScrollSize().y - this.mainLeftItems.getSize().y) > 0) {
+        if (this.mainLeftItems.getScroll().y - (this.mainLeftItems.getScrollSize().y - this.mainLeftItems.getSize().y) >= 0) {
             this.loadMore(pAndScrollToSelect);
         } else if (this.maxItems > 0 && (this.mainLeftItems.getScrollSize().y - this.mainLeftItems.getSize().y) == 0) {
             this.loadMore(pAndScrollToSelect);
@@ -683,7 +683,6 @@ jarves.WindowCombine = new Class({
                 } else {
                     this.loadItems(pFrom, pMax, pAndScrollToSelect);
                 }
-
             }.bind(this));
         }
 
