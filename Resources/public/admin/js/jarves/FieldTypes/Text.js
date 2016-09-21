@@ -36,6 +36,11 @@ jarves.FieldTypes.Text = new Class({
                 label: t('Redirect this value always'),
                 description: t('Redirect this value always to another field (and overwrites it always). Example: fieldName:modifier1|modifier2,fieldName2:modifier3'),
                 type: 'text'
+            },
+            sign: {
+                label: 'Sign',
+                description: t('Which character should be displayed at the end of the field (usually used for currency)'),
+                type: 'text'
             }
         }
     },
@@ -134,9 +139,10 @@ jarves.FieldTypes.Text = new Class({
             this.main.disabled = true;
         }
 
-        if (this.options.inputIcon) {
+        if (this.options.inputIcon || this.options.sign) {
             this.main = new Element('div', {
                 'class': 'jarves-Input-text-container',
+                'data-sign': this.options.sign,
                 styles: {
                     'width': this.options.inputWidth == '100%' ? null : this.options.inputWidth,
                     'height': this.options.inputHeight ? parseInt(this.options.inputHeight) - 2 : null
@@ -146,15 +152,21 @@ jarves.FieldTypes.Text = new Class({
 
             this.input.addClass('withIcon');
 
-            if ('#' === this.options.inputIcon.substr(0, 1)) {
-                new Element('span', {
-                    'class': 'jarves-Input-text-icon ' + this.options.inputIcon.substr(1)
-                }).inject(this.main);
-            } else {
-                new Element('img', {
-                    'class': 'jarves-Input-text-icon',
-                    src: jarves.mediaPath(this.options.inputIcon)
-                }).inject(this.main);
+            if (this.options.inputIcon) {
+                if ('#' === this.options.inputIcon.substr(0, 1)) {
+                    new Element('span', {
+                        'class': 'jarves-Input-text-icon ' + this.options.inputIcon.substr(1)
+                    }).inject(this.main);
+                } else {
+                    new Element('img', {
+                        'class': 'jarves-Input-text-icon',
+                        src: jarves.mediaPath(this.options.inputIcon)
+                    }).inject(this.main);
+                }
+            }
+
+            if (this.options.sign) {
+                this.main.addClass('jarves-Input-text-container-with-sign');
             }
         }
 

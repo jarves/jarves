@@ -81,13 +81,7 @@ class TypeObject extends AbstractType
     public function getSelection()
     {
         $selection = [];
-        if ($columns = $this->getColumns()) {
-            foreach ($columns as $column) {
-                $selection[] = $column->getName();
-            }
-        } else {
-            $selection[] = $this->getFieldDefinition()->getId();
-        }
+        $selection[] = $this->getFieldDefinition()->getId();
 
         return $selection;
     }

@@ -1011,7 +1011,7 @@ jarves.WindowEdit = new Class({
         if (this.classProperties.usePatch) {
             this.lastSaveRq.patch(request);
         } else {
-            this.lastSaveRq.post(request);
+            this.lastSaveRq.put(request);
         }
     }
 });

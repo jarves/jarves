@@ -33,16 +33,16 @@ input.text {
 
     display: inline-block;
 
-
     min-width: 20px;
 
-    -webkit-appearance : none;
+    -webkit-appearance: none;
 
     @include box-sizing(border-box);
     @include transition(all 0.2s ease-out);
     background-color: lighten($mainColor, 5%);
     border: 1px solid darken($mainColor, 8%);
     border-radius: 2px;
+
 }
 
 .jarves-Input-text:hover,
@@ -57,6 +57,21 @@ textarea.jarves-Input-text {
 .jarves-Input-text-container {
     display: inline-block;
     position: relative;
+}
+
+.jarves-Input-text-container-with-sign {
+    &::before {
+        border-radius: 2px;
+        line-height: 26px;
+        content: attr(data-sign);
+        position: absolute;
+        left: 1px;
+        top: 1px;
+        bottom: 1px;
+        padding: 0 4px;
+        background-color: #eee;
+        text-align: right;
+    }
 }
 
 .jarves-Input-text-icon {

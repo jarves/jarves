@@ -10,6 +10,7 @@
     <column name="target" type="VARCHAR" size="255"/>
     <column name="visible" type="BOOLEAN" default="true"/>
     <column name="access_denied" type="BOOLEAN"/>
+    <column name="meta_description" type="VARCHAR" size="255"/>
     <column name="meta" type="VARCHAR" size="255"/>
     <column name="force_https" type="BOOLEAN"/>
     <column name="access_from" type="BIGINT"/>

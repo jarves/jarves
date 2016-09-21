@@ -6,6 +6,14 @@
     <column name="password" type="VARCHAR" size="512"/>
     <column name="activation_key" type="VARCHAR" size="255"/>
     <column name="email" type="VARCHAR" size="255"/>
+    <column name="company" type="VARCHAR" size="255"/>
+    <column name="street" type="VARCHAR" size="255"/>
+    <column name="city" type="VARCHAR" size="255"/>
+    <column name="country" type="VARCHAR" size="255"/>
+    <column name="phone" type="VARCHAR" size="255"/>
+    <column name="fax" type="VARCHAR" size="255"/>
+
+    <column name="zip" type="INTEGER"/>
     <column name="settings" type="OBJECT"/>
     <column name="widgets" type="OBJECT"/>
     <column name="activate" type="BOOLEAN"/>

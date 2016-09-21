@@ -29,6 +29,7 @@ use Jarves\Tools;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
@@ -88,8 +89,10 @@ class Propel extends AbstractStorage
         $this->conditionOperator = $conditionOperator;
     }
 
-    public function init()
+    public function configure($objectKey, $definition)
     {
+        parent::configure($objectKey, $definition);
+
         if ($this->propelPrimaryKeys) {
             return;
         }
@@ -144,7 +147,6 @@ class Propel extends AbstractStorage
             $fields[] = $this->definition->getTreeLabel();
         }
 
-        $this->init();
         $query = $this->getQueryClass();
         list($fields, $relations, $relationFields) = $this->getFields($fields);
         $selects = array_keys($fields);
@@ -225,8 +227,6 @@ class Propel extends AbstractStorage
      */
     public function getFields($fields)
     {
-        $this->init();
-
         if ($fields != '*' && is_string($fields)) {
             $fields = explode(',', str_replace(' ', '', trim($fields)));
         }
@@ -341,7 +341,10 @@ class Propel extends AbstractStorage
                         $column = $tableMap->getColumnByPhpName(ucfirst($field))
                     ) {
                         $fields2[$column->getPhpName()] = $column;
+                        continue;
                     }
+
+                    throw new \RuntimeException("In table {$tableMap->getName()} does not have field `{$field}` nor relation `{$relationName}`.");
                 }
             }
         }
@@ -439,9 +442,7 @@ class Propel extends AbstractStorage
     public function getPhpName($objectName = null)
     {
         $clazz = Objects::normalizeObjectKey($objectName ?: $this->getObjectKey());
-        $clazz = ucfirst(
-            $this->objects->getNamespace($clazz) . '\\Model\\' . $this->objects->getName($clazz)
-        );
+        $clazz = $this->objects->getNamespace($clazz) . '\\Model\\' . ucfirst($this->objects->getName($clazz));
 
         return $clazz;
     }
@@ -477,6 +478,8 @@ class Propel extends AbstractStorage
     }
 
     /**
+     * Maps options like limit, offset, order
+     *
      * @param ModelCriteria $query
      * @param array $options
      *
@@ -515,6 +518,50 @@ class Propel extends AbstractStorage
                     $query->orderBy($column->getName(), $direction);
                 }
             }
+        }
+    }
+
+    /**
+     *
+     * @param array|Collection|ModelCriteria $query
+     * @param callable      $callback
+     *
+     * @return array
+     */
+    public function mapResult($result, callable $callback)
+    {
+        if ($result instanceof ModelCriteria) {
+            $result = $result->find()->getArrayCopy();
+        }
+
+        if ($result instanceof Collection) {
+            $result = $result->getArrayCopy();
+        }
+
+        return array_map($callback, $result);
+    }
+
+    /**
+     * Adds $query->where() based on $condition.
+     *
+     * @param ModelCriteria  $query
+     * @param Condition|null $condition
+     */
+    public function mapCondition(ModelCriteria $query, Condition $condition = null)
+    {
+        if (!$condition) {
+            return;
+        }
+
+        $params = [];
+        $sql = $this->conditionOperator->standardConditionToSql($condition, $params, $this->getObjectKey());
+
+        $connection = \Propel\Runtime\Propel::getConnection('default');
+        if ($sql) {
+            foreach ($params as $k => $param) {
+                $sql = str_replace(' ' . $k, ' ' . $connection->quote($param), $sql);
+            }
+            $query->where($sql);
         }
     }
 
@@ -746,11 +793,39 @@ class Propel extends AbstractStorage
     }
 
     /**
+     * Checks whether only primary key fields should be selected.
+     *
+     * @param array $options with 'fields' item (e.g ['fields' => 'id, name'])
+     *
+     * @return bool
+     */
+    public function onlyPrimaryKeySelected($options)
+    {
+        if (!isset($options['fields']) || '*' === $options['fields'] || '' === $options['fields'] ) {
+            return false;
+        }
+
+        $fields = $options['fields'];
+
+        if ($fields != '*' && is_string($fields)) {
+            $fields = explode(',', str_replace(' ', '', trim($fields)));
+            $fields = array_map(function($word) { return ucfirst($word); }, $fields);
+        }
+
+        $primaryKeys = $this->getDefinition()->getPrimaryKeyNames();
+
+        if (count($primaryKeys) !== count($fields)) {
+            return false;
+        }
+
+        return !array_diff($primaryKeys, $fields);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getItems(array $filter = null, Condition $condition = null, $options = null)
     {
-        $this->init();
         $query = $this->getQueryClass();
         list($fields, $relations, $relationFields) = $this->getFields($options['fields']);
         $selects = array_keys($fields);
@@ -855,7 +930,6 @@ class Propel extends AbstractStorage
      */
     public function getItem($pk, $options = array())
     {
-        $this->init();
         $query = $this->getQueryClass();
         $query->limit(1);
 
@@ -947,8 +1021,6 @@ class Propel extends AbstractStorage
      */
     public function update($pk, $values)
     {
-        $this->init();
-
         $query = $this->getQueryClass();
 
         $this->mapPk($query, $pk);
@@ -964,8 +1036,6 @@ class Propel extends AbstractStorage
      */
     public function patch($pk, $values)
     {
-        $this->init();
-
         $query = $this->getQueryClass();
 
         $this->mapPk($query, $pk);
@@ -1036,8 +1106,6 @@ class Propel extends AbstractStorage
      */
     public function add($values, $targetPk = null, $mode = 'first', $scope = null)
     {
-        $this->init();
-
         $clazz = $this->getPhpName();
         $obj = new $clazz();
 

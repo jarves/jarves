@@ -1306,6 +1306,9 @@ class ObjectCrud implements ObjectCrudInterface
     protected function getItemsSelection($fields = null)
     {
         $fields = Tools::listToArray($fields);
+        if ($fields) {
+            return $fields;
+        }
 
         if (!$fields && $this->getColumns()) {
             $fields = [];

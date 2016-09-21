@@ -1094,7 +1094,7 @@ class Field extends Model
     public function validate()
     {
         if (!$this->hasFieldType()){
-            return true;
+            return [];
         }
 
         if ($this->isVirtual()) {
