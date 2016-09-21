@@ -516,6 +516,7 @@ class FrontendRouter
 
         if (!$foundDomain) {
             $dispatcher->dispatch('core/domain-not-found', new GenericEvent($hostname));
+            $this->stopwatch->stop($title);
 
             return null;
         }
@@ -528,7 +529,7 @@ class FrontendRouter
 
     /**
      * Returns the id of given path-info. Null if not existent.
-     * 
+     *
      * @return Node|null
      */
     public function searchPage()
