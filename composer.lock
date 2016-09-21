@@ -4,7 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "a2947c948b2778e7e073d9906aec7dd5",
+    "hash": "3af7131d3351b451efb7bbc0a9f0d003",
+    "content-hash": "a5464a71858fc3a66d46e8e6cecc1068",
     "packages": [
         {
             "name": "composer/composer",
@@ -852,52 +853,6 @@
             "time": "2016-01-25 15:43:01"
         },
         {
-            "name": "kadet/keylighter",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/kadet1090/KeyLighter.git",
-                "reference": "9f195d70411b1c7bd03c080e80e95323d1bcc18c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/kadet1090/KeyLighter/zipball/9f195d70411b1c7bd03c080e80e95323d1bcc18c",
-                "reference": "9f195d70411b1c7bd03c080e80e95323d1bcc18c",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.5.0",
-                "symfony/console": "^3.1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "4.8.*"
-            },
-            "bin": [
-                "bin/keylighter"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Kadet\\Highlighter\\": "."
-                },
-                "files": [
-                    "./functions.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Kacper Donat",
-                    "email": "contact@kadet.net"
-                }
-            ],
-            "description": "Yet another syntax highlighter for PHP",
-            "time": "2016-09-04 16:32:15"
-        },
-        {
             "name": "michelf/php-markdown",
             "version": "1.6.0",
             "source": {
@@ -1323,22 +1278,30 @@
         },
         {
             "name": "psr/log",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "fe0936ee26643249e916849d48e3a51d5f5e278b"
+                "reference": "5277094ed527a1c4477177d102fe4c53551953e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/fe0936ee26643249e916849d48e3a51d5f5e278b",
-                "reference": "fe0936ee26643249e916849d48e3a51d5f5e278b",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/5277094ed527a1c4477177d102fe4c53551953e0",
+                "reference": "5277094ed527a1c4477177d102fe4c53551953e0",
                 "shasum": ""
             },
+            "require": {
+                "php": ">=5.3.0"
+            },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
             "autoload": {
-                "psr-0": {
-                    "Psr\\Log\\": ""
+                "psr-4": {
+                    "Psr\\Log\\": "Psr/Log/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1352,12 +1315,13 @@
                 }
             ],
             "description": "Common interface for logging libraries",
+            "homepage": "https://github.com/php-fig/log",
             "keywords": [
                 "log",
                 "psr",
                 "psr-3"
             ],
-            "time": "2012-12-21 11:40:51"
+            "time": "2016-09-19 16:02:08"
         },
         {
             "name": "seld/cli-prompt",
@@ -2413,16 +2377,16 @@
         },
         {
             "name": "willdurand/negotiation",
-            "version": "v2.0.3",
+            "version": "v2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/willdurand/Negotiation.git",
-                "reference": "1ebc51dd6d47f4037b0d2493335304e5aea50ab6"
+                "reference": "bc814293b153f543c99c89d94c8cc07b3259eef9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/willdurand/Negotiation/zipball/1ebc51dd6d47f4037b0d2493335304e5aea50ab6",
-                "reference": "1ebc51dd6d47f4037b0d2493335304e5aea50ab6",
+                "url": "https://api.github.com/repos/willdurand/Negotiation/zipball/bc814293b153f543c99c89d94c8cc07b3259eef9",
+                "reference": "bc814293b153f543c99c89d94c8cc07b3259eef9",
                 "shasum": ""
             },
             "require": {
@@ -2434,7 +2398,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.0-dev"
+                    "dev-master": "2.1-dev"
                 }
             },
             "autoload": {
@@ -2461,7 +2425,7 @@
                 "header",
                 "negotiation"
             ],
-            "time": "2016-08-30 11:08:41"
+            "time": "2016-09-21 11:26:55"
         }
     ],
     "packages-dev": [
@@ -2558,12 +2522,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jarves/jarves-publication.git",
-                "reference": "eda26a57f2d6482bf4c27c0de964177205026d37"
+                "reference": "b2bf530c02f8a21bb0cffe5d1aebd21c0b5220c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jarves/jarves-publication/zipball/eda26a57f2d6482bf4c27c0de964177205026d37",
-                "reference": "eda26a57f2d6482bf4c27c0de964177205026d37",
+                "url": "https://api.github.com/repos/jarves/jarves-publication/zipball/b2bf530c02f8a21bb0cffe5d1aebd21c0b5220c4",
+                "reference": "b2bf530c02f8a21bb0cffe5d1aebd21c0b5220c4",
                 "shasum": ""
             },
             "type": "library",
@@ -2590,7 +2554,7 @@
                 "blog",
                 "news"
             ],
-            "time": "2016-04-07 19:29:17"
+            "time": "2016-09-21 17:24:24"
         },
         {
             "name": "mockery/mockery",
@@ -3029,7 +2993,6 @@
     "stability-flags": {
         "propel/propel-bundle": 20,
         "propel/propel": 20,
-        "kadet/keylighter": 20,
         "mockery/mockery": 0,
         "jarves/demotheme-bundle": 20,
         "jarves/publication-bundle": 20
