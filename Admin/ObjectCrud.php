@@ -1026,11 +1026,11 @@ class ObjectCrud implements ObjectCrudInterface
         */
         $obj = $this->objects->getStorageController($this->getObject());
         $primaryKey = $obj->normalizePrimaryKey($pk);
-        $item = $this->getItem($primaryKey, $this->getObjectDefinition()->getPrimaryKeyNames());
-        if (!$item) {
+        $found = $this->getItem($primaryKey, $this->getObjectDefinition()->getPrimaryKeyNames());
+        if (!$found) {
             return null;
         }
-        $items = $this->getItems(null, 1000, null, null, $this->getObjectDefinition()->getPrimaryKeyNames(), $order);
+        $items = $this->getItems(null, 10, null, null, $this->getObjectDefinition()->getPrimaryKeyNames(), $order);
 
         $position = 0;
 
@@ -1040,7 +1040,9 @@ class ObjectCrud implements ObjectCrudInterface
             $singlePrimaryValue = current($primaryKey);
         }
 
-        while (null !== $item = next($items)) {
+        while (true) {
+            $item = current($items);
+
             if ($singlePrimaryKey) {
                 if ($item[$singlePrimaryKey] == $singlePrimaryValue) {
                     break;
@@ -1057,11 +1059,13 @@ class ObjectCrud implements ObjectCrudInterface
                 }
             }
 
-            $position++;
-
-            if ($position === count($items)) {
-                $items = $this->getItems(null, 1000, $position, null, $this->getObjectDefinition()->getPrimaryKeyNames(), $order);
+            if (!next($items)) {
+                $items = $this->getItems(null, 100, $position, null, $this->getObjectDefinition()->getPrimaryKeyNames(), $order);
+                if (!$items) {
+                    break;
+                }
             }
+            $position++;
         }
 
         return $position;
