@@ -46,7 +46,10 @@ class TypeContentElements extends AbstractType
         if (!$contentsObject) {
             $contentsObject = new Object();
             $contentsObject->setId($contentsObjectName);
-            $contentsObject->setWorkspace(true);
+
+            if ($object->getWorkspace()) {
+                $contentsObject->setWorkspace(true);
+            }
 
             $contentsObject->setAutoCrud(false);
             $contentsObject->setSearchable(false);
