@@ -323,7 +323,7 @@ class ObjectCrudController extends ObjectCrud
     {
         $primaryKey = $this->extractPrimaryKey($request);
 
-        return $this->getPosition($primaryKey);
+        return $this->getPosition($primaryKey, $request->get('order'));
     }
 
 }

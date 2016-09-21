@@ -17,6 +17,7 @@ namespace Jarves\Admin\FieldTypes;
 use Jarves\Configuration\Configs;
 use Jarves\Configuration\Field;
 use Jarves\ORM\Builder\Builder;
+use Jarves\Tools;
 
 abstract class AbstractType implements TypeInterface
 {
@@ -78,7 +79,7 @@ abstract class AbstractType implements TypeInterface
 
     public function mapValues(array &$data)
     {
-        $data[$this->getFieldDefinition()->getId()] = $this->getValue();
+        Tools::setArrayPath($data, $this->getFieldDefinition()->getId(), $this->getValue());
     }
 
     /**

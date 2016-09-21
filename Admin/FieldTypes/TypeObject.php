@@ -85,6 +85,8 @@ class TypeObject extends AbstractType
             foreach ($columns as $column) {
                 $selection[] = $column->getName();
             }
+        } else {
+            $selection[] = $this->getFieldDefinition()->getId();
         }
 
         return $selection;

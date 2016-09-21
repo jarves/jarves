@@ -211,7 +211,7 @@ class PageResponse extends Response
                 }
             }
         }
-        
+
         return $this->favicon;
     }
 
@@ -749,21 +749,21 @@ class PageResponse extends Response
 
             $themeId = $page->getTheme() ?: $this->pageStack->getCurrentDomain()->getTheme();
             if ($theme = $this->jarves->getConfigs()->getTheme($themeId)) {
-    
+
                 $layoutKey = $this->getLayout($page);
                 if ($layout = $theme->getLayoutByKey($layoutKey)) {
                     if ($layout->getDoctype()) {
                         return $layout->getDoctype();
                     }
                 }
-                
+
                 if ($theme->getDoctype()) {
                     return $theme->getDoctype();
                 }
             }
-            
+
         }
-        
+
         return $this->docType;
     }
 
@@ -1167,7 +1167,7 @@ class PageResponse extends Response
 
         return $this;
     }
-    
+
     /**
      *
      * @param Content|ContentInterface $content

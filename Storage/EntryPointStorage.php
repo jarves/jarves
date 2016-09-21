@@ -59,7 +59,6 @@ class EntryPointStorage extends AbstractStorage
         $adminUtils = new \Jarves\Admin\Utils($this->jarves);
 
         $entryPoint = $adminUtils->getEntryPoint($path);
-        var_dump($path, $entryPoint);
         $children = [];
 
         if ($entryPoint['children']) {

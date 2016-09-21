@@ -566,7 +566,6 @@ class ObjectCrud implements ObjectCrudInterface
             $this->prepareFieldItem($this->fields);
             $this->translateFields($this->fields);
 
-            $this->prepareFieldItem($this->columns);
             $this->translateFields($this->columns);
 
             if (!isset($this->titleField)) {
@@ -587,6 +586,8 @@ class ObjectCrud implements ObjectCrudInterface
                 $this->translateFields($this->columns);
             }
         }
+
+        $this->ensureLanguageField();
 
         $this->fields = $this->toIdIndex($this->fields);
         $this->columns = $this->toIdIndex($this->columns);
@@ -808,14 +809,19 @@ class ObjectCrud implements ObjectCrudInterface
             }
 
             $fieldName = $key;
-            $objectName = $key;
+            $objectDefinition = $this->objectDefinition;
 
             if (strpos($key, '.')) {
                 list($objectName, $fieldName) = explode('.', $key);
-                $field['type'] = 'object';
+                $foreignObjectName = $objectDefinition->getField($objectName)->getObject();
+
+                $objectDefinition = $this->jarves->getConfigs()->getObject($foreignObjectName);
+                if (!$objectDefinition) {
+                    throw new \RuntimeException("Object {$foreignObjectName} not found, used in field {$this->objectDefinition->getKey()} {$key}");
+                }
             }
 
-            if ($oField = $this->objectDefinition->getField($objectName)) {
+            if ($oField = $objectDefinition->getField($fieldName)) {
                 $field = array_merge($oField->toArray(), $field);
             }
 //
@@ -861,6 +867,20 @@ class ObjectCrud implements ObjectCrudInterface
     }
 
     /**
+     * Makes sure $this->_fields has a language field when multiLanguage=true
+     */
+    protected function ensureLanguageField()
+    {
+        if ($this->getMultiLanguage() && !isset($this->_fields['lang'])) {
+            $langField = new Field(null, $this->jarves);
+            $langField->setId('lang');
+            $langField->setType('text');
+            $langField->setRequired(true);
+            $this->_fields['lang'] = $langField;
+        }
+    }
+
+    /**
      * Prepare fields. Loading tableItems by select and file fields.
      *
      * Adds `lang` field when necessary.
@@ -871,14 +891,6 @@ class ObjectCrud implements ObjectCrudInterface
      */
     public function prepareFieldItem($fields)
     {
-        if ($this->getMultiLanguage() && !isset($this->_fields['lang'])) {
-            $langField = new Field(null, $this->jarves);
-            $langField->setId('lang');
-            $langField->setType('text');
-            $langField->setRequired(true);
-            $this->_fields['lang'] = $langField;
-        }
-
         if (is_array($fields)) {
             foreach ($fields as $field) {
                 $this->prepareFieldItem($field);
@@ -985,12 +997,14 @@ class ObjectCrud implements ObjectCrudInterface
     public function getDefaultFieldList()
     {
         $fields = array();
-        $objectFields = array_flip(array_keys($this->getObjectDefinition()->getFieldsArray()));
-
         if ($this->_fields) {
             foreach ($this->_fields as $key => $field) {
-                if (isset($objectFields[$key]) && !$field->getCustomSave() && !$field->getStartEmpty()) {
-                    $fields[] = $key;
+                if (!$field->getCustomSave() && !$field->getStartEmpty()) {
+                    if (!$field->hasFieldType()) {
+                        $fields[] = $key;
+                    } else if ($selection = $field->getFieldType()->getSelection()) {
+                        $fields = array_merge($fields, $selection);
+                    }
                 }
             }
         }
@@ -998,7 +1012,7 @@ class ObjectCrud implements ObjectCrudInterface
         return $fields;
     }
 
-    public function getPosition($pk)
+    public function getPosition($pk, $order)
     {
         /*$obj = $this->objects->getClass($this->getObject());
         $primaryKey = $obj->normalizePrimaryKey($pk);
@@ -1012,7 +1026,11 @@ class ObjectCrud implements ObjectCrudInterface
         */
         $obj = $this->objects->getStorageController($this->getObject());
         $primaryKey = $obj->normalizePrimaryKey($pk);
-        $items = $this->getItems();
+        $item = $this->getItem($primaryKey, $this->getObjectDefinition()->getPrimaryKeyNames());
+        if (!$item) {
+            return null;
+        }
+        $items = $this->getItems(null, 1000, null, null, $this->getObjectDefinition()->getPrimaryKeyNames(), $order);
 
         $position = 0;
 
@@ -1022,8 +1040,7 @@ class ObjectCrud implements ObjectCrudInterface
             $singlePrimaryValue = current($primaryKey);
         }
 
-        foreach ($items as $item) {
-
+        while (null !== $item = next($items)) {
             if ($singlePrimaryKey) {
                 if ($item[$singlePrimaryKey] == $singlePrimaryValue) {
                     break;
@@ -1041,6 +1058,10 @@ class ObjectCrud implements ObjectCrudInterface
             }
 
             $position++;
+
+            if ($position === count($items)) {
+                $items = $this->getItems(null, 1000, $position, null, $this->getObjectDefinition()->getPrimaryKeyNames(), $order);
+            }
         }
 
         return $position;
@@ -1372,7 +1393,11 @@ class ObjectCrud implements ObjectCrudInterface
 
         $result = [];
         foreach ($fields as $field) {
-            if (!$this->getObjectDefinition()->getField($field)) {
+            if (!($field = $this->getObjectDefinition()->getField($field))) {
+                continue;
+            }
+
+            if (!$field->getFieldType() || !$field->getFieldType()->getColumns()) {
                 continue;
             }
 
@@ -1381,7 +1406,7 @@ class ObjectCrud implements ObjectCrudInterface
             }
 
             $result[] = [
-                $field,
+                $field->getId(),
                 'LIKE',
                 $query . '%'
             ];
@@ -2119,24 +2144,25 @@ class ObjectCrud implements ObjectCrudInterface
     }
 
     /**
-     * @param Request|array $requestOrData
-     * @return array
+     * @param Request|array $requestData
+     * *@return array
      */
-    public function collectData($requestOrData)
+    public function collectData($requestData)
     {
-        if (!$requestOrData instanceof Request) {
-            return $requestOrData;
+        if ($requestData instanceof Request) {
+            $requestData = $requestData->request->all();
         }
 
         $fields = $this->_fields;
-        $values = $requestOrData->request->all();
+        $values = [];
 
         foreach ($fields as $field) {
             $key = lcfirst($field->getId());
 
-            $value = $requestOrData->files->get($key);
-            if (!$value) {
-                $value = $requestOrData->request->get($key);
+            if (isset($requestData[$key])) {
+                $value = $requestData[$key];
+            } else {
+                $value = Tools::getArrayPath($requestData, $key);
             }
 
             $values[$key] = $value;
@@ -2385,6 +2411,7 @@ class ObjectCrud implements ObjectCrudInterface
         $this->fields = $fields;
         $this->_fields = array();
         $this->prepareFieldItem($this->fields);
+        $this->ensureLanguageField();
     }
 
     /**

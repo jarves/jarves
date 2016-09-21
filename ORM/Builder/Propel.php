@@ -105,7 +105,7 @@ class Propel implements BuildInterface
                 $this->declareTable($xml, $object);
 
                 if (!is_dir(dirname($modelsFile))) {
-                    mkdir(dirname($modelsFile));
+                    mkdir(dirname($modelsFile), 0777, true);
                 }
 
                 file_put_contents($modelsFile, $this->getFormattedXml($xml));

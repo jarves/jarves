@@ -22,16 +22,15 @@ use Jarves\Configuration\ConditionSubSelect;
 use Jarves\Exceptions\FileNotFoundException;
 use Jarves\Exceptions\ObjectNotFoundException;
 use Jarves\Jarves;
-use Jarves\Model\AclQuery;
 use Jarves\Objects;
 use Jarves\Propel\StandardEnglishPluralizer;
 use Jarves\Propel\WorkspaceManager;
-use Jarves\Publication\Model\Map\NewsTableMap;
 use Jarves\Tools;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\ObjectCollection;
+use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Propel as RuntimePropel;
@@ -319,8 +318,8 @@ class Propel extends AbstractStorage
                         } else {
                             foreach ($relationFieldSelection as $relationField) {
                                 //check if $relationField exists in the foreign table
-                                if (!$relation->getRightTable()->hasColumn($relationField)) {
-                                    continue;
+                                if (!$relation->getRightTable()->hasColumnByPhpName($relationField)) {
+                                    throw new \RuntimeException("Table {$relation->getRightTable()->getName()} in relation {$relation->getName()} does not have column $relationField");
                                 }
                                 $relationFields[ucfirst($originalRelationName)][] = $relationField;
                             }
@@ -569,7 +568,7 @@ class Propel extends AbstractStorage
         try {
             $stmt = $con->prepare($sql);
         } catch (\PDOException $e) {
-            throw $e;
+            throw new PropelException('Could not execute query '. $sql, 0, $e);
         }
         $db->bindValues($stmt, $params, $dbMap);
 
@@ -601,7 +600,6 @@ class Propel extends AbstractStorage
             foreach ($relations as $name => $relation) {
                 if ($relation->getType() != RelationMap::MANY_TO_MANY && $relation->getType() != RelationMap::ONE_TO_MANY
                 ) {
-
                     $query->{'join' . $name}($name);
                     //$query->with($name);
 
@@ -1152,7 +1150,7 @@ class Propel extends AbstractStorage
         $self = $this;
         /**
          * @param RelationDefinition $relation
-         * 
+         *
          * @throws ObjectNotFoundException
          * @throws \Exception
          */
@@ -1207,8 +1205,8 @@ class Propel extends AbstractStorage
                             );
                             $item2 = null;
                             if ($pk) {
-                                $pk = $self->getPropelPk($pk, $relation->getForeignObjectKey());
-                                $item2 = $foreignQuery->findPk($pk);
+                                $propelPk = $self->getPropelPk($pk, $relation->getForeignObjectKey());
+                                $item2 = $foreignQuery->findPk($propelPk);
                             }
                             if (!$item2) {
                                 $item2 = new $foreignClass();
@@ -1254,20 +1252,43 @@ class Propel extends AbstractStorage
                     );
                 }
 
+                //try to set the local column of the relation directly, when we get only primary keys
                 $propelRelation = $self->tableMap->getRelation(ucfirst($fieldName));
                 $localColumns = $propelRelation->getLocalColumns();
                 $firstColumn = current($localColumns);
+                $hasPrimaryKey = false;
 
                 if (is_array($fieldValue)) {
                     $foreignColumns = $propelRelation->getForeignColumns();
                     $firstForeignColumn = current($foreignColumns);
 
                     $key = lcfirst($firstForeignColumn->getPhpName());
-                    $fieldValue = $fieldValue[$key];
+                    if (isset($fieldValue[$key])) {
+                        $fieldValue = $fieldValue[$key];
+                        $hasPrimaryKey = true;
+                    }
+                } else {
+                    $hasPrimaryKey = true;
                 }
 
-                $setter = 'set' . ucfirst($firstColumn->getPhpName());
-                $item->$setter($fieldValue);
+                if ($hasPrimaryKey) {
+                    //set local column of foreign key directly
+                    $setter = 'set' . ucfirst($firstColumn->getPhpName());
+                    $item->$setter($fieldValue);
+                } else {
+                    //we got no primary key, so set values at the object directly
+                    $getter = 'get' . ucfirst($relation->getName());
+                    $relatedItem = $item->$getter();
+                    if (!$relatedItem) {
+                        $class = $propelRelation->getForeignTable()->getClassName();
+                        $relatedItem = new $class;
+                        $setter = 'set' . ucfirst($relation->getName());
+                        $item->$setter($relatedItem);
+                    }
+                    foreach ($fieldValue as $k => $v) {
+                        $relatedItem->{'set' . ucfirst($k)}($v);
+                    }
+                }
             }
         };
 

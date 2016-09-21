@@ -108,6 +108,55 @@ class Tools {
     }
 
     /**
+     * Returns the value of a $dotPath in $array.
+     *
+     * (['a' => ['b' => 5]], 'a.b') = 5
+     *
+     * @param array $array
+     * @param string $dotPath
+     *
+     * @return mixed
+     */
+    public static function getArrayPath($array, $dotPath)
+    {
+        $path = explode('.', $dotPath);
+        foreach ($path as $p) {
+            if (isset($array[$p])) {
+                $array = $array[$p];
+            } else {
+                return null;
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * Sets the value of a $dotPath in $array.
+     *
+     * (['a' => ['b' => 5]], 'a.b', 6) = ['a' => ['b' => 6]]
+     *
+     *
+     * @param array &$array
+     * @param string $dotPath
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    public static function setArrayPath(&$array, $dotPath, $value)
+    {
+        $path = explode('.', $dotPath);
+        foreach ($path as $p) {
+            if (!isset($array[$p])) {
+                $array[$p] = [];
+            }
+            $array = &$array[$p];
+        }
+
+        $array = $value;
+    }
+
+    /**
      * Returns a relative path from $path to $current.
      *
      * @param string $from

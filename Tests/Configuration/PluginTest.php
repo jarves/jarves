@@ -202,7 +202,7 @@ class PluginTest extends KernelAwareTestCase
                     'label' => 'Detail page',
                     'type' => 'object',
                     'object' => 'JarvesBundle:Node',
-                    'selection' => array()
+                    'selection' => array('detailPage')
                 ),
             ),
         );

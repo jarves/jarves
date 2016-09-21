@@ -16,6 +16,7 @@ namespace Jarves\Admin\Form;
 
 use Jarves\Configuration\Field;
 use Jarves\Exceptions\Rest\ValidationFailedException;
+use Jarves\Tools;
 
 class Form
 {
@@ -77,7 +78,11 @@ class Form
         foreach ($this->getFields() as $field) {
             $key = lcfirst($field->getId());
 
-            $value = isset($data[$key]) ? $data[$key] : null;
+            if (isset($data[$key])) {
+                $value = $data[$key];
+            } else {
+                $value = Tools::getArrayPath($data, $key);
+            }
 
             if (null === $value && $defaultData) {
                 $value = isset($defaultData[$key]) ? $defaultData[$key] : null;
@@ -96,6 +101,7 @@ class Form
 
         foreach ($this->getFields() as $field) {
             $key = $field->getId();
+
             if ($field['noSave']) {
                 continue;
             }
@@ -109,7 +115,8 @@ class Form
                 continue;
             }
 
-            if (!$filterFields || isset($filterFields[$key])) {
+            $startKey = explode('.', $key)[0];
+            if (!$filterFields || isset($filterFields[$startKey])) {
                 if (!$errors = $field->validate()) {
                     $field->mapValues($values);
                 } else {

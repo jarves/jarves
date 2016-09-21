@@ -263,6 +263,9 @@ class ConditionOperator
             $field = $def->getField($fieldName);
             if ($field) {
                 $columns = $field->getFieldType()->getColumns();
+                if (!$columns) {
+                    throw new \RuntimeException("Field $fieldName ({$field->getType()}) does not have columns");
+                }
                 $columnName = Tools::camelcase2Underscore($columns[0]->getName());
             }
         } else {
