@@ -153,8 +153,8 @@ class JarvesBundle extends Bundle
             /** @var EntryPoint[][] $objectEntryPoints */
             $objectEntryPoints = [];
             //read all entry points for each object
-            if ($bundleConfig->getEntryPoints()) {
-                foreach ($bundleConfig->getEntryPoints() as $entryPoint) {
+            if ($bundleConfig->getAllEntryPoints()) {
+                foreach ($bundleConfig->getAllEntryPoints() as $entryPoint) {
                     if ($entryPoint->getObject()) {
                         $objectEntryPoints[$entryPoint->getObject()][$entryPoint->getType()] = $entryPoint;
                     }
@@ -239,7 +239,7 @@ class JarvesBundle extends Bundle
                     if ($fieldType->isUserInterfaceOnly()) {
                         continue;
                     }
-                    
+
                     if (!$fieldType->getService()) {
                         throw new \RuntimeException(sprintf(
                             'For field type %s:%s is no service defined. If it does not handle model related persisting, ' .
@@ -248,7 +248,7 @@ class JarvesBundle extends Bundle
                             $fieldType->getId()
                         ));
                     }
-                    
+
                     if (!$container->has($fieldType->getService())) {
                         throw new \RuntimeException(sprintf(
                             'Service `%s` for field type %s:%s does not exist',
@@ -266,8 +266,8 @@ class JarvesBundle extends Bundle
             }
         }
     }
-    
-    
+
+
     protected function registerContentTypes(Jarves $jarves, ContainerInterface $container)
     {
         /** @var ContentRender $jarvesContentRender */
