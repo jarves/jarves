@@ -46,7 +46,7 @@ var jarves_system_backup = new Class({
             method: {
                 label: _('Method'),
                 type: 'select',
-                desc: _("Please note: If you choose 'Generate later' you have to setup the cronjob script."),
+                description: _("Please note: If you choose 'Generate later' you have to setup the cronjob script."),
                 help: 'admin/backup-cronjob',
                 items: {
                     download: _('Download now'),
@@ -68,7 +68,7 @@ var jarves_system_backup = new Class({
                             savetarget_local: {
                                 needValue: 'local',
                                 lable: _('Target'),
-                                desc: _('Relative paths starts at the root of the jarves installation.'),
+                                description: _('Relative paths starts at the root of the jarves installation.'),
                                 type: 'file'
                             }
                         }
@@ -95,7 +95,7 @@ var jarves_system_backup = new Class({
                         items: this.eachItems,
                         depends: {
                             each_minute: {
-                                desc: _('Specify in minutes'),
+                                description: _('Specify in minutes'),
                                 needValue: 'specifiy',
                                 type: 'datetime'
                             }
@@ -151,20 +151,20 @@ var jarves_system_backup = new Class({
                     pages_allversions: {
                         needValue: ['all', 'choose'],
                         label: _('With all versions'),
-                        desc: _('This includes additionally all versions. Please note: Can blow up the backup file.'),
+                        description: _('This includes additionally all versions. Please note: Can blow up the backup file.'),
                         type: 'checkbox'
                     },
                     pages_domains: {
                         label: _('Whole website'),
                         needValue: 'choose',
-                        desc: _('Please select one or more domains. All nodes below this domains will then be included.'),
+                        description: _('Please select one or more domains. All nodes below this domains will then be included.'),
                         type: 'textboxList',
                         store: 'backend/stores/domains'
                     },
                     pages_nodes: {
                         label: _('Nodes'),
                         needValue: 'choose',
-                        desc: _('Please select one or more nodes.'),
+                        description: _('Please select one or more nodes.'),
                         type: 'array',
                         startWith: 1,
                         columns: [
@@ -182,7 +182,7 @@ var jarves_system_backup = new Class({
 
             files: {
                 label: _('Files'),
-                desc: _('All files means all files except extension files.'),
+                description: _('All files means all files except extension files.'),
                 type: 'select',
                 items: {
                     nothing: _('Nothing'),
@@ -193,7 +193,7 @@ var jarves_system_backup = new Class({
                     files_allversions: {
                         needValue: ['all', 'choose'],
                         label: _('With all versions'),
-                        desc: _('This includes additionally all versions. Please note: Can blow up the backup file.'),
+                        description: _('This includes additionally all versions. Please note: Can blow up the backup file.'),
                         type: 'checkbox'
                     },
                     files_choose: {
@@ -217,14 +217,14 @@ var jarves_system_backup = new Class({
             /* part of jarves.cms 1.1
              system: {
              label: _('Make a installation package'),
-             desc: _('This includes then additionally all system files, the contents of the system database and the installer. Does not contain your system configuration. (inc/config.php)'),
+             description: _('This includes then additionally all system files, the contents of the system database and the installer. Does not contain your system configuration. (inc/config.php)'),
              type: 'checkbox'
              },
              */
 
             extensions: {
                 label: _('Extensions'),
-                desc: _('Contains the whole package of an extension and also your translated languages and adjusted templates of each.'),
+                description: _('Contains the whole package of an extension and also your translated languages and adjusted templates of each.'),
                 type: 'select',
                 items: {
                     nothing: _('Nothing'),
@@ -242,7 +242,7 @@ var jarves_system_backup = new Class({
 
             extensions_data: {
                 label: _('Extension contents'),
-                desc: _('Means the contents in the database.'),
+                description: _('Means the contents in the database.'),
                 type: 'select',
                 items: {
                     nothing: _('Nothing'),
@@ -253,7 +253,7 @@ var jarves_system_backup = new Class({
                     extensions_data_allversions: {
                         needValue: ['all', 'choose'],
                         label: _('With all versions'),
-                        desc: _('This includes additionally all versions. Please note: Can blow up the backup file.'),
+                        description: _('This includes additionally all versions. Please note: Can blow up the backup file.'),
                         type: 'checkbox'
                     },
                     extensions_data_choose: {
@@ -691,7 +691,7 @@ var jarves_system_backup = new Class({
         this.main.empty();
 
         this.importFile = new jarves.Field({
-            type: 'file', label: _('Backup file'), desc: _('Choose the backup file and press Extract.')
+            type: 'file', label: _('Backup file'), description: _('Choose the backup file and press Extract.')
         }, this.main);
 
         this.innerDiv = new Element('div', {style: 'padding: 15px; line-height: 30px;'}).inject(this.main);

@@ -20,18 +20,18 @@ jarves.FieldTypes.Object = new Class({
         options: {
             object: {
                 label: 'Object key',
-                desc: 'Example: jarvesbundle:Node.',
+                description: 'Example: jarvesbundle:Node.',
                 type: 'objectKey',
                 required: true
             },
             'objectLabel': {
                 needValue: 'object',
                 label: t('Object label field (Optional)'),
-                desc: t('The key of the field which should be used as label.')
+                description: t('The key of the field which should be used as label.')
             },
             asObjectUrl: {
                 label: 'Value as object url',
-                desc: 'Returns object:name://value instead of only the `value`.',
+                description: 'Returns object:name://value instead of only the `value`.',
                 type: 'checkbox',
                 'default': false
             }
@@ -39,14 +39,14 @@ jarves.FieldTypes.Object = new Class({
         modelOptions: {
             object: {
                 label: 'Object key',
-                desc: 'Example: jarves/node.',
+                description: 'Example: jarves/node.',
                 type: 'objectKey',
                 required: true
             },
             'objectLabel': {
                 needValue: 'object',
                 label: t('Object label field (Optional)'),
-                desc: t('The key of the field which should be used as label.')
+                description: t('The key of the field which should be used as label.')
             },
             'objectRelation': {
                 label: t('Relation'),
@@ -63,19 +63,19 @@ jarves.FieldTypes.Object = new Class({
                         type: 'text',
                         needValue: 'nToM',
                         label: t('PHP name of the middle-table'),
-                        desc: t('Used only in n-to-n relations.')
+                        description: t('Used only in n-to-n relations.')
                     },
                     objectRelationTable: {
                         type: 'text',
                         needValue: 'nToM',
                         label: t('Table name of the middle-table'),
-                        desc: t('Used only in n-to-n relations.')
+                        description: t('Used only in n-to-n relations.')
                     }
                 }
             },
             'objectRefRelationName': {
                 label: t('Reference name (Optional)'),
-                desc: t('Name for the outgoing-relation in the foreign object to this object.')
+                description: t('Name for the outgoing-relation in the foreign object to this object.')
             },
             'objectRelationOnDelete': {
                 label: t('OnDelete method (Optional)'),
@@ -93,7 +93,7 @@ jarves.FieldTypes.Object = new Class({
                 label: t('With constraint'),
                 type: 'checkbox',
                 'default': 'true',
-                desc: t('If the storage backend should also create a constraint so its not possible to pass a invalid reference id.')
+                description: t('If the storage backend should also create a constraint so its not possible to pass a invalid reference id.')
             }
         }
     },

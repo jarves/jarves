@@ -22,14 +22,14 @@ jarves.LabelTypes['Object'] = new Class({
         options: {
             object: {
                 label: 'Object key',
-                desc: 'Example: JarvesBundle:Node.',
+                description: 'Example: JarvesBundle:Node.',
                 type: 'objectKey',
                 required: true
             },
             'objectLabel': {
                 needValue: 'object',
                 label: t('Object label field (Optional)'),
-                desc: t('The key of the field which should be used as label.')
+                description: t('The key of the field which should be used as label.')
             }
         }
     },

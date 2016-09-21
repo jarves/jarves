@@ -251,7 +251,7 @@ var jarves_system_module = new Class({
 
             dialog.version = new jarves.Field({
                 label: t('Version constraint'),
-                desc: t('Example: >=1.0.0, dev-master, *, 3.6.*'),
+                description: t('Example: >=1.0.0, dev-master, *, 3.6.*'),
                 type: 'text',
                 'default': '*',
                 inputWidth: 100
@@ -259,7 +259,7 @@ var jarves_system_module = new Class({
 
             dialog.withBundles = new jarves.Field({
                 label: t('Install all containing bundles'),
-                desc: t('If the package is a jarves package, we install also all containing bundles.'),
+                description: t('If the package is a jarves package, we install also all containing bundles.'),
                 type: 'checkbox',
                 'default': true
             }, dialog.getContentContainer());
@@ -317,7 +317,7 @@ var jarves_system_module = new Class({
                 }).inject(dialog.getContentContainer());
                 dialog.withFiles = new jarves.Field({
                     label: t('Remove also all files'),
-                    desc: t('This tries also to uninstall the composer package.'),
+                    description: t('This tries also to uninstall the composer package.'),
                     type: 'checkbox'
                 }, dialog.getContentContainer());
                 return;
@@ -402,7 +402,7 @@ var jarves_system_module = new Class({
             //prompt.input.destroy();
             prompt.packageInput = new jarves.Field({
                 label: t('Package name'),
-                desc: t('Is used as name for the composer package. Example: peter/blog'),
+                description: t('Is used as name for the composer package. Example: peter/blog'),
                 type: 'text',
                 modifier: 'trim',
                 require: true,
@@ -431,7 +431,7 @@ var jarves_system_module = new Class({
 
             prompt.classInput = new jarves.Field({
                 label: t('Bundle namespace'),
-                desc: t('Is a PHP namespace containing your vendor prefix. It must be a string ending with the Bundle suffix.  Example Peter\\BlogBundle.'),
+                description: t('Is a PHP namespace containing your vendor prefix. It must be a string ending with the Bundle suffix.  Example Peter\\BlogBundle.'),
                 modifier: 'phpclass',
                 type: 'text',
                 requiredRegex: '^(([a-zA-Z0-9_-]+)\\\\)*([a-zA-Z0-9_-]*)Bundle',
@@ -470,7 +470,7 @@ var jarves_system_module = new Class({
             prompt.directoryStructure = new jarves.Field({
                 label: t('Generate directory structure'),
                 type: 'checkbox',
-                desc: t('Generates some common directories and files.'),
+                description: t('Generates some common directories and files.'),
                 'default': true
             }, prompt.getContentContainer());
 

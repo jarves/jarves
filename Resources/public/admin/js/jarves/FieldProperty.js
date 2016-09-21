@@ -33,7 +33,7 @@ jarves.FieldProperty = new Class({
         },
         width: {
             label: t('Width'),
-            desc: t('Use a px value or a % value. Example: 25%, 50, 35px')
+            description: t('Use a px value or a % value. Example: 25%, 50, 35px')
         },
         primaryKey: {
             needValue: ['text', 'password', 'number', 'checkbox', 'select', 'date', 'object', 'datetime', 'file',
@@ -45,7 +45,7 @@ jarves.FieldProperty = new Class({
         },
         autoIncrement: {
             label: 'Auto increment?',
-            desc: t('If no value is assigned the value will be increased by each insertion.'),
+            description: t('If no value is assigned the value will be increased by each insertion.'),
             type: 'checkbox',
             'default': false,
             needValue: 'number',
@@ -56,7 +56,7 @@ jarves.FieldProperty = new Class({
             cookieStorage: 'jarves.FieldProperty.__optional__',
             type: 'childrenSwitcher',
             children: {
-                desc: {
+                description: {
                     label: t('Description'),
                     type: 'text'
                 },
@@ -86,16 +86,16 @@ jarves.FieldProperty = new Class({
                 },
                 target: {
                     label: t('Inject to target'),
-                    desc: t('If your tab has a own layout.'),
+                    description: t('If your tab has a own layout.'),
                     type: 'text'
                 },
                 'needValue': {
                     label: tc('kaFieldTable', 'Visibility condition'),
-                    desc: t("Shows this field only, if the field defined below or the parent field has the defined value. String, JSON notation for arrays and objects, /regex/ or 'javascript:(value=='foo'||value.substr(0,4)=='lala')'")
+                    description: t("Shows this field only, if the field defined below or the parent field has the defined value. String, JSON notation for arrays and objects, /regex/ or 'javascript:(value=='foo'||value.substr(0,4)=='lala')'")
                 },
                 againstField: {
                     label: tc('kaFieldTable', 'Visibility condition target field'),
-                    desc: t("Define the key of another field if the condition should not against the parent. Use JSON notation for arrays and objects. String or Array")
+                    description: t("Define the key of another field if the condition should not against the parent. Use JSON notation for arrays and objects. String or Array")
                 },
                 'default': {
                     againstField: 'type',
@@ -108,17 +108,17 @@ jarves.FieldProperty = new Class({
                     againstField: 'type',
                     type: 'text',
                     label: t('Required value as regular expression.'),
-                    desc: t('Example of an email-check: /^[^@]+@[^@]+/')
+                    description: t('Example of an email-check: /^[^@]+@[^@]+/')
                 },
                 tableItem: {
                     label: t('Acts as a table item'),
-                    desc: t('Injects instead of a DIV a TR element.'),
+                    description: t('Injects instead of a DIV a TR element.'),
                     type: 'checkbox',
                     'default': false
                 },
                 noWrapper: {
                     label: t('No wrapper. Removes all around the field itself.'),
-                    desc: t('Injects only the pure UI of the defined type.'),
+                    description: t('Injects only the pure UI of the defined type.'),
                     type: 'checkbox',
                     'default': false
                 }

@@ -24,7 +24,7 @@ jarves.FieldTypes.Select = new Class({
             },
             items: {
                 label: t('static items'),
-                desc: t('Use JSON notation. Array(key==label) or Object(key => label). Example: {"item1": "[[Item 1]]"} or ["Foo", "Bar", "Three"].')
+                description: t('Use JSON notation. Array(key==label) or Object(key => label). Example: {"item1": "[[Item 1]]"} or ["Foo", "Bar", "Three"].')
             },
             /**
              * When options.items is a array and this is false the value is the index, otherwise index=label.
@@ -38,37 +38,37 @@ jarves.FieldTypes.Select = new Class({
              */
             itemsLabelAsValue: {
                 label: '`items` label as value',
-                desc: 'When options.items is a array and this is false the value is the index, otherwise index=label',
+                description: 'When options.items is a array and this is false the value is the index, otherwise index=label',
                 type: 'checkbox',
                 'default': true
             },
 //            multi: {
 //                label: t('Multiple selection'),
-//                desc: t('This field returns then an array.'),
+//                description: t('This field returns then an array.'),
 //                'default': false,
 //                type: 'checkbox'
 //            },
             combobox: {
                 label: t('Combobox'),
                 'default': false,
-                desc: t('if you want to allow the user to enter a own value.'),
+                description: t('if you want to allow the user to enter a own value.'),
                 type: 'checkbox'
             },
             object: {
                 label: t('Objecy key'),
                 combobox: true,
                 type: 'objectKey',
-                desc: t('The key of the object')
+                description: t('The key of the object')
             },
             withoutManageLink: {
                 label: t('Without manage link'),
                 type: 'checkbox',
-                desc: t('Disables the link that points to the crud edit window')
+                description: t('Disables the link that points to the crud edit window')
             },
             withoutAddLink: {
                 label: t('Without add link'),
                 type: 'checkbox',
-                desc: t('Disables the link that points to the crud add window')
+                description: t('Disables the link that points to the crud add window')
             }
         }
     },

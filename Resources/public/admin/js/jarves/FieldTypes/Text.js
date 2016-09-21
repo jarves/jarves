@@ -24,17 +24,17 @@ jarves.FieldTypes.Text = new Class({
             modifier: {
                 label: 'Value modifier',
                 type: 'text',
-                desc: 'A pipe separated list of modifiers. Exampple: trim|ucfirst|camelcase.' +
+                description: 'A pipe separated list of modifiers. Exampple: trim|ucfirst|camelcase.' +
                     'Possible: trim, lower, ucfirst, lcfirst, phpfunction, phpclass, underscore, camelcase, dash, url'
             },
             redirectSameValue: {
                 label: t('Redirect this value'),
-                desc: t('Redirect this value to another field with the same result as value. Example: fieldName:modifier1|modifier2,fieldName2:modifier3'),
+                description: t('Redirect this value to another field with the same result as value. Example: fieldName:modifier1|modifier2,fieldName2:modifier3'),
                 type: 'text'
             },
             redirectValue: {
                 label: t('Redirect this value always'),
-                desc: t('Redirect this value always to another field (and overwrites it always). Example: fieldName:modifier1|modifier2,fieldName2:modifier3'),
+                description: t('Redirect this value always to another field (and overwrites it always). Example: fieldName:modifier1|modifier2,fieldName2:modifier3'),
                 type: 'text'
             }
         }

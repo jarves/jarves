@@ -516,7 +516,7 @@ var jarves_system_module_view = new Class({
                     this.dependsStatus[ extKey ] = 'ok';
 
                     this.dependFiles[extKey] = new jarves.Field({
-                        type: 'file', empty: false, label: 'Installation package', desc: _('Jarves cms can not fetch server information. Please choose the proper installation file')
+                        type: 'file', empty: false, label: 'Installation package', description: _('Jarves cms can not fetch server information. Please choose the proper installation file')
                     }).inject(li);
                 }
 
@@ -548,7 +548,7 @@ var jarves_system_module_view = new Class({
 
                      this.dependFiles[extKey] = new jarves.Field({
                      type: 'file', empty: false, label: 'Installation package',
-                     desc: _('Jarves cms can not fetch the proper package with the needed version. Please choose the proper installation file')
+                     description: _('Jarves cms can not fetch the proper package with the needed version. Please choose the proper installation file')
                      }).inject( li );
 
                      new jarves.Button(_('Install')).inject(); */

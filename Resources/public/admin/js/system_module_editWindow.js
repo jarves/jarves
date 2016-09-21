@@ -66,14 +66,14 @@ var jarves_system_module_editWindow = new Class({
             },
             preview: {
                 label: t('Preview possibility'),
-                desc: t('Requires defined views/plugins at the object'),
+                description: t('Requires defined views/plugins at the object'),
                 type: 'checkbox'
             },
 
             titleField: {
                 label: t('Window title field (Optional)'),
                 needValue: 'adminWindowEdit',
-                desc: t('Defines which field the window should use for his title.')
+                description: t('Defines which field the window should use for his title.')
             },
 
             workspace: {
@@ -85,13 +85,13 @@ var jarves_system_module_editWindow = new Class({
             multiLanguage: {
                 label: t('Multilingual'),
                 type: 'checkbox',
-                desc: t("The windows gets then a language chooser on the right top bar. The object or table needs a extra field 'lang' for this.")
+                description: t("The windows gets then a language chooser on the right top bar. The object or table needs a extra field 'lang' for this.")
             },
 
             multiDomain: {
                 label: t('Multi domain'),
                 type: 'checkbox',
-                desc: t("Useful, when these objects are categorized usually under domains. The windows gets then a domain chooser on the right top bar. The object or table needs a extra field 'domain_id' for this.")
+                description: t("Useful, when these objects are categorized usually under domains. The windows gets then a domain chooser on the right top bar. The object or table needs a extra field 'domain_id' for this.")
             }
 
         };
@@ -298,12 +298,11 @@ var jarves_system_module_editWindow = new Class({
 
         var addFields = {
 
-
             nestedAddWithPositionSelection: {
                 type: 'checkbox',
                 label: t('With position selection'),
                 'default': true,
-                desc: t('This allows the user to choose a position where the item gets inserted.')
+                description: t('This allows the user to choose a position where the item gets inserted.')
             },
 
             addMultiple: {
@@ -372,7 +371,7 @@ var jarves_system_module_editWindow = new Class({
 
                     itemLayout: {
                         label: t('Item layout (Optional)'),
-                        desc: t('Default behaviour is that the system extracts the first three columns and build it on its own. You can define here your own item HTML.') +
+                        description: t('Default behaviour is that the system extracts the first three columns and build it on its own. You can define here your own item HTML.') +
                             '<br/>' + t('Example:') + '<br/>' +
                             '&lt;h2&gt;{title}&lt;/h2&gt;<br/>' +
                             '&lt;div style="font-size: 10px;"&gt;{anotherFieldName}&lt;/div&gt;',
@@ -396,7 +395,7 @@ var jarves_system_module_editWindow = new Class({
                 label: t('As nested set'),
                 type: 'checkbox',
                 'default': false,
-                desc: t('Shows then the tree instead of a list.')
+                description: t('Shows then the tree instead of a list.')
 
             },
 
@@ -418,7 +417,7 @@ var jarves_system_module_editWindow = new Class({
                         type: 'select',
                         items: {
                             asc: 'ASC',
-                            desc: 'DESC'
+                            description: 'DESC'
                         }
                     }
                 }
@@ -441,7 +440,7 @@ var jarves_system_module_editWindow = new Class({
                                 type: 'text',
                                 needValue: 'quick',
                                 label: t('Search fields'),
-                                desc: t('Comma seperated. Use only  defined columns from above.')
+                                description: t('Comma seperated. Use only  defined columns from above.')
                             },
                             filterCustom: {
                                 label: t('Search fields'),
@@ -473,23 +472,23 @@ var jarves_system_module_editWindow = new Class({
                         children: {
                             addIcon: {
                                 label: t('Icon file'),
-                                desc: t('Vector images with #&lt;id&gt; are possible.'),
+                                description: t('Vector images with #&lt;id&gt; are possible.'),
                                 type: 'file',
                                 needValue: 1,
                                 combobox: true
                             },
                             addEntrypoint: {
                                 label: t('Entry point'),
-                                desc: t('You can define here another entry point, so that this action goes through another controller class.'),
+                                description: t('You can define here another entry point, so that this action goes through another controller class.'),
                                 type: 'text',
                                 needValue: 1,
-                                desc: t('Default is &lt;current&gt;. Relative values are possible.')
+                                description: t('Default is &lt;current&gt;. Relative values are possible.')
                             },
 
                             addLabel: {
 
                                 label: t('Add label text'),
-                                desc: t('The tooltip for the add button and the title of the position chooser dialog.'),
+                                description: t('The tooltip for the add button and the title of the position chooser dialog.'),
                                 type: 'text',
                                 'default': 'Add',
                                 needValue: 1
@@ -500,13 +499,12 @@ var jarves_system_module_editWindow = new Class({
                     },
 
                     edit: {
-
                         label: t('Editable'),
                         type: 'checkbox',
                         children: {
                             editIcon: {
                                 label: t('Icon file'),
-                                desc: t('Vector images with #&lt;id&gt; are possible.'),
+                                description: t('Vector images with #&lt;id&gt; are possible.'),
                                 type: 'file',
                                 needValue: 1,
                                 combobox: true
@@ -515,9 +513,9 @@ var jarves_system_module_editWindow = new Class({
                             editEntrypoint: {
                                 label: t('Entry point'),
                                 type: 'text',
-                                desc: t('You can define here another entry point, so that this action goes through another controller class.'),
+                                description: t('You can define here another entry point, so that this action goes through another controller class.'),
                                 needValue: 1,
-                                desc: t('Default is &lt;current&gt;. Relative values are possible.')
+                                description: t('Default is &lt;current&gt;. Relative values are possible.')
                             }
                         }
 
@@ -532,16 +530,16 @@ var jarves_system_module_editWindow = new Class({
                             removeIcon: {
                                 label: t('Icon file'),
                                 type: 'file',
-                                desc: t('Vector images with #&lt;id&gt; are possible.'),
+                                description: t('Vector images with #&lt;id&gt; are possible.'),
                                 needValue: 1,
                                 combobox: true
                             },
                             removeEntrypoint: {
                                 label: t('Entry point'),
                                 type: 'text',
-                                desc: t('You can define here another entry point, so that this action goes through another controller class.'),
+                                description: t('You can define here another entry point, so that this action goes through another controller class.'),
                                 needValue: 1,
-                                desc: t('Default is &lt;current&gt;. Relative values are possible.')
+                                description: t('Default is &lt;current&gt;. Relative values are possible.')
                             }
 
                         }
@@ -550,11 +548,11 @@ var jarves_system_module_editWindow = new Class({
 
                     itemActions: {
                         label: t('Custom item actions'),
-                        desc: t('This generates on each record a extra icon which opens the defined entry point.'),
+                        description: t('This generates on each record a extra icon which opens the defined entry point.'),
                         type: 'array',
                         withOrder: true,
                         columns: [
-                            {'label': t('Entry point'), desc: t('The path to the entry point')},
+                            {'label': t('Entry point'), description: t('The path to the entry point')},
                             {'label': t('Title')},
                             {'label': t('Icon path')}
                         ],
@@ -588,7 +586,7 @@ var jarves_system_module_editWindow = new Class({
                             nestedMoveable: {
 
                                 label: t('Moveable'),
-                                desc: t('Defines whether the items in the object tree are moveable or not.'),
+                                description: t('Defines whether the items in the object tree are moveable or not.'),
                                 type: 'checkbox',
                                 'default': true
 
@@ -604,17 +602,17 @@ var jarves_system_module_editWindow = new Class({
                                     'nestedRootFieldLabel': {
                                         type: 'text',
                                         label: t('Label field (optional)'),
-                                        desc: t('Priority: default label > tree label > this label > window class tree root label')
+                                        description: t('Priority: default label > tree label > this label > window class tree root label')
                                     },
                                     'nestedRootFieldTemplate': {
                                         type: 'codemirror',
                                         label: t('Label template (optional)'),
-                                        desc: t('Priority: default template > tree template > this template > window class tree root template')
+                                        description: t('Priority: default template > tree template > this template > window class tree root template')
                                     },
                                     'nestedRootFieldFields': {
                                         type: 'text',
                                         label: t('Select fields (optional)'),
-                                        desc: t('Define here other fields than in the default selection. (e.g. if you need more fields in your template above.)')
+                                        description: t('Define here other fields than in the default selection. (e.g. if you need more fields in your template above.)')
                                     },
 
                                     nestedRootAdd: {
@@ -624,7 +622,7 @@ var jarves_system_module_editWindow = new Class({
                                         children: {
                                             nestedRootAddIcon: {
                                                 label: t('Icon file'),
-                                                desc: t('Vector images with #&lt;id&gt; are possible.'),
+                                                description: t('Vector images with #&lt;id&gt; are possible.'),
                                                 type: 'file',
                                                 needValue: 1,
                                                 combobox: true
@@ -633,7 +631,7 @@ var jarves_system_module_editWindow = new Class({
                                             nestedRootAddLabel: {
 
                                                 label: t('Add root label text'),
-                                                desc: t('For add button.'),
+                                                description: t('For add button.'),
                                                 'default': 'Add root',
                                                 type: 'text',
                                                 needValue: 1
@@ -643,9 +641,9 @@ var jarves_system_module_editWindow = new Class({
                                             nestedRootAddEntrypoint: {
                                                 label: t('Entry point'),
                                                 type: 'text',
-                                                desc: t('You can define here another entry point, so that this action goes through another controller class.'),
+                                                description: t('You can define here another entry point, so that this action goes through another controller class.'),
                                                 needValue: 1,
-                                                desc: t('Default is &lt;current&gt;/root.Relative values are possible.')
+                                                description: t('Default is &lt;current&gt;/root.Relative values are possible.')
                                             }
                                         }
 
@@ -659,9 +657,9 @@ var jarves_system_module_editWindow = new Class({
                                             nestedRootEditEntrypoint: {
                                                 label: t('Entry point'),
                                                 type: 'text',
-                                                desc: t('You can define here another entry point, so that this action goes through another controller class.'),
+                                                description: t('You can define here another entry point, so that this action goes through another controller class.'),
                                                 needValue: 1,
-                                                desc: t('Default is &lt;current&gt;/root. Relative values are possible.')
+                                                description: t('Default is &lt;current&gt;/root. Relative values are possible.')
                                             }
                                         }
 
@@ -676,9 +674,9 @@ var jarves_system_module_editWindow = new Class({
                                             nestedRootRemoveEntrypoint: {
                                                 label: t('Entry point'),
                                                 type: 'text',
-                                                desc: t('You can define here another entry point, so that this action goes through another controller class.'),
+                                                description: t('You can define here another entry point, so that this action goes through another controller class.'),
                                                 needValue: 1,
-                                                desc: t('Default is &lt;current&gt;/root. Relative values are possible.')
+                                                description: t('Default is &lt;current&gt;/root. Relative values are possible.')
                                             }
 
                                         }
@@ -701,7 +699,7 @@ var jarves_system_module_editWindow = new Class({
                     'export': {
                         label: t('Export'),
                         type: 'checkbox',
-                        desc: t('Provide a export button in the window container.')
+                        description: t('Provide a export button in the window container.')
                     },
 
                     /*export_types: {
@@ -1015,7 +1013,7 @@ var jarves_system_module_editWindow = new Class({
                         empty: false
                     },
                     'arguments': {
-                        type: 'text', label: t('Arguments'), desc: t('Comma sperated')
+                        type: 'text', label: t('Arguments'), description: t('Comma sperated')
                     },
                     visibility: {
                         type: 'select', label: t('Visibility'),
@@ -1207,7 +1205,7 @@ var jarves_system_module_editWindow = new Class({
                 empty: false
             },
             'arguments': {
-                type: 'text', label: t('Arguments'), desc: t('Comma sperated')
+                type: 'text', label: t('Arguments'), description: t('Comma sperated')
             },
             visibility: {
                 type: 'select', label: t('Visibility'),
@@ -1794,7 +1792,7 @@ var jarves_system_module_editWindow = new Class({
 
                 this.toolbarTabItemDef = {
                     key: {
-                        type: 'text', label: t('ID'), desc: t('Will be surrounded with __ and __ (double underscore) if its not already.')
+                        type: 'text', label: t('ID'), description: t('Will be surrounded with __ and __ (double underscore) if its not already.')
                     },
                     label: {
                         type: 'text', label: t('Label')
@@ -1805,7 +1803,7 @@ var jarves_system_module_editWindow = new Class({
                         label: t('Content layout (Optional)'),
                         height: 200,
                         help: 'admin/objectWindowLayout',
-                        desc: t('If you want to have a own layout in this content tab, then just type here the HTML.')
+                        description: t('If you want to have a own layout in this content tab, then just type here the HTML.')
                     },
                     __optional__: {
                         label: t('More'),
@@ -1814,11 +1812,11 @@ var jarves_system_module_editWindow = new Class({
                         children: {
                             'needValue': {
                                 label: tc('kaFieldTable', 'Visibility condition (Optional)'),
-                                desc: t("Shows this field only, if the field defined below or the parent field has the defined value. String, JSON notation for arrays and objects, /regex/ or 'javascript:(value=='foo'||value.substr(0,4)=='lala')'")
+                                description: t("Shows this field only, if the field defined below or the parent field has the defined value. String, JSON notation for arrays and objects, /regex/ or 'javascript:(value=='foo'||value.substr(0,4)=='lala')'")
                             },
                             againstField: {
                                 label: tc('kaFieldTable', 'Visibility condition field (Optional)'),
-                                desc: t("Define the key of another field if the condition should not against the parent. Use JSON notation for arrays and objects. String or Array")
+                                description: t("Define the key of another field if the condition should not against the parent. Use JSON notation for arrays and objects. String or Array")
                             }
                         }
                     }

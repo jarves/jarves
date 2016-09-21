@@ -22,12 +22,12 @@ jarves.FieldTypes.Dialog = new Class({
             },
             minWidth: {
                 lable: 'Min width',
-                desc: 'px, numbers or % values.',
+                description: 'px, numbers or % values.',
                 type: 'text'
             },
             minHeight: {
                 lable: 'Min height',
-                desc: 'px, numbers or % values.',
+                description: 'px, numbers or % values.',
                 type: 'text'
             }
         }

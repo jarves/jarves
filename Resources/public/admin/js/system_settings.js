@@ -52,7 +52,7 @@ var jarves_system_settings = new Class({
                         type: 'text',
                         label: 'System title',
                         required: true,
-                        desc: t('Appears in the administration title.')
+                        description: t('Appears in the administration title.')
                     },
                     email: {
                         type: 'text',
@@ -66,7 +66,7 @@ var jarves_system_settings = new Class({
                     languages: {
                         type: 'textboxList',
                         label: t('Languages'),
-                        desc: t('Limit the language selection, system-wide.'),
+                        description: t('Limit the language selection, system-wide.'),
                         itemsKey: 'code',
                         labelTemplate: '{{title}} ({{langtitle}}, {{code}})',
                         items: this.langs
@@ -125,13 +125,13 @@ var jarves_system_settings = new Class({
                     //
                     //         // 'displayErrors': {
                     //         //     label: t('Display errors'),
-                    //         //     desc: t('Prints errors to the frontend clients. You should deactivate this in productive systems.'),
+                    //         //     description: t('Prints errors to the frontend clients. You should deactivate this in productive systems.'),
                     //         //     type: 'checkbox'
                     //         // },
                     //         // 'displayDetailedRestErrors': {
                     //         //     label: t('Display REST error'),
                     //         //     type: 'checkbox',
-                    //         //     desc: t('Display more information in REST errors, like line number, file path and backstrace.')
+                    //         //     description: t('Display more information in REST errors, like line number, file path and backstrace.')
                     //         // },
                     //         'logErrors': {
                     //             label: t('Save errors into a log file'),
@@ -140,7 +140,7 @@ var jarves_system_settings = new Class({
                     //                 'logErrorsFile': {
                     //                     needValue: 1,
                     //                     label: t('Log file'),
-                    //                     desc: t('Example: jarves.log')
+                    //                     description: t('Example: jarves.log')
                     //                 }
                     //             }
                     //         },
@@ -157,7 +157,7 @@ var jarves_system_settings = new Class({
                     //         'debugLogSqls': {
                     //             label: t('[Debug] Log all SQL queries'),
                     //             'default': false,
-                    //             desc: t('Deactivate this on productive machines, otherwise it will blow up your logs!'),
+                    //             description: t('Deactivate this on productive machines, otherwise it will blow up your logs!'),
                     //             type: 'checkbox'
                     //         }
                     //     }
@@ -183,7 +183,7 @@ var jarves_system_settings = new Class({
                     },
                     'file[disableModeChange]': {
                         label: t('Do not change file mode by existing files'),
-                        desc: t('In some circumstances it is necessary to disable the chmod call on existing files. For example if your IDE or a custom interface always changes the owner of Jarves cms files.'),
+                        description: t('In some circumstances it is necessary to disable the chmod call on existing files. For example if your IDE or a custom interface always changes the owner of Jarves cms files.'),
                         type: 'checkbox',
                         'default': false
                     }
@@ -196,11 +196,11 @@ var jarves_system_settings = new Class({
                     // localFileUrl: {
                     //     type: 'text',
                     //     label: t('Local file URL'),
-                    //     desc: t('For http proxy (vanish, AWS cloudfront etc) you should enter the URL here. Default is empty.')
+                    //     description: t('For http proxy (vanish, AWS cloudfront etc) you should enter the URL here. Default is empty.')
                     // },
                     mounts: {
                         label: t('External file mount'),
-                        desc: t('Here you can connect with a external cloud storage server'),
+                        description: t('Here you can connect with a external cloud storage server'),
                         type: 'array',
                         asHash: true,
                         columns: [
@@ -226,7 +226,7 @@ var jarves_system_settings = new Class({
                     'client[class]': {
                         type: 'select',
                         label: t('Backend client driver'),
-                        desc: t('Login, session processing etc. The user "admin" always authenticate against the Jarves cms users database.'),
+                        description: t('Login, session processing etc. The user "admin" always authenticate against the Jarves cms users database.'),
                         items: {
                             'Jarves\\Client\\JarvesUsers': t('Jarves cms users database')
                         },
@@ -265,7 +265,7 @@ var jarves_system_settings = new Class({
                         type: 'checkbox',
                         'default': true,
                         label: t('Session auto boot'),
-                        desc: t('You can deactivate the automatic distribution of session ids if you disable this option. To track the user, you have to start then the process in your module manually.')
+                        description: t('You can deactivate the automatic distribution of session ids if you disable this option. To track the user, you have to start then the process in your module manually.')
 
                     },
                     '__info__': {

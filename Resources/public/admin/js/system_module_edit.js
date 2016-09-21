@@ -378,7 +378,7 @@ var jarves_system_module_edit = new Class({
             width: 'auto',
             inputHeight: 'auto',
             type: 'textarea',
-            desc: t('This displays the content of ./Resources/doc/index.md. Markdown format.'),
+            description: t('This displays the content of ./Resources/doc/index.md. Markdown format.'),
             readMore: 'http://en.wikipedia.org/wiki/Markdown'
         }, p, {win: this.win});
         this.text.setValue(t('Loading ...'));
@@ -779,7 +779,7 @@ var jarves_system_module_edit = new Class({
             label: {
                 label: t('Label'),
                 required: true,
-                desc: t('Surround the value with [[ and ]] to make it multilingual.')
+                description: t('Surround the value with [[ and ]] to make it multilingual.')
             },
             type: {
                 label: t('Type'),
@@ -804,7 +804,7 @@ var jarves_system_module_edit = new Class({
                     },
                     'javascriptClass': {
                         label: t('Custom javascript user interface class (Optional)'),
-                        desc: t('Should be extended from jarves.WindowList, jarves.WindowEdit, jarves.WindowAdd or jarves.WindowCombine.'),
+                        description: t('Should be extended from jarves.WindowList, jarves.WindowEdit, jarves.WindowAdd or jarves.WindowCombine.'),
                         'default': '',
                         needValue: ['list', 'edit', 'add', 'combine']
                     },
@@ -869,13 +869,13 @@ var jarves_system_module_edit = new Class({
                         needValue: 'custom',
                         label: t('File name and class information'),
                         help: 'admin/extension-custom-javascript',
-                        desc: t('Javascript file: &lt;extKey&gt;/admin/js/&lt;pathWithUnderscore&gt;.js and class name: &lt;extKey&gt;_&lt;pathWithUnderscore&gt;.')
+                        description: t('Javascript file: &lt;extKey&gt;/admin/js/&lt;pathWithUnderscore&gt;.js and class name: &lt;extKey&gt;_&lt;pathWithUnderscore&gt;.')
                     }
                 }
             },
             link: {
                 label: t('Is link in administration menu bar?'),
-                desc: t('Only in the first and second level.'),
+                description: t('Only in the first and second level.'),
                 type: 'checkbox',
                 needValue: ['list', 'add', 'edit', 'combine', 'custom'],
                 againstField: 'type',
@@ -883,12 +883,12 @@ var jarves_system_module_edit = new Class({
                     icon: {
                         needValue: 1,
                         label: t('Icon (Optional)'),
-                        desc: t('Relative to /web/'),
+                        description: t('Relative to /web/'),
                         type: 'text'
                     },
                     system: {
                         label: t('Is link under System menu?'),
-                        desc: t('Only in the first and second level.'),
+                        description: t('Only in the first and second level.'),
                         type: 'checkbox',
                         needValue: 1
                     }
@@ -1191,7 +1191,7 @@ var jarves_system_module_edit = new Class({
                 type: 'text',
                 required: true,
                 requiredRegex: '^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_.-]+)$',
-                desc: t('Should be in format &lt;vendor&gt;/&lt;name&gt;. Example: peter/blog'),
+                description: t('Should be in format &lt;vendor&gt;/&lt;name&gt;. Example: peter/blog'),
                 readMore: 'http://getcomposer.org/doc/01-basic-usage.md#package-names',
                 required: true
             },
@@ -1220,12 +1220,12 @@ var jarves_system_module_edit = new Class({
                 label: t('Version'),
                 type: 'text',
                 readMore: 'http://getcomposer.org/doc/01-basic-usage.md#package-versions',
-                desc: t('Composer uses VCS repositories, so you can specify own branches or git tags to specify a version. Use this field only if you provide this package not through a VCS.')
+                description: t('Composer uses VCS repositories, so you can specify own branches or git tags to specify a version. Use this field only if you provide this package not through a VCS.')
             },
             screenshots: {
                 label: t('Screenshots'),
                 type: 'text',
-                desc: t('Screenshots in %s').replace('%s', pConfig._path + 'Resources/screenshots/'),
+                description: t('Screenshots in %s').replace('%s', pConfig._path + 'Resources/screenshots/'),
                 disabled: true
             },
             //            version: {
@@ -1235,7 +1235,7 @@ var jarves_system_module_edit = new Class({
             //            },
             authors: {
                 label: t('Authors'),
-                desc: t(''),
+                description: t(''),
                 type: 'array',
                 withOrder: true,
                 columns: [
@@ -1257,7 +1257,7 @@ var jarves_system_module_edit = new Class({
             },
             require: {
                 label: t('Dependencies'),
-                desc: t(''),
+                description: t(''),
                 readMore: 'http://getcomposer.org/doc/01-basic-usage.md#package-versions',
                 type: 'array',
                 asHash: true,
@@ -1278,11 +1278,11 @@ var jarves_system_module_edit = new Class({
             community: {
                 label: t('Community'),
                 type: 'checkbox',
-                desc: t('Is this extension available under jarves.io/bundles.')
+                description: t('Is this extension available under jarves.io/bundles.')
             },
             category: {
                 label: t('Category'),
-                desc: t('What kind of extension is this?'),
+                description: t('What kind of extension is this?'),
                 type: 'select',
                 items: {
                     1: 'Information/Editorial office',
@@ -2139,7 +2139,7 @@ var jarves_system_module_edit = new Class({
                     '__entryPoints__': {
                         type: 'label',
                         label: 'Note to entry points below',
-                        desc: 'If you have crud entry points for this object defined, you shoud link it here. When the crud is from type `combined`, then all three entrypoints have the same value. When defined a object select box transform into a managed object select box, which allows the user to jump directly to the crud window',
+                        description: 'If you have crud entry points for this object defined, you shoud link it here. When the crud is from type `combined`, then all three entrypoints have the same value. When defined a object select box transform into a managed object select box, which allows the user to jump directly to the crud window',
                         children: {
                             listEntryPoint: {
                                 label: t('Listing window entry point'),
@@ -2168,34 +2168,34 @@ var jarves_system_module_edit = new Class({
                             table: {
                                 label: t('Table name'),
                                 modifier: 'underscore|trim',
-                                desc: t('A ORM needs usually a table name which is then created in the database.')
+                                description: t('A ORM needs usually a table name which is then created in the database.')
                             },
                             crossRef: {
                                 label: t('CrossRef'),
                                 type: 'checkbox',
-                                desc: t('If this is a cross table (usually used in n-to-n relations)')
+                                description: t('If this is a cross table (usually used in n-to-n relations)')
                             },
                             labelField: {
                                 label: t('Label field'),
-                                desc: t('Default field for the label.'),
+                                description: t('Default field for the label.'),
                                 type: 'text',
                                 modifier: 'camelcase|trim|lcfirst'
                             },
                             labelTemplate: {
                                 label: t('Label template (Optional)'),
-                                desc: t('For the javascript user interface field.'),
+                                description: t('For the javascript user interface field.'),
                                 //todo, help id
                                 type: 'codemirror'
                             },
                             defaultSelection: {
                                 label: t('Default selection (Optional)'),
-                                desc: t('You may enter here some field names comma separated. (e.g. if you have a own label template which needs it). Empty for full selection.'),
+                                description: t('You may enter here some field names comma separated. (e.g. if you have a own label template which needs it). Empty for full selection.'),
                                 type: 'text'
                             },
 
                             blacklistSelection: {
                                 label: t('Blacklist selection'),
-                                desc: t('Enter fields which are not selectable through the ORM (and therefore also for the REST API). Comma separated.')
+                                description: t('Enter fields which are not selectable through the ORM (and therefore also for the REST API). Comma separated.')
                             },
 
                             limitDataSets: {
@@ -2204,13 +2204,13 @@ var jarves_system_module_edit = new Class({
                             },
                             nested: {
                                 label: t('Nested Set Model'),
-                                desc: t('Implement with lft, rgt and lvl fields.'),
+                                description: t('Implement with lft, rgt and lvl fields.'),
                                 type: 'checkbox',
                                 children: {
                                     nestedRootAsObject: {
                                         needValue: 1,
                                         label: t('Root as object (Optional)'),
-                                        desc: t('Display an object item as the root item.'),
+                                        description: t('Display an object item as the root item.'),
                                         type: 'checkbox',
                                         children: {
                                             nestedRootObject: {
@@ -2222,7 +2222,7 @@ var jarves_system_module_edit = new Class({
                                                 needValue: 1,
                                                 label: t('Foreign key'),
                                                 modifier: 'camelcase|trim|lcfirst',
-                                                desc: t('Which field in the current object contains the primary value of the parent object?')
+                                                description: t('Which field in the current object contains the primary value of the parent object?')
                                             },
                                             nestedRootObjectLabelField: {
                                                 needValue: 1,
@@ -2232,7 +2232,7 @@ var jarves_system_module_edit = new Class({
                                             nestedRootObjectExtraFields: {
                                                 needValue: 1,
                                                 label: t('Extra fields (Optional)'),
-                                                desc: t('Comma separated. The backend (admin/objectTreeRoot) returns primary key, label and these extra fields. You may use this to get more fields in the user interface classes.')
+                                                description: t('Comma separated. The backend (admin/objectTreeRoot) returns primary key, label and these extra fields. You may use this to get more fields in the user interface classes.')
                                             }
                                         }
                                     }
@@ -2243,17 +2243,17 @@ var jarves_system_module_edit = new Class({
                     multiLanguage: {
                         label: t('Multi-language'),
                         type: 'checkbox',
-                        desc: t('Adds a extra field \'lang\' varchar(2)')
+                        description: t('Adds a extra field \'lang\' varchar(2)')
                     },
                     workspace: {
                         label: t('Workspace versioning'),
                         type: 'checkbox',
-                        desc: t('')
+                        description: t('')
                     },
                     domainDepended: {
                         label: t('Domain depended'),
                         type: 'checkbox',
-                        desc: t('Adds a extra \'domain\' object field')
+                        description: t('Adds a extra \'domain\' object field')
                     }
                 }
             },
@@ -2279,7 +2279,7 @@ var jarves_system_module_edit = new Class({
                                     'fieldInterfaceClass': {
                                         needValue: 'custom',
                                         label: t('Javascript class name'),
-                                        desc: t('You can inject javascript files through extension settings to make a javascript class available.')
+                                        description: t('You can inject javascript files through extension settings to make a javascript class available.')
                                     }
                                 }
                             },
@@ -2297,17 +2297,17 @@ var jarves_system_module_edit = new Class({
                             'fieldLabel': {
                                 type: 'text',
                                 label: t('Label field (optional)'),
-                                desc: t('If you want to show a other label than the default label field.')
+                                description: t('If you want to show a other label than the default label field.')
                             },
                             'fieldTemplate': {
                                 type: 'codemirror',
                                 label: t('Label template (optional)'),
-                                desc: t('If you want to show a other template than the default label template.')
+                                description: t('If you want to show a other template than the default label template.')
                             },
                             'fieldFields': {
                                 type: 'text',
                                 label: t('Select fields (optional)'),
-                                desc: t('Define here other fields than in the default selection. (e.g. if you need more fields in your template above.)')
+                                description: t('Define here other fields than in the default selection. (e.g. if you need more fields in your template above.)')
                             }
                         }
                     },
@@ -2316,7 +2316,7 @@ var jarves_system_module_edit = new Class({
                         needValue: 1,
                         type: 'childrenSwitcher',
                         label: t('Browser UI (tree)'),
-                        desc: t('Only for nested objects.'),
+                        description: t('Only for nested objects.'),
                         children: {
 
                             treeInterface: {
@@ -2332,7 +2332,7 @@ var jarves_system_module_edit = new Class({
                                     treeInterfaceClass: {
                                         needValue: 'custom',
                                         label: t('Javascript class'),
-                                        desc: t('Define the javascript class which is used to display the chooser. Include the javascript file through "Javascript files" under tab "Extras"')
+                                        description: t('Define the javascript class which is used to display the chooser. Include the javascript file through "Javascript files" under tab "Extras"')
                                     }
                                 }
                             },
@@ -2351,7 +2351,7 @@ var jarves_system_module_edit = new Class({
                             //         treeDataModelClass: {
                             //             label: t('PHP Class'),
                             //             needValue: 'custom',
-                            //             desc: t('A class that extends from \\Admin\\FieldModel\\Tree. Entry point admin/object-tree?uri=...')
+                            //             description: t('A class that extends from \\Admin\\FieldModel\\Tree. Entry point admin/object-tree?uri=...')
                             //         }
                             //     }
                             // },
@@ -2359,17 +2359,17 @@ var jarves_system_module_edit = new Class({
                             'treeLabel': {
                                 type: 'text',
                                 label: t('Tree label field (optional)'),
-                                desc: t('If you want to show a other label than the default label field.')
+                                description: t('If you want to show a other label than the default label field.')
                             },
                             'treeTemplate': {
                                 type: 'codemirror',
                                 label: t('Tree label template (optional)'),
-                                desc: t('If you want to show a other template than the default label template.')
+                                description: t('If you want to show a other template than the default label template.')
                             },
                             'treeFields': {
                                 type: 'text',
                                 label: t('Tree select fields (optional)'),
-                                desc: t('Define here other fields than in the default selection. (e.g. if you need more fields in your chooser label template.)')
+                                description: t('Define here other fields than in the default selection. (e.g. if you need more fields in your chooser label template.)')
                             },
                             'treeMoveable': {
                                 type: 'checkbox',
@@ -2458,21 +2458,21 @@ var jarves_system_module_edit = new Class({
                                 needValue: 1,
                                 againstField: 'nestedRootAsObject',
                                 label: t('Tree root label field (optional)'),
-                                desc: t('If you want to show a other label than the default label field and other than default tree label field of the root object.')
+                                description: t('If you want to show a other label than the default label field and other than default tree label field of the root object.')
                             },
                             'treeRootFieldTemplate': {
                                 type: 'codemirror',
                                 needValue: 1,
                                 againstField: 'nestedRootAsObject',
                                 label: t('Tree root abel template (optional)'),
-                                desc: t('If you want to show a other template than the default label field and other than default tree template of the root object')
+                                description: t('If you want to show a other template than the default label field and other than default tree template of the root object')
                             },
                             'treeRootFieldFields': {
                                 type: 'text',
                                 needValue: 1,
                                 againstField: 'nestedRootAsObject',
                                 label: t('Tree root select fields (optional)'),
-                                desc: t('Define here other fields than in the default selection. (e.g. if you need more fields in your template above.)')
+                                description: t('Define here other fields than in the default selection. (e.g. if you need more fields in your template above.)')
                             }
                         }
                     },
@@ -2493,13 +2493,13 @@ var jarves_system_module_edit = new Class({
                                     browserInterfaceClass: {
                                         needValue: 'custom',
                                         label: t('Javascript class'),
-                                        desc: t('Define the javascript class which is used to display the chooser. Include the javascript file through "Javascript files" under tab "Extras"')
+                                        description: t('Define the javascript class which is used to display the chooser. Include the javascript file through "Javascript files" under tab "Extras"')
                                     },
                                     browserInterfaceOptions: {
                                         label: t('UI properties'),
                                         needValue: 'custom',
                                         width: 'auto',
-                                        desc: t('You can allow extensions to set some properties when providing your object chooser.'),
+                                        description: t('You can allow extensions to set some properties when providing your object chooser.'),
                                         type: 'fieldTable'
                                     },
                                     browserOptions: {
@@ -2535,7 +2535,7 @@ var jarves_system_module_edit = new Class({
                             //         browserDataModelClass: {
                             //             label: t('PHP Class'),
                             //             needValue: 'custom',
-                            //             desc: t('A class that extends from \\Admin\\FieldModel\\Browse. Entry point admin/objects?uri=...')
+                            //             description: t('A class that extends from \\Admin\\FieldModel\\Browse. Entry point admin/objects?uri=...')
                             //         }
                             //     }
                             // }
@@ -2667,7 +2667,7 @@ var jarves_system_module_edit = new Class({
             new Element('th', {
                 text: t('Column name'),
                 width: 150
-            }).inject(fieldTable.headerTr.getFirst(), 'after');
+            }).inject(fieldTable.headerTr.getChildren()[1], 'after');
 
             fieldTable.addEvent('add', function(item) {
                 item.underscoreDisplay = new Element('td', {
@@ -3008,14 +3008,14 @@ var jarves_system_module_edit = new Class({
                     adminAssets: {
 
                         label: t('Admin assets'),
-                        desc: t('Will be loaded during the login. Relative to /web/.'),
+                        description: t('Will be loaded during the login. Relative to /web/.'),
                         type: 'array',
                         width: 'auto',
                         columns: [
                             {label: t('Type'), width: 80},
                             t('Path'),
                             {label: t('Compression'), width: 80},
-                            {label: t('Recursive'), width: 80, desc: t('Only for assets')}
+                            {label: t('Recursive'), width: 80, description: t('Only for assets')}
                         ],
                         withOrder: true,
                         fields: {
@@ -3047,7 +3047,7 @@ var jarves_system_module_edit = new Class({
                     caches: {
                         label: t('Cache keys'),
                         width: 'auto',
-                        desc: t('Define here all cache keys your extension use, so we can delete all properly if needed. You can optional define a method, if you have stored this cache not through our cache layer and want to do own stuff.'),
+                        description: t('Define here all cache keys your extension use, so we can delete all properly if needed. You can optional define a method, if you have stored this cache not through our cache layer and want to do own stuff.'),
                         type: 'array',
                         columns: [
                             {label: t('Key'), width: '50%'},
@@ -3073,7 +3073,7 @@ var jarves_system_module_edit = new Class({
                         type: 'array',
                         label: t('Define events'),
                         width: 'auto',
-                        desc: t('Here you can define events, where others can attach to.'),
+                        description: t('Here you can define events, where others can attach to.'),
                         columns: [
                             {label: t('Key'), width: '40%'},
                             {label: t('Description')}
@@ -3083,7 +3083,7 @@ var jarves_system_module_edit = new Class({
                                 type: 'text',
                                 required: true
                             },
-                            desc: {
+                            description: {
                                 type: 'text'
                             }
                         }
@@ -3092,7 +3092,7 @@ var jarves_system_module_edit = new Class({
                     listeners: {
 
                         label: t('Event listener'),
-                        desc: t('You can attach here directly your action to an event.'),
+                        description: t('You can attach here directly your action to an event.'),
                         type: 'array',
                         width: 'auto',
                         columns: [
@@ -3120,7 +3120,7 @@ var jarves_system_module_edit = new Class({
                                                 type: 'array',
                                                 asArray: true,
                                                 columns: [
-                                                    {label: t('Method'), desc: t('Example `\BundleName\ClassName::methodName`')}
+                                                    {label: t('Method'), description: t('Example `\BundleName\ClassName::methodName`')}
                                                 ],
                                                 fields: {
                                                     method: {
@@ -3168,7 +3168,7 @@ var jarves_system_module_edit = new Class({
                         type: 'array',
                         label: t('CDN Driver'),
                         width: 'auto',
-                        desc: t('Here you can define driver for the file abstraction layer. The class has to be in module/&lt;extKey&gt;/&lt;class&gt;.class.php'),
+                        description: t('Here you can define driver for the file abstraction layer. The class has to be in module/&lt;extKey&gt;/&lt;class&gt;.class.php'),
                         asHash: 1,
                         columns: [
                             {label: t('Class'), width: '150'},

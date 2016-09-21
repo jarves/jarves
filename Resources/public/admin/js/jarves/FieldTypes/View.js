@@ -21,11 +21,11 @@ jarves.FieldTypes.View = new Class({
             directory: {
                 label: 'Path to directory',
                 type: 'text',
-                desc: 'Example: @JarvesBundle/folder1/'
+                description: 'Example: @JarvesBundle/folder1/'
             },
             fullPath: {
                 label: 'Full path',
-                desc: 'Returns and uses the full path instead of the relative to the `directory` option.',
+                description: 'Returns and uses the full path instead of the relative to the `directory` option.',
                 type: 'checkbox'
             }
         }

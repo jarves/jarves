@@ -20,7 +20,7 @@ jarves.FieldTypes.File = new Class({
         options: {
             returnPath: {
                 label: 'Return the path',
-                desc: 'Instead of the object id',
+                description: 'Instead of the object id',
                 type: 'checkbox',
                 'default': false
             },

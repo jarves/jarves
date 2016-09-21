@@ -21,7 +21,7 @@ jarves.FieldTypes.Info = new Class({
         options: {
             safeInfo: {
                 label: 'Safe info',
-                desc: t('Sets the value as a `text` not as `html` if true'),
+                description: t('Sets the value as a `text` not as `html` if true'),
                 'default': true,
                 type: 'checkbox'
             }

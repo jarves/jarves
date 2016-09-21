@@ -23,7 +23,7 @@ jarves.LabelTypes.Image = new Class({
             width: {
                 label: t('Width in px'),
                 type: 'number',
-                desc: t('Default is 100%')
+                description: t('Default is 100%')
             }
         }
     },
