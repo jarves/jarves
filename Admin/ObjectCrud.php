@@ -1030,7 +1030,7 @@ class ObjectCrud implements ObjectCrudInterface
         if (!$found) {
             return null;
         }
-        $items = $this->getItems(null, 10, null, null, $this->getObjectDefinition()->getPrimaryKeyNames(), $order);
+        $items = $this->getItems(null, 1000, null, null, $this->getObjectDefinition()->getPrimaryKeyNames(), $order);
 
         $position = 0;
 
@@ -1060,7 +1060,7 @@ class ObjectCrud implements ObjectCrudInterface
             }
 
             if (!next($items)) {
-                $items = $this->getItems(null, 100, $position, null, $this->getObjectDefinition()->getPrimaryKeyNames(), $order);
+                $items = $this->getItems(null, 1000, $position, null, $this->getObjectDefinition()->getPrimaryKeyNames(), $order);
                 if (!$items) {
                     break;
                 }
