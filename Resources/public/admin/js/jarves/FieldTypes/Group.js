@@ -15,6 +15,11 @@ jarves.FieldTypes.Group = new Class({
 
     Extends: jarves.FieldAbstract,
 
+    options: {
+        horizontal: false,
+        border: true
+    },
+
     createLayout: function () {
         if (this.fieldInstance.title) {
             this.fieldInstance.title.addClass('jarves-Field-group-title');
@@ -23,5 +28,13 @@ jarves.FieldTypes.Group = new Class({
         this.fieldInstance.childContainer = new Element('div', {
             'class': 'jarves-Field-group'
         }).inject(this.fieldInstance.toElement());
+
+        if (this.options.horizontal) {
+            this.fieldInstance.childContainer.addClass('jarves-Field-group-horizontal');
+        }
+
+        if (!this.options.border) {
+            this.fieldInstance.childContainer.addClass('jarves-Field-group-no-border');
+        }
     }
 });

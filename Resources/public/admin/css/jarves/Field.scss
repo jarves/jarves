@@ -404,6 +404,14 @@ tr.jarves-field-main > td div.desc {
     border: 1px solid #e4e4e4;
 }
 
+.jarves-Field-group-no-border {
+    border: 0;
+}
+
+.jarves-Field-group-horizontal > div {
+    display: table-cell !important;
+}
+
 .jarves-Field-group-title > div.title {
     padding-left: 0;
     color: gray;
