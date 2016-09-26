@@ -813,6 +813,10 @@ class ObjectCrud implements ObjectCrudInterface
 
             if (strpos($key, '.')) {
                 list($objectName, $fieldName) = explode('.', $key);
+                if (!$objectDefinition->getField($objectName)) {
+                    throw new \RuntimeException("Relation `$objectName` (`$key`) in object {$objectDefinition->getKey()} not found.");
+                }
+
                 $foreignObjectName = $objectDefinition->getField($objectName)->getObject();
 
                 $objectDefinition = $this->jarves->getConfigs()->getObject($foreignObjectName);
@@ -824,24 +828,6 @@ class ObjectCrud implements ObjectCrudInterface
             if ($oField = $objectDefinition->getField($fieldName)) {
                 $field = array_merge($oField->toArray(), $field);
             }
-//
-//                if (!isset($field['type'])) {
-//                    $field['type'] = 'predefined';
-//                }
-//                if (strtolower($field['type']) == 'predefined' && !isset($field['object'])) {
-//                    $field['object'] = $this->getObject();
-//                }
-//                if (strtolower($field['type']) == 'predefined' && !isset($field['field'])) {
-//                    $field['field'] = $fieldName;
-//                }
-//
-//                if (!isset($field['label'])) {
-//                    $field['label'] = $oField->getLabel();
-//                }
-//
-//                if (!isset($field['desc']) && $oField->getDesc()) {
-//                    $field['desc'] = $oField->getDesc();
-//                }
 
             if (isset($field['children'])) {
                 $this->prepareFieldDefinition($field['children']);

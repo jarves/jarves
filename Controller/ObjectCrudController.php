@@ -130,6 +130,24 @@ class ObjectCrudController extends ObjectCrud
 
     /**
      * @ApiDoc(
+     *    description="Returns the position in the %object% list of selected item"
+     * )
+     *
+     * @Rest\View()
+     * @Rest\Get("/{pk}/:position")
+     *
+     * @param Request $request
+     * @return array
+     */
+    public function getItemPositionAction(Request $request)
+    {
+        $primaryKey = $this->extractPrimaryKey($request);
+
+        return $this->getPosition($primaryKey, $request->get('order'));
+    }
+
+    /**
+     * @ApiDoc(
      *    description="Returns a single %object% item"
      * )
      *
@@ -306,24 +324,6 @@ class ObjectCrudController extends ObjectCrud
     public function addMultipleItemAction(Request $request)
     {
         return $this->addMultiple($request);
-    }
-
-    /**
-     * @ApiDoc(
-     *    description="Returns the position in the %object% list of selected item"
-     * )
-     *
-     * @Rest\View()
-     * @Rest\Get("/{pk}/:position")
-     *
-     * @param Request $request
-     * @return array
-     */
-    public function getItemPositionAction(Request $request)
-    {
-        $primaryKey = $this->extractPrimaryKey($request);
-
-        return $this->getPosition($primaryKey, $request->get('order'));
     }
 
 }

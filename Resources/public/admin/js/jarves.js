@@ -568,7 +568,7 @@ jarves.openObjectListEntryPoint = function(objectKey) {
 };
 
 /**
- * Returns a list of the primary keys.
+ * Returns a list of the primary key names.
  *
  * @param {String} objectKey
  *
@@ -581,6 +581,26 @@ jarves.getObjectPrimaryList = function(objectKey) {
     Object.each(def.fields, function(field, key) {
         if (field.primaryKey) {
             res.push(key);
+        }
+    });
+
+    return res;
+};
+
+/**
+ * Returns a list of the primary key field definitions.
+ *
+ * @param {String} objectKey
+ *
+ * @return {Array}
+ */
+jarves.getObjectPrimaryFields = function(objectKey) {
+    var def = jarves.getObjectDefinition(objectKey);
+
+    var res = [];
+    Object.each(def.fields, function(field, key) {
+        if (field.primaryKey) {
+            res.push(field);
         }
     });
 
@@ -631,7 +651,7 @@ jarves.getObjectPk = function(objectKey, item) {
  * @returns {Object} always a object
  */
 jarves.getObjectPkFromUrlId = function(objectKey, urlId) {
-    var pks = jarves.getObjectPrimaryList(objectKey);
+    var pks = jarves.getObjectPrimaryFields(objectKey);
 
     if ('object' === typeOf(urlId)) {
         return urlId;
@@ -645,9 +665,9 @@ jarves.getObjectPkFromUrlId = function(objectKey, urlId) {
     var result = {};
     Array.each(pks, function(pk, idx) {
         if ('number' === pk.type) {
-            result[pk] = parseInt(values[idx]);
+            result[pk.id] = parseInt(values[idx]);
         } else {
-            result[pk] = values[idx];
+            result[pk.id] = values[idx];
         }
     });
 

@@ -341,7 +341,6 @@ jarves.FieldForm = new Class({
         obj.addEvent('change', this.fireChange);
 
         if (instanceOf(obj, jarves.FieldForm)) {
-            console.log('isForm', obj, id);
             obj.setForm(this);
         } else {
             obj.setForm(this);

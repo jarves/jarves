@@ -81,6 +81,7 @@ jarves.FieldTypes.Select = new Class({
         store: false, //string
         object: false, //for object chooser
         objectIdAsUrlId: false,
+        objectIdAsRaw: false,
         withoutManageLink: false,
         withoutAddLink: false
     },
@@ -149,9 +150,15 @@ jarves.FieldTypes.Select = new Class({
 
     getValue: function () {
         var value = this.select.getValue();
+
         if (value && this.options.object && !this.options.objectIdAsUrlId) {
             value = jarves.getObjectPkFromUrlId(this.options.object, value);
+
+            if (this.options.objectIdAsRaw) {
+                value = jarves.getObjectId(this.options.object, value);
+            }
         }
+
         return value;
     },
 
