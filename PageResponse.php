@@ -39,6 +39,11 @@ class PageResponse extends Response
     public $docType = 'JarvesBundle:Doctypes:html5.html.twig';
 
     /**
+     * @var array
+     */
+    protected $parameters = [];
+
+    /**
      * @var Jarves
      */
     protected $jarves;
@@ -601,7 +606,7 @@ class PageResponse extends Response
             'domain' => $this->pageStack->getCurrentDomain(),
             'additionalHeaderTags' => $this->getAdditionalHeaderTags()
         ];
-        $data = array_merge($data, $this->getAssetTags());
+        $data = array_merge($data, $this->getAssetTags(), $this->getParameters());
 
         $html = $this->templating->render(
             $this->getDocType(),
@@ -777,6 +782,22 @@ class PageResponse extends Response
     public function setDocType($docType)
     {
         $this->docType = $docType;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @param array $parameters
+     */
+    public function setParameters($parameters)
+    {
+        $this->parameters = $parameters;
     }
 
     /**
