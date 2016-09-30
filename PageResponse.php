@@ -549,14 +549,6 @@ class PageResponse extends Response
      */
     public function prepare(Request $request)
     {
-        if (!$this->pageStack->getCurrentDomain()) {
-            $domain = new Domain();
-            $domain->setDomain($this->pageStack->getRequest()->getHost());
-            $domain->setPath($this->pageStack->getRequest()->getBasePath());
-            $domain->setMaster(true);
-            $this->pageStack->setCurrentDomain($domain);
-        }
-
         parent::prepare($request);
 
         if (!$this->getContent()) {

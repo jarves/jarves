@@ -148,6 +148,15 @@ class PageStack
      */
     public function getCurrentDomain()
     {
+        if (null === $this->domain) {
+            $domain = new Domain();
+            $domain->setDomain($this->getRequest()->getHost());
+            $domain->setPath($this->getRequest()->getBasePath());
+            $domain->setMaster(true);
+
+            return $domain;
+        }
+
         return $this->domain;
     }
 
@@ -268,7 +277,7 @@ class PageStack
 
     /**
      * @param bool $full
-     * 
+     *
      * @return string
      */
     public function getCurrentUrl($full = false)
@@ -278,13 +287,13 @@ class PageStack
 
     /**
      * Returns the affix relative to current page.
-     * 
+     *
      * If the current page is : /documentation/field,
      * but the actual loaded route is: /documentation/field/field-name,
-     * then '/field-name' is returned. 
-     * 
+     * then '/field-name' is returned.
+     *
      * This can be the case, when a plugin added own routes and returned a result for '/field-name'.
-     * 
+     *
      * @return string
      */
     public function getCurrentUrlAffix()
@@ -292,11 +301,11 @@ class PageStack
         $pathInfo = $this->getRequest()->getPathInfo(); //with leading /
         $currentUrl = $this->getCurrentUrl(); //without leading /
 
-       return substr(ltrim($pathInfo, '/'), strlen($currentUrl));
+        return substr(ltrim($pathInfo, '/'), strlen($currentUrl));
     }
 
     /**
-     * @param Node|int|string   $nodeOrId
+     * @param Node|int|string $nodeOrId
      * @param bool $fullUrl with http://
      * @param bool $suppressStartNodeCheck
      *
