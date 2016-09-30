@@ -148,7 +148,7 @@ class PageStack
      */
     public function getCurrentDomain()
     {
-        if (null === $this->domain) {
+        if (null === $this->domain && $this->getRequest()) {
             $domain = new Domain();
             $domain->setDomain($this->getRequest()->getHost());
             $domain->setPath($this->getRequest()->getBasePath());
