@@ -23,9 +23,9 @@ services:
          tags:
             - { name: twig.extension }
 
-     jarves.twig.extension.resizeImage:
-         class: Jarves\Twig\ResizeImageExtension
-         arguments: ["@jarves"]
+     jarves.twig.extension.file:
+         class: Jarves\Twig\FileExtension
+         arguments: ["@jarves", "@jarves.filesystem.web"]
          tags:
             - { name: twig.extension }
 
