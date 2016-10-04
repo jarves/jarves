@@ -16,9 +16,17 @@ jarves.LabelTypes.Datetime = new Class({
 
     render: function(values) {
         var value = values[this.fieldId] || '';
+
         if (value != 0 && value) {
             var format = ( !this.definition.format ) ? '%d.%m.%Y %H:%M' : this.definition.format;
-            return new Date(value * 1000).format(format);
+            if (typeof value == 'number') {
+                return new Date(value * 1000).format(format);
+            }
+            if (typeof value == 'object') {
+                return new Date(value['date'] + ' ' +value['timezone']).format(format);
+            }
+
+            return new Date(value).format(format);
         }
 
         return '';
