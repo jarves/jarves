@@ -84,6 +84,10 @@ services:
          class: Jarves\Controller\PageController
          arguments: ["@jarves.editmode", "@jarves.page_stack"]
 
+     jarves.controller.static:
+         class: Jarves\Controller\StaticController
+         arguments: ["@jarves.page_response.factory"]
+
      jarves.configuration_operator:
          class: Jarves\Configuration\ConfigurationOperator
          arguments: ["@jarves.filesystem.local"]
