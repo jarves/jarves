@@ -27,12 +27,12 @@ class FileExtension extends \Twig_Extension
     /**
      * @var WebFilesystem
      */
-    private $filesystem;
+    private $webFilesystem;
 
-    function __construct(Jarves $jarves, WebFilesystem $filesystem)
+    function __construct(Jarves $jarves, WebFilesystem $webFilesystem)
     {
         $this->jarves = $jarves;
-        $this->filesystem = $filesystem;
+        $this->webFilesystem = $webFilesystem;
     }
 
     /**
@@ -64,32 +64,39 @@ class FileExtension extends \Twig_Extension
      *
      * @return string
      */
-    public function resizeImage($id, $maxWidth = 100, $maxHeight = 100)
+    public function resizeImage($id, $maxWidth = 100, $maxHeight = 100, $quality = 8)
     {
-        $path = $this->filesystem->getPath($id);
-        $image = $this->filesystem->getResizeMax($path, $maxWidth, $maxHeight);
+        $path = $this->webFilesystem->getPath($id);
+        $cacheDir = 'cache/rendered-image/' . $path;
 
-        //todo
+        //@todo handle cacche
+        $image = $this->webFilesystem->getResizeMax($path, $maxWidth, $maxHeight);
 
-        return '';
+        $this->webFilesystem->writeImage($image->getResult(), $cacheDir, $quality);
+
+        return $cacheDir;
     }
 
     /**
      * @param integer|string $id path or file id
-     * @param string $resolution <width>x<height>
-     * @param bool   $resize
+     * @param int            $maxWidth
+     * @param int            $maxHeight
+     * @param bool           $resize
      *
      * @return string
      * @internal param int|string $id path or file id
      */
-    public function thumbnail($id, $resolution, $resize = false)
+    public function thumbnail($id, $maxWidth = 100, $maxHeight = 100, $quality, $resize = true)
     {
-        $path = $this->filesystem->getPath($id);
-        $image = $this->filesystem->getThumbnail($path, $resolution, $resize);
+        $path = $this->webFilesystem->getPath($id);
+        $cacheDir = 'cache/rendered-image/' . $path;
 
-        //todo
+        //@todo handle cacche
+        $image = $this->webFilesystem->getThumbnail($path, $maxWidth . 'x' . $maxHeight);
 
-        return '';
+        $this->webFilesystem->writeImage($image, $cacheDir, $quality);
+
+        return $cacheDir;
     }
 
     /**
@@ -99,7 +106,7 @@ class FileExtension extends \Twig_Extension
      */
     public function publicUrl($id)
     {
-        return $this->filesystem->getPath($id);
+        return $this->webFilesystem->getPath($id);
     }
 
 }

@@ -70,6 +70,19 @@ class Tools {
     }
 
     /**
+     * Returns the lowercased file extension of $path.
+     *
+     * @param string $path
+     *
+     * @return string|boolean false if not '.' is present in $path.
+     */
+    public static function getFileExtension($path)
+    {
+        $paths = explode('.', strtolower($path));
+        return $paths ? array_pop($paths) : false;
+    }
+
+    /**
      * @param string $string a comma separated list of values
      * @return array
      */

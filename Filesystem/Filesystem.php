@@ -8,6 +8,8 @@ use Jarves\Filesystem\Adapter\Local;
 use Jarves\Model\File;
 use Jarves\File\FileInfoInterface;
 use Jarves\Model\FileQuery;
+use Jarves\Tools;
+use PHPImageWorkshop\Core\ImageWorkshopLayer;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -329,6 +331,35 @@ class Filesystem implements FilesystemInterface
         return $items;
     }
 
+    /**
+     * @param resource $image
+     * @param string   $path
+     * @param int      $quality between 0 and 10
+     *
+     * @return bool
+     */
+    public function writeImage($image, $path, $quality = 8)
+    {
+        ob_start();
+
+        switch (Tools::getFileExtension($path)) {
+            case 'png':
+                imagepng($image, null, $quality);
+                break;
+            case 'jpeg':
+            case 'jpg':
+                imagejpeg($image, null, $quality * 100);
+                break;
+            case 'gif':
+                imagegif($image);
+                break;
+
+        }
+
+        $imageBuffer = ob_get_clean();
+
+        return $this->write($path, $imageBuffer);
+    }
 
     /**
      * Resize a image and returns it's object.
@@ -337,7 +368,7 @@ class Filesystem implements FilesystemInterface
      * @param integer $width
      * @param int     $height
      *
-     * @return \PHPImageWorkshop\ImageWorkshop
+     * @return ImageWorkshopLayer
      */
     public function getResizeMax($path, $width, $height)
     {
