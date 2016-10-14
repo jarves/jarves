@@ -1461,7 +1461,7 @@ var jarves_user_acl = new Class({
                     }
 
                     var groups = [];
-                    Array.each(item.groupMembership, function (group) {
+                    Array.each(item.groups, function (group) {
                         groups.push(group.name);
                     });
 

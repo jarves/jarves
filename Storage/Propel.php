@@ -344,7 +344,8 @@ class Propel extends AbstractStorage
                         continue;
                     }
 
-                    throw new \RuntimeException("In table {$tableMap->getName()} does not have field `{$field}` nor relation `{$relationName}`.");
+                    $rels = implode(',', array_keys($tableMap->getRelations()));
+                    throw new \RuntimeException("In table {$tableMap->getName()} does not have field `{$field}` nor relation `{$relationName}` [$rels].");
                 }
             }
         }

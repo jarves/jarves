@@ -50,6 +50,13 @@ class ObjectCrud implements ObjectCrudInterface
     protected $table = '';
 
     /**
+     * Whether this CRUD view is based on a object with an id.
+     *
+     * @var bool
+     */
+    protected $objectBased = true;
+
+    /**
      * Defines the object which should be used.
      *
      * @var string object key
@@ -507,6 +514,10 @@ class ObjectCrud implements ObjectCrudInterface
             return;
         }
 
+        if (!$this->getObject()) {
+            return;
+        }
+
         $this->objectDefinition = $this->objects->getDefinition($this->getObject());
 
         if (!$this->objectDefinition && $this->getObject() && !$withoutObjectCheck) {
@@ -708,7 +719,6 @@ class ObjectCrud implements ObjectCrudInterface
 
     public function getInfo()
     {
-//        $vars = get_object_vars($this);
         $vars = [];
         $reflect = new \ReflectionClass($this);
         foreach ($reflect->getProperties() as $property) {
@@ -761,7 +771,6 @@ class ObjectCrud implements ObjectCrudInterface
         }
 
         return $result;
-
     }
 
     /**
@@ -2504,6 +2513,30 @@ class ObjectCrud implements ObjectCrudInterface
     public function getObject()
     {
         return Objects::normalizeObjectKey($this->object);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getObjectBased()
+    {
+        return $this->objectBased;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isObjectBased()
+    {
+        return $this->objectBased;
+    }
+
+    /**
+     * @param boolean $objectBased
+     */
+    public function setObjectBased($objectBased)
+    {
+        $this->objectBased = $objectBased;
     }
 
     /**

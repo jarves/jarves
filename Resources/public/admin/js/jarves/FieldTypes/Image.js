@@ -59,6 +59,9 @@ jarves.FieldTypes.Image = new Class({
                     this.setValue(value);
                 }.bind(this),
                 value: this.value,
+                browserOptions: {
+                    selectionOnlyFiles: true
+                },
                 objects: ['jarves/file']
             };
 

@@ -529,7 +529,11 @@ jarves.AdminInterface = new Class({
         this.renderMenu();
 
         this.border.setStyles({'display': 'block'});
-        this.mainMenuUserName.set('text', tf('Welcome, %s %s', window._session.firstName, window._session.lastName));
+        var name = window._session.username;
+        if (window._session.firstName || window._session.lastName) {
+            name = window._session.firstName + ' ' + window._session.lastName;
+        }
+        this.mainMenuUserName.set('text', tf('Welcome, %s ', name));
 
 //        var profilePictureUrl;
 //        if (window._session.imagePath) {

@@ -435,7 +435,7 @@ jarves.FieldTypes.Array = new Class({
                     tr.inject(tr.getPrevious(), 'before');
                     this.fireChange();
                 }
-            }).inject(td);
+            }.bind(this)).inject(td);
 
             new Element('a', {
                 'class': 'jarves-button-icon icon-arrow-down-14',
@@ -446,7 +446,7 @@ jarves.FieldTypes.Array = new Class({
                     tr.inject(tr.getNext(), 'after');
                     this.fireChange();
                 }
-            }).inject(td);
+            }.bind(this)).inject(td);
 
         }
 

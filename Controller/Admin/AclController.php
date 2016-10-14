@@ -185,7 +185,7 @@ class AclController extends Controller
             $userFilter,
             array(
                 'limit' => 10,
-                'fields' => 'id,username,email,groupMembership.name,firstName,lastName'
+                'fields' => 'id,username,email,groups.name,firstName,lastName'
             )
         );
 
@@ -207,4 +207,4 @@ class AclController extends Controller
             'groups' => $groups
         );
     }
-} 
+}

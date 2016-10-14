@@ -34,13 +34,6 @@ jarves.WindowEdit = new Class({
 
         this.winParams = Object.clone(this.win.getParameter());
 
-        if (!this.windowAdd && !this.getPrimaryKey()) {
-            this.win.alert('No item given. A edit object window can not be called directly.', function() {
-                this.win.close();
-            }.bind(this));
-            return;
-        }
-
         if (!container) {
             this.container = this.win.content;
             this.container.setStyle('overflow', 'visible');
@@ -67,6 +60,10 @@ jarves.WindowEdit = new Class({
      */
     getPrimaryKey: function() {
         return this.options.primaryKey || this.winParams.item;
+    },
+
+    isObjectBased: function() {
+        return this.classProperties['objectBased'];
     },
 
     getObjectKey: function() {
@@ -148,7 +145,7 @@ jarves.WindowEdit = new Class({
 
         new Request.JSON({url: _pathAdmin + this.getEntryPoint() + '/', noCache: true, onComplete: function(pResponse) {
 
-            if (!pResponse.error && pResponse.data && pResponse.data._isClassDefinition) {
+            if (!pResponse.error && pResponse.data) {
                 this.render(pResponse.data);
             } else {
                 this.container.set('html', '<div style="text-align: center; padding: 50px; color: red">' + t('Failed. No correct class definition returned. %s').replace('%s', 'admin/' + this.getEntryPoint()) + '</div>');
@@ -179,7 +176,11 @@ jarves.WindowEdit = new Class({
             return;
         }
 
-        var id = jarves.getObjectUrlId(this.classProperties['object'], this.getPrimaryKey());
+        var url = _pathAdmin + this.getEntryPoint();
+        if (this.isObjectBased()) {
+            var id = jarves.getObjectUrlId(this.getObjectKey(), this.getPrimaryKey());
+            url += '/' + id;
+        }
 
         if (this.lastRq) {
             this.lastRq.cancel();
@@ -187,7 +188,7 @@ jarves.WindowEdit = new Class({
 
         this.win.setLoading(true, null, this.container.getCoordinates(this.win));
 
-        this.lastRq = new Request.JSON({url: _pathAdmin + this.getEntryPoint() + '/' + id,
+        this.lastRq = new Request.JSON({url: url,
             noCache: true, onComplete: function(res) {
                 this._loadItem(res.data);
             }.bind(this)}).get({withAcl: true});
@@ -269,8 +270,8 @@ jarves.WindowEdit = new Class({
             logger(tf('Field %s ($titleField) for the window title does not exists in the $fields variable', titleField));
         }
 
-        if (titleField && this.fields[titleField]) {
-            value = jarves.getObjectFieldLabel(value, this.fieldForm.getFieldDefinition(titleField), titleField, this.classProperties['object']);
+        if (titleField && this.fields[titleField] && this.getObjectKey()) {
+            value = jarves.getObjectFieldLabel(value, this.fieldForm.getFieldDefinition(titleField), titleField, this.getObjectKey());
             return value;
         }
         return '';
@@ -448,6 +449,13 @@ jarves.WindowEdit = new Class({
     render: function(pValues) {
         this.classProperties = pValues;
 
+        if (!this.windowAdd && this.isObjectBased() && !this.getPrimaryKey()) {
+            this.win.alert('No item given. A edit object window can not be called directly. Use objectBased=false if you have custom routes.', function() {
+                this.win.close();
+            }.bind(this));
+            return;
+        }
+
         this.container.empty();
 
         this.win.setLoading(true, null, {left: 265});
@@ -583,7 +591,7 @@ jarves.WindowEdit = new Class({
             }
 
         }
-     },
+    },
 
     changeVersion: function() {
         var value = this.versioningSelect.getValue();
@@ -630,13 +638,19 @@ jarves.WindowEdit = new Class({
             if (!answer) return;
 
             this.win.setLoading(true, null, this.container.getCoordinates(this.win));
-            var itemPk = jarves.getObjectUrlId(this.classProperties['object'], this.getPrimaryKey());
+            var url = _pathAdmin + this.getEntryPoint();
+            if (this.isObjectBased()) {
+                var id= jarves.getObjectUrlId(this.getObjectKey(), this.getPrimaryKey());
+                url += '/' + id;
+            }
 
-            this.lastDeleteRq = new Request.JSON({url: _pathAdmin + this.getEntryPoint() + '/' + itemPk,
+            this.lastDeleteRq = new Request.JSON({url: url,
                 onComplete: function(pResponse) {
                     this.win.setLoading(false);
                     this.fireEvent('remove', this.getPrimaryKey());
-                    jarves.getAdminInterface().objectChanged(this.classProperties['object']);
+                    if (this.isObjectBased()) {
+                        jarves.getAdminInterface().objectChanged(this.getObjectKey());
+                    }
                     this.destroy();
                 }.bind(this)}).requestDelete();
 
@@ -663,8 +677,10 @@ jarves.WindowEdit = new Class({
 
         this.saveBtn.setButtonStyle('blue')
 
-        this.removeBtn = this.actionGroup.addButton(t('Remove'), jarves.mediaPath(this.classProperties.removeIcon), this.remove.bind(this));
-        this.removeBtn.setButtonStyle('red');
+        if (this.classProperties.remove) {
+            this.removeBtn = this.actionGroup.addButton(t('Remove'), jarves.mediaPath(this.classProperties.removeIcon), this.remove.bind(this));
+            this.removeBtn.setButtonStyle('red');
+        }
 
         this.resetBtn = this.actionGroup.addButton(t('Reset'), '#icon-escape', this.reset.bind(this));
 
@@ -672,7 +688,7 @@ jarves.WindowEdit = new Class({
             this.showVersionsBtn = this.actionGroup.addButton(t('Versions'), '#icon-history', this.showVersions);
         }
 
-        if (true) {
+        if (false) {
             this.previewBtn = this.actionGroup.addButton(t('Preview'), '#icon-eye');
         }
 
@@ -686,7 +702,7 @@ jarves.WindowEdit = new Class({
         var dialog = this.win.newDialog();
 
         new jarves.ObjectVersionGraph(dialog.content, {
-            object: jarves.getObjectUrlId(this.classProperties['object'], this.getPrimaryKey())
+            object: jarves.getObjectUrlId(this.getObjectKey(), this.getPrimaryKey())
         });
 
     },
@@ -964,10 +980,16 @@ jarves.WindowEdit = new Class({
     },
 
     doSave: function(andClose) {
-        var objectId = jarves.getObjectUrlId(this.classProperties['object'], this.getPrimaryKey());
+        var url = _pathAdmin + this.getEntryPoint();
+
+        if (this.isObjectBased()) {
+            var objectId = jarves.getObjectUrlId(this.getObjectKey(), this.getPrimaryKey());
+            url += '/' + objectId;
+        }
+
         var request = this.buildRequest(this.classProperties.usePatch);
 
-        this.lastSaveRq = new Request.JSON({url: _pathAdmin + this.getEntryPoint() + '/' + objectId,
+        this.lastSaveRq = new Request.JSON({url: url,
             noErrorReporting: [
                 'Jarves\\Exceptions\\Rest\\ValidationFailedException',
                 'DuplicateKeysException',
@@ -996,7 +1018,9 @@ jarves.WindowEdit = new Class({
                 this.fieldForm.resetPatch();
 
                 this.fireEvent('save', [request, response]);
-                jarves.getAdminInterface().objectChanged(this.classProperties['object']);
+                if (this.isObjectBased()) {
+                    jarves.getAdminInterface().objectChanged(this.getObjectKey());
+                }
 
                 if ((!andClose || this.inline ) && this.classProperties.versioning == true) {
                     this.loadVersions();
