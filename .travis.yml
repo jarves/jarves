@@ -20,7 +20,11 @@ before_script:
 
   - sudo chown -R www-data .
 
-  - Tests/Integration/skeletion/app/console jarves:configuration:database $DB_TYPE $DB_NAME $DB_USER --server=$DB_SERVER
+  - export SYMFONY__DATABASE_DRIVER=$DB_TYPE
+  - export SYMFONY__DATABASE_NAME=$DB_NAME
+  - export SYMFONY__DATABASE_USER=$DB_USER
+  - export SYMFONY__DATABASE_HOST=$DB_SERVER
+
   - rm -rf Tests/Integration/skeletion/app/cache/*
   - Tests/Integration/skeletion/app/console propel:model:build
   - Tests/Integration/skeletion/app/console propel:migration:diff
