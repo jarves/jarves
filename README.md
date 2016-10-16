@@ -30,7 +30,7 @@ This describes the customized installation, usually used by developers.
 
 Read the [development installation documentation](http://jarves.io/documentation/quick-start/installation).
 
-Read the [Create A Theme documentation](http://jarves.io/documentation/quick-start/create-a-theme), to create layouts for your website.
+Read the [Create A Theme documentation](http://jarves.io/documentation/cook-book/create-a-theme), to create layouts for your website.
 
 Extensions
 ----------

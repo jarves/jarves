@@ -53,51 +53,18 @@ class JarvesConfig
     }
 
     /**
-     * @param bool $withCache
-     *
+     * @param SystemConfig $systemConfig
+     */
+    public function setSystemConfig(SystemConfig $systemConfig)
+    {
+        $this->systemConfig = $systemConfig;
+    }
+
+    /**
      * @return SystemConfig
      */
-    public function getSystemConfig($withCache = true)
+    public function getSystemConfig()
     {
-        if (null === $this->systemConfig) {
-
-            $configFile = $this->rootDir . '/config/config.jarves.xml';
-            $configEnvFile = $this->rootDir . '/config/config.jarves_' . $this->environment . '.xml';
-            if (file_exists($configEnvFile)) {
-                $configFile = $configEnvFile;
-            }
-
-            $cacheFile = $configFile . '.cache.php';
-            $systemConfigCached = @file_get_contents($cacheFile);
-
-            $cachedSum = 0;
-            if ($systemConfigCached) {
-                $cachedSum = substr($systemConfigCached, 0, 32);
-                $systemConfigCached = substr($systemConfigCached, 33);
-            }
-
-            $systemConfigHash = file_exists($configFile) ? md5(filemtime($configFile)) : -1;
-
-            if ($withCache && $systemConfigCached && $cachedSum === $systemConfigHash) {
-                $this->systemConfig = @unserialize($systemConfigCached);
-            }
-
-            if (!$this->systemConfig) {
-                $configXml = file_exists($configFile) ? file_get_contents($configFile) : [];
-                $this->systemConfig = new SystemConfig($configXml);
-                file_put_contents($cacheFile, $systemConfigHash . "\n" . serialize($this->systemConfig));
-            }
-
-            if (!$this->systemConfig->getDatabase() || !$this->systemConfig->getDatabase()->isValid()) {
-                $database = $this->container->get('jarves.configuration.database');
-                $this->systemConfig->setDatabase($database);
-                if (!$database->isValid()) {
-                    throw new BuildException('Jarves uses the database credentials from parameters.yml. ' .
-                        'You did not configure all parameters.');
-                }
-            }
-        }
-
         return $this->systemConfig;
     }
 
