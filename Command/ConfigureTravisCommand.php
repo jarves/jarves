@@ -55,7 +55,7 @@ You can set with this command configuration values inside the app/config/config.
 
         $yaml = Yaml::parse(file_get_contents($file));
 
-        $yaml['parameters']['database_type'] = $input->getArgument('type');
+        $yaml['parameters']['database_driver'] = $input->getArgument('type');
         $yaml['parameters']['database_name'] = $input->getArgument('database-name');
         $yaml['parameters']['database_user'] = $input->getArgument('username');
         $yaml['parameters']['database_password'] = $input->getOption('pw');
