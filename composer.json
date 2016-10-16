@@ -36,7 +36,8 @@
         "composer\/composer": "1.0.0",
         "friendsofsymfony/rest-bundle": "2.1.0",
         "nelmio/api-doc-bundle": "~2.5",
-        "icap/html-diff": ">=1.0.1"
+        "icap/html-diff": ">=1.0.1",
+        "kadet/keylighter": "^0.8.2"
     },
     "require-dev": {
         "phpunit/phpunit": "~3.7",
