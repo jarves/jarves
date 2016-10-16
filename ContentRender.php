@@ -148,7 +148,7 @@ class ContentRender
         }
 
         $contents = $this->getSlotContents($nodeId, $slotId);
-        return $this->renderContents($contents, $params);
+        return $this->renderSlotContents($contents, $params);
     }
 
     /**
@@ -172,7 +172,7 @@ class ContentRender
         }
 
         $contents = $this->getSlotContents($nodeId, $slotId);
-        return $this->renderContents($contents, $params);
+        return $this->renderSlotContents($contents, $params);
     }
 
     /**
@@ -208,37 +208,50 @@ class ContentRender
 
         return $contents;
     }
-//
-//    public function renderView(&$contents, $view)
-//    {
-//        return json_encode(iterator_to_array($contents));
-//    }
 
     /**
-     * Build HTML for given contents.
+     * Renders all Content elements into html.
      *
-     * @param array $contents
-     * @param array $slotProperties
+     * @param Content[] $contents
      *
-     * @return string|null
+     * @return string generated html
      */
-    public function renderContents(&$contents, $slotProperties)
+    public function renderContents($contents)
     {
-        $name = isset($slotProperties['name']) ? $slotProperties['name'] : '';
+        $html = '';
+        $contents = $this->filterContentsForAccess($contents);
 
-        $title = sprintf('Slot %s [%d]', $name, $slotProperties['id']);
-        $this->stopwatch->start($title, 'Jarves');
+        foreach ($contents as $content) {
+            if (is_string($content)) {
+                $html .= $content;
+                continue;
+            }
 
-        if (is_string($contents)) {
-            return $contents;
+            if ('stopper' === $content->getType()) {
+                if ($html) {
+                    break;
+                }
+
+                continue;
+            }
+
+            $html .= $this->renderContent($content);
         }
 
-        $filteredContents = array();
-        if (!($contents instanceof \Traversable)) {
-            return;
-        }
+        return $html;
+    }
 
-        /** @var $content Content */
+    /**
+     * Filters $contents and returns only $content items which have valid access. (is visible, accessible by current user etc)
+     *
+     * @param Content[] $contents
+     *
+     * @return array
+     */
+    protected function filterContentsForAccess($contents)
+    {
+        $filteredContents = [];
+
         foreach ($contents as $content) {
             $access = true;
 
@@ -288,6 +301,33 @@ class ContentRender
             }
         }
 
+        return $filteredContents;
+    }
+
+    /**
+     * Build HTML for given contents, used in {% contents 1 %}.
+     *
+     * @param array $contents
+     * @param array $slotProperties
+     *
+     * @return string|null
+     */
+    public function renderSlotContents($contents, $slotProperties)
+    {
+        $name = isset($slotProperties['name']) ? $slotProperties['name'] : '';
+
+        $title = sprintf('Slot %s [%d]', $name, $slotProperties['id']);
+        $this->stopwatch->start($title, 'Jarves');
+
+        if (is_string($contents)) {
+            return $contents;
+        }
+
+        if (!($contents instanceof \Traversable)) {
+            return;
+        }
+
+        $filteredContents = $this->filterContentsForAccess($contents);
         $count = count($filteredContents);
 
         /*
@@ -334,7 +374,6 @@ class ContentRender
                 $data['layoutContentsIndex'] = $i;
 
                 $html .= $this->renderContent($content, $data);
-
             }
         }
 

@@ -44,9 +44,9 @@ class RenderContentsExtension extends \Twig_Extension
         );
     }
 
-    public function renderContents($contents, $view = '')
+    public function renderContents($contents)
     {
-        return $this->container->get('jarves.content.render')->renderContents($contents, $view);
+        return $this->container->get('jarves.content.render')->renderContents($contents);
     }
 
 }
