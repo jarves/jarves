@@ -20,7 +20,7 @@ before_script:
 
   - sudo chown -R www-data .
 
-  - Tests/Integration/skeletion/app/console jarves:configuration:database $DB_TYPE $DB_NAME $DB_USER --server=$DB_SERVER
+  - Tests/Integration/skeletion/app/console jarves:configuration:travis $DB_TYPE $DB_NAME $DB_USER --server=$DB_SERVER
   - rm -rf Tests/Integration/skeletion/app/cache/*
   - Tests/Integration/skeletion/app/console propel:model:build
   - Tests/Integration/skeletion/app/console propel:migration:diff
