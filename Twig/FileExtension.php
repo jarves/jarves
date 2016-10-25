@@ -86,7 +86,7 @@ class FileExtension extends \Twig_Extension
      * @return string
      * @internal param int|string $id path or file id
      */
-    public function thumbnail($id, $maxWidth = 100, $maxHeight = 100, $quality, $resize = true)
+    public function thumbnail($id, $maxWidth = 100, $maxHeight = 100, $quality = 8, $resize = true)
     {
         $path = $this->webFilesystem->getPath($id);
         $cacheDir = 'cache/rendered-image/' . $path;
