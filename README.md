@@ -30,7 +30,7 @@ This describes the customized installation, usually used by developers.
 
 Read the [development installation documentation](http://jarves.io/documentation/quick-start/installation).
 
-Read the [Create A Theme documentation](http://jarves.io/documentation/quick-start/create-a-theme), to create layouts for your website.
+Read the [Create A Theme documentation](http://jarves.io/documentation/cook-book/create-a-theme), to create layouts for your website.
 
 Extensions
 ----------
@@ -62,7 +62,6 @@ Features
  - Session storage through several layers (distributed sessions supported)
  - Easy to extend through a fancy extension editor, completely modulized - the symfony way
  - CRUD window generator, without writing one line of code
- - Easy and integrated backup system, perfect for live/dev-scenarios
  - Extremely detailed permission system
  - Ships with a solid bunch of UI input widgets (input fields)
  - Several flexible authentication layers (e.g. changeable for administration, changeable per domain)

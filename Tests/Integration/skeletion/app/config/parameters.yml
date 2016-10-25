@@ -1,10 +1,9 @@
-# This file is auto-generated during the composer install
 parameters:
     database_driver: pdo_mysql
     database_host: 127.0.0.1
     database_port: null
-    database_name: symfony
-    database_user: root
+    database_name: test
+    database_user: null
     database_password: null
     mailer_transport: smtp
     mailer_host: 127.0.0.1
@@ -13,3 +12,5 @@ parameters:
     locale: en
     secret: 1234onwdfhouh23bhou325iuhno4
     jarves_admin_prefix: /jarves
+    database_type: pdo_mysql
+    database_server: 127.0.0.1

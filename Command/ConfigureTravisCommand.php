@@ -18,8 +18,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Yaml\Yaml;
 
-class ConfigurationCommand extends AbstractCommand
+class ConfigureTravisCommand extends AbstractCommand
 {
 
     /**
@@ -29,8 +30,8 @@ class ConfigurationCommand extends AbstractCommand
     {
         parent::configure();
         $this
-            ->setName('jarves:configuration:database')
-            ->setDescription('Builds all propel models in jarves bundles.')
+            ->setName('jarves:configuration:travis')
+            ->setDescription('Builds the database configuration for travis ci.')
             ->addArgument('type', InputArgument::REQUIRED, 'database type: mysql|pgsql|sqlite')
             ->addArgument('database-name', InputArgument::REQUIRED, 'database name')
             ->addArgument('username', InputArgument::OPTIONAL, 'database login username')
@@ -39,8 +40,7 @@ class ConfigurationCommand extends AbstractCommand
             ->addOption('port', null, InputOption::VALUE_OPTIONAL)
             ->setHelp('
 You can set with this command configuration values inside the app/config/config.jarves.xml file.
-')
-        ;
+');
     }
 
     /**
@@ -48,33 +48,23 @@ You can set with this command configuration values inside the app/config/config.
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $systemConfig = $this->getJarves()->getSystemConfig(false);
+        $container = $this->getContainer();
 
-        $database = $systemConfig->getDatabase(true);
+        $rootDir = $container->getParameter('kernel.root_dir');
+        $file = sprintf('%s/config/parameters.yml', $rootDir);
 
-        $mainConnection = $database->getMainConnection();
+        $yaml = Yaml::parse(file_get_contents($file));
 
-        $mainConnection->setType($input->getArgument('type'));
-        $mainConnection->setName($input->getArgument('database-name'));
-        $mainConnection->setUsername($input->getArgument('username'));
-
-        $mainConnection->setPassword($input->getOption('pw'));
+        $yaml['parameters']['database_driver'] = $input->getArgument('type');
+        $yaml['parameters']['database_name'] = $input->getArgument('database-name');
+        $yaml['parameters']['database_user'] = $input->getArgument('username');
+        $yaml['parameters']['database_password'] = $input->getOption('pw');
 
         $server = $input->getOption('server') ?: '127.0.0.1';
-        if ('sqlite' === $mainConnection->getType()) {
-            @touch($server);
-            $server = realpath($server);
-        }
-        $mainConnection->setServer($server);
+        $yaml['parameters']['database_server'] = $server;
 
-        $mainConnection->setPort($input->getOption('port'));
+        file_put_contents($file, Yaml::dump($yaml));
 
-        $path = realpath($this->getApplication()->getKernel()->getRootDir().'/..') . '/app/config/config.jarves.xml';
-        $systemConfig->save($path);
-
-        $cache = realpath($this->getApplication()->getKernel()->getRootDir().'/..') . '/app/config/config.jarves.xml.cache.php';
-        @unlink($cache);
-
-        $output->writeln(sprintf('File `%s` updated.', $path));
+        $output->writeln(sprintf('File "%s" updated.', $file));
     }
 }

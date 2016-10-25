@@ -14,6 +14,7 @@
 
 namespace Jarves\Command;
 
+use Doctrine\Common\Util\Debug;
 use Jarves\Model\Content;
 use Jarves\Model\Domain;
 use Jarves\Model\DomainQuery;
@@ -29,6 +30,7 @@ use Propel\Runtime\Propel;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -47,6 +49,7 @@ class ContentImportCommand extends AbstractCommand
         parent::configure();
         $this
             ->setName('jarves:content:import')
+            ->addOption('watch', null, InputOption::VALUE_NONE, "Watches for file changes and reimports")
             ->setDescription('Imports website data from the package in app/jarves');
     }
 
@@ -67,14 +70,53 @@ class ContentImportCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-//        $basePath = 'jarves-export/' . date('Ymd-His'). '/';
         $basePath = 'app/jarves/';
-
         $fs = new Filesystem();
         if (!$fs->exists($basePath)) {
             $output->writeln(sprintf('<error>No website data in %s</error>', $basePath));
             return;
         }
+
+        $files = $this->import($input, $output);
+
+        if (!$input->getOption('watch')) {
+            $output->writeln("<info>Done.</info>");
+        } else {
+            do {
+                $output->writeln("<info>Done. Wait for changes ...</info>");
+
+                while (true) {
+                    sleep(1);
+                    clearstatcache();
+                    foreach ($files as $path => $mtime) {
+                        if ($mtime !== filemtime($path)) {
+                            $output->writeln(sprintf("<info>%s changed. Reimport</info>", $path));
+                            break 2;
+                        }
+                    }
+                }
+
+                try {
+                    $files = $this->import($input, $output);
+                } catch (\Exception $e) {
+                    foreach ($files as $path => $mtime) {
+                        $files[$path] = filemtime($path);
+                    }
+
+                    $output->writeln("<error>Failed</error>");
+                    echo Debug::toString($e);
+                    $output->writeln("<info>Waiting for changes ...</info>");
+                }
+
+            } while(true);
+        }
+
+    }
+
+    protected function import(InputInterface $input, OutputInterface $output)
+    {
+        $basePath = 'app/jarves/';
+        $openedFiles = [];
 
         $domains = [];
         $nodes = [];
@@ -84,16 +126,21 @@ class ContentImportCommand extends AbstractCommand
         Propel::getWriteConnection('default')->beginTransaction();
 
         //import files
-        $fileReferences = $ymlParser->parse(file_get_contents($basePath . '/file_references.yml'));
-        $output->writeln(sprintf('Import %d file references ...', count($fileReferences)));
-        FileQuery::create()
-            ->deleteAll();
+        $fileReferencesPath = $basePath . '/file_references.yml';
+        if (file_exists($fileReferencesPath)) {
+            $openedFiles[$fileReferencesPath] = filemtime($fileReferencesPath);
+            $fileReferences = $ymlParser->parse(file_get_contents($fileReferencesPath));
 
-        foreach ($fileReferences as $id => $path) {
-            $file = new File();
-            $file->setId($id);
-            $file->setPath($path);
-            $file->save();
+            $output->writeln(sprintf('Import %d file references ...', count($fileReferences)));
+            FileQuery::create()
+                ->deleteAll();
+
+            foreach ($fileReferences as $id => $path) {
+                $file = new File();
+                $file->setId($id);
+                $file->setPath($path);
+                $file->save();
+            }
         }
 
         $relativePathBase = $basePath . 'website/';
@@ -119,7 +166,10 @@ class ContentImportCommand extends AbstractCommand
                 $domain = new Domain();
             }
 
-            $domainFromYml = $ymlParser->parse(file_get_contents($relativePathBase . $domainName . '.yml'));
+            $ymlPath = $relativePathBase . $domainName . '.yml';
+            $domainFromYml = $ymlParser->parse(file_get_contents($ymlPath));
+            $openedFiles[$ymlPath] = filemtime($ymlPath);
+
             $oldData = $domain->toArray(TableMap::TYPE_CAMELNAME);
             $domain->fromArray(array_merge($oldData, $domainFromYml), TableMap::TYPE_CAMELNAME);
             $domain->setStartnodeId(null);
@@ -170,7 +220,10 @@ class ContentImportCommand extends AbstractCommand
                     //its a node
                     $node = isset($nodes[$path]) ? $nodes[$path] : new Node();
 
-                    $nodeFromYml = $ymlParser->parse(file_get_contents($relativePathBase . $domainName . '/' . $path));
+                    $ymlPath = $relativePathBase . $domainName . '/' . $path;
+                    $nodeFromYml = $ymlParser->parse(file_get_contents($ymlPath));
+                    $openedFiles[$ymlPath] = filemtime($ymlPath);
+
                     $node->fromArray($nodeFromYml, TableMap::TYPE_CAMELNAME);
                     $node->setDomain($domain);
                     $urn = $baseName;
@@ -231,6 +284,6 @@ class ContentImportCommand extends AbstractCommand
         $cacher = $this->getContainer()->get('jarves.cache.cacher');
         $cacher->invalidateCache('core');
 
-        $output->writeln("<info>Done.</info>");
+        return $openedFiles;
     }
 }

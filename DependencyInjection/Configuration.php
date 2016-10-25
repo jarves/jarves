@@ -5,11 +5,6 @@ namespace Jarves\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-/**
- * This is the class that validates and merges configuration from your app/config files
- *
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html#cookbook-bundles-extension-config-class}
- */
 class Configuration implements ConfigurationInterface
 {
     /**
@@ -18,15 +13,45 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-//        $rootNode = $treeBuilder->root('jarves');
+        $rootNode = $treeBuilder->root('jarves');
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
-
-//        $rootNode
-//            ->children()
-//            ->end();
+        $rootNode
+            ->children()
+                ->scalarNode('systemTitle')
+                    ->defaultValue('Fresh Installation')
+                ->end()
+                ->scalarNode('languages')
+                    ->defaultValue('en')
+                ->end()
+                ->arrayNode('cache')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('service')
+                            ->defaultValue('jarves.cache.backend.files')
+                        ->end()
+                        ->arrayNode('options')
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode('mountpoints')
+                ->end()
+                ->arrayNode('file')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('groupPermission')
+                            ->defaultValue('rw')
+                        ->end()
+                        ->scalarNode('everyonePermission')
+                            ->defaultValue('r')
+                        ->end()
+                        ->scalarNode('disableModeChange')
+                            ->defaultValue(false)
+                        ->end()
+                        ->scalarNode('groupOwner')
+                        ->end()            
+                    ->end()
+                ->end()
+            ->end();
 
         return $treeBuilder;
     }

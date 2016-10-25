@@ -1,2 +1,12 @@
 vendor/
 jarves.propel.schema.built.xml
+
+Model/Base
+Model/Map
+
+Tests/Integration/skeletion/app/cache
+Tests/Integration/skeletion/app/propel
+Tests/Integration/skeletion/web/cache
+Tests/Integration/skeletion/web/bundles
+Tests/Integration/skeletion/src/Test/Model/Base
+Tests/Integration/skeletion/src/Test/Model/Map
