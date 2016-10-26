@@ -122,6 +122,29 @@ class PageResponseFactory
     }
 
     /**
+     * Creates a new PageResponse object based on a Node object.
+     * If you've a theme then you could specify "theme" at the route options (to have a custom doctype/base template)
+     *
+     * @param string $template
+     * @param array  $parameters
+     * @param Node   $page
+     *
+     * @return PageResponse
+     * @internal param null|string $routeName
+     *
+     */
+    public function createWithBody(Node $page = null, $template, $parameters = [])
+    {
+        $pageResponse = $this->createWithPage($page);
+
+        $body = $this->templating->render($template, $parameters);
+        $pageResponse->setBody($body);
+        $pageResponse->setRenderFrontPage(false);
+
+        return $pageResponse;
+    }
+
+    /**
      * Creates a new PageResponse object based on the current found route (using Symfony's router) or using $routeName.
      * You need to define at your routes additional options: title, theme, layout.
      *
