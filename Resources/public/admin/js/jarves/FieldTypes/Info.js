@@ -19,10 +19,10 @@ jarves.FieldTypes.Info = new Class({
 
     Statics: {
         options: {
-            safeInfo: {
+            html: {
                 label: 'Safe info',
-                description: t('Sets the value as a `text` not as `html` if true'),
-                'default': true,
+                description: t('Sets the value as `html` if true'),
+                'default': false,
                 type: 'checkbox'
             }
         }
@@ -40,10 +40,10 @@ jarves.FieldTypes.Info = new Class({
             return;
         }
 
-        this.infoLabel.set(this.options.safeInfo ? 'text' : 'html', pValue);
+        this.infoLabel.set(this.options.html ? 'html' : 'text', pValue);
     },
 
     getValue: function () {
-        return this.infoLabel.get(this.options.safeInfo ? 'text' : 'html');
+        return this.infoLabel.get(this.options.html ? 'html' : 'text');
     }
 });
