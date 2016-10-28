@@ -21,6 +21,7 @@ jarves.FieldTypes.Lang = new Class({
 
     initialize: function (fieldInstance, options) {
         options.object = 'jarves/language';
+        options.objectIdAsRaw = true;
         this.parent(fieldInstance, options);
 
         var hasSessionLang = false;

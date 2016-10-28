@@ -24,7 +24,9 @@ jarves.WindowAdd = new Class({
         //ist in render() am ende also lösche unnötigen balast
         this.win.setLoading(false);
 
-        this.removeBtn.hide();
+        if (this.removeBtn) {
+            this.removeBtn.hide();
+        }
 
         if (this.previewBtn) {
             this.previewBtn.hide();
