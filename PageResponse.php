@@ -21,9 +21,9 @@ use Jarves\AssetHandler\JsHandler;
 use Jarves\Configuration\ThemeLayout;
 use Jarves\Model\Content;
 use Jarves\Model\ContentInterface;
-use Jarves\Model\Domain;
 use Jarves\Model\Node;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Templating\EngineInterface;
@@ -136,6 +136,11 @@ class PageResponse extends Response
     protected $resourceCompression = false;
 
     /**
+     * @var ParameterBag
+     */
+    public $meta;
+
+    /**
      * @var Container
      */
     private $assetCompilerContainer;
@@ -183,6 +188,7 @@ class PageResponse extends Response
         $this->templating = $templating;
         $this->editMode = $editMode;
         $this->pageStack = $pageStack;
+        $this->meta = new ParameterBag();
     }
 
     /**
