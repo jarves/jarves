@@ -162,6 +162,19 @@ class PageResponseFactory
      */
     public function createFromRoute($routeName = null, $contents = null)
     {
+        $page = $this->createPageFromRoute($routeName);
+        return $this->createFromPage($page, $contents);
+    }
+
+    /**
+     * Creates a Node object based on given $routeName or current route.
+     *
+     * @param string|null $routeName
+     *
+     * @return Node
+     */
+    public function createPageFromRoute($routeName = null)
+    {
         if (!$routeName) {
             $routeName = $this->pageStack->getRequest()->attributes->get('_route');
             if (!$routeName) {
@@ -196,9 +209,9 @@ class PageResponseFactory
         }
 
         $route = $routes[$routeName];
-        $page = Node::createPage($route->getOption('title'), $route->getPath(), $route->getOption('theme'), $route->getOption('layout'));
+        $url = $this->router->generate($routeName, $this->pageStack->getRequest()->attributes->all());
 
-        return $this->createFromPage($page, $contents);
+        return Node::createPage($route->getOption('title'), parse_url($url)['path'], $route->getOption('theme'), $route->getOption('layout'));
     }
 
     /**

@@ -323,6 +323,16 @@ class PageResponse extends Response
     }
 
     /**
+     * Returns the current page of the pageStack.
+     *
+     * @return Node|null
+     */
+    public function getPage()
+    {
+        return $this->pageStack->getCurrentPage();
+    }
+
+    /**
      * Adds a css file to the page.
      *
      * @param string $path

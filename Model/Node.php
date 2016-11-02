@@ -16,12 +16,25 @@ namespace Jarves\Model;
 
 use Propel\Runtime\Collection\ObjectCollection;
 use Jarves\Model\Base\Node as BaseNode;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class Node extends BaseNode
 {
     protected $collNestedGetLinks;
 
-    protected $parentsCached;
+    /**
+     * Parents. Mostly used for breadcrumb.
+     *
+     * @var Node[]|null
+     */
+    protected $parents;
+
+    /**
+     * Children. Mostly used for breadcrumb.
+     *
+     * @var Node[]|null
+     */
+    protected $offspring;
 
     const TYPE_PAGE = 0;
     const TYPE_LINK = 1;
@@ -29,9 +42,21 @@ class Node extends BaseNode
     const TYPE_TRAY = 3;
 
     /**
+     * @var ParameterBag
+     */
+    public $meta;
+
+    /**
      * @var string
      */
     protected $path;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setType(Node::TYPE_PAGE);
+        $this->meta = new ParameterBag();
+    }
 
     /**
      * @param string      $title
@@ -58,7 +83,7 @@ class Node extends BaseNode
      */
     public function getCacheKey()
     {
-        if (null !== $this->getId()){
+        if (null !== $this->getId()) {
             return (string)$this->getId();
         }
 
@@ -113,30 +138,54 @@ class Node extends BaseNode
     }
 
     /**
-     * Returns all parents.
+     * Returns all parents. Mainly used for breadcrumb.
      *
-     * @return mixed
+     * @return Node[]
      */
     public function getParents()
     {
-        if (!$this->parentsCached) {
+        if (!$this->parents) {
 
-            $this->parentsCached = array();
+            $this->parents = array();
 
             if ($this->isNew()) {
-                return $this->parentsCached ?: [];
+                return $this->parents ?: [];
             }
 
             $ancestors = $this->getAncestors();
             foreach ($ancestors as $parent) {
 
                 if ($parent->getType() !== null && $parent->getType() < 2) { //exclude root node
-                    $this->parentsCached[] = $parent;
+                    $this->parents[] = $parent;
                 }
             }
         }
 
-        return $this->parentsCached;
+        return $this->parents;
+    }
+
+    /**
+     * @param Node $node
+     */
+    public function addParent(Node $node)
+    {
+        $this->parents[] = $node;
+    }
+
+    /**
+     * @return Node[]
+     */
+    public function getOffspring()
+    {
+        return $this->offspring ?: [];
+    }
+
+    /**
+     * @param Node $node
+     */
+    public function addOffspring(Node $node)
+    {
+        $this->offspring[] = $node;
     }
 
     /**
@@ -156,7 +205,7 @@ class Node extends BaseNode
             $parents = $this->getParents();
 
             $path = $this->getDomain()->getDomain();
-            foreach ($parents as &$parent) {
+            foreach ($parents as $parent) {
                 $path .= $pDelimiter . $parent->getTitle();
             }
 

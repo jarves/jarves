@@ -34,12 +34,12 @@ use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 class PageStack
 {
     /**
-     * @var Domain
+     * @var Domain|null
      */
     protected $domain;
 
     /**
-     * @var Node
+     * @var Node|null
      */
     protected $node;
 
@@ -120,7 +120,7 @@ class PageStack
     }
 
     /**
-     * @return PageResponse
+     * @return PageResponse|null
      */
     public function getPageResponse()
     {
@@ -169,7 +169,7 @@ class PageStack
     }
 
     /**
-     * @return Node
+     * @return Node|null
      */
     public function getCurrentPage()
     {
@@ -313,33 +313,45 @@ class PageStack
      */
     public function getNodeUrl($nodeOrId, $fullUrl = false, $suppressStartNodeCheck = false)
     {
-        $id = $nodeOrId;
-
-        if (!$nodeOrId) {
-            $nodeOrId = $this->getCurrentPage();
-        }
-
-        if ($nodeOrId instanceof Node) {
-            $id = $nodeOrId->getId();
-        }
 
         $domain = $this->getCurrentDomain();
+        $url = null;
+        $id = null;
 
-        if (!is_numeric($id)) {
-            //url given
-            $url = $id;
+        if (is_string($nodeOrId) && !is_numeric($nodeOrId)) {
+            $url = $nodeOrId;
         } else {
-            $domainId = $nodeOrId instanceof Node ? $nodeOrId->getDomainId() : $this->getDomainOfPage($id);
+            $node = $nodeOrId;
+            if (!$nodeOrId) {
+                $node = $this->getCurrentPage();
+            } else {
+                if (is_numeric($nodeOrId)) {
+                    $node = $this->getPage($nodeOrId);
+                }
+            }
 
-            if (!$domain || $domainId !== $domain->getId()) {
+            $id = $node->getId();
+            $domainId = $node->getDomainId();
+
+            if ($domainId && (!$domain || $domainId !== $domain->getId())) {
                 $domain = $this->getDomain($domainId);
             }
 
-            if (!$suppressStartNodeCheck && $domain->getStartnodeId() === $id) {
+            if (!$suppressStartNodeCheck && $domain->getStartnodeId() && $domain->getStartnodeId() === $id) {
                 $url = '/';
             } else {
-                $urls = $this->getCachedPageToUrl($domainId);
-                $url = isset($urls[$id]) ? $urls[$id] : '';
+                if (!$node->getId()) {
+                    //dynamic created Nodes need to define the full url as urn since it does not have parents
+                    //nor do we get the full url from getCachedPageToUrl().
+                    $url = $node->getUrn();
+                } else {
+                    $urls = $this->getCachedPageToUrl($domainId);
+                    $url = isset($urls[$id]) ? $urls[$id] : '';
+                }
+
+                if (!$url && !$id) {
+                    throw new \InvalidArgumentException('Requested url for page that does not have an id and no urn.');
+                }
             }
         }
 
@@ -356,16 +368,18 @@ class PageStack
             $url = substr($prefix, 1) . $url;
         }
 
-        $domainName = $domain->getRealDomain();
-
         //crop first /
         if (substr($url, 0, 1) == '/') {
             $url = substr($url, 1);
         }
 
         if ($fullUrl) {
-            $isSecure = $this->getRequest() ? $this->getRequest()->isSecure() : false;
+            $domainName = $this->getRequest()->getHttpHost();
+            if ($domain) {
+                $domainName = $domain->getRealDomain();
+            }
 
+            $isSecure = $this->getRequest() ? $this->getRequest()->isSecure() : false;
             $url = 'http' . ($isSecure ? 's' : '') . '://' . $domainName . $url;
         } else {
             //check that we have first starting slash
