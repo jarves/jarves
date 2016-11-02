@@ -104,19 +104,23 @@ class PageResponseFactory
      * Creates a new PageResponse object based on the current found route (using Symfony's router) or using $routeName.
      * If you've a theme then you could specify "theme" at the route options (to have a custom doctype/base template)
      *
-     * @param string $template
-     * @param array $parameters
+     * Note: The actual rendering of $view is delayed to the PageResponse::prepare() which is called shortly before sending the request.
+     *
+     * @param string      $view
+     * @param array       $parameters
      * @param null|string $routeName
      *
      * @return PageResponse
      */
-    public function createFromRouteWithBody($template, $parameters = [], $routeName = null)
+    public function createFromRouteWithBody($view, $parameters = [], $routeName = null)
     {
         $pageResponse = $this->createFromRoute($routeName);
 
-        $body = $this->templating->render($template, $parameters);
+        $body = function() use ($view, $parameters, $pageResponse) {
+            $parameters = array_merge($pageResponse->getPageViewParameter(), $parameters);
+            return $this->templating->render($view, $parameters);
+        };
         $pageResponse->setBody($body);
-        $pageResponse->setRenderFrontPage(false);
 
         return $pageResponse;
     }
@@ -125,21 +129,24 @@ class PageResponseFactory
      * Creates a new PageResponse object based on a Node object.
      * If you've a theme then you could specify "theme" at the route options (to have a custom doctype/base template)
      *
-     * @param string $template
+     * Note: The actual rendering of $view is delayed to the PageResponse::prepare() which is called shortly before sending the request.
+     *
+     * @param string $view
      * @param array  $parameters
      * @param Node   $page
      *
      * @return PageResponse
      * @internal param null|string $routeName
-     *
      */
-    public function createWithBody(Node $page = null, $template, $parameters = [])
+    public function createFromPageWithBody($view, $parameters = [], Node $page = null)
     {
-        $pageResponse = $this->createWithPage($page);
+        $pageResponse = $this->createFromPage($page);
 
-        $body = $this->templating->render($template, $parameters);
+        $body = function() use ($view, $parameters, $pageResponse) {
+            $parameters = array_merge($pageResponse->getPageViewParameter(), $parameters);
+            return $this->templating->render($view, $parameters);
+        };
         $pageResponse->setBody($body);
-        $pageResponse->setRenderFrontPage(false);
 
         return $pageResponse;
     }
@@ -191,7 +198,7 @@ class PageResponseFactory
         $route = $routes[$routeName];
         $page = Node::createPage($route->getOption('title'), $route->getPath(), $route->getOption('theme'), $route->getOption('layout'));
 
-        return $this->createWithPage($page, $contents);
+        return $this->createFromPage($page, $contents);
     }
 
     /**
@@ -200,7 +207,7 @@ class PageResponseFactory
      *
      * @return PageResponse
      */
-    public function createWithPage($page, $contents = null)
+    public function createFromPage($page, $contents = null)
     {
         $page = $this->pageStack->getPage($page);
 

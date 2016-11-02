@@ -102,7 +102,7 @@ class PageResponse extends Response
     protected $header = array();
 
     /**
-     * @var string
+     * @var string|callable
      */
     protected $body = '';
 
@@ -275,7 +275,7 @@ class PageResponse extends Response
     }
 
     /**
-     * @param string $body
+     * @param string|callable $body
      */
     public function setBody($body)
     {
@@ -283,7 +283,7 @@ class PageResponse extends Response
     }
 
     /**
-     * @return string
+     * @return string|callable
      */
     public function getBody()
     {
@@ -591,7 +591,9 @@ class PageResponse extends Response
     {
         $body = $this->getBody();
 
-        if ($this->getRenderFrontPage()) {
+        if (is_callable($body)) {
+            $body = $body();
+        } else if ($this->getRenderFrontPage()) {
             $body = $this->buildBody();
         }
 
@@ -706,12 +708,7 @@ class PageResponse extends Response
         try {
             $html = $this->templating->render(
                 $layoutPath,
-                array(
-                    'page' => $this->pageStack->getCurrentPage(),
-                    'domain' => $this->pageStack->getCurrentDomain(),
-                    'baseUrl' => $this->getBaseHref(),
-                    'themeOptions' => $this->pageStack->getCurrentDomain() ? $this->pageStack->getCurrentDomain()->getThemeOptions() : []
-                )
+                $this->getPageViewParameter()
             );
         } catch (\Exception $e) {
             throw new \Exception(sprintf('Cant render view `%s` of theme `%s`.', $layoutPath, $themeId), 0, $e);
@@ -720,6 +717,22 @@ class PageResponse extends Response
         $this->stopwatch->stop('Build PageBody');
 
         return $html;
+    }
+
+    /**
+     * Returns an array with page, domain, baseUrl and themeOptions, which is being used by most page view templates.
+     *
+     * @return array
+     */
+    public function getPageViewParameter()
+    {
+        return [
+            'page' => $this->pageStack->getCurrentPage(),
+            'pageResponse' => $this,
+            'domain' => $this->pageStack->getCurrentDomain(),
+            'baseUrl' => $this->getBaseHref(),
+            'themeOptions' => $this->pageStack->getCurrentDomain() ? $this->pageStack->getCurrentDomain()->getThemeOptions() : []
+        ];
     }
 
     /**
