@@ -136,11 +136,6 @@ class PageResponse extends Response
     protected $resourceCompression = false;
 
     /**
-     * @var ParameterBag
-     */
-    public $meta;
-
-    /**
      * @var Container
      */
     private $assetCompilerContainer;
@@ -188,7 +183,6 @@ class PageResponse extends Response
         $this->templating = $templating;
         $this->editMode = $editMode;
         $this->pageStack = $pageStack;
-        $this->meta = new ParameterBag();
     }
 
     /**

@@ -211,7 +211,15 @@ class PageResponseFactory
         $route = $routes[$routeName];
         $url = $this->router->generate($routeName, $this->pageStack->getRequest()->attributes->all());
 
-        return Node::createPage($route->getOption('title'), parse_url($url)['path'], $route->getOption('theme'), $route->getOption('layout'));
+        $page = Node::createPage($route->getOption('title'), parse_url($url)['path'], $route->getOption('theme'), $route->getOption('layout'));
+
+        if ($route->getOption('meta')) {
+            foreach ((array)$route->getOption('meta') as $key => $value) {
+                $page->meta->set($key, $value);
+            }
+        }
+
+        return $page;
     }
 
     /**
