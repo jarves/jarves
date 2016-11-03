@@ -298,6 +298,11 @@ tr.jarves-field-main > td div.desc {
     background-color: #ddd;
 }
 
+table.jarves-field-autotable,
+table.jarves-field-array {
+    table-layout: fixed;
+}
+
 .jarves-field-array-column-desc {
     color: #a2a2a2;
     font-weight: normal;
@@ -357,6 +362,7 @@ tr.jarves-field-main > td div.desc {
     background-color: white;
     padding: 5px;
     min-height: 50px;
+    overflow: auto;
 }
 
 .jarves-field-plugin-options {
