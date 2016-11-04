@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Contains current requested node and current domain, and the current PageResponse.
@@ -187,7 +188,7 @@ class PageStack
     /**
      * Returns the current logged in User if available. Null if not or another token than Jarves' is active.
      *
-     * @return User|null
+     * @return UserInterface|null
      */
     public function getUser()
     {

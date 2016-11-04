@@ -20,6 +20,7 @@ use Jarves\Model\LogRequest;
 use Jarves\PageStack;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class JarvesHandler extends AbstractProcessingHandler
 {
@@ -154,33 +155,16 @@ class JarvesHandler extends AbstractProcessingHandler
     public function getLogRequest()
     {
         if (!$this->logRequest && $this->pageStack->getRequest()) {
-//            if (!$this->jarves->has('profiler')) {
-//                $id = md5(mt_rand() . ':' . uniqid());
-//            } else {
-//                /** @var $profiler \Symfony\Component\HttpKernel\Profiler\Profiler */
-//                $profiler = $this->jarves->get('profiler');
-//
-////                var_dump($profiler->loadProfileFromResponse());
-////                exit;
-//                //$id = $profiler->ge
-//            }
-//
-//            return $this->kernel->getContainer()->get('profiler')->loadProfileFromResponse($this->response);
-
             $this->logRequest = new LogRequest();
             $this->logRequest->setId(md5(mt_rand() . ':' . uniqid()));
             $this->logRequest->setDate(microtime(true));
             $this->logRequest->setIp($this->pageStack->getRequest()->getClientIp());
             $this->logRequest->setPath(substr($this->pageStack->getRequest()->getPathInfo(), 0, 254));
             $this->logRequest->setUsername(
-                $this->pageStack->getUser()
+                $this->pageStack->getUser() instanceof UserInterface
                     ? $this->pageStack->getUser()->getUsername()
                     : 'Guest'
             );
-
-//            if ($this->jarves->getSystemConfig()->getLogs()->getClientInfo()) {
-//                $this->logRequest->setRequestInformation((string)$this->jarves->getRequest());
-//            }
 
         }
 

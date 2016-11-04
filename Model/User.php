@@ -17,8 +17,9 @@ namespace Jarves\Model;
 use Jarves\Client\ClientAbstract;
 use Jarves\Jarves;
 use Jarves\Model\Base\User as BaseUser;
+use Symfony\Component\Security\Core\User\UserInterface;
 
-class User extends BaseUser
+class User extends BaseUser implements UserInterface
 {
     protected $cachedGroupIds;
 
@@ -82,5 +83,29 @@ class User extends BaseUser
     public function hasRole($role)
     {
         return in_array($role, $this->getGroupRoles());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRoles()
+    {
+        return $this->getGroupRoles();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSalt()
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function eraseCredentials()
+    {
+        throw new \RuntimeException('This method is not implemented.');
     }
 }
