@@ -17,6 +17,12 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
+                ->scalarNode('admin')
+                    ->defaultValue(true)
+                ->end()
+                ->scalarNode('router')
+                    ->defaultValue(true)
+                ->end()
                 ->scalarNode('systemTitle')
                     ->defaultValue('Fresh Installation')
                 ->end()
@@ -48,7 +54,7 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue(false)
                         ->end()
                         ->scalarNode('groupOwner')
-                        ->end()            
+                        ->end()
                     ->end()
                 ->end()
             ->end();

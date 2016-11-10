@@ -31,5 +31,15 @@ class JarvesExtension extends Extension
         $definition = $container->getDefinition('jarves.config');
         $systemConfig = new Definition(SystemConfig::class, [$config]);
         $definition->addMethodCall('setSystemConfig', [$systemConfig]);
+
+        if (false === $config['admin']) {
+            $container->removeDefinition('jarves.paramFetcher.listener');
+            $container->removeDefinition('jarves.rest.routing_loader');
+        }
+
+        if (false === $config['router']) {
+            $container->removeDefinition('jarves.frontendRoutes.listener');
+            $container->removeDefinition('jarves.pluginResponse.listener');
+        }
     }
 }
