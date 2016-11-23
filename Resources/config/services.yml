@@ -122,22 +122,6 @@ services:
           class: "%jarves.cache.response_cacher.class%"
           arguments: ["@jarves", "@jarves.page_stack", "@jarves.cache.cacher", "@templating", "@jarves.page_response.factory"]
 
-     jarves.configuration.database:
-         class: "%jarves.configuration.database.class%"
-         calls:
-            - [addConnection, ["@jarves.configuration.database.connection.main"]]
-#            - [setPrefix, ["%database_table_prefix%"]]
-
-     jarves.configuration.database.connection.main:
-         class: "%jarves.configuration.database.connection.main.class%"
-         calls:
-            - [setType, ["%database_driver%"]]
-            - [setServer, ["%database_host%"]]
-            - [setPort, ["%database_port%"]]
-            - [setName, ["%database_name%"]]
-            - [setUsername, ["%database_user%"]]
-            - [setPassword, ["%database_password%"]]
-
      jarves.filesystem.adapter.local:
          class: "%jarves.filesystem.adapter.local.class%"
          shared: false
