@@ -114,7 +114,7 @@ jarves.FieldTypes.Wysiwyg = new Class({
     },
 
     getValue: function () {
-        if (!this.ready || !this.editor.bodyElement) {
+        if (!this.ready) {
             return this.value;
         } else {
             return this.editor.getContent();
