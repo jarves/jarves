@@ -37,6 +37,7 @@ jarves.Field = new Class({
         width: null,
 
         required: false,
+        cssClass: '',
         requiredRegex: null,
 
         'default': null,
@@ -258,6 +259,10 @@ jarves.Field = new Class({
             this.fieldPanel = new Element('div', {
                 'class': 'jarves-field-field'
             }).inject(this.main);
+        }
+
+        if (this.options.options && this.options.options['cssClass']) {
+            this.toElement().addClass(this.options.options['cssClass']);
         }
 
         if (this.options.required && this.options.withAsteriskIfRequired && this.titleText) {

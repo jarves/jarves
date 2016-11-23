@@ -29,7 +29,6 @@ jarves.FieldTypes.Wysiwyg = new Class({
     value: '',
 
     options: {
-
         config: 'full',
 
         configs: {
@@ -37,7 +36,8 @@ jarves.FieldTypes.Wysiwyg = new Class({
                 plugins: [
                     "advlist autolink lists link image charmap print preview anchor",
                     "searchreplace visualblocks code fullscreen",
-                    "insertdatetime media table contextmenu paste"
+                    "insertdatetime media table contextmenu paste",
+                    "autoresize"
                 ],
                 toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
             },
@@ -46,14 +46,16 @@ jarves.FieldTypes.Wysiwyg = new Class({
                     "advlist autolink lists link image charmap print preview hr anchor pagebreak",
                     "searchreplace wordcount visualblocks visualchars code fullscreen",
                     "insertdatetime media nonbreaking save table contextmenu directionality",
-                    "emoticons template paste textcolor"
+                    "emoticons template paste textcolor",
+                    "autoresize"
                 ],
                 toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
                 toolbar2: "print preview media | forecolor backcolor emoticons",
                 tools: "inserttable"
             }
-        }
+        },
 
+        extraConfig: {}
     },
 
     createLayout: function () {
@@ -64,27 +66,32 @@ jarves.FieldTypes.Wysiwyg = new Class({
 
         var config = this.options.configs[this.options.config];
 
-       tinymce.init(Object.merge({
-           mode: 'exact',
-           inline: true,
-           elements: [this.main],
+        if (!config) {
+            console.error('Config not found for '.this.options.config);
+        }
+
+        config = Object.merge(config, this.options.extraConfig);
+
+        tinymce.init(Object.merge({
+            mode: 'exact',
+            elements: [this.main],
 //            content_document: this.main.getDocument(),
 //            content_window: this.main.getWindow(),
-           setup: function(editor) {
-               this.editor = editor;
-               this.ready = true;
-               if (this.value) {
-                   this.main.set('html', this.value);
-               }
-               editor.on('change', function(ed){
-                   this.checkChange();
-               }.bind(this));
-           }.bind(this)
-       }, config));
+            setup: function (editor) {
+                this.editor = editor;
+                this.ready = true;
+                if (this.value) {
+                    editor.setContent(this.value);
+                }
+                editor.on('change', function (ed) {
+                    this.checkChange();
+                }.bind(this));
+            }.bind(this)
+        }, config));
 
-       this.main.addEvent('keyup', function(ed){
-           this.checkChange();
-       }.bind(this));
+        this.main.addEvent('keyup', function (ed) {
+            this.checkChange();
+        }.bind(this));
     },
 
     checkChange: function () {
@@ -103,7 +110,7 @@ jarves.FieldTypes.Wysiwyg = new Class({
     setValue: function (pValue) {
         this.value = pValue;
         this.oldData = this.value;
-        this.main.set('html', this.value);
+        this.editor.setContent(this.value);
     },
 
     getValue: function () {
