@@ -129,6 +129,9 @@ class PageResponseFactory
      * Creates a new PageResponse object based on a Node object.
      * If you've a theme then you could specify "theme" at the route options (to have a custom doctype/base template)
      *
+     * This method overwrites your `layout` and has as its parent directly the doctype. Use createFromPageWithContent
+     * to change only the actual content (not the layout itself)
+     *
      * Note: The actual rendering of $view is delayed to the PageResponse::prepare() which is called shortly before sending the request.
      *
      * @param string $view
@@ -147,6 +150,29 @@ class PageResponseFactory
             return $this->templating->render($view, $parameters);
         };
         $pageResponse->setBody($body);
+
+        return $pageResponse;
+    }
+
+    /**
+     * Creates a new PageResponse object based on a Node object.
+     * If you've a theme then you could specify "theme" at the route options (to have a custom doctype/base template)
+     *
+     * This method sets the actual content of your layout placeholders.
+     *
+     * Note: The actual rendering of $view is delayed to the PageResponse::prepare() which is called shortly before sending the request.
+     *
+     * @param string $view
+     * @param array  $parameters
+     * @param Node   $page
+     *
+     * @return PageResponse
+     * @internal param null|string $routeName
+     */
+    public function createFromPageWithContent($view, $parameters = [], Node $page = null)
+    {
+        $pageResponse = $this->createFromPage($page);
+        $pageResponse->setPageContent($this->templating->render($view, $parameters));
 
         return $pageResponse;
     }
