@@ -29,9 +29,19 @@ jarves.FieldTypes.Wysiwyg = new Class({
     value: '',
 
     options: {
-        config: 'full',
+        config: 'standard',
 
         configs: {
+            small: {
+                plugins: [
+                    "advlist autolink lists link image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "insertdatetime media table contextmenu paste",
+                    "autoresize"
+                ],
+                menubar: false,
+                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | code"
+            },
             standard: {
                 plugins: [
                     "advlist autolink lists link image charmap print preview anchor",
@@ -39,11 +49,11 @@ jarves.FieldTypes.Wysiwyg = new Class({
                     "insertdatetime media table contextmenu paste",
                     "autoresize"
                 ],
-                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
+                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | code"
             },
             full: {
                 plugins: [
-                    "advlist autolink lists link image charmap print preview hr anchor pagebreak",
+                    "advlist autolink lists link image charmap print preview hr anchor",
                     "searchreplace wordcount visualblocks visualchars code fullscreen",
                     "insertdatetime media nonbreaking save table contextmenu directionality",
                     "emoticons template paste textcolor",
@@ -78,13 +88,15 @@ jarves.FieldTypes.Wysiwyg = new Class({
 //            content_document: this.main.getDocument(),
 //            content_window: this.main.getWindow(),
             setup: function (editor) {
-                this.editor = editor;
-                this.ready = true;
-                if (this.value) {
-                    editor.setContent(this.value);
-                }
-                editor.on('change', function (ed) {
-                    this.checkChange();
+                editor.on('init', function(evt) {
+                    this.editor = editor;
+                    this.ready = true;
+                    if (this.value) {
+                        editor.setContent(this.value);
+                    }
+                    editor.on('change', function (ed) {
+                        this.checkChange();
+                    }.bind(this));
                 }.bind(this));
             }.bind(this)
         }, config));
@@ -104,13 +116,16 @@ jarves.FieldTypes.Wysiwyg = new Class({
     },
 
     toElement: function () {
-        return this.main;
+        //we can not return this.main as it is invisible made by the tinymce. actual div is something else.
+        return this.fieldInstance.fieldPanel;
     },
 
     setValue: function (pValue) {
-        this.value = pValue;
+        this.value = pValue || '';
         this.oldData = this.value;
-        this.editor.setContent(this.value);
+        if (this.ready) {
+            this.editor.setContent(this.value);
+        }
     },
 
     getValue: function () {
