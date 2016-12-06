@@ -55,8 +55,12 @@ textarea.jarves-Input-text {
 }
 
 .jarves-Input-text-container {
-    display: inline-block;
     position: relative;
+    display: table;
+
+    > * {
+        display: table-cell !important;
+    }
 }
 
 .jarves-Input-text-container-with-sign {

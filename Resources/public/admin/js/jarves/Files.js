@@ -723,19 +723,67 @@ jarves.Files = new Class({
             this.paste();
         }.bind(this));
 
-        this.optionsBarCopyLink = this.fileOptionsGroup.addButton('Copy link', '#icon-link-2', function() {
-            this.copyLink();
+        var id = (Math.random() * 10 * (Math.random() * 10)).toString(36).slice(3);
+        var clipboardInput;
+        this.optionsBarCopyLink = this.fileOptionsGroup.addButton('Copy url', '#icon-link-2', function() {
+            var selectedFiles = this.getSelectedFilesAsArray();
+            if (!selectedFiles.length) {
+                selectedFiles = [this.currentFile];
+            }
+
+            var path = selectedFiles[0].path;
+
+            if (!clipboardInput) {
+                clipboardInput = new Element('input', {
+                    id: id,
+                    value: path
+                }).inject(document.body);
+            }
+            this.optionsBarCopyLink.highlight('Copied!');
         }.bind(this));
+        this.optionsBarCopyLink.toElement().set('data-clipboard-target', '#' + id);
+
+        this.optionsBarCopyLinkFull = this.fileOptionsGroup.addButton('Copy full url', '#icon-link-2', function() {
+            var selectedFiles = this.getSelectedFilesAsArray();
+            if (!selectedFiles.length) {
+                selectedFiles = [this.currentFile];
+            }
+
+            var path = location.protocol + '//' + location.host + selectedFiles[0].path;
+
+            if (!clipboardInput) {
+                clipboardInput = new Element('input', {
+                    id: id,
+                    value: path
+                }).inject(document.body);
+            }
+            this.optionsBarCopyLinkFull.highlight('Copied!');
+        }.bind(this));
+        this.optionsBarCopyLinkFull.toElement().set('data-clipboard-target', '#' + id);
+
+        var cleanUp = function() {
+            clipboardInput.destroy();
+            clipboardInput = null;
+        }.bind(this);
+
+        setTimeout(function() {
+            var clipboard = new Clipboard(this.optionsBarCopyLink.toElement());
+            clipboard.on('success', cleanUp);
+            clipboard.on('error', cleanUp);
+            var clipboardFull = new Clipboard(this.optionsBarCopyLinkFull.toElement());
+            clipboardFull.on('success', cleanUp);
+            clipboardFull.on('error', cleanUp);
+        }.bind(this), 50);
 
         this.optionsBarMoreInformation = new Element('div', {
             'class': 'jarves-Window-sidebar-delimiter jarves-Files-sidebar-more-information selectable'
-        }).inject(this.optionsBarCopyLink, 'after');
+        }).inject(this.optionsBarCopyLinkFull, 'after');
 
         this.win.addEvent('resizeSidebar', function(width){
             if (width < 100) {
                 this.optionsBarMoreInformation.dispose()
             } else {
-                this.optionsBarMoreInformation.inject(this.optionsBarCopyLink, 'after');
+                this.optionsBarMoreInformation.inject(this.optionsBarCopyLinkFull, 'after');
             }
         }.bind(this));
     },
@@ -917,22 +965,16 @@ jarves.Files = new Class({
         }
 
         var path = selectedFiles[0].path;
+        var element = new Element('div');
 
-        var element = new Element('div', {
-            text: 'Path '
-        });
+        var fullPath = new jarves.Field({
+            'type': 'text',
+            label: 'Full path',
+            'clipboard': true,
+            width: '100%'
+        }, element);
 
-        var baseDir = location.href.substr(0, location.href.indexOf('#'));
-        baseDir = baseDir.slice(0, -7); //minus '/jarves'
-
-        var code = new Element('code', {
-        }).inject(element);
-
-        new Element('a', {
-            href:baseDir + path,
-            'target': '_blank',
-            text: baseDir + path
-        }).inject(code);
+        fullPath.setValue(path);
 
         this.getWindow().alert(element);
     },

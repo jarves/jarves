@@ -41,6 +41,10 @@ jarves.FieldTypes.Text = new Class({
                 label: 'Sign',
                 description: t('Which character should be displayed at the end of the field (usually used for currency)'),
                 type: 'text'
+            },
+            clipboard: {
+                label: 'Activate clipboard copy',
+                type: 'checkbox'
             }
         }
     },
@@ -125,8 +129,11 @@ jarves.FieldTypes.Text = new Class({
     oldValue: null,
 
     createLayout: function () {
+        var id = (Math.random() * 10 * (Math.random() * 10)).toString(36).slice(3);
+
         this.main = this.input = new Element('input', {
             'class': 'jarves-Input-text',
+            id: id,
             style: this.options.style,
             styles: {
                 'width': this.options.inputWidth == '100%' ? null : this.options.inputWidth,
@@ -139,7 +146,7 @@ jarves.FieldTypes.Text = new Class({
             this.main.disabled = true;
         }
 
-        if (this.options.inputIcon || this.options.sign) {
+        if (this.options.inputIcon || this.options.sign || this.options.clipboard) {
             this.main = new Element('div', {
                 'class': 'jarves-Input-text-container',
                 'data-sign': this.options.sign,
@@ -150,7 +157,10 @@ jarves.FieldTypes.Text = new Class({
             }).inject(this.fieldInstance.fieldPanel);
             this.input.inject(this.main);
 
-            this.input.addClass('withIcon');
+
+            if (this.options.inputIcon || this.options.sign) {
+                this.input.addClass('withIcon');
+            }
 
             if (this.options.inputIcon) {
                 if ('#' === this.options.inputIcon.substr(0, 1)) {
@@ -167,6 +177,26 @@ jarves.FieldTypes.Text = new Class({
 
             if (this.options.sign) {
                 this.main.addClass('jarves-Input-text-container-with-sign');
+            }
+
+            if (this.options.clipboard) {
+                var button = new Element('a', {
+                    'class': 'jarves-Button icon-clipboard-2',
+                    'data-clipboard-target': '#' + id,
+                    alt: 'Copy to clipboard'
+                }).inject(this.main);
+
+                setTimeout(function() {
+                    new Clipboard(button);
+                }, 50);
+
+                button.addEvent('click', function() {
+                    var toolTip = new jarves.Tooltip(button, 'Copied!');
+                    toolTip.show();
+                    setTimeout(function() {
+                        toolTip.stop();
+                    }, 1000);
+                });
             }
         }
 
