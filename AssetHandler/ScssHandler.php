@@ -32,7 +32,6 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
      */
     protected $sassPath;
 
-
     /**
      * CssHandler constructor.
      * @param Jarves $jarves
