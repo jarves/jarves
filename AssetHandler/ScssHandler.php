@@ -28,14 +28,22 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
     protected $filesystem;
 
     /**
+     * @var string
+     */
+    protected $sassPath;
+
+
+    /**
      * CssHandler constructor.
      * @param Jarves $jarves
      * @param Filesystem $filesystem
+     * @param string $sassPath
      */
-    public function __construct(Jarves $jarves, Filesystem $filesystem)
+    public function __construct(Jarves $jarves, Filesystem $filesystem, $sassPath = 'sass')
     {
         parent::__construct($jarves);
         $this->filesystem = $filesystem;
+        $this->sassPath = $sassPath;
     }
 
     public function compileFile(AssetInfo $assetInfo)
@@ -113,7 +121,7 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
             $processBuilder = new ProcessBuilder();
             $processBuilder
                 ->setInput(file_get_contents($localPath))
-                ->add('sass')
+                ->add($this->sassPath)
                 ->add('--scss')
                 ->add('--no-cache')
                 ->add('--unix-newlines')
@@ -127,8 +135,11 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
             while ($process->isRunning()) ;
 
             if (127 === $process->getExitCode()) {
-                throw new \RuntimeException('sass binary not found. Please install sass first and make its in $PATH. '
-                    . $process->getExitCodeText());
+                throw new \RuntimeException(sprintf(
+                    '%s binary not found. Please make sure sass is available in $PATH or sass_path is defined correctly. Error: %s',
+                    $this->sassPath,
+                    $process->getExitCodeText()
+                ));
             }
 
             if (0 !== $process->getExitCode()) {

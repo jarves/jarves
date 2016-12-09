@@ -41,5 +41,8 @@ class JarvesExtension extends Extension
             $container->removeDefinition('jarves.frontendRoutes.listener');
             $container->removeDefinition('jarves.pluginResponse.listener');
         }
+
+        $definition = $container->getDefinition('jarves.asset_handler.scss');
+        $definition->addArgument($config['assets']['sass_path']);
     }
 }
