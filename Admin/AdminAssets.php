@@ -19,7 +19,9 @@ use Jarves\ACL;
 use Jarves\ACLRequest;
 use Jarves\Jarves;
 use Jarves\Model\DomainQuery;
+use Jarves\Model\User;
 use Jarves\PageStack;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class AdminAssets
 {
@@ -85,15 +87,21 @@ class AdminAssets
 
         if ($this->pageStack->isLoggedIn()) {
             $user = $this->pageStack->getUser();
-            $session['userId'] = $user->getId();
-            $session['username'] = $user->getUsername();
-            $session['lastLogin'] = $user->getLastLogin();
-            $session['firstName'] = $user->getFirstName();
-            $session['lastName'] = $user->getLastName();
+            if ($user instanceof UserInterface) {
+                $session['username'] = $user->getUsername();
+            }
+
+            if ($user instanceof User) {
+                $session['username'] = $user->getUsername();
+                $session['userId'] = $user->getId();
+                $session['lastLogin'] = $user->getLastLogin();
+                $session['firstName'] = $user->getFirstName();
+                $session['lastName'] = $user->getLastName();
 
 //            $email = $user->getEmail();
 //            $session['emailMd5'] = $email ? md5(strtolower(trim($email))) : null;
-            $session['imagePath'] = $user->getImagePath();
+                $session['imagePath'] = $user->getImagePath();
+            }
         }
 
         $session['token'] = get_class($this->pageStack->getToken());

@@ -16,6 +16,7 @@ use Jarves\Configuration\Condition;
 use Jarves\Model\Acl as AclObject;
 use Jarves\Model\AclQuery;
 use Jarves\Model\Base\UserQuery;
+use Jarves\Model\User;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 
@@ -534,14 +535,17 @@ class ACL
         $field = $aclRequest->getField();
 
         $pk = $this->objects->normalizePkString($objectKey, $pk);
+        $user = $this->pageStack->getUser();
 
         if (ACL::TARGET_TYPE_USER === $targetType && null === $targetId) {
             //0 means guest
-            $targetId = $this->pageStack->getUser() ? $this->pageStack->getUser()->getId() : 0;
+            $targetId = 0;
+            if ($user instanceof User) {
+                $targetId = $user->getId();
+            }
         }
 
-        $user = $this->pageStack->getUser();
-        if ($user) {
+        if ($user instanceof User) {
             $groupIds = $user->getGroupIds();
             if (false !== strpos(',' . $groupIds . ',', ',1,')) {
                 //user is in the admin group, so he has always access.
