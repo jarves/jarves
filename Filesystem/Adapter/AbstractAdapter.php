@@ -33,21 +33,6 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $jarves;
 
     /**
-     * Constructor
-     *
-     * @param string $mountPath The mount name for this layer. (in fact, the folder name in media/<folder>)
-     * @param array $params
-     */
-    public function __construct($mountPath, $params = null)
-    {
-        $this->setMountPath($mountPath);
-
-        if ($params) {
-            $this->setParams($params);
-        }
-    }
-
-    /**
      * @return Jarves
      */
     public function getJarves()

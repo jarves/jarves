@@ -141,7 +141,6 @@ class WebFilesystem extends Filesystem
             $adapter->setContainer($this->container);
         }
 
-        $adapter->loadConfig();
 
         return $this->adapterInstances[$firstFolder] = $adapter;
     }

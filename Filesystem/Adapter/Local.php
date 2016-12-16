@@ -50,11 +50,18 @@ class Local extends AbstractAdapter
     public $groupName = '';
 
     /**
-     * {@inheritDoc}
+     * Constructor
+     *
+     * @param string $mountPath The mount name for this layer. (in fact, the folder name in media/<folder>)
+     * @param array $params
      */
-    public function __construct($mountPoint, $params = null)
+    public function __construct($mountPath, $params = null)
     {
-        parent::__construct($mountPoint, $params);
+        $this->setMountPath($mountPath);
+
+        if ($params) {
+            $this->setParams($params);
+        }
     }
 
     public function getFullPath($path)
