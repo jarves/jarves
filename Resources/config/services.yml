@@ -122,6 +122,11 @@ services:
           class: "%jarves.cache.response_cacher.class%"
           arguments: ["@jarves", "@jarves.page_stack", "@jarves.cache.cacher", "@templating", "@jarves.page_response.factory"]
 
+
+     jarves.filesystem.adapter.flysystem:
+         class: Jarves\Filesystem\Adapter\Flysystem
+         arguments: ['@?']
+
      jarves.filesystem.adapter.local:
          class: "%jarves.filesystem.adapter.local.class%"
          shared: false
