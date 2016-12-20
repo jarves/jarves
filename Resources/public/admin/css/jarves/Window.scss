@@ -21,7 +21,10 @@
     bottom: 0;
     overflow: hidden;
     min-height: 250px;
-//    background-color: #fafafa;
+}
+
+.jarves-desktop .jarves-Window-border {
+    background-color: #f0f0f0;
 }
 
 .jarves-Window-border > .jarves-Layout-main-fixed {
@@ -95,6 +98,10 @@
     height: 54px;
     //padding-top: 5px;
     @include box-sizing(border-box);
+
+    &.disabled {
+        height: 0;
+    }
 }
 
 /*

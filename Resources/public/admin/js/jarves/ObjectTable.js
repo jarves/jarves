@@ -41,6 +41,17 @@ jarves.ObjectTable = new Class({
         this.setOptions(pChooserBrowserOptions);
         this.win = pWindowInstance;
 
+        this.searchInput = new jarves.Field({
+            noWrapper: true,
+            type: 'text',
+            inputIcon: '#icon-search-8',
+            inputWidth: 150
+        }, this.win.getTitleGroupContainer());
+
+        this.searchInput.addEvent('change', function() {
+            this.loadPage(1);
+        }.bind(this));
+
         if (this._createLayout()) {
             this.loadPage(1);
         }
@@ -207,23 +218,27 @@ jarves.ObjectTable = new Class({
 
     loadPage: function (pPage) {
 
+        this.win.setLoading(true);
+        var callback = function() {
+            this.win.setLoading(false);
+        }.bind(this);
         //first get count, fire there then real _loadPage() which loads the items then
-        this.getCount(pPage);
+        this.getCount(pPage, callback);
     },
 
-    getCount: function (pPage) {
-
+    getCount: function (pPage, callback) {
         this.lr = new Request.JSON({url: jarves.getObjectApiUrl(this.objectKey) + '/:count',
             noCache: 1, onComplete: function (pRes) {
 
             this.itemsCount = pRes.data;
-            this._loadPage(pPage);
+            this._loadPage(pPage, callback);
 
-        }.bind(this)}).get();
-
+        }.bind(this)}).get({
+            q: this.searchInput.getValue()
+        });
     },
 
-    _loadPage: function (pPage) {
+    _loadPage: function (pPage, callback) {
 
         if (this.lr) {
             this.lr.cancel();
@@ -244,13 +259,17 @@ jarves.ObjectTable = new Class({
         var req = {
             limit: this.options.itemsPerPage,
             offset: offset,
-            fields: fields.join(',')
+            fields: fields.join(','),
+            q: this.searchInput.getValue()
         };
 
         this.lr = new Request.JSON({url: jarves.getObjectApiUrl(this.objectKey), noCache: 1, onComplete: function (pRes) {
 
             this.renderResult(pRes.data);
             this.renderActions(pPage, Math.ceil(this.itemsCount / this.options.itemsPerPage), this.itemsCount);
+            if (callback) {
+                callback();
+            }
 
         }.bind(this)}).get(req);
 

@@ -1060,8 +1060,7 @@ jarves.Window = new Class({
 
         this.titleAdditional = new Element('span', {'class': 'jarves-jarves-Window-titlepath-additional'}).inject(this.titlePath);
 
-        this.titleGroups =
-            new Element('div', {'class': 'jarves-Window-win-titleGroups'}).inject(this.mainLayout.getCell(1, 1));
+        this.titleGroups = new Element('div', {'class': 'jarves-Window-win-titleGroups'}).inject(this.mainLayout.getCell(1, 1));
 
         this.mainLayout.getCell(2, 1).addClass('jarves-Window-win-content-container');
         this.content = new Element('div', {'class': 'jarves-Window-win-content'}).inject(this.mainLayout.getCell(2, 1));
@@ -1133,6 +1132,14 @@ jarves.Window = new Class({
 
     getTitleGroupContainer: function () {
         return this.titleGroups;
+    },
+
+    disableTitleGroups: function () {
+        this.titleGroups.addClass('disabled');
+    },
+
+    enableTitleGroups: function () {
+        this.titleGroups.addClass('disabled');
     },
 
     enableTitleActionBar: function() {
