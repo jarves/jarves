@@ -2,8 +2,10 @@
 
 namespace Jarves\Filesystem\Adapter;
 
+use Jarves\Exceptions\FileNotFoundException;
 use Jarves\File\FileInfo;
-use League\Flysystem\AdapterInterface;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Sftp\SftpAdapter;
 
 /**
  * Adpater for the flysystem.
@@ -12,92 +14,183 @@ use League\Flysystem\AdapterInterface;
 class Flysystem extends AbstractAdapter
 {
     /**
-     * @var AdapterInterface
+     * @var Filesystem
      */
-    protected $adapter;
+    private $filesystem;
 
     /**
-     * @param AdapterInterface $adapter
+     * @var
      */
-    public function __construct(AdapterInterface $adapter)
+    private $name;
+
+    /**
+     * @var
+     */
+    private $baseUrl;
+
+    private $REQUIRED;
+
+    public function __construct()
     {
-        $this->adapter = $adapter;
+        $this->REQUIRED = new \stdClass;
     }
 
+    protected function getOptions($name, $options, $defaults)
+    {
+        foreach ($defaults as $key => $value) {
+            if (!isset($options[$key])) {
+                if ($this->REQUIRED === $value) {
+                    throw new \Exception("The mount '$name' needs an option '$key' defined.");
+                }
+                $options[$key] = $value;
+            }
+        }
+
+        return $options;
+    }
+
+    public function initialize($name, $type, $baseUrl, array $options)
+    {
+        $adapter = null;
+
+        switch ($type){
+            case 'sftp':
+                $options = $this->getOptions($name, $options, [
+                    'host' => $this->REQUIRED,
+                    'port' => 21,
+                    'username' => posix_getpwuid(posix_geteuid())['name'],
+                    'password' => '',
+                    'root' => $this->REQUIRED,
+                    'privateKey' => '',
+                    'timeout' => 10
+                ]);
+
+                $adapter = new SftpAdapter($options);
+                break;
+        }
+
+        if (!$adapter) {
+            throw new \Exception("Type '$type' not compatible with flysytem");
+        }
+
+        $this->filesystem = new \League\Flysystem\Filesystem($adapter);
+
+        $this->name = $name;
+        $this->baseUrl = $baseUrl;
+    }
 
     public function write($path, $content = '')
     {
-        // TODO: Implement write() method.
+        if ($this->filesystem->has($path)) {
+            return $this->filesystem->update($path, $content);
+        }
+
+        return $this->filesystem->write($path, $content);
+    }
+
+    public function publicUrl($path)
+    {
+        return rtrim($this->baseUrl, '/') . '/' . trim($path, "\\//");
+    }
+
+    public function size($path)
+    {
+        return $this->filesystem->getSize($path);
     }
 
     public function read($path)
     {
-        // TODO: Implement read() method.
+        return $this->filesystem->read($path);
     }
 
     public function has($path)
     {
-        // TODO: Implement has() method.
+        return $this->filesystem->has($path);
     }
 
     public function delete($path)
     {
-        // TODO: Implement delete() method.
+        return $this->filesystem->delete($path);
     }
 
     public function mkdir($path)
     {
-        // TODO: Implement mkdir() method.
-    }
-
-    public function hash($path)
-    {
-        // TODO: Implement hash() method.
+        return $this->filesystem->createDir($path);
     }
 
     public function filemtime($path)
     {
-        // TODO: Implement filemtime() method.
+        return $this->filesystem->getTimestamp($path);
     }
 
     public function move($source, $target)
     {
-        // TODO: Implement move() method.
+        $this->filesystem->rename($source, $target);
     }
 
     public function copy($path, $newPath)
     {
-        // TODO: Implement copy() method.
+        $this->filesystem->copy($path, $newPath);
     }
 
     public function getFiles($path)
     {
-        // TODO: Implement getFiles() method.
+        $items = [];
+        $contents = $this->filesystem->listContents($path);
+        foreach ($contents as $content) {
+
+            $file = new \Jarves\File\FileInfo();
+            $file->setPath('/' . $this->name . '/' . $content['path']);
+            $file->setType($content['type']);
+            $file->setCreatedTime($content['timestamp']);
+            $file->setModifiedTime($content['timestamp']);
+            $file->setPublicUrl($this->publicUrl($content['path']));
+
+            if (isset($content['size'])) {
+                $file->setSize($content['size']);
+            }
+
+            $items[] = $file;
+        }
+
+        return $items;
     }
 
     /**
      * @param string $path
+     *
      * @return integer
      */
     public function getCount($path)
     {
-        // TODO: Implement getCount() method.
+        return count($this->filesystem->listContents($path));
     }
 
     /**
      * @param string $path
+     *
      * @return FileInfo
+     * @throws FileNotFoundException
      */
     public function getFile($path)
     {
-        // TODO: Implement getFile() method.
-    }
+        $metaData = $this->filesystem->getMetadata($path);
+        if (!$metaData) {
+            throw new FileNotFoundException(sprintf('File `%s` does not exists.', $path));
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadConfig()
-    {
-        // It's not implemented
+        $file = new \Jarves\File\FileInfo();
+        $file->setPath('/' . $this->name . '/' . $path);
+        $file->setType($metaData['type']);
+        $file->setPublicUrl($this->publicUrl($path));
+
+        $size = $this->filesystem->getSize($path);
+        $timestamp = $this->filesystem->getTimestamp($path);
+
+        $file->setCreatedTime($timestamp);
+        $file->setModifiedTime($timestamp);
+        $file->setSize($size);
+
+        return $file;
     }
 }

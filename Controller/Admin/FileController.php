@@ -19,7 +19,6 @@ use Jarves\File\FileInfo;
 use Jarves\File\FileSize;
 use Jarves\Model\Base\FileQuery;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Jarves\Model\File;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -97,7 +96,7 @@ class FileController extends Controller
         FileQuery::create()->filterByPath($path)->delete();
 
         if ($result = $this->webFilesystem->remove($path)) {
-            $this->newFeed($file, 'deleted', $path);
+            $this->newFeed($file, 'deleted');
         }
 
         return $result;
@@ -116,7 +115,7 @@ class FileController extends Controller
      *
      * @param ParamFetcher $paramFetcher
      *
-     * @return bool
+     * @return array|boolean
      */
     public function createFileAction(ParamFetcher $paramFetcher)
     {
@@ -281,7 +280,7 @@ class FileController extends Controller
         $this->checkOrThrow($aclRequest);
 
         if ($result = $this->webFilesystem->mkdir($path)) {
-            $this->newFeed($path, 'created', $path);
+            $this->newFeed($path, 'created');
         }
 
         return $result;
@@ -482,18 +481,22 @@ class FileController extends Controller
     }
 
     /**
-     * @param string|File $path
+     * @param string|FileInfo $path
      * @param string $verb
      * @param string $message
      */
     protected function newFeed($path, $verb, $message = '')
     {
         $file = $path;
-        if (!($path instanceof File)) {
-            $file = $this->webFilesystem->getFile($path);
+        if (!($path instanceof FileInfo)) {
+            try {
+                $file = $this->webFilesystem->getFile($path);
+            } catch (\Exception $e){
+                return;
+            }
         }
 
-        if ($file instanceof File) {
+        if ($file instanceof FileInfo) {
             $this->utils->newNewsFeed(
                 $this->objects,
                 'jarves/file',
@@ -567,22 +570,21 @@ class FileController extends Controller
         $blacklistedFiles = array('/index.php' => 1, '/install.php' => 1);
 
         foreach ($files as $key => $file) {
-            $file = $file->toArray();
-
-            $aclRequest = ACLRequest::create('jarves/file', ['path' => $file['path']])->onlyListingMode();
+            $aclRequest = ACLRequest::create('jarves/file', ['path' => $file->getPath()])->onlyListingMode();
             if (!$this->acl->check($aclRequest)
             ) {
                 continue;
             }
 
-            if (isset($blacklistedFiles[$file['path']]) | (!$showHiddenFiles && substr($file['name'], 0, 1) == '.')) {
+            if (isset($blacklistedFiles[$file->getPath()]) | (!$showHiddenFiles && substr($file->getName(), 0, 1) == '.')) {
                 continue;
             } else {
-                $aclRequest = ACLRequest::create('jarves/file', ['path' => $file['path']])->onlyUpdateMode();
-                $file['writeAccess'] = $this->acl->check($aclRequest);
-                $this->appendImageInformation($file);
+                $aclRequest = ACLRequest::create('jarves/file', ['path' => $file->getPath()])->onlyUpdateMode();
+                $fileArray = $file->toArray();
+                $fileArray['writeAccess'] = $this->acl->check($aclRequest);
+                $this->appendImageInformation($fileArray);
+                $result[] = $fileArray;
             }
-            $result[] = $file;
         }
 
         return $result;
@@ -837,7 +839,7 @@ class FileController extends Controller
         }
 
         if ($result = $this->webFilesystem->write($path, $content)) {
-            $this->newFeed($path, 'changed content of');
+            $this->newFeed($path, 'changed content');
         }
 
         return $result;

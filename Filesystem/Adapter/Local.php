@@ -50,18 +50,56 @@ class Local extends AbstractAdapter
     public $groupName = '';
 
     /**
-     * Constructor
-     *
-     * @param string $mountPath The mount name for this layer. (in fact, the folder name in media/<folder>)
-     * @param array $params
+     * @var string
      */
-    public function __construct($mountPath, $params = null)
-    {
-        $this->setMountPath($mountPath);
+    protected $baseUrl;
 
-        if ($params) {
-            $this->setParams($params);
+    /**
+     * @param string $groupPermissions
+     * @param string $everyonePermission
+     * @param bool   $disableModeChange
+     * @param string $groupOwner
+     *
+     * @internal param array $params
+     */
+    public function __construct($groupPermissions = 'rw', $everyonePermission = 'r', $disableModeChange = true, $groupOwner = null)
+    {
+        $this->fileMode = 600;
+        $this->dirMode = 700;
+
+        if ($groupPermissions == 'rw') {
+            $this->fileMode += 60;
+            $this->dirMode += 70;
+        } elseif ($groupPermissions == 'r') {
+            $this->fileMode += 40;
+            $this->dirMode += 50;
         }
+
+        if ($everyonePermission == 'rw') {
+            $this->fileMode += 6;
+            $this->dirMode += 7;
+        } elseif ($everyonePermission == 'r') {
+            $this->fileMode += 4;
+            $this->dirMode += 5;
+        }
+
+        $this->fileMode = octdec($this->fileMode);
+        $this->dirMode = octdec($this->dirMode);
+        $this->groupName = $groupOwner;
+        $this->changeMode = !$disableModeChange;
+    }
+
+    public function initialize($name, $type, $baseUrl, array $options)
+    {
+        $this->baseUrl = $baseUrl;
+        if (isset($options['root'])) {
+            $this->setRoot($options['root']);
+        }
+    }
+
+    public function publicUrl($path)
+    {
+        return '/' . trim($path, "\\//");
     }
 
     public function getFullPath($path)
@@ -78,15 +116,6 @@ class Local extends AbstractAdapter
 
         return $root . $path;
     }
-
-    public function setParams($params)
-    {
-        parent::setParams($params);
-        if ($this->getParam('root')) {
-            $this->setRoot($this->getParam('root'));
-        }
-    }
-
 
     /**
      * Sets file permissions on file/folder recursively.
@@ -136,37 +165,6 @@ class Local extends AbstractAdapter
 
         return true;
 
-    }
-
-    /**
-     * Loads and converts the configuration to appropriate modes.
-     *
-     */
-    public function loadConfig()
-    {
-        $this->fileMode = 600;
-        $this->dirMode = 700;
-
-        if ($this->getJarves()->getSystemConfig()->getFile()->getGroupPermission() == 'rw') {
-            $this->fileMode += 60;
-            $this->dirMode += 70;
-        } elseif ($this->getJarves()->getSystemConfig()->getFile()->getGroupPermission() == 'r') {
-            $this->fileMode += 40;
-            $this->dirMode += 50;
-        }
-
-        if ($this->getJarves()->getSystemConfig()->getFile()->getEveryonePermission() == 'rw') {
-            $this->fileMode += 6;
-            $this->dirMode += 7;
-        } elseif ($this->getJarves()->getSystemConfig()->getFile()->getEveryonePermission() == 'r') {
-            $this->fileMode += 4;
-            $this->dirMode += 5;
-        }
-
-        $this->fileMode = octdec($this->fileMode);
-        $this->dirMode = octdec($this->dirMode);
-        $this->groupName = $this->getJarves()->getSystemConfig()->getFile()->getGroupOwner();
-        $this->changeMode = !$this->getJarves()->getSystemConfig()->getFile()->getDisableModeChange();
     }
 
     /**
@@ -333,6 +331,7 @@ class Local extends AbstractAdapter
 
             $fileInfo->setPath(substr($file, strlen($this->getRoot()) - 1));
             $fileInfo->setType(is_dir($file) ? FileInfo::DIR : FileInfo::FILE);
+            $fileInfo->setPublicUrl($this->publicUrl($path));
 
             if (!is_link($file)) {
                 $fileInfo->setCreatedTime(filectime($file));
@@ -356,6 +355,7 @@ class Local extends AbstractAdapter
         $file = new \Jarves\File\FileInfo();
         $file->setPath($path ? : '/');
         $path = $this->getFullPath($path ? : '/');
+
         if (!file_exists($path)) {
             throw new FileNotFoundException(sprintf('File `%s` does not exists.', $path));
         }
@@ -416,6 +416,14 @@ class Local extends AbstractAdapter
     public function has($path)
     {
         return file_exists($this->getRoot() . $path);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function size($path)
+    {
+        return filesize($this->getRoot() . $path);
     }
 
     /**

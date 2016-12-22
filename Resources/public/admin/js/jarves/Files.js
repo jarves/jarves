@@ -731,7 +731,7 @@ jarves.Files = new Class({
                 selectedFiles = [this.currentFile];
             }
 
-            var path = selectedFiles[0].path;
+            var path = selectedFiles[0].publicUrl;
 
             if (!clipboardInput) {
                 clipboardInput = new Element('input', {
@@ -743,24 +743,6 @@ jarves.Files = new Class({
         }.bind(this));
         this.optionsBarCopyLink.toElement().set('data-clipboard-target', '#' + id);
 
-        this.optionsBarCopyLinkFull = this.fileOptionsGroup.addButton('Copy full url', '#icon-link-2', function() {
-            var selectedFiles = this.getSelectedFilesAsArray();
-            if (!selectedFiles.length) {
-                selectedFiles = [this.currentFile];
-            }
-
-            var path = location.protocol + '//' + location.host + selectedFiles[0].path;
-
-            if (!clipboardInput) {
-                clipboardInput = new Element('input', {
-                    id: id,
-                    value: path
-                }).inject(document.body);
-            }
-            this.optionsBarCopyLinkFull.highlight('Copied!');
-        }.bind(this));
-        this.optionsBarCopyLinkFull.toElement().set('data-clipboard-target', '#' + id);
-
         var cleanUp = function() {
             clipboardInput.destroy();
             clipboardInput = null;
@@ -770,20 +752,17 @@ jarves.Files = new Class({
             var clipboard = new Clipboard(this.optionsBarCopyLink.toElement());
             clipboard.on('success', cleanUp);
             clipboard.on('error', cleanUp);
-            var clipboardFull = new Clipboard(this.optionsBarCopyLinkFull.toElement());
-            clipboardFull.on('success', cleanUp);
-            clipboardFull.on('error', cleanUp);
         }.bind(this), 50);
 
         this.optionsBarMoreInformation = new Element('div', {
             'class': 'jarves-Window-sidebar-delimiter jarves-Files-sidebar-more-information selectable'
-        }).inject(this.optionsBarCopyLinkFull, 'after');
+        }).inject(this.optionsBarCopyLink, 'after');
 
         this.win.addEvent('resizeSidebar', function(width){
             if (width < 100) {
                 this.optionsBarMoreInformation.dispose()
             } else {
-                this.optionsBarMoreInformation.inject(this.optionsBarCopyLinkFull, 'after');
+                this.optionsBarMoreInformation.inject(this.optionsBarCopyLink, 'after');
             }
         }.bind(this));
     },

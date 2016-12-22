@@ -2,11 +2,11 @@
 
 namespace Jarves\Filesystem;
 
+use Jarves\Exceptions\FileNotFoundException;
 use Jarves\File\FileInfo;
 use Jarves\Filesystem\Adapter\AdapterInterface;
 use Jarves\Filesystem\Adapter\Local;
 use Jarves\Model\File;
-use Jarves\File\FileInfoInterface;
 use Jarves\Model\FileQuery;
 use Jarves\Tools;
 use PHPImageWorkshop\Core\ImageWorkshopLayer;
@@ -38,7 +38,11 @@ class Filesystem implements FilesystemInterface
     public function setAdapter(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
-        $this->adapter->loadConfig();
+    }
+
+    public function getMountDirectory($path)
+    {
+        return '';
     }
 
     /**
@@ -62,17 +66,9 @@ class Filesystem implements FilesystemInterface
 
             return $result;
         } else {
-            if ('/' !== $path[0]) {
-                $path = '/' . $path;
-            }
+            $path = '/' . trim($path, "\\//\n\r");
 
-            if ('/' === substr($path, -1)) {
-                $path = substr($path, 0, -1);
-            }
-
-            $fs = $this->getAdapter($path);
-            $path = substr($path, strlen($fs->getMountPath()));
-
+            $path = substr($path, strlen(trim($this->getMountDirectory($path), "\\//")) + 1);
 
             if ('/' !== $path[0]) {
                 $path = '/' . $path;
@@ -104,42 +100,51 @@ class Filesystem implements FilesystemInterface
      *
      * @param string $path
      *
-     * @return FileInfoInterface
+     * @return FileInfo
+     * @throws FileNotFoundException
      */
     public function getFile($path)
     {
         $fs = $this->getAdapter($path);
         $path = $this->normalizePath($path);
 
-        return $fs->getFile($path);
+        $file = $fs->getFile($path);
+        if (!$file) {
+            throw new FileNotFoundException(sprintf('File `%s` does not exists.', $path));
+        }
+
+        return $file;
     }
 
-    public function checkFileValues(FileInfo $file, File $databaseFile)
+    public function updateDatabaseFile(FileInfo $file, File $databaseFile)
     {
-        if ($file->getSize() != $databaseFile->getSize()) {
-            $databaseFile->setSize($file->getSize());
-        }
-        if ($file->getHash() != $databaseFile->getHash()) {
-            $databaseFile->setHash($file->getHash());
-        }
-        if ($file->getType() != $databaseFile->getType()) {
-            $databaseFile->setType($file->getType());
-        }
-        if ($file->getCreatedTime() != $databaseFile->getCreatedTime()) {
-            $databaseFile->setCreatedTime($file->getCreatedTime());
-        }
-        if ($file->getModifiedTime() != $databaseFile->getModifiedTime()) {
-            $databaseFile->setModifiedTime($file->getModifiedTime());
-        }
+        $databaseFile->setSize($file->getSize());
+        $databaseFile->setHash($file->getHash());
+        $databaseFile->setType($file->getType());
+        $databaseFile->setCreatedTime($file->getCreatedTime());
+        $databaseFile->setModifiedTime($file->getModifiedTime());
+        $databaseFile->setMountPoint($file->getMountPoint());
+        $file->setId($databaseFile->getId());
+        $databaseFile->save();
     }
 
-    public function createFromPathInfo(FileInfoInterface $fileInfo)
+    /**
+     * @param FileInfo $fileInfo
+     *
+     * @return File
+     */
+    public function createFromPathInfo(FileInfo $fileInfo)
     {
         $array = $fileInfo->toArray();
         $file = new File();
         $file->fromArray($array, TableMap::TYPE_CAMELNAME);
-        $file->setHash($this->hash($file->getPath()));
+
+        $limit = 1024 * 1024 * 1024 * 5; //5 megabyte
+        if ($fileInfo->isFile() && $this->size($file->getPath()) < $limit) {
+            $file->setHash($this->hash($file->getPath()));
+        }
         $file->save();
+        $fileInfo->setId($file->getId());
 
         return $file;
     }
@@ -243,6 +248,12 @@ class Filesystem implements FilesystemInterface
         return $fs->hash($this->normalizePath($path));
     }
 
+    public function size($path)
+    {
+        $fs = $this->getAdapter($path);
+        return $fs->size($this->normalizePath($path));
+    }
+
     public function filemtime($path)
     {
         $fs = $this->getAdapter($path);
@@ -293,7 +304,7 @@ class Filesystem implements FilesystemInterface
      *
      * @param string $path
      *
-     * @return File[]
+     * @return FileInfo[]
      */
     public function getFiles($path)
     {
@@ -317,14 +328,7 @@ class Filesystem implements FilesystemInterface
 
         usort(
             $items,
-
-            /**
-             * @param FileInfoInterface $a
-             * @param FileInfoInterface $b
-             *
-             * @return mixed
-             */
-            function($a, $b){
+            function(FileInfo $a, FileInfo $b){
                 return strnatcasecmp($a ? $a->getPath() : '', $b ? $b->getPath() : '');
             });
 
