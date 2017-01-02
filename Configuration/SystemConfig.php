@@ -182,28 +182,6 @@ class SystemConfig extends Model {
     }
 
     /**
-     * @param MountPoint[] $mountPoints
-     */
-    public function setMountPoints(array $mountPoints = null)
-    {
-        $this->mountPoints = $mountPoints;
-    }
-
-    /**
-     * @param bool $orCreate creates the value of not exists.
-     *
-     * @return MountPoint[]
-     */
-    public function getMountPoints($orCreate = false)
-    {
-        if ($orCreate && null === $this->mountPoints) {
-            $this->mountPoints = [];
-        }
-
-        return $this->mountPoints;
-    }
-
-    /**
      * @param string $systemTitle
      */
     public function setSystemTitle($systemTitle)

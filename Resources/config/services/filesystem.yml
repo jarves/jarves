@@ -1,0 +1,31 @@
+services:
+     jarves.filesystem.adapter.local:
+         class: "%jarves.filesystem.adapter.local.class%"
+         calls:
+            - [setRoot, ["%kernel.root_dir%/../web"]]
+         tags:
+            - { name: jarves.filesystem.adapter, type: local }
+
+     jarves.filesystem.adapter.scp:
+         class: Jarves\Filesystem\Adapter\Flysystem
+         tags:
+            - { name: jarves.filesystem.adapter, type: sftp }
+
+     jarves.filesystem.adapter.cache:
+         class: "%jarves.filesystem.adapter.local.class%"
+         calls:
+            - [setRoot, ["%kernel.cache_dir%"]]
+
+     jarves.filesystem.local:
+         class: "%jarves.filesystem.local.class%"
+         calls:
+            - [setAdapter, ["@jarves.filesystem.adapter.local"]]
+
+     jarves.filesystem.cache:
+         class: "%jarves.filesystem.cache.class%"
+         calls:
+            - [setAdapter, ["@jarves.filesystem.adapter.cache"]]
+
+     jarves.filesystem.web:
+         class: "%jarves.filesystem.web.class%"
+         arguments: ["@jarves", "@jarves.config", "@service_container", "@jarves.filesystem.cache"]

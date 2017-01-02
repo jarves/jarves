@@ -19,6 +19,8 @@ use Jarves\Configuration\Connection;
 use Jarves\Configuration\Database;
 use Jarves\Configuration\EntryPoint;
 use Jarves\DependencyInjection\AssetCompilerCompilerPass;
+use Jarves\DependencyInjection\Compiler\FilesystemAdapterCompilerPass;
+use Jarves\DependencyInjection\Compiler\RackspaceOpenCloudCompilerPass;
 use Jarves\DependencyInjection\ModelBuilderCompilerPass;
 use Propel\Runtime\Connection\ConnectionManagerMasterSlave;
 use Propel\Runtime\Connection\ConnectionManagerSingle;
@@ -39,6 +41,7 @@ class JarvesBundle extends Bundle
     {
         $container->addCompilerPass(new ModelBuilderCompilerPass());
         $container->addCompilerPass(new AssetCompilerCompilerPass());
+        $container->addCompilerPass(new FilesystemAdapterCompilerPass());
 
         //necessary to get fos_rest_bundle working
         $container->loadFromExtension('framework', [

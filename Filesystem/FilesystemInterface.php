@@ -2,7 +2,7 @@
 
 namespace Jarves\Filesystem;
 
-use Jarves\File\FileInfoInterface;
+use Jarves\File\FileInfo;
 use Jarves\Filesystem\Adapter\AdapterInterface;
 
 interface FilesystemInterface {
@@ -23,13 +23,13 @@ interface FilesystemInterface {
 
     /**
      * @param string $path
-     * @return FileInfoInterface[]
+     * @return FileInfo[]
      */
     public function getFiles($path);
 
     /**
      * @param string $path
-     * @return FileInfoInterface
+     * @return FileInfo
      */
     public function getFile($path);
 

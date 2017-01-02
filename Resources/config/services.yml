@@ -1,3 +1,6 @@
+imports:
+    - { resource: 'services/filesystem.yml' }
+
 parameters:
      jarves.core.class: Jarves\Jarves
      jarves.config.class: Jarves\JarvesConfig
@@ -121,35 +124,6 @@ services:
      jarves.cache.response_cacher:
           class: "%jarves.cache.response_cacher.class%"
           arguments: ["@jarves", "@jarves.page_stack", "@jarves.cache.cacher", "@templating", "@jarves.page_response.factory"]
-
-     jarves.filesystem.adapter.local:
-         class: "%jarves.filesystem.adapter.local.class%"
-         shared: false
-         arguments: ["/"]
-         calls:
-             - [setJarves, ["@jarves"]]
-             - [setRoot, ["%kernel.root_dir%/.."]]
-
-     jarves.filesystem.adapter.cache:
-         class: "%jarves.filesystem.adapter.local.class%"
-         arguments: ["/"]
-         calls:
-             - [setJarves, ["@jarves"]]
-             - [setRoot, ["%kernel.cache_dir%"]]
-
-     jarves.filesystem.local:
-         class: "%jarves.filesystem.local.class%"
-         calls:
-            - [setAdapter, ["@jarves.filesystem.adapter.local"]]
-
-     jarves.filesystem.cache:
-         class: "%jarves.filesystem.cache.class%"
-         calls:
-            - [setAdapter, ["@jarves.filesystem.adapter.cache"]]
-
-     jarves.filesystem.web:
-         class: "%jarves.filesystem.web.class%"
-         arguments: ["@jarves", "@jarves.config", "@service_container", "@jarves.filesystem.cache"]
 
      jarves.navigation:
          class: "%jarves.navigation.class%"

@@ -37,7 +37,8 @@
         "friendsofsymfony/rest-bundle": "2.1.0",
         "nelmio/api-doc-bundle": "~2.5",
         "icap/html-diff": ">=1.0.1",
-        "kadet/keylighter": "^0.8.2"
+        "kadet/keylighter": "^0.8.2",
+        "league/flysystem": "^1.0"
     },
     "minimum-stability": "alpha",
     "require-dev": {

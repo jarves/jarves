@@ -44,5 +44,19 @@ class JarvesExtension extends Extension
 
         $definition = $container->getDefinition('jarves.asset_handler.scss');
         $definition->addArgument($config['assets']['sass_path']);
+
+        if (isset($config['mounts'])) {
+            $mountNames = array_keys($config['mounts']);
+            $web = $container->getDefinition('jarves.filesystem.web');
+            $web->addMethodCall('setMountNames', [$mountNames]);
+        }
+
+        $localAdapter = $container->getDefinition('jarves.filesystem.adapter.local');
+        $localAdapter->addArgument($config['file']['groupPermission']);
+        $localAdapter->addArgument($config['file']['everyonePermission']);
+        $localAdapter->addArgument($config['file']['disableModeChange']);
+        if (isset($config['file']['groupOwner'])) {
+            $localAdapter->addArgument($config['file']['groupOwner']);
+        }
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Jarves\Filesystem;
 
-use Jarves\File\FileInfoInterface;
 use Jarves\Filesystem\Adapter\Local;
 use Jarves\Jarves;
 use Jarves\File\FileInfo;
@@ -48,19 +47,33 @@ class WebFilesystem extends Filesystem
      */
     private $utils;
 
+    private $mountNames = [];
+
     /**
      * @param Jarves $jarves
      * @param JarvesConfig $jarvesConfig
      * @param ContainerInterface $container
      * @param Filesystem $cacheFilesystem
      */
-    function __construct(Jarves $jarves, JarvesConfig $jarvesConfig, ContainerInterface $container,
-                         Filesystem $cacheFilesystem)
+    function __construct(
+        Jarves $jarves,
+        JarvesConfig $jarvesConfig,
+        ContainerInterface $container,
+        Filesystem $cacheFilesystem
+    )
     {
         $this->jarves = $jarves;
         $this->jarvesConfig = $jarvesConfig;
         $this->container = $container;
         $this->cacheFilesystem = $cacheFilesystem;
+    }
+
+    /**
+     * @param array $mountNames
+     */
+    public function setMountNames(array $mountNames)
+    {
+        $this->mountNames = $mountNames;
     }
 
     /**
@@ -89,6 +102,19 @@ class WebFilesystem extends Filesystem
         return $fullPath ? $path : substr($path, strlen($tmp));
     }
 
+    public function getMountDirectory($path)
+    {
+        $path = trim($path, '//');
+        $folders = explode('/', $path);
+        $firstFolder = array_shift($folders) ?: '/';
+
+        if ('/' !== $firstFolder && in_array($firstFolder, $this->mountNames, true)) {
+            return $firstFolder;
+        }
+
+        return '';
+    }
+
     /**
      * @param string $path
      *
@@ -99,61 +125,55 @@ class WebFilesystem extends Filesystem
         $adapterServiceId = 'jarves.filesystem.adapter.local';
 
         $params['root'] = realpath($this->jarves->getRootDir() . '/../web/');
+        $mountDirectory = $this->getMountDirectory($path) ?: '/';
 
-        if ($path && '/' !== $path[0]) {
-            $path = '/' . $path;
+        if ('/' !== $mountDirectory) {
+            $adapterServiceId = 'jarves.filesystem.mount.' . $mountDirectory;
         }
 
-        if ($path != '/') {
-            $sPos = strpos(substr($path, 1), '/');
-            if (false === $sPos) {
-                $firstFolder = substr($path, 1);
-            } else {
-                $firstFolder = substr($path, 1, $sPos);
-            }
-        } else {
-            $firstFolder = '/';
+        if (isset($this->adapterInstances[$mountDirectory])) {
+            return $this->adapterInstances[$mountDirectory];
         }
 
-        if ('/' !== $firstFolder) {
-            //todo
-            $mounts = $this->jarvesConfig->getSystemConfig()->getMountPoints(true);
-
-            //if firstFolder a mounted folder?
-            if ($mounts && $mounts->hasMount($firstFolder)) {
-//                $mountPoint = $mounts->getMount($firstFolder);
-//                $adapterClass = $mountPoint->getClass();
-//                $params = $mountPoint->getParams();
-//                $mountName = $firstFolder;
-            } else {
-                $firstFolder = '/';
-            }
-        }
-
-        if (isset($this->adapterInstances[$firstFolder])) {
-            return $this->adapterInstances[$firstFolder];
-        }
-
-        $adapter = $this->newAdapter($adapterServiceId, $firstFolder, $params);
-        $adapter->setMountPath($firstFolder);
+        /** @var AdapterInterface $adapter */
+        $adapter = $this->container->get($adapterServiceId);
 
         if ($adapter instanceof ContainerAwareInterface) {
             $adapter->setContainer($this->container);
         }
 
-        $adapter->loadConfig();
-
-        return $this->adapterInstances[$firstFolder] = $adapter;
+        return $this->adapterInstances[$mountDirectory] = $adapter;
     }
 
     /**
      * {@inheritdoc}
      *
-     * @return FileInfoInterface|FileInfoInterface[]|File
+     * @return FileInfo
      */
     public function getFile($path)
     {
-        return $this->wrap(parent::getFile($path));
+        if ('/' === $path) {
+            $fileInfo = new FileInfo();
+            $fileInfo->setPath('/');
+            $fileInfo->setType('dir');
+            return $fileInfo;
+        }
+
+        $normalized = trim($path, "\\//\r\n");
+        if (in_array($normalized, $this->mountNames, true)) {
+            $fileInfo = new FileInfo();
+            $fileInfo->setPath('/' . $normalized);
+            $fileInfo->setType('dir');
+            $fileInfo->setMountPoint(true);
+            $fs = $this->getAdapter('/' . $normalized);
+            $fileInfo->setPublicUrl($fs->publicUrl(''));
+            return $fileInfo;
+        }
+
+        $files = parent::getFile($path);
+        $this->syncDatabase($files);
+
+        return $files;
     }
 
     /**
@@ -164,12 +184,16 @@ class WebFilesystem extends Filesystem
      * in references but an ID. This ID is related to the path. If a file path is changed
      * we need only to change one place (system_file table) instead of all references.
      *
-     * @param FileInfoInterface|FileInfoInterface[] $fileInfo
+     * @param FileInfo|FileInfo[] $fileInfo
      *
-     * @return FileInfoInterface|FileInfoInterface[]|File
+     * @return File[]|File
      */
-    public function wrap($fileInfo)
+    public function syncDatabase($fileInfo)
     {
+        if (null === $fileInfo) {
+            return null;
+        }
+
         if (is_array($fileInfo)) {
             $result = [];
             $paths = [];
@@ -189,7 +213,7 @@ class WebFilesystem extends Filesystem
 
             foreach ($fileInfo as $file) {
                 if (isset($files[$file->getPath()])) {
-                    $this->checkFileValues($file, $files[$file->getPath()]);
+                    $this->updateDatabaseFile($file, $files[$file->getPath()]);
                     $result[] = $files[$file->getPath()];
                 } else {
                     $result[] = $this->createFromPathInfo($file);
@@ -198,63 +222,46 @@ class WebFilesystem extends Filesystem
 
             return $result;
         } else {
-            if ($fileInfo instanceof File) {
-                return $fileInfo; //it's already a `File`, return it.
-            }
-
             $path = $fileInfo->getPath();
-            $fileObj = FileQuery::create()->orderById()->filterByPath($path)->groupByPath()->findOne();
-            if (!$fileObj) {
-                $fileObj = $this->createFromPathInfo($fileInfo);
+
+            $databaseFile = FileQuery::create()->orderById()->filterByPath($path)->groupByPath()->findOne();
+            if (!$databaseFile) {
+                $databaseFile = $this->createFromPathInfo($fileInfo);
             } else {
-                $this->checkFileValues($fileInfo, $fileObj);
+                $this->updateDatabaseFile($fileInfo, $databaseFile);
             }
 
-            return $fileObj;
+            return $databaseFile;
         }
-    }
-
-    /**
-     * @param string $serviceId
-     * @param string $mountPath
-     * @param array $params
-     * @return \Jarves\Filesystem\Adapter\AdapterInterface
-     */
-    public function newAdapter($serviceId, $mountPath, $params)
-    {
-        $service = $this->container->get($serviceId);
-        $service->setMountPath($mountPath);
-        $service->setParams($params);
-        return $service;
     }
 
     /**
      * @param string $path
-     * @return \Jarves\Model\File[]
+     * @return FileInfo[]
      */
     public function getFiles($path)
     {
         $items = parent::getFiles($path);
-        $fs = $this->getAdapter($path);
 
-        if ($fs->getMountPath()) {
-            foreach ($items as &$file) {
-                $file->setMountPoint($fs->getMountPath());
-            }
+        foreach ($items as &$file) {
+            $file->setMountPoint($this->getMountDirectory($path));
         }
 
+        $this->syncDatabase($items);
+
         if ('/' === $path) {
-            foreach ($this->jarvesConfig->getSystemConfig()->getMountPoints() as $mountPoint) {
+            foreach ($this->mountNames as $name) {
                 $fileInfo = new FileInfo();
-                $fileInfo->setPath('/' . $mountPoint->getPath());
-//                $fileInfo->setIcon($mountPoint->getIcon());
+                $fileInfo->setPath('/' . $name);
                 $fileInfo->setType(FileInfo::DIR);
                 $fileInfo->setMountPoint(true);
+                $fs = $this->getAdapter('/' . $name);
+                $fileInfo->setPublicUrl($fs->publicUrl(''));
                 array_unshift($items, $fileInfo);
             }
         }
 
-        return $this->wrap($items);
+        return $items;
     }
 
 
@@ -327,7 +334,7 @@ class WebFilesystem extends Filesystem
                     $content = $oldFs->read($this->normalizePath($oldFile));
                     $newFs->write($this->normalizePath($newPath), $content);
                 } else {
-                    if ('/' === $oldFs->getMountPath()) {
+                    if ($oldFs instanceof Local) {
                         /** @var Local $oldFs */
                         //just directly upload the stuff
                         $this->copyFolder($oldFs->getRoot() . $oldFile, $newPath);
@@ -343,16 +350,15 @@ class WebFilesystem extends Filesystem
                     $oldFs->delete($this->normalizePath($oldFile));
                     if ($this) {
                         $file->setPath($this->normalizePath($newPath));
-                        $file = $this->wrap($file);
-                        $file->save();
+                        $this->syncDatabase($file);
                     }
                 }
                 $result = true;
             }
             if ('move' === $action) {
-                $file = $this->wrap($file);
-                $file->setPath($this->normalizePath($newPath));
-                $file->save();
+                $databaseFile = $this->syncDatabase($file);
+                $databaseFile->setPath($this->normalizePath($newPath));
+                $databaseFile->save();
             }
         }
 
