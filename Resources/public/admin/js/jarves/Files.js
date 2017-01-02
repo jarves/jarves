@@ -723,7 +723,7 @@ jarves.Files = new Class({
             this.paste();
         }.bind(this));
 
-        var id = (Math.random() * 10 * (Math.random() * 10)).toString(36).slice(3);
+        var id = 'a' + (Math.random() * 10 * (Math.random() * 10)).toString(36).slice(3);
         var clipboardInput;
         this.optionsBarCopyLink = this.fileOptionsGroup.addButton('Copy url', '#icon-link-2', function() {
             var selectedFiles = this.getSelectedFilesAsArray();
