@@ -329,6 +329,10 @@ class Local extends AbstractAdapter
             }
             $file = $path . $file;
 
+            if (is_dir($file)) {
+                $file .= '/';
+            }
+
             $fileInfo->setPath(substr($file, strlen($this->getRoot()) - 1));
             $fileInfo->setType(is_dir($file) ? FileInfo::DIR : FileInfo::FILE);
             $fileInfo->setPublicUrl($this->publicUrl($path));

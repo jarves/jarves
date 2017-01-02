@@ -522,6 +522,11 @@ jarves.Files = new Class({
 
     parseAddressFaker: function() {
         var path = this.addressFaker.get('text');
+
+        if (path != '/' && path.substr(path.length - 1) == '/') {
+            path = path.substr(0, path.length - 1);
+        }
+
         var paths = '/' == path ? [''] : path.split('/');
 
         var tempPath = '';
@@ -534,12 +539,13 @@ jarves.Files = new Class({
         } else {
             paths.each(function(path) {
                 tempPath += '/' + path;
-                var target = tempPath + '';
+                var target = tempPath + '/';
+
                 new Element('a', {
-                    text: path
+                    text: path === '/' ? '/' : path.replace(/\//g, '')
                 }).addEvent('click', function() {
-                        this.load(target);
-                    }.bind(this)).inject(fragment);
+                    this.load(target);
+                }.bind(this)).inject(fragment);
             }.bind(this));
         }
 
@@ -672,6 +678,15 @@ jarves.Files = new Class({
         }.bind(this));
     },
 
+    openPublicSelected: function() {
+        var selected = this.getSelectedFilesAsArray();
+        if (!selected.length) return;
+
+        Array.each(selected, function(file) {
+            window.open(file.publicUrl, '_blank');
+        }.bind(this));
+    },
+
     newVersionForSelected: function() {
         var selected = this.getSelectedFilesAsArray();
         if (!selected.length) return;
@@ -697,6 +712,10 @@ jarves.Files = new Class({
 
         this.optionsBarOpenExternal = this.fileOptionsGroup.addButton('Open external', '#icon-forward-4', function() {
             this.openExternalSelected();
+        }.bind(this));
+
+        this.optionsBarOpenPublic = this.fileOptionsGroup.addButton('Open public', '#icon-forward-4', function() {
+            this.openPublicSelected();
         }.bind(this));
 
         this.optionsBarRename = this.fileOptionsGroup.addButton('Rename', '#icon-pencil', function() {
@@ -878,9 +897,11 @@ jarves.Files = new Class({
                 if (callback) callback(false);
                 return;
             }
+            this.showLoader(true);
             this.move(this.current + '/' + pFile.name, this.current + '/' + name, null, function(renamed) {
+                this.showLoader(false);
                 if (callback) callback(renamed, name);
-            });
+            }.bind(this));
         }.bind(this));
     },
 
@@ -1219,8 +1240,6 @@ jarves.Files = new Class({
             this.curRequest.cancel();
         }
 
-        path = this.normalizePath(path);
-
         this.showLoader(true);
         this.setAddressFakerAsFile(false);
         this.currentFile = this.path2File[path];
@@ -1251,7 +1270,7 @@ jarves.Files = new Class({
 
                     if (this.options.selection && (this.options.selectionValue == this.currentFile.path || this.options.selectionValue == this.currentFile.path.substr(1))) {
                         if (this.currentFile.path != '/') {
-                            this.load(this.currentFile.path.substr(0, this.currentFile.path.lastIndexOf('/')));
+                            this.load(this.currentFile.path);
                         }
                     } else {
                         this.load(path);

@@ -66,7 +66,7 @@ class Filesystem implements FilesystemInterface
 
             return $result;
         } else {
-            $path = '/' . trim($path, "\\//\n\r");
+            $path = '/' . ltrim($path, "\\//\n\r");
 
             $path = substr($path, strlen(trim($this->getMountDirectory($path), "\\//")) + 1);
 
@@ -140,7 +140,7 @@ class Filesystem implements FilesystemInterface
         $file->fromArray($array, TableMap::TYPE_CAMELNAME);
 
         $limit = 1024 * 1024 * 1024 * 5; //5 megabyte
-        if ($fileInfo->isFile() && $this->size($file->getPath()) < $limit) {
+        if (!$file->getHash() && $fileInfo->isFile() && $file->getSize() < $limit) {
             $file->setHash($this->hash($file->getPath()));
         }
         $file->save();

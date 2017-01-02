@@ -162,7 +162,7 @@ class WebFilesystem extends Filesystem
         $normalized = trim($path, "\\//\r\n");
         if (in_array($normalized, $this->mountNames, true)) {
             $fileInfo = new FileInfo();
-            $fileInfo->setPath('/' . $normalized);
+            $fileInfo->setPath('/' . $normalized . '/');
             $fileInfo->setType('dir');
             $fileInfo->setMountPoint(true);
             $fs = $this->getAdapter('/' . $normalized);
@@ -252,7 +252,7 @@ class WebFilesystem extends Filesystem
         if ('/' === $path) {
             foreach ($this->mountNames as $name) {
                 $fileInfo = new FileInfo();
-                $fileInfo->setPath('/' . $name);
+                $fileInfo->setPath('/' . $name . '/');
                 $fileInfo->setType(FileInfo::DIR);
                 $fileInfo->setMountPoint(true);
                 $fs = $this->getAdapter('/' . $name);
