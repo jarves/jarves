@@ -2,7 +2,7 @@ services:
      jarves.filesystem.adapter.local:
          class: "%jarves.filesystem.adapter.local.class%"
          calls:
-            - [setRoot, ["%kernel.root_dir%/../web"]]
+            - [setRoot, ["%kernel.root_dir%/../"]]
          tags:
             - { name: jarves.filesystem.adapter, type: local }
 
