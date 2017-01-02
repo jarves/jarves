@@ -122,7 +122,7 @@ class WebFilesystem extends Filesystem
      */
     public function getAdapter($path = null)
     {
-        $adapterServiceId = 'jarves.filesystem.adapter.local';
+        $adapterServiceId = 'jarves.filesystem.adapter.web';
 
         $params['root'] = realpath($this->jarves->getRootDir() . '/../web/');
         $mountDirectory = $this->getMountDirectory($path) ?: '/';

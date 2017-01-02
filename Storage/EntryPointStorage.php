@@ -80,11 +80,6 @@ class EntryPointStorage extends AbstractStorage
      */
     public function getItems(array $filter = null, Condition $condition = null, $options = null)
     {
-//        $adminUtils = new \Jarves\Admin\Utils($this->jarves);
-//        $entryPoint = $adminUtils->getEntryPoint('JarvesPublicationBundle');
-//        var_dump($entryPoint);
-//        exit;
-
         $result = [];
 
         foreach ($this->jarves->getBundles() as $bundle) {
@@ -93,12 +88,6 @@ class EntryPointStorage extends AbstractStorage
                 'title' => $bundle->getName()
             );
             $result[] = $item;
-
-//            $children = $this->getChildrenFlattenList($item['path']);
-
-//            $entryPoint = $adminUtils->getEntryPoint($item['path'], true);
-//            foreach ($entryPoint['children'] as $key => $entryPoint) {
-
         }
 
         return $result;

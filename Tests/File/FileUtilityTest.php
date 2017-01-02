@@ -54,7 +54,7 @@ class FileUtilityTest extends KernelAwareTestCase
         $fs->write($file, $content);
 
         $fileObj = $fs->getFile($file);
-        $this->assertInstanceOf('Jarves\\File\\FileInfoInterface', $fileObj);
+        $this->assertInstanceOf('Jarves\\File\\FileInfo', $fileObj);
 
         $this->assertFileExists($realPath . $file);
         $this->assertTrue($fs->has($file));
@@ -90,13 +90,13 @@ class FileUtilityTest extends KernelAwareTestCase
         $this->assertCount(10, $files);
         $this->assertEquals(10, $fs->getCount($dir));
 
-        $this->assertInstanceOf('Jarves\\File\\FileInfoInterface', $files[0]);
+        $this->assertInstanceOf('Jarves\\File\\FileInfo', $files[0]);
         $this->assertEquals('file1', $files[0]->getName());
         $this->assertEquals('file5', $files[4]->getName());
         $this->assertEquals('file10', $files[9]->getName());
 
         $file1 = $fs->getFile($dir . '/file1');
-        $this->assertInstanceOf('Jarves\\File\\FileInfoInterface', $file1);
+        $this->assertInstanceOf('Jarves\\File\\FileInfo', $file1);
         $this->assertEquals('/test_utility_folder/file1', $file1->getPath());
         $this->assertEquals('file1', $file1->getName());
         $this->assertEquals('/test_utility_folder', $file1->getDir());

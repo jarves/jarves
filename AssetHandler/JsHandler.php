@@ -132,7 +132,8 @@ EOF
         $md5Line = '/* ' . md5($md5String) . " */\n";
 
         $oFile = 'cache/compressed-js/' . md5($md5String) . '.js';
-        $handle = @fopen($this->getJarves()->getRootDir() . '/../web/' . $oFile, 'r');
+        $cachePath = $this->getJarves()->getRootDir() . '/../web/' . $oFile;
+        $handle = @fopen($cachePath, 'r');
         if ($handle) {
             $line = fgets($handle);
             fclose($handle);

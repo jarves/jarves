@@ -370,6 +370,10 @@ class Local extends AbstractAdapter
 
         $file->setType(is_dir($path) ? 'dir' : 'file');
 
+        if ($file->isDir()) {
+            $file->setPath($file->getPath() . '/');
+        }
+
         $file->setCreatedTime(filectime($path));
         $file->setModifiedTime(filectime($path));
         $file->setSize(filesize($path));

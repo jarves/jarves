@@ -6,6 +6,11 @@ services:
          tags:
             - { name: jarves.filesystem.adapter, type: local }
 
+     jarves.filesystem.adapter.web:
+         class: "%jarves.filesystem.adapter.local.class%"
+         calls:
+            - [setRoot, ["%kernel.root_dir%/../web"]]
+
      jarves.filesystem.adapter.scp:
          class: Jarves\Filesystem\Adapter\Flysystem
          tags:
