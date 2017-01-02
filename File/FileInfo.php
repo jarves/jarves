@@ -34,7 +34,7 @@ class FileInfo
     /**
      * @var string FileInfo::FILE|FileInfo::DIR
      */
-    private $type;
+    private $type = FileInfo::FILE;
 
     /**
      * @var string
@@ -42,9 +42,9 @@ class FileInfo
     private $hash;
 
     /**
-     * @var string
+     * @var integer
      */
-    private $size;
+    private $size = 0;
 
     /**
      * @var integer
@@ -282,7 +282,7 @@ class FileInfo
     }
 
     /**
-     * @param int $createdTime
+     * @param int $createdTime unix timestamp
      */
     public function setCreatedTime($createdTime)
     {
@@ -290,7 +290,7 @@ class FileInfo
     }
 
     /**
-     * @param int $modifiedTime
+     * @param int $modifiedTime unix timestamp
      */
     public function setModifiedTime($modifiedTime)
     {

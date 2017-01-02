@@ -1483,7 +1483,7 @@ jarves.Files = new Class({
                     'class': 'jarves-Full'
                 }).inject(this.fileContainer);
 
-                var mode = 'text';
+                var mode = 'htmlmixed';
                 var modes = {
                     'php': 'php',
                     'js': 'javascript',
