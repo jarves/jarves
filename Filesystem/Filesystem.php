@@ -68,11 +68,10 @@ class Filesystem implements FilesystemInterface
         } else {
             $path = '/' . ltrim($path, "\\//\n\r");
 
+            //remove mount name from path
             $path = substr($path, strlen(trim($this->getMountDirectory($path), "\\//")) + 1);
 
-            if ('/' !== $path[0]) {
-                $path = '/' . $path;
-            }
+            $path = '/' . ltrim($path, "\\//\n\r");
 
             $path = str_replace('..', '', $path);
             $path = str_replace('//', '/', $path);
