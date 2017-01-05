@@ -67,14 +67,25 @@ class FileExtension extends \Twig_Extension
     public function resizeImage($id, $maxWidth = 100, $maxHeight = 100, $quality = 8)
     {
         $path = $this->webFilesystem->getPath($id);
-        $cacheDir = 'cache/rendered-image/' . $path;
 
-        //@todo handle cacche
-        $image = $this->webFilesystem->getResizeMax($path, $maxWidth, $maxHeight);
+        $cachePath = 'cache/rendered-image/' . $path;
 
-        $this->webFilesystem->writeImage($image->getResult(), $cacheDir, $quality);
+        if (false !== $pos = strrpos($cachePath, '.')) {
+            $ext = substr($cachePath, $pos);
+            $cachePath = substr($cachePath, 0, $pos);
 
-        return $cacheDir;
+            $cachePath .= '_' . $maxHeight . 'x' . $maxHeight . '.' . $quality . '.' . $ext;
+        } else {
+            $cachePath .= '_' . $maxHeight . 'x' . $maxHeight . '.' . $quality;
+        }
+
+        if (!$this->webFilesystem->has($cachePath)) {
+            $image = $this->webFilesystem->getResizeMax($path, $maxWidth, $maxHeight);
+
+            $this->webFilesystem->writeImage($image->getResult(), $cachePath, $quality);
+        }
+
+        return $cachePath;
     }
 
     /**
@@ -89,14 +100,24 @@ class FileExtension extends \Twig_Extension
     public function thumbnail($id, $maxWidth = 100, $maxHeight = 100, $quality = 8, $resize = true)
     {
         $path = $this->webFilesystem->getPath($id);
-        $cacheDir = 'cache/rendered-image/' . $path;
+        $cachePath = 'cache/rendered-image/' . ltrim($path, '/');
 
-        //@todo handle cacche
-        $image = $this->webFilesystem->getThumbnail($path, $maxWidth . 'x' . $maxHeight);
+        if (false !== $pos = strrpos($cachePath, '.')) {
+            $ext = substr($cachePath, $pos);
+            $cachePath = substr($cachePath, 0, $pos);
 
-        $this->webFilesystem->writeImage($image, $cacheDir, $quality);
+            $cachePath .= '_' . $maxHeight . 'x' . $maxHeight . '.' . $quality . $ext;
+        } else {
+            $cachePath .= '_' . $maxHeight . 'x' . $maxHeight . '.' . $quality;
+        }
 
-        return $cacheDir;
+        if (!$this->webFilesystem->has($cachePath)) {
+            $image = $this->webFilesystem->getThumbnail($path, $maxWidth . 'x' . $maxHeight);
+
+            $this->webFilesystem->writeImage($image, $cachePath, $quality);
+        }
+
+        return $cachePath;
     }
 
     /**
