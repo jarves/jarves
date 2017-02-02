@@ -25,8 +25,8 @@ class Content extends \Twig_Node
         $this->name = $name;
 
         parent::__construct(
-            array('id' => $id, 'type' => $type, 'options' => $options),
-            array('optional' => filter_var($optional, FILTER_VALIDATE_BOOLEAN)),
+            array('id' => $id),
+            array('optional' => filter_var($optional, FILTER_VALIDATE_BOOLEAN), 'type' => $type, 'options' => $options),
             $line,
             $tag
         );
@@ -45,14 +45,14 @@ class Content extends \Twig_Node
             ->addDebugInfo($this)
             ->write("\$renderParams = [];\n");
 
-        if (null !== $type = $this->getNode('type')) {
+        if (null !== $type = $this->getAttribute('type')) {
             $compiler
                 ->write("\$renderParams['type'] = ")
                 ->subcompile($type)
                 ->write(";\n");
         }
 
-        if (null !== $options = $this->getNode('options')) {
+        if (null !== $options = $this->getAttribute('options')) {
             $compiler
                 ->write("\$renderParams['options'] = ")
                 ->subcompile($options)
