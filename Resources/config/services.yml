@@ -105,12 +105,12 @@ services:
 
      jarves.cache.fast:
          class: "%jarves.cache.fast.class%"
-         factory: [%jarves.cache.factory.class%, createFast]
+         factory: ["%jarves.cache.factory.class%", createFast]
          arguments: ["@service_container", "@jarves.config"]
 
      jarves.cache.distributed:
          class: "%jarves.cache.fast.class%"
-         factory: [%jarves.cache.factory.class%, createDistributed]
+         factory: ["%jarves.cache.factory.class%", createDistributed]
          arguments: ["@service_container", "@jarves.config"]
 
      jarves.content.render:
@@ -138,7 +138,6 @@ services:
 
      jarves.paramFetcher.listener:
         class: "%jarves.paramFetcher.listener.class%"
-        scope: request
         arguments: ["@jarves.page_stack", "@fos_rest.request.param_fetcher"]
         tags:
             - { name: kernel.event_listener, event: kernel.controller, prioarity: 6 }
