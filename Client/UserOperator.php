@@ -85,7 +85,7 @@ class UserOperator
         }
 
         if (null !== $requiredGroupRole) {
-            $groupRoles = $user->getGroupRoles();
+            $groupRoles = $user->getRoles();
 
             if (!in_array($requiredGroupRole, $groupRoles)) {
                 $this->logger->warning(sprintf('Login failed for "%s". Not in requested group role "%s" vs "%s"', $username, $requiredGroupRole, implode(',', $groupRoles)));

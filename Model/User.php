@@ -14,7 +14,6 @@
 
 namespace Jarves\Model;
 
-use Jarves\Client\ClientAbstract;
 use Jarves\Jarves;
 use Jarves\Model\Base\User as BaseUser;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -56,12 +55,20 @@ class User extends BaseUser implements UserInterface
     }
 
     /**
+     * @param string $role
+     * @return boolean
+     */
+    public function hasRole($role)
+    {
+        return in_array($role, $this->getRoles());
+    }
+
+    /**
      * Return all groups, converted it names to role names.
      *
-     * @return string[]
-     * @throws \Propel\Runtime\Exception\PropelException
+     * {@inheritdoc}
      */
-    public function getGroupRoles()
+    public function getRoles()
     {
         $names = GroupQuery::create()
             ->select('Name')
@@ -77,23 +84,6 @@ class User extends BaseUser implements UserInterface
     }
 
     /**
-     * @param string $role
-     * @return boolean
-     */
-    public function hasRole($role)
-    {
-        return in_array($role, $this->getGroupRoles());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRoles()
-    {
-        return $this->getGroupRoles();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getSalt()
@@ -106,6 +96,6 @@ class User extends BaseUser implements UserInterface
      */
     public function eraseCredentials()
     {
-        throw new \RuntimeException('This method is not implemented.');
+        $this->password = null;
     }
 }

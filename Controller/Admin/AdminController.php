@@ -235,7 +235,7 @@ class AdminController extends Controller
             return false;
         }
 
-        $token = new UsernamePasswordToken($user, null, "main", $user->getGroupRoles());
+        $token = new UsernamePasswordToken($user, null, "main", $user->getRoles());
         $this->tokenStorage->setToken($token);
 
         //now dispatch the login event
