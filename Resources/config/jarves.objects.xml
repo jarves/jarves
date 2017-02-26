@@ -130,6 +130,9 @@
             <label>Access denied</label>
             <description>For everyone. This removes the page from the navigation.</description>
           </field>
+          <field id="metaDescription" type="text">
+            <label>Meta Description</label>
+          </field>
           <field id="meta" type="text">
             <label>Meta tags</label>
           </field>
