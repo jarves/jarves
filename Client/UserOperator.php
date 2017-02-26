@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
 class UserOperator
@@ -145,11 +146,11 @@ class UserOperator
     }
 
     /**
-     * @param User $user
+     * @param UserInterface $user
      */
-    public function manualLogin(User $user)
+    public function manualLogin(UserInterface $user)
     {
-        $token = new UsernamePasswordToken($user, null, "main", $user->getGroupRoles());
+        $token = new UsernamePasswordToken($user, null, "main", $user->getRoles());
         $this->tokenStorage->setToken($token);
 
         //now dispatch the login event
