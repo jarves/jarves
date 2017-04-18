@@ -481,6 +481,11 @@ class Jarves
             return Tools::getRelativePath($path, $root);
         }
 
+        //to remove '/' if it is at the start of route
+		if ('/' === $path[0]) {
+            $path = substr($path, 1);
+        }
+        
         return $path;
     }
 
