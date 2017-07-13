@@ -118,16 +118,27 @@ class ScssHandler extends AbstractHandler implements CompileHandlerInterface
             $this->resolveDependencies($localPath, $dependencies);
 
             $processBuilder = new ProcessBuilder();
-            $processBuilder
-                ->setInput(file_get_contents($localPath))
-                ->add($this->sassPath)
-                ->add('--scss')
-                ->add('--no-cache')
-                ->add('--unix-newlines')
-                ->add('--load-path')
-                ->add(dirname($localPath))
-                ->add($localPath)
-                ->enableOutput();
+
+            if ('sassc' === basename($this->sassPath)) {
+                $processBuilder
+                    ->setInput(file_get_contents($localPath))
+                    ->add($this->sassPath)
+                    ->add('--load-path')
+                    ->add(dirname($localPath))
+                    ->add($localPath)
+                    ->enableOutput();
+            } else {
+                $processBuilder
+                    ->setInput(file_get_contents($localPath))
+                    ->add($this->sassPath)
+                    ->add('--scss')
+                    ->add('--no-cache')
+                    ->add('--unix-newlines')
+                    ->add('--load-path')
+                    ->add(dirname($localPath))
+                    ->add($localPath)
+                    ->enableOutput();
+            }
 
             $process = $processBuilder->getProcess();
             $process->start();
