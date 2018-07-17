@@ -55,7 +55,7 @@ Features
  - Based on Symfony
  - Based on Propel ORM (Propel supports MySQL, PostgreSQL, SQLite, MSSQL, and Oracle), http://www.propelorm.org
  - Advanced, fast and fresh administration interface
- - The administration API is completely abstracted through a [REST API](http://jarves.io/bundles/app/images/screenshots/rest-api.png)
+ - The administration API is completely abstracted through a [REST API](https://raw.githubusercontent.com/jarves/jarves.io/master/src/AppBundle/Resources/public/images/screenshots/rest-api.png)
  - File abstraction layer (for mounts with external storages [s3, ftp, dropbox, etc]), CDN
  - i18n using `getText` (with all of its features [e.g. including plural support, contexts]) compatible .po files
  - High-Performance through several cache layers
@@ -72,12 +72,12 @@ Features
 Screenshot
 ----------
 
-![Administration Login](http://jarves.io/bundles/app/images/screenshots/admin-login.png)
+![Administration Login](https://raw.githubusercontent.com/jarves/jarves.io/master/src/AppBundle/Resources/public/images/screenshots/admin-login.png)
 
 ### Frontend inline editing
 
-![Administration Frontend Edit](http://jarves.io/bundles/app/images/screenshots/admin-frontend-edit.png)
-![Administration Frontend Edit 2](http://jarves.io/bundles/app/images/screenshots/admin-frontend-edit-content-elements.png)
+![Administration Frontend Edit](https://raw.githubusercontent.com/jarves/jarves.io/master/src/AppBundle/Resources/public/images/screenshots/admin-frontend-edit.png)
+![Administration Frontend Edit 2](https://raw.githubusercontent.com/jarves/jarves.io/master/src/AppBundle/Resources/public/images/screenshots/admin-frontend-edit-content-elements.png)
 
 ### File manager
 
@@ -88,22 +88,22 @@ Screenshot
 5. File Abstraction Layer (for AWS S3 inside Jarves for example)
 6. Async file uploaded
 
-![Administration File manager](http://jarves.io/bundles/app/images/screenshots/admin-files-context-image.png)
-![Administration File manager Images](http://jarves.io/bundles/app/images/screenshots/admin-files-context-image2.png)
-![Administration File manager Crop](http://jarves.io/bundles/app/images/screenshots/admin-files-image-crop.png)
-![Administration File manager Editor](http://jarves.io/bundles/app/images/screenshots/admin-file-codemirror.png)
+![Administration File manager](https://raw.githubusercontent.com/jarves/jarves.io/master/src/AppBundle/Resources/public/images/screenshots/admin-files-context-image.png)
+![Administration File manager Images](https://raw.githubusercontent.com/jarves/jarves.io/master/src/AppBundle/Resources/public/images/screenshots/admin-files-context-image2.png)
+![Administration File manager Crop](https://raw.githubusercontent.com/jarves/jarves.io/master/src/AppBundle/Resources/public/images/screenshots/admin-files-image-crop.png)
+![Administration File manager Editor](https://raw.githubusercontent.com/jarves/jarves.io/master/src/AppBundle/Resources/public/images/screenshots/admin-file-codemirror.png)
 
 ### CRUD Framework
-![Administration CRUD List](http://jarves.io/bundles/app/images/screenshots/admin-crud-list.png)
-![Administration CRUD Form](http://jarves.io/bundles/app/images/screenshots/admin-crud-form.png)
-![Administration CRUD Objects](http://jarves.io/bundles/app/images/screenshots/admin-extensioneditor-objects.png)
+![Administration CRUD List](https://raw.githubusercontent.com/jarves/jarves.io/master/src/AppBundle/Resources/public/images/screenshots/admin-crud-list.png)
+![Administration CRUD Form](https://raw.githubusercontent.com/jarves/jarves.io/master/src/AppBundle/Resources/public/images/screenshots/admin-crud-form.png)
+![Administration CRUD Objects](https://raw.githubusercontent.com/jarves/jarves.io/master/src/AppBundle/Resources/public/images/screenshots/admin-extensioneditor-objects.png)
 
 ### Permission System
 
 Very detailed permission system.
 
-![Permission System Entry Points](http://jarves.io/bundles/app/images/screenshots/admin-permission-management1.png)
-![Permission System Objects](http://jarves.io/bundles/app/images/screenshots/admin-permission-management2.png)
+![Permission System Entry Points](https://raw.githubusercontent.com/jarves/jarves.io/master/src/AppBundle/Resources/public/images/screenshots/admin-permission-management1.png)
+![Permission System Objects](https://raw.githubusercontent.com/jarves/jarves.io/master/src/AppBundle/Resources/public/images/screenshots/admin-permission-management2.png)
 
 [More Screenshots](http://jarves.io/documentation/quick-start/screenshots)
 
